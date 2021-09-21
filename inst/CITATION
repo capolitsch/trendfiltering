@@ -1,0 +1,15 @@
+citHeader("To cite the modeltools package in publications use:")
+
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
+
+bibentry(bibtype = "Manual",
+         title = "{trendfiltering}: Denoising one-dimensional data with trend filtering",
+         author = c(person(given = "Collin A.",
+                             family = "Politsch",
+                             role = "aut",
+                             comment = c(ORCID = "0000-0003-3727-9167"))
+                   )
+         year = year,
+         note = note,,
+         key = "trendfiltering")
