@@ -5,7 +5,8 @@ Version: 0.1.0
 Date: 2021-09-29
 Authors@R: c(person(given = "Collin A.",
                     family = "Politsch",
-                    role = "aut",
+                    role = c("aut","cre"),
+                    email = "collinpolitsch@gmail.com",
                     comment = c(ORCID = "0000-0003-3727-9167"))
             )
 URL: https://github.com/capolitsch
