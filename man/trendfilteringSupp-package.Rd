@@ -3,7 +3,7 @@
 \docType{package}
 \name{trendfilteringSupp-package}
 \alias{trendfilteringSupp-package}
-\title{Optimal one-dimensional data analysis with trend filtering}
+\title{Optimal one-dimensional data analysis with trend filtering (under construction)}
 \description{
 This package serves as a software supplement to
 \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
