@@ -112,9 +112,10 @@ trend filtering estimate.}
 \loadmathjax{} \code{bootstrap.trendfilter} implements a
 parametric bootstrap algorithm to obtain one or both of the following:
 \enumerate{
-\item{Standard errors of the optimized trend filtering point estimator}
-\item{Percentile-based \code{1-alpha} variability bands of the optimized
-trend filtering point estimator.}}
+\item Standard errors of the optimized trend filtering point estimator
+\item Percentile-based \code{1-alpha} variability bands of the optimized
+trend filtering point estimator.
+}
 }
 \details{
 See
