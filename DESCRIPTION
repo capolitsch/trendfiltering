@@ -2,7 +2,7 @@ Package: trendfiltering
 Type: Package
 Title: Denoising one-dimensional data with trend filtering
 Version: 0.1.0
-Date: 2021-09-21
+Date: 2021-09-29
 Authors@R: c(person(given = "Collin A.",
                     family = "Politsch",
                     role = "aut",
@@ -26,7 +26,7 @@ Imports:
   dplyr (>= 1.0.5), 
   tidyr (>= 1.1.3),
   matrixStats (>= 0.58.0), 
-  magrittr (>= 2.0.1)
+  magrittr (>= 2.0.1),
   tidyselect,
   knitr,
   rmarkdown
