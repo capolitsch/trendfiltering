@@ -25,6 +25,7 @@
 #' utilize. Defaults to the number of cores detected.
 #' @return An object of class 'bootstrap.trendfilter'. This is a comprehensive
 #' list containing all of the analysis' important information, data, and results:
+#' \enumerate{
 #' \item{x.eval}{(Inherited from \code{obj}) The grid of inputs the trend 
 #' filtering estimate and variability bands were evaluated on.}
 #' \item{tf.estimate}{The trend filtering estimate of the signal, evaluated on 
@@ -90,6 +91,7 @@
 #' algorithm to converge within the given tolerance, for each bootstrap
 #' trend filtering estimate.}
 #' \item{x.scale, y.scale, data.scaled}{for internal use.}
+#' }
 #' @details See
 #' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
 #' Politsch et al. (2020a)} for the full parametric bootstrap algorithm. 

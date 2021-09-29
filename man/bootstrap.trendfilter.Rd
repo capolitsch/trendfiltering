@@ -40,6 +40,7 @@ utilize. Defaults to the number of cores detected.}
 \value{
 An object of class 'bootstrap.trendfilter'. This is a comprehensive
 list containing all of the analysis' important information, data, and results:
+\enumerate{
 \item{x.eval}{(Inherited from \code{obj}) The grid of inputs the trend
 filtering estimate and variability bands were evaluated on.}
 \item{tf.estimate}{The trend filtering estimate of the signal, evaluated on
@@ -105,6 +106,7 @@ specified by \code{obj_tol}. In which case, it is often prudent to increase
 algorithm to converge within the given tolerance, for each bootstrap
 trend filtering estimate.}
 \item{x.scale, y.scale, data.scaled}{for internal use.}
+}
 }
 \description{
 \loadmathjax{} \code{bootstrap.trendfilter} implements a
