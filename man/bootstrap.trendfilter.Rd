@@ -40,7 +40,6 @@ utilize. Defaults to the number of cores detected.}
 \value{
 An object of class 'bootstrap.trendfilter'. This is a comprehensive
 list containing all of the analysis' important information, data, and results:
-\enumerate{
 \item{x.eval}{(Inherited from \code{obj}) The grid of inputs the trend
 filtering estimate and variability bands were evaluated on.}
 \item{tf.estimate}{The trend filtering estimate of the signal, evaluated on
@@ -134,7 +133,7 @@ Notices of the Royal Astronomical Society}, 492(3), p. 4019-4032.
 }
 }
 \seealso{
-\code{\link{bootstrap.trendfilter}}
+\code{\link{SURE.trendfilter}}
 }
 \author{
 Collin A. Politsch, \email{collinpolitsch@gmail.com}

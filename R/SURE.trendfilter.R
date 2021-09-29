@@ -124,10 +124,9 @@
 #' \strong{[Link]}}}
 #' }
 
-
 #' @importFrom tidyr drop_na tibble
-#' @importFrom magrittr %>% %$%
-#' @importFrom dplyr arrange filter
+#' @importFrom magrittr %$%
+#' @importFrom dplyr %>% arrange filter
 #' @importFrom glmgen trendfilter.control.list
 SURE.trendfilter <- function(x,
                              y,

@@ -24,7 +24,6 @@
 #' utilize. Defaults to the number of cores detected.
 #' @return An object of class 'bootstrap.trendfilter'. This is a comprehensive
 #' list containing all of the analysis' important information, data, and results:
-#' \enumerate{
 #' \item{x.eval}{(Inherited from \code{obj}) The grid of inputs the trend 
 #' filtering estimate and variability bands were evaluated on.}
 #' \item{tf.estimate}{The trend filtering estimate of the signal, evaluated on 
@@ -91,9 +90,9 @@
 #' trend filtering estimate.}
 #' \item{x.scale, y.scale, data.scaled}{for internal use.}
 #' @details Further details...
-#' @export SURE.trendfilter
+#' @export bootstrap.trendfilter
 #' @author Collin A. Politsch, \email{collinpolitsch@@gmail.com}
-#' @seealso \code{\link{bootstrap.trendfilter}}
+#' @seealso \code{\link{SURE.trendfilter}}
 #' @references 
 #' \enumerate{
 #' \item{Politsch et al. (2020a). Trend filtering – I. A modern 

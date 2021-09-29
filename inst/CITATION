@@ -7,9 +7,8 @@ bibentry(bibtype = "Manual",
          title = "{trendfiltering}: Denoising one-dimensional data with trend filtering",
          author = c(person(given = "Collin A.",
                              family = "Politsch",
-                             role = "aut",
+                             role = c("aut","cre"),
                              comment = c(ORCID = "0000-0003-3727-9167"))
                    )
-         year = year,
-         note = note,,
+         year = 2021,
          key = "trendfiltering")

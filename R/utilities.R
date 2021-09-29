@@ -1,9 +1,11 @@
+#' Extra functions for working with SALT Observatory spectra
+
 #' @importFrom dplyr %>%
 #' @importFrom magrittr %$%
 #' @noRd
 #' @export
-trendfilter.interval <- function(x, y, weights, 
-                                 B = 100, alpha = 0.05, bootstrap.bands = T,
+trendfilter.interval <- function(x, y, weights, bootstrap.bands = T,
+                                 B = 100, alpha = 0.05, 
                                  max_iter = 5000, obj_tol = 1e-12, ...){
   
   SURE.out <- SURE.trendfilter(x = x,
@@ -19,7 +21,6 @@ trendfilter.interval <- function(x, y, weights,
     return(boot.out)
   }
 }
-
 
 #' @noRd
 #' @export
@@ -83,26 +84,24 @@ mask.intervals <- function(df, min.mask.width = 20){
   return(df)
 }
 
+##########
 
 #' @noRd
 #' @export
-plot.spectrum <- function(denoise.out){
+plot_spectrum <- function(denoise.out){
   
 }
-
 
 #' @noRd
 #' @export
 transparency <- function(color, trans){
   
-  num2hex <- function(x)
-  {
+  num2hex <- function(x){
     hex <- unlist(strsplit("0123456789ABCDEF",split=""))
     return(paste(hex[(x-x%%16)/16+1],hex[x%%16+1],sep=""))
   }
+  
   rgb <- rbind(col2rgb(color),trans)
   res <- paste("#",apply(apply(rgb,2,num2hex),2,paste,collapse=""),sep="")
   return(res)
-  
-  
 }
