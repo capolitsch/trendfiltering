@@ -2,7 +2,6 @@
 
 S3method(plot,spectrum)
 export(SURE.trendfilter)
-export(bootstrap.trendfilter)
 export(mask.intervals)
 export(transparency)
 export(trendfilter.interval)

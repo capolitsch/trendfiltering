@@ -90,24 +90,22 @@
 #' algorithm to converge within the given tolerance, for each bootstrap
 #' trend filtering estimate.}
 #' \item{x.scale, y.scale, data.scaled}{for internal use.}
-#' }
-#' @details See
-#' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-#' Politsch et al. (2020a)} for the full parametric bootstrap algorithm. 
-#' @export bootstrap.trendfilter
+#' @details Further details...
+#' @export SURE.trendfilter
 #' @author Collin A. Politsch, \email{collinpolitsch@@gmail.com}
-#' @seealso \code{\link{SURE.trendfilter}}
+#' @seealso \code{\link{bootstrap.trendfilter}}
 #' @references 
 #' \enumerate{
 #' \item{Politsch et al. (2020a). Trend filtering – I. A modern 
 #' statistical tool for time-domain astronomy and astronomical spectroscopy. 
 #' \emph{Monthly Notices of the Royal Astronomical Society}, 492(3), 
-#' p. 4005-4018.
-#' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{[Link]}} \cr
+#' p. 4005-4018. 
+#' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{\strong{[Link]}}}
 #' \item{Politsch et al. (2020b). Trend Filtering – II. Denoising 
 #' astronomical signals with varying degrees of smoothness. \emph{Monthly 
 #' Notices of the Royal Astronomical Society}, 492(3), p. 4019-4032.
-#' \href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{[Link]}} \cr
+#' \href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
+#' \strong{[Link]}}}
 #' }
 
 

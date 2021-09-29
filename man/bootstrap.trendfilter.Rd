@@ -107,7 +107,6 @@ algorithm to converge within the given tolerance, for each bootstrap
 trend filtering estimate.}
 \item{x.scale, y.scale, data.scaled}{for internal use.}
 }
-}
 \description{
 \loadmathjax{} \code{bootstrap.trendfilter} implements a
 parametric bootstrap algorithm to obtain one or both of the following:
@@ -118,9 +117,7 @@ trend filtering point estimator.
 }
 }
 \details{
-See
-\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-Politsch et al. (2020a)} for the full parametric bootstrap algorithm.
+Further details...
 }
 \references{
 \enumerate{
@@ -128,15 +125,16 @@ Politsch et al. (2020a)} for the full parametric bootstrap algorithm.
 statistical tool for time-domain astronomy and astronomical spectroscopy.
 \emph{Monthly Notices of the Royal Astronomical Society}, 492(3),
 p. 4005-4018.
-\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{\link{Link}}} \cr
+\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{\strong{\link{Link}}}}
 \item{Politsch et al. (2020b). Trend Filtering – II. Denoising
 astronomical signals with varying degrees of smoothness. \emph{Monthly
 Notices of the Royal Astronomical Society}, 492(3), p. 4019-4032.
-\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{\link{Link}}} \cr
+\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
+\strong{\link{Link}}}}
 }
 }
 \seealso{
-\code{\link{SURE.trendfilter}}
+\code{\link{bootstrap.trendfilter}}
 }
 \author{
 Collin A. Politsch, \email{collinpolitsch@gmail.com}
