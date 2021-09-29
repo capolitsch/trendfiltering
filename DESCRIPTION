@@ -1,6 +1,7 @@
 Package: trendfiltering
 Type: Package
 Title: Denoising one-dimensional data with trend filtering
+Description: Denoising one-dimensional data with trend filtering
 Version: 0.1.0
 Date: 2021-09-29
 Authors@R: c(person(given = "Collin A.",
@@ -9,9 +10,8 @@ Authors@R: c(person(given = "Collin A.",
                     email = "collinpolitsch@gmail.com",
                     comment = c(ORCID = "0000-0003-3727-9167"))
             )
-URL: https://github.com/capolitsch
+URL: https://github.com/capolitsch/trendfiltering
 BugReports: https://github.com/capolitsch/trendfiltering/issues
-Description: Denoising one-dimensional data with trend filtering
 License: MIT
 Encoding: UTF-8
 LazyData: true

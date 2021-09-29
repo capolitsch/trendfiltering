@@ -103,6 +103,5 @@ transparency <- function(color, trans){
   rgb <- rbind(col2rgb(color),trans)
   res <- paste("#",apply(apply(rgb,2,num2hex),2,paste,collapse=""),sep="")
   return(res)
-  
-  
+
 }
