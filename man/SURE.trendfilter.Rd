@@ -148,12 +148,12 @@ values, which should typically be equally-spaced in log-space. The full error
 curve and the optimized trend filtering estimate are returned within a
 list that also includes useful ancillary information.
 
-Given the choice of \mjeqn{$k$}{ascii}, the hyperparameter
-\mjeqn{$\gamma$}{ascii} is used to tune the complexity (i.e. the wiggliness)
+Given the choice of \mjeqn{k}{ascii}, the hyperparameter
+\mjeqn{\gamma}{ascii} is used to tune the complexity (i.e. the wiggliness)
 of the trend filtering estimate by weighting the tradeoff between the
 complexity of the estimate and the size of the squared residuals. Obtaining
 an accurate estimate is therefore intrinsically tied to finding an optimal
-choice of \mjeqn{$\gamma$}{ascii}. The selection of \mjeqn{$\gamma$}{ascii}
+choice of \mjeqn{\gamma}{ascii}. The selection of \mjeqn{\gamma}{ascii}
 is typically done by minimizing an estimate of the mean-squared prediction
 error (MSPE) of the trend filtering estimator. Here, there are two different
 notions of error to consider, namely, \emph{fixed-input} error
@@ -162,6 +162,11 @@ which type of error to consider is made based on how the inputs are sampled.
 As a general rule-of-thumb, we recommend optimizing with respect to
 fixed-input error when the inputs are regularly-sampled and optimizing with
 respect to random-input error on irregularly-sampled data.
+
+Recall the DGP stated in (link) and let it be denoted by
+$Q$ so that \mjeqn{\mathbb{E}_Q\link[=\\cdot]{\cdot}}{ascii} is the mathematical expectation
+with respect to the randomness of the DGP. Further, let
+\mjeqn{\sigma_i^2 = \text{Var}(\epsilon_i)}{ascii}.
 }
 \references{
 \enumerate{
