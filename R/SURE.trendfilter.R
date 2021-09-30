@@ -1,7 +1,7 @@
 #' Optimize the trend filtering hyperparameter by minimizing Stein's unbiased 
 #' risk estimate
 #'
-#' @description \loadmathjax{} \code{SURE.trendfilter} optimizes the trend
+#' @description \loadmathjax \code{SURE.trendfilter} optimizes the trend
 #' filtering hyperparameter by running a grid search over the vector, `gammas`,
 #' of candidate hyperparameter values, and then selects the value that minimizes
 #' an unbiased estimate of the model's generalization error. The full 
@@ -120,30 +120,21 @@
 #' curve and the optimized trend filtering estimate are returned within a
 #' list that also includes useful ancillary information.
 #' 
-#' Given the choice of $k$, the hyperparameter $\gamma>0$ is used to tune the 
-#' complexity (i.e. the wiggliness) of the trend filtering estimate by 
-#' weighting the tradeoff between the complexity of the estimate and the size 
-#' of the squared residuals. Obtaining an accurate estimate is therefore 
-#' intrinsically tied to finding an optimal choice of $\gamma$. The selection 
-#' of $\gamma$ is typically done by minimizing an estimate of the mean-squared 
-#' prediction error (MSPE) of the trend filtering estimator. Here, there are 
-#' two different notions of error to consider, namely, \emph{fixed-input} error 
+#' Given the choice of \mjeqn{$k$}{ascii}, the hyperparameter
+#' \mjeqn{$\gamma$}{ascii} is used to tune the complexity (i.e. the wiggliness)
+#' of the trend filtering estimate by weighting the tradeoff between the
+#' complexity of the estimate and the size of the squared residuals. Obtaining
+#' an accurate estimate is therefore intrinsically tied to finding an optimal
+#' choice of \mjeqn{$\gamma$}{ascii}. The selection of \mjeqn{$\gamma$}{ascii}
+#' is typically done by minimizing an estimate of the mean-squared prediction
+#' error (MSPE) of the trend filtering estimator. Here, there are two different
+#' notions of error to consider, namely, \emph{fixed-input} error 
 #' and \emph{random-input} error. As the names suggest, the distinction between 
 #' which type of error to consider is made based on how the inputs are sampled. 
 #' As a general rule-of-thumb, we recommend optimizing with respect to 
 #' fixed-input error when the inputs are regularly-sampled and optimizing with 
 #' respect to random-input error on irregularly-sampled data.
 #'
-#' Recall the DGP stated in (link) and let it be denoted by 
-#' $Q$ so that \mjseqn{$\mathbb{E}_Q[\cdot]$} is the mathematical expectation 
-#' with respect to the randomness of the DGP. Further, let 
-#' \mjseqn{$\sigma_i^2 = \text{Var}(\epsilon_i)$}. The fixed-input MSPE is given by
-#' \mjseqn{
-#' \begin{align}
-#' R(\gamma) &= \frac{1}{n}\sum_{i=1}^{n}\mathbb{E}_{Q}\Big[\big(f(t_i) - \widehat{f}_0(t_i;\gamma)\big)^2\;\Big|\;t_1,\dots,t_n\Big] \\
-#' &= \frac{1}{n}\sum_{i=1}^{n}\Big(\mathbb{E}_{Q}\Big[\big(f_0(t_i) - \widehat{f}_0(t_i;\gamma)\big)^2\;\Big|\;t_1,\dots,t_n\Big] + \sigma_i^2\Big)
-#' \end{align}
-#' }
 #' 
 #' @export SURE.trendfilter
 #' @author Collin A. Politsch, Ph.D., \email{collinpolitsch@@gmail.com}
