@@ -135,51 +135,15 @@
 #' respect to random-input error on irregularly-sampled data.
 #'
 #' Recall the DGP stated in (link) and let it be denoted by 
-#' $Q$ so that $\mathbb{E}_Q[\cdot]$ is the mathematical expectation with respect 
-#' to the randomness of the DGP. Further, let 
-#' $\sigma_i^2 = \text{Var}(\epsilon_i)$. The fixed-input MSPE is given by
+#' $Q$ so that \mjseqn{$\mathbb{E}_Q[\cdot]$} is the mathematical expectation 
+#' with respect to the randomness of the DGP. Further, let 
+#' \mjseqn{$\sigma_i^2 = \text{Var}(\epsilon_i)$}. The fixed-input MSPE is given by
+#' \mjseqn{
 #' \begin{align}
 #' R(\gamma) &= \frac{1}{n}\sum_{i=1}^{n}\mathbb{E}_{Q}\Big[\big(f(t_i) - \widehat{f}_0(t_i;\gamma)\big)^2\;\Big|\;t_1,\dots,t_n\Big] \\
 #' &= \frac{1}{n}\sum_{i=1}^{n}\Big(\mathbb{E}_{Q}\Big[\big(f_0(t_i) - \widehat{f}_0(t_i;\gamma)\big)^2\;\Big|\;t_1,\dots,t_n\Big] + \sigma_i^2\Big)
 #' \end{align}
-#' and the random-input MSPE is given by
-#' \begin{equation}
-#' \widetilde{R}(\gamma) = \mathbb{E}_{Q}\Big[\big(f(t) - \widehat{f}_0(t;\gamma)\big)^2\Big],
-#' \end{equation}
-#' where, in the latter, $t$ is considered to be a random component of the DGP 
-#' with a marginal probability density $p_t(t)$ supported on the observed input 
-#' interval. In each case, the theoretically optimal choice of $\gamma$ is 
-#' defined as the minimizer of the respective choice of error. Empirically, we 
-#' estimate the theoretically optimal choice of $\gamma$ by minimizing an 
-#' estimate of (link) or (link). For fixed-input 
-#' error we recommend Stein's unbiased risk estimate 
-#' (SURE; (link)) and for random-input error we recommend 
-#' $K$-fold cross validation with $K=10$. We elaborate on SURE here and refer 
-#' the reader to (link) for $K$-fold cross validation. 
-#' 
-#' The SURE formula provides an unbiased estimate of the fixed-input MSPE of a 
-#' statistical estimator:
-#' \begin{align}
-#' \widehat{R}_0(\gamma) &= \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}_0)}{n},
-#' \end{align}
-#' where $\overline{\sigma}^{2} = n^{-1}\sumin \sigma_i^2$ and
-#' $\text{df}(\widehat{f}_0)$ is defined above. A formula for the
-#' effective degrees of freedom of the trend filtering estimator is available
-#' via the generalized lasso results of (link); namely,
-#' \begin{align}
-#' \text{df}(\widehat{f}_0) &= \mathbb{E}[\text{number of knots in $\widehat{f}_0$}] + k + 1.
-#' \end{align}
-#' We then obtain our hyperparameter estimate $\widehat{\gamma}$ by minimizing the 
-#' following plug-in estimate for (link):
-#' \begin{equation}
-#' \widehat{R}(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f}_0)}{n},
-#' \end{equation}
-#' where $\widehat{\text{df}}$ is the estimate for the effective degrees of 
-#' freedom that is obtained by replacing the expectation in (link) with 
-#' the observed number of knots, and $\widehat{\overline{\sigma}}^2$ is an 
-#' estimate of $\overline{\sigma}^2$. If a reliable estimate of 
-#' $\overline{\sigma}^2$ is not available \emph{a priori}, a data-driven 
-#' estimate can be constructed (see, e.g., (link)).
+#' }
 #' 
 #' @export SURE.trendfilter
 #' @author Collin A. Politsch, Ph.D., \email{collinpolitsch@@gmail.com}
