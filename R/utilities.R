@@ -86,7 +86,7 @@ mask.intervals <- function(df, min.mask.width = 20){
 
 #' @noRd
 #' @export
-plot.spec <- function(denoise.out){
+plot_spectrum <- function(denoise.out){
   
 }
 

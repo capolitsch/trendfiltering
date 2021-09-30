@@ -20,7 +20,7 @@ bootstrap.trendfilter(
 variability bands. Defaults to \code{B = 100}. Increase this for more precise
 bands (e.g. for the final analysis you intend to publish).}
 
-\item{return.full.ensemble}{logical. If \code{TRUE}, the full trend filtering
+\item{return.full.ensemble}{Logical. If \code{TRUE}, the full trend filtering
 bootstrap ensemble is returned as an \mjeqn{n \times B}{ascii} matrix, less
 any columns potentially pruned post-hoc (see \code{prune} below). Defaults to
 \code{return.full.ensemble = FALSE}.}
@@ -28,7 +28,7 @@ any columns potentially pruned post-hoc (see \code{prune} below). Defaults to
 \item{alpha}{Specifies the width of the \code{1-alpha} pointwise variability
 bands. Defaults to \code{alpha = 0.05}.}
 
-\item{prune}{logical. If \code{TRUE}, then the trend filtering bootstrap
+\item{prune}{Logical. If \code{TRUE}, then the trend filtering bootstrap
 ensemble is examined for rare instances in which the optimization has
 stopped at zero knots (most likely erroneously), and removes them from the
 ensemble. Defaults to \code{TRUE}. Do not change this unless you really know
@@ -64,7 +64,7 @@ return \code{NULL}.}
 \item{edf.boots}{An integer vector of the estimated number of effective
 degrees of freedom of each trend filtering bootstrap estimate. These should
 all be relatively close to \code{edf.min} (below).}
-\item{prune}{logical. If \code{TRUE}, then the trend filtering bootstrap
+\item{prune}{Logical. If \code{TRUE}, then the trend filtering bootstrap
 ensemble is examined for rare instances in which the optimization has
 stopped at zero knots (most likely erroneously), and removes them from the
 ensemble.}
@@ -104,7 +104,7 @@ specified by \code{obj_tol}. In which case, it is often prudent to increase
 \item{n.iter.boots}{Vector of the number of iterations needed for the ADMM
 algorithm to converge within the given tolerance, for each bootstrap
 trend filtering estimate.}
-\item{x.scale, y.scale, data.scaled}{for internal use.}
+\item{x.scale, y.scale, data.scaled}{For internal use}
 }
 \description{
 \loadmathjax{} \code{bootstrap.trendfilter} implements a
@@ -129,12 +129,11 @@ p. 4005-4018.
 \item{Politsch et al. (2020b). Trend Filtering – II. Denoising
 astronomical signals with varying degrees of smoothness. \emph{Monthly
 Notices of the Royal Astronomical Society}, 492(3), p. 4019-4032.
-\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{\link{Link}}} \cr
-}
+\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{\link{Link}}}}
 }
 \seealso{
 \code{\link{SURE.trendfilter}}
 }
 \author{
-Collin A. Politsch, \email{collinpolitsch@gmail.com}
+Collin A. Politsch, Ph.D., \email{collinpolitsch@gmail.com}
 }
