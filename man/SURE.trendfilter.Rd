@@ -14,8 +14,7 @@ SURE.trendfilter(
   x.eval = x,
   nx.eval,
   k = 2L,
-  thinning = NULL,
-  optimization.params = list(max_iter = 600L, obj_tol = 1e-10)
+  optimization.params = list(max_iter = 600L, obj_tol = 1e-10, thinning = NULL)
 )
 }
 \arguments{
@@ -30,21 +29,23 @@ response, target, outcome, regressand, dependent variable, etc.)}
 observed outputs, defined as the reciprocal of the variance of the error
 distribution. That is, \code{weights = 1 / sigmas^2}, where \code{sigmas} is a vector
 of standard errors of the uncertainty in the observed outputs. \code{weights}
-should either have length equal to 1 (corresponding to observations with a
-constant variance) or length equal to \code{length(y)} (i.e. heteroskedastic
-errors).}
+should either have length equal to 1 (corresponding to an error distribution
+with a constant variance) or length equal to \code{length(y)}
+(i.e. heteroskedastic errors).}
 
 \item{ngammas}{Integer. The number of trend filtering hyperparameter values
-to run the grid search over.}
+to run the grid search over. In this default case, the hyperparameter values
+are automatically chosen by \code{SURE.trendfilter} and \code{ngammas} simply controls
+the granularity of the grid.}
 
 \item{gammas}{Overrides \code{ngammas} if passed. A vector of trend filtering
 hyperparameter values to run the grid search over. It is advisable to let
-the vector be equally-spaced in log-space and provided in descending order.
-The function output will contain the sorted hyperparameter vector regardless
-of the user-supplied ordering, and all related output objects (e.g. the
-\code{errors} vector) will correspond to this sorted hyperparameter vector
-ordering. It's best to leave this alone argument alone unless you know what
-you are doing.}
+the vector be equally-spaced in log-space and passed to \code{SURE.trendfilter}
+in descending order. The function output will contain the sorted
+hyperparameter vector regardless of the user-supplied ordering, and all
+related output objects (e.g. the \code{errors} vector) will correspond to this
+descending ordering. It's best to leave this
+argument alone unless you know what you are doing.}
 
 \item{x.eval}{A grid of inputs to evaluate the optimized trend filtering
 estimate on. Defaults to the observed inputs, \code{x}.}
@@ -52,14 +53,17 @@ estimate on. Defaults to the observed inputs, \code{x}.}
 \item{nx.eval}{Integer. If passed, then \code{x.eval} is overridden with \cr
 \code{x.eval = seq(min(x), max(x), length = nx.eval)}}
 
-\item{k}{The degree of the trend filtering estimator. Defaults to \code{k = 2}
-(quadratic trend filtering). Must be one of \verb{k = 0,1,2,3}. However, \code{k = 3}
-is discouraged due to algorithmic instability, and \code{k = 2} typically gives a
-visually indistinguishable estimate anyway.}
+\item{k}{The degree of the trend filtering estimator. More precisely, with
+the trend filtering estimator defined as a piecewise function of polynomials
+smoothly connected at a set of "knots", \code{k} controls the degree of the
+polynomials that build up the trend filtering estimator.
+Defaults to \code{k = 2} (i.e. a piecewise quadratic estimate). Must be one of
+\verb{k = 0,1,2,3}. However, \code{k = 3} is discouraged due to algorithmic
+instability, and \code{k = 2} typically gives a visually indistinguishable
+estimate anyway.}
 
 \item{optimization.params}{A named list of parameters that contains all
-parameter choices (user-supplied or defaults) to be passed to the trend
-filtering ADMM algorithm
+parameter choices to be passed to the trend filtering ADMM algorithm
 (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
 Tibshirani 2016}). See the documentation for the \pkg{glmgen} function
 \code{\link[glmgen]{trendfilter.control.list}} for full details.
@@ -79,11 +83,10 @@ estimate does not appear to have fully converged to a reasonable estimate of
 the signal.
 \item{\code{thinning}}: Logical. If \code{TRUE}, then the data are
 preprocessed so that a smaller, better conditioned data set is used for
-fitting. When left \code{NULL}, the default, the optimization will
+fitting. When left \code{NULL} (the default choice), the optimization will
 automatically detect whether thinning should be applied (i.e. cases in
 which the numerical fitting algorithm will struggle to converge). This
-preprocessing procedure is controlled by the \code{x_tol} argument of
-\code{\link[glmgen]{trendfilter.control.list}}.
+preprocessing procedure is controlled by the \code{x_tol} argument below.
 \item{\code{x_tol}}: Controls the automatic detection of when thinning should be
 applied to the data. If we make bins
 of size \code{x_tol} and find at least two elements of \code{x} that fall into the
@@ -129,22 +132,89 @@ that a smaller, better conditioned data set is used for fitting.}
 \item{x.scale, y.scale, data.scaled}{For internal use}
 }
 \description{
-\code{SURE.trendfilter} estimates the (fixed-input)
-mean-squared error of a trend filtering estimator by computing Stein's
-unbiased risk estimate (a.k.a. SURE) over a grid of hyperparameter
-values, which should typically be equally-spaced in log-space. The full error
-curve and the optimized trend filtering estimate are returned within a
-list that also includes useful ancillary information.
+\code{SURE.trendfilter} optimizes the trend filtering
+hyperparameter by running a grid search over the vector, \code{gammas}, of
+candidate hyperparameter values, and then selects the value that minimizes
+an unbiased estimate of the model's generalization error. The full
+generalization error curve and the optimized trend filtering estimate of the
+signal are then returned within a list that also includes useful ancillary
+information.
 }
 \details{
 \loadmathjax{}
 
-\code{SURE.trendfilter} estimates the (fixed-input)
+\code{SURE.trendfilter} estimates the fixed-input
 mean-squared error of a trend filtering estimator by computing Stein's
 unbiased risk estimate (a.k.a. SURE) over a grid of hyperparameter
 values, which should typically be equally-spaced in log-space. The full error
 curve and the optimized trend filtering estimate are returned within a
 list that also includes useful ancillary information.
+
+Given the choice of $k$, the hyperparameter $\gamma>0$ is used to tune the
+complexity (i.e. the wiggliness) of the trend filtering estimate by
+weighting the tradeoff between the complexity of the estimate and the size
+of the squared residuals. Obtaining an accurate estimate is therefore
+intrinsically tied to finding an optimal choice of $\gamma$. The selection
+of $\gamma$ is typically done by minimizing an estimate of the mean-squared
+prediction error (MSPE) of the trend filtering estimator. Here, there are
+two different notions of error to consider, namely, \emph{fixed-input} error
+and \emph{random-input} error. As the names suggest, the distinction between
+which type of error to consider is made based on how the inputs are sampled.
+As a general rule-of-thumb, we recommend optimizing with respect to
+fixed-input error when the inputs are regularly-sampled and optimizing with
+respect to random-input error on irregularly-sampled data.
+
+Recall the DGP stated in (\ref{observational_model2}) and let it be denoted by
+$Q$ so that $\mathbb{E}\emph{Q\link[=\\cdot]{\cdot}$ is the mathematical expectation with respect
+to the randomness of the DGP. Further, let
+$\sigma_i^2 = \text{Var}(\epsilon_i)$. The fixed-input MSPE is given by
+\begin{align}
+R(\gamma) &= \frac{1}{n}\sum}{i=1}^{n}\mathbb{E}\emph{{Q}\Big\link[=\\big(f(t_i) - \\widehat{f}_0(t_i;\\gamma)\\big)^2\\;\\Big|\\;t_1,\\dots,t_n\\Big]{\big(f(t_i) - \widehat{f}_0(t_i;\gamma)\big)^2\;\Big|\;t_1,\dots,t_n\Big} \label{fixed_error} \\
+&= \frac{1}{n}\sum}{i=1}^{n}\Big(\mathbb{E}\emph{{Q}\Big\link[=\\big(f_0(t_i) - \\widehat{f}_0(t_i;\\gamma)\\big)^2\\;\\Big|\\;t_1,\\dots,t_n\\Big]{\big(f_0(t_i) - \widehat{f}_0(t_i;\gamma)\big)^2\;\Big|\;t_1,\dots,t_n\Big} + \sigma_i^2\Big)
+\end{align}
+and the random-input MSPE is given by
+\begin{equation}
+\widetilde{R}(\gamma) = \mathbb{E}}{Q}\Big\link[=\\big(f(t) - \\widehat{f}_0(t;\\gamma)\\big)^2\\Big]{\big(f(t) - \widehat{f}_0(t;\gamma)\big)^2\Big}, \label{random_error}
+\end{equation}
+where, in the latter, $t$ is considered to be a random component of the DGP
+with a marginal probability density $p_t(t)$ supported on the observed input
+interval. In each case, the theoretically optimal choice of $\gamma$ is
+defined as the minimizer of the respective choice of error. Empirically, we
+estimate the theoretically optimal choice of $\gamma$ by minimizing an
+estimate of (\ref{fixed_error}) or (\ref{random_error}). For fixed-input
+error we recommend Stein's unbiased risk estimate
+(SURE; \citealt{stein1981,edf}) and for random-input error we recommend
+$K$-fold cross validation with $K=10$. We elaborate on SURE here and refer
+the reader to \cite{Wasserman_2003} for $K$-fold cross validation.
+
+The SURE formula provides an unbiased estimate of the fixed-input MSPE of a
+statistical estimator:
+\begin{align}
+\what{R}\emph{0(\gamma) &= \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \what{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\what{f}_0)}{n}, \label{Cp}
+\end{align}
+where $\overline{\sigma}^{2} = n^{-1}\sumin \sigma_i^2$ and
+$\text{df}(\what{f}_0)$ is defined in (\ref{edf}). A formula for the
+effective degrees of freedom of the trend filtering estimator is available
+via the generalized lasso results of \cite{dflasso}; namely,
+\begin{align}
+\text{df}(\what{f}\emph{0) &= \mathbb{E}\link[=\\text{number of knots in $\\what{f}_0$}]{\text{number of knots in $\what{f}_0$}} + k + 1.  \label{edf2}
+\end{align}
+We then obtain our hyperparameter estimate $\what{\gamma}$ by minimizing the
+following plug-in estimate for (\ref{Cp}):
+\begin{equation}
+\what{R}(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \what{f}_0(t_i; \gamma)\big)^2 + \frac{2\what{\overline{\sigma}}^{2}\what{\text{df}}(\what{f}_0)}{n}, \label{SURE}
+\end{equation}
+where $\what{\text{df}}$ is the estimate for the effective degrees of
+freedom that is obtained by replacing the expectation in (\ref{edf2}) with
+the observed number of knots, and $\what{\overline{\sigma}}^2$ is an
+estimate of $\overline{\sigma}^2$. If a reliable estimate of
+$\overline{\sigma}^2$ is not available \emph{a priori}, a data-driven
+estimate can be constructed (see, e.g., \citealt{Wasserman}). We provide a
+supplementary \textsf{R} package on the corresponding author's GitHub
+page\footnote{\url{https://github.com/capolitsch/trendfilteringSupp}} for
+implementing SURE with trend filtering. The package is built on top of the
+\pkg{glmgen} \textsf{R} package of \cite{glmgen}, which already includes an
+implementation of $K$-fold cross validation.
 }
 \references{
 \enumerate{
