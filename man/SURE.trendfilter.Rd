@@ -132,17 +132,15 @@ that a smaller, better conditioned data set is used for fitting.}
 \item{x.scale, y.scale, data.scaled}{For internal use}
 }
 \description{
-\code{SURE.trendfilter} optimizes the trend filtering
-hyperparameter by running a grid search over the vector, \code{gammas}, of
-candidate hyperparameter values, and then selects the value that minimizes
+\loadmathjax{} \code{SURE.trendfilter} optimizes the trend
+filtering hyperparameter by running a grid search over the vector, \code{gammas},
+of candidate hyperparameter values, and then selects the value that minimizes
 an unbiased estimate of the model's generalization error. The full
 generalization error curve and the optimized trend filtering estimate of the
 signal are then returned within a list that also includes useful ancillary
 information.
 }
 \details{
-\loadmathjax{}
-
 \code{SURE.trendfilter} estimates the fixed-input
 mean-squared error of a trend filtering estimator by computing Stein's
 unbiased risk estimate (a.k.a. SURE) over a grid of hyperparameter
@@ -164,57 +162,52 @@ As a general rule-of-thumb, we recommend optimizing with respect to
 fixed-input error when the inputs are regularly-sampled and optimizing with
 respect to random-input error on irregularly-sampled data.
 
-Recall the DGP stated in (\ref{observational_model2}) and let it be denoted by
+Recall the DGP stated in (link) and let it be denoted by
 $Q$ so that $\mathbb{E}\emph{Q\link[=\\cdot]{\cdot}$ is the mathematical expectation with respect
 to the randomness of the DGP. Further, let
 $\sigma_i^2 = \text{Var}(\epsilon_i)$. The fixed-input MSPE is given by
 \begin{align}
-R(\gamma) &= \frac{1}{n}\sum}{i=1}^{n}\mathbb{E}\emph{{Q}\Big\link[=\\big(f(t_i) - \\widehat{f}_0(t_i;\\gamma)\\big)^2\\;\\Big|\\;t_1,\\dots,t_n\\Big]{\big(f(t_i) - \widehat{f}_0(t_i;\gamma)\big)^2\;\Big|\;t_1,\dots,t_n\Big} \label{fixed_error} \\
+R(\gamma) &= \frac{1}{n}\sum}{i=1}^{n}\mathbb{E}\emph{{Q}\Big\link[=\\big(f(t_i) - \\widehat{f}_0(t_i;\\gamma)\\big)^2\\;\\Big|\\;t_1,\\dots,t_n\\Big]{\big(f(t_i) - \widehat{f}_0(t_i;\gamma)\big)^2\;\Big|\;t_1,\dots,t_n\Big} \\
 &= \frac{1}{n}\sum}{i=1}^{n}\Big(\mathbb{E}\emph{{Q}\Big\link[=\\big(f_0(t_i) - \\widehat{f}_0(t_i;\\gamma)\\big)^2\\;\\Big|\\;t_1,\\dots,t_n\\Big]{\big(f_0(t_i) - \widehat{f}_0(t_i;\gamma)\big)^2\;\Big|\;t_1,\dots,t_n\Big} + \sigma_i^2\Big)
 \end{align}
 and the random-input MSPE is given by
 \begin{equation}
-\widetilde{R}(\gamma) = \mathbb{E}}{Q}\Big\link[=\\big(f(t) - \\widehat{f}_0(t;\\gamma)\\big)^2\\Big]{\big(f(t) - \widehat{f}_0(t;\gamma)\big)^2\Big}, \label{random_error}
+\widetilde{R}(\gamma) = \mathbb{E}}{Q}\Big\link[=\\big(f(t) - \\widehat{f}_0(t;\\gamma)\\big)^2\\Big]{\big(f(t) - \widehat{f}_0(t;\gamma)\big)^2\Big},
 \end{equation}
 where, in the latter, $t$ is considered to be a random component of the DGP
 with a marginal probability density $p_t(t)$ supported on the observed input
 interval. In each case, the theoretically optimal choice of $\gamma$ is
 defined as the minimizer of the respective choice of error. Empirically, we
 estimate the theoretically optimal choice of $\gamma$ by minimizing an
-estimate of (\ref{fixed_error}) or (\ref{random_error}). For fixed-input
+estimate of (link) or (link). For fixed-input
 error we recommend Stein's unbiased risk estimate
-(SURE; \citealt{stein1981,edf}) and for random-input error we recommend
+(SURE; (link)) and for random-input error we recommend
 $K$-fold cross validation with $K=10$. We elaborate on SURE here and refer
-the reader to \cite{Wasserman_2003} for $K$-fold cross validation.
+the reader to (link) for $K$-fold cross validation.
 
 The SURE formula provides an unbiased estimate of the fixed-input MSPE of a
 statistical estimator:
 \begin{align}
-\what{R}\emph{0(\gamma) &= \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \what{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\what{f}_0)}{n}, \label{Cp}
+\widehat{R}\emph{0(\gamma) &= \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}_0)}{n},
 \end{align}
 where $\overline{\sigma}^{2} = n^{-1}\sumin \sigma_i^2$ and
-$\text{df}(\what{f}_0)$ is defined in (\ref{edf}). A formula for the
+$\text{df}(\widehat{f}_0)$ is defined above. A formula for the
 effective degrees of freedom of the trend filtering estimator is available
-via the generalized lasso results of \cite{dflasso}; namely,
+via the generalized lasso results of (link); namely,
 \begin{align}
-\text{df}(\what{f}\emph{0) &= \mathbb{E}\link[=\\text{number of knots in $\\what{f}_0$}]{\text{number of knots in $\what{f}_0$}} + k + 1.  \label{edf2}
+\text{df}(\widehat{f}\emph{0) &= \mathbb{E}\link[=\\text{number of knots in $\\widehat{f}_0$}]{\text{number of knots in $\widehat{f}_0$}} + k + 1.
 \end{align}
-We then obtain our hyperparameter estimate $\what{\gamma}$ by minimizing the
-following plug-in estimate for (\ref{Cp}):
+We then obtain our hyperparameter estimate $\widehat{\gamma}$ by minimizing the
+following plug-in estimate for (link):
 \begin{equation}
-\what{R}(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \what{f}_0(t_i; \gamma)\big)^2 + \frac{2\what{\overline{\sigma}}^{2}\what{\text{df}}(\what{f}_0)}{n}, \label{SURE}
+\widehat{R}(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f}_0)}{n},
 \end{equation}
-where $\what{\text{df}}$ is the estimate for the effective degrees of
-freedom that is obtained by replacing the expectation in (\ref{edf2}) with
-the observed number of knots, and $\what{\overline{\sigma}}^2$ is an
+where $\widehat{\text{df}}$ is the estimate for the effective degrees of
+freedom that is obtained by replacing the expectation in (link) with
+the observed number of knots, and $\widehat{\overline{\sigma}}^2$ is an
 estimate of $\overline{\sigma}^2$. If a reliable estimate of
 $\overline{\sigma}^2$ is not available \emph{a priori}, a data-driven
-estimate can be constructed (see, e.g., \citealt{Wasserman}). We provide a
-supplementary \textsf{R} package on the corresponding author's GitHub
-page\footnote{\url{https://github.com/capolitsch/trendfilteringSupp}} for
-implementing SURE with trend filtering. The package is built on top of the
-\pkg{glmgen} \textsf{R} package of \cite{glmgen}, which already includes an
-implementation of $K$-fold cross validation.
+estimate can be constructed (see, e.g., (link)).
 }
 \references{
 \enumerate{
