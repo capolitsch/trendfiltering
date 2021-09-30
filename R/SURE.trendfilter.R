@@ -136,7 +136,7 @@
 #' respect to random-input error on irregularly-sampled data.
 #' 
 #' Recall the DGP stated in (link) and let it be denoted by 
-#' $Q$ so that \mjeqn{\mathbb{E}_Q[\cdot]}{ascii} is the mathematical expectation 
+#' $Q$ so that \mjeqn{\mathbb{E}_Q\[\cdot\]}{ascii} is the mathematical expectation 
 #' with respect to the randomness of the DGP. Further, let 
 #' \mjeqn{\sigma_i^2 = \text{Var}(\epsilon_i)}{ascii}. 
 #'
