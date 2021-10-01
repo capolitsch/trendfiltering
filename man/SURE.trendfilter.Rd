@@ -148,12 +148,12 @@ values, which should typically be equally-spaced in log-space. The full error
 curve and the optimized trend filtering estimate are returned within a
 list that also includes useful ancillary information.
 
-Given the choice of \eqn{k}, the hyperparameter
-\eqn{\gamma} is used to tune the complexity (i.e. the wiggliness)
+Given the choice of \mjeqn{k}{ascii}, the hyperparameter
+\mjeqn{\gamma}{ascii} is used to tune the complexity (i.e. the wiggliness)
 of the trend filtering estimate by weighting the tradeoff between the
 complexity of the estimate and the size of the squared residuals. Obtaining
 an accurate estimate is therefore intrinsically tied to finding an optimal
-choice of \eqn{\gamma}. The selection of \eqn{\gamma}
+choice of \mjeqn{\gamma}{ascii}. The selection of \mjeqn{\gamma}{ascii}
 is typically done by minimizing an estimate of the mean-squared prediction
 error (MSPE) of the trend filtering estimator. Here, there are two different
 notions of error to consider, namely, \emph{fixed-input} error
@@ -164,14 +164,11 @@ fixed-input error when the inputs are regularly-sampled and optimizing with
 respect to random-input error on irregularly-sampled data.
 
 Recall the DGP stated in (link) and let it be denoted by
-\eqn{Q} so that \mjeqn{\mathbb{E}\emph{Q[\cdot]}{ascii} is the mathematical
+\mjeqn{Q}{ascii} so that \mjeqn{\mathbb{E}\emph{Q[\cdot]}{ascii} is the mathematical
 expectation with respect to the randomness of the DGP. Further, let
 \mjeqn{\sigma_i^2 = \text{Var}(\epsilon_i)}{ascii}.
 The fixed-input MSPE is given by
-\mjsdeqn{\begin{align}
-R(\gamma) &= \frac{1}{n}\sum}{i=1}^{n}\mathbb{E}\emph{{Q}\Big\link[=\\big(f(t_i) - \\widehat{f}_0(t_i;\\gamma)\\big)^2\\;\\Big|\\;t_1,\\dots,t_n\\Big]{\big(f(t_i) - \widehat{f}_0(t_i;\gamma)\big)^2\;\Big|\;t_1,\dots,t_n\Big} \cr
-&= \frac{1}{n}\sum}{i=1}^{n}\Big(\mathbb{E}_{Q}\Big\link[=\\big(f_0(t_i) - \\widehat{f}_0(t_i;\\gamma)\\big)^2\\;\\Big|\\;t_1,\\dots,t_n\\Big]{\big(f_0(t_i) - \widehat{f}_0(t_i;\gamma)\big)^2\;\Big|\;t_1,\dots,t_n\Big} + \sigma_i^2\Big)
-\end{align}}
+\mjdeqn{R(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\mathbb{E}_{Q}\Big\link[=\\big(f(t_i) - \\widehat{f}_0(t_i;\\gamma)\\big)^2\\;\\Big|\\;t_1,\\dots,t_n\\Big]{\big(f(t_i) - \widehat{f}_0(t_i;\gamma)\big)^2\;\Big|\;t_1,\dots,t_n\Big}}{ascii}
 }
 \references{
 \enumerate{
