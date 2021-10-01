@@ -3,7 +3,7 @@ Type: Package
 Title: Denoising one-dimensional data with trend filtering
 Description: Denoising one-dimensional data with trend filtering
 Version: 0.1.0
-Date: 2021-09-29
+Date: 2021-10-02
 Authors@R: c(person(given = "Collin A.",
                     family = "Politsch",
                     role = c("aut","cre"),

@@ -1,7 +1,7 @@
 #' Optimize the trend filtering hyperparameter by minimizing Stein's unbiased 
 #' risk estimate
 #'
-#' @description \loadmathjax \code{SURE.trendfilter} optimizes the trend
+#' @description \code{SURE.trendfilter} optimizes the trend
 #' filtering hyperparameter by running a grid search over the vector, `gammas`,
 #' of candidate hyperparameter values, and then selects the value that minimizes
 #' an unbiased estimate of the model's generalization error. The full 
@@ -113,7 +113,7 @@
 #' that a smaller, better conditioned data set is used for fitting.}
 #' \item{x.scale, y.scale, data.scaled}{For internal use}
 #' 
-#' @details \code{SURE.trendfilter} estimates the fixed-input
+#' @details \loadmathjax \code{SURE.trendfilter} estimates the fixed-input
 #' mean-squared error of a trend filtering estimator by computing Stein's
 #' unbiased risk estimate (a.k.a. SURE) over a grid of hyperparameter
 #' values, which should typically be equally-spaced in log-space. The full error
@@ -136,14 +136,13 @@
 #' respect to random-input error on irregularly-sampled data.
 #' 
 #' Recall the DGP stated in (link) and let it be denoted by 
-#' \mjeqn{Q}{ascii} so that 
-#' \mjeqn{\mathbb{E}_{Q}\[\cdot\]}{ascii} is the
-#' mathematical expectation with respect to the randomness of the DGP.
-#' Further, let \mjeqn{\sigma_i^2 = \text{Var}(\epsilon_i)}{ascii}. 
+#' \mjeqn{Q}{ascii} so that is the mathematical expectation with respect to
+#' the randomness of the DGP.
+#' Further, let \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}{ascii}. 
 #' The fixed-input MSPE is given by
-#' \mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\mathbb{E}_{Q}\[(f(t_i) - \widehat{f}_0(t_i;\gamma))^2\;|\;t_1,\dots,t_n\]}{ascii}
+#' \mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\mathbb{E}_{Q}(f(t_{i}) - \widehat{f}_{0}(t_{i};\gamma))^2\;|\;t_{1},\dots,t_{n}}{ascii}
 #' and the random-input MSPE is given by
-#' \mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}_{Q}\Big[\big(f(t) - \widehat{f}_0(t;\gamma)\big)^2\Big],}{ascii}
+#' \mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}_{Q}(f(t) - \widehat{f}_{0}(t;\gamma))^{2}}{ascii},
 #' where, in the latter, \mjeqn{t}{ascii} is considered to be a random component of the DGP 
 #' with a marginal probability density \mjeqn{p_t(t)}{ascii} supported on the observed input 
 #' interval. In each case, the theoretically optimal choice of \mjeqn{\gamma}{ascii} is 
@@ -154,9 +153,6 @@
 #' (SURE; (link)) and for random-input error we recommend 
 #' \mjeqn{K}{ascii}-fold cross validation with \mjeqn{K = 10}{ascii}. We elaborate on SURE here and refer 
 #' the reader to (link) for \mjeqn{K}{ascii}-fold cross validation. 
-#' 
-#' The SURE formula provides an unbiased estimate of the fixed-input MSPE of a 
-#' statistical estimator:
 #' 
 #' @export SURE.trendfilter
 #' @author Collin A. Politsch, Ph.D., \email{collinpolitsch@@gmail.com}
