@@ -135,15 +135,13 @@
 #' fixed-input error when the inputs are regularly-sampled and optimizing with 
 #' respect to random-input error on irregularly-sampled data.
 #' 
-#' Recall the DGP stated in (link) and let it be denoted by 
-#' \mjeqn{Q}{ascii} so that \mjeqn{\mathbb{E}_Q(\cdot)}{ascii}
-#' is the mathematical expectation with respect to
-#' the randomness of the DGP.
+#' Recall the DGP stated in (link).
 #' Further, let \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i}).}{ascii} 
 #' The fixed-input MSPE is given by
-#' \mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\mathbb{E}_{Q}(f(t_{i}) - \widehat{f}_{0}(t_{i};\gamma))^2\;|\;t_{1},\dots,t_{n}}{ascii}
+#' \mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}(f(t_{i}) - 
+#' \widehat{f}_{0}(t_{i};\gamma))^2\;|\;t_{1},\dots,t_{n}}{ascii}
 #' and the random-input MSPE is given by
-#' \mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}_{Q}(f(t) - \widehat{f}_{0}(t;\gamma))^{2}}{ascii},
+#' \mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}(f(t) - \widehat{f}_{0}(t;\gamma))^{2},}{ascii}
 #' where, in the latter, \mjeqn{t}{ascii} is considered to be a random component of the DGP 
 #' with a marginal probability density \mjeqn{p_t(t)}{ascii} supported on the observed input 
 #' interval. In each case, the theoretically optimal choice of \mjeqn{\gamma}{ascii} is 
