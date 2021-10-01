@@ -164,10 +164,10 @@ fixed-input error when the inputs are regularly-sampled and optimizing with
 respect to random-input error on irregularly-sampled data.
 
 Recall the DGP stated in (link) and let it be denoted by
-\mjeqn{Q}{ascii} so that \mjeqn{\mathbb{E}\emph{{Q}(\cdot)}{ascii}
+\mjeqn{Q}{ascii} so that \mjeqn{\mathbb{E}\emph{Q(\cdot)}{ascii}
 is the mathematical expectation with respect to
 the randomness of the DGP.
-Further, let \mjeqn{\sigma}{i}^{2} = \text{Var}(\epsilon_{i})}{ascii}.
+Further, let \mjeqn{\sigma}{i}^{2} = \text{Var}(\epsilon_{i}).}{ascii}
 The fixed-input MSPE is given by
 \mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\mathbb{E}\emph{{Q}(f(t}{i}) - \widehat{f}\emph{{0}(t}{i};\gamma))^2\;|\;t_{1},\dots,t_{n}}{ascii}
 and the random-input MSPE is given by

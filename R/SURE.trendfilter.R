@@ -136,10 +136,10 @@
 #' respect to random-input error on irregularly-sampled data.
 #' 
 #' Recall the DGP stated in (link) and let it be denoted by 
-#' \mjeqn{Q}{ascii} so that \mjeqn{\mathbb{E}_{Q}(\cdot)}{ascii}
+#' \mjeqn{Q}{ascii} so that \mjeqn{\mathbb{E}_Q(\cdot)}{ascii}
 #' is the mathematical expectation with respect to
 #' the randomness of the DGP.
-#' Further, let \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}{ascii}. 
+#' Further, let \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i}).}{ascii} 
 #' The fixed-input MSPE is given by
 #' \mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\mathbb{E}_{Q}(f(t_{i}) - \widehat{f}_{0}(t_{i};\gamma))^2\;|\;t_{1},\dots,t_{n}}{ascii}
 #' and the random-input MSPE is given by
