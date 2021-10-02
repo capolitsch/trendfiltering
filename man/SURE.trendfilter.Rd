@@ -25,13 +25,13 @@ control variable, etc.)}
 \item{y}{The vector of observed values of the output variable (a.k.a. the
 response, target, outcome, regressand, dependent variable, etc.)}
 
-\item{weights}{\strong{Must be passed.} A vector of weights for the
-observed outputs, defined as the reciprocal of the variance of the error
-distribution. That is, \code{weights = 1 / sigmas^2}, where \code{sigmas} is a vector
-of standard errors of the uncertainty in the observed outputs. \code{weights}
-should either have length equal to 1 (corresponding to an error distribution
-with a constant variance) or length equal to \code{length(y)}
-(i.e. heteroskedastic errors).}
+\item{weights}{\strong{Must be passed.} A vector of weights for the observed
+outputs, defined as the reciprocal of the variance of the error distribution.
+That is, \code{weights = 1 / sigmas^2}, where \code{sigmas} is a vector of standard
+errors of the uncertainty in the observed outputs. \code{weights} should either
+have length equal to 1 (corresponding to an error distribution with a
+constant variance) or length equal to \code{length(y)} (i.e. heteroskedastic
+errors).}
 
 \item{ngammas}{Integer. The number of trend filtering hyperparameter values
 to run the grid search over. In this default case, the hyperparameter values
@@ -50,17 +50,16 @@ argument alone unless you know what you are doing.}
 \item{x.eval}{A grid of inputs to evaluate the optimized trend filtering
 estimate on. Defaults to the observed inputs, \code{x}.}
 
-\item{nx.eval}{Integer. If passed, then \code{x.eval} is overridden with \cr
+\item{nx.eval}{Integer. If passed, then \code{x.eval} is overridden with
 \code{x.eval = seq(min(x), max(x), length = nx.eval)}}
 
 \item{k}{The degree of the trend filtering estimator. More precisely, with
 the trend filtering estimator defined as a piecewise function of polynomials
 smoothly connected at a set of "knots", \code{k} controls the degree of the
-polynomials that build up the trend filtering estimator.
-Defaults to \code{k = 2} (i.e. a piecewise quadratic estimate). Must be one of
-\verb{k = 0,1,2,3}. However, \code{k = 3} is discouraged due to algorithmic
-instability, and \code{k = 2} typically gives a visually indistinguishable
-estimate anyway.}
+polynomials that build up the trend filtering estimator. Defaults to \code{k = 2}
+(i.e. a piecewise quadratic estimate). Must be one of \verb{k = 0,1,2,3}. However,
+\code{k = 3} is discouraged due to algorithmic instability, and \code{k = 2} typically
+gives a visually indistinguishable estimate anyway.}
 
 \item{optimization.params}{A named list of parameters that contains all
 parameter choices to be passed to the trend filtering ADMM algorithm
@@ -81,16 +80,16 @@ criterion; when the relative change in the objective function is less than
 this value, the algorithm terminates. Decrease this if the trend filtering
 estimate does not appear to have fully converged to a reasonable estimate of
 the signal.
-\item{\code{thinning}}: Logical. If \code{TRUE}, then the data are
-preprocessed so that a smaller, better conditioned data set is used for
-fitting. When left \code{NULL} (the default choice), the optimization will
-automatically detect whether thinning should be applied (i.e. cases in
-which the numerical fitting algorithm will struggle to converge). This
-preprocessing procedure is controlled by the \code{x_tol} argument below.
+\item{\code{thinning}}: Logical. If \code{TRUE}, then the data are preprocessed so that
+a smaller, better conditioned data set is used for fitting. When left \code{NULL}
+(the default setting), the optimization will automatically detect whether
+thinning should be applied (i.e. cases in which the numerical fitting
+algorithm will struggle to converge). This preprocessing procedure is
+controlled by the \code{x_tol} argument below.
 \item{\code{x_tol}}: Controls the automatic detection of when thinning should be
-applied to the data. If we make bins
-of size \code{x_tol} and find at least two elements of \code{x} that fall into the
-same bin, then we thin the data.}}
+applied to the data. If we make bins of size \code{x_tol} and find at least two
+elements of \code{x} that fall into the same bin, then we thin the data.
+}}
 }
 \value{
 An object of class 'SURE.trendfilter'. This is a list with the
@@ -132,9 +131,9 @@ that a smaller, better conditioned data set is used for fitting.}
 \item{x.scale, y.scale, data.scaled}{For internal use}
 }
 \description{
-\code{SURE.trendfilter} optimizes the trend
-filtering hyperparameter by running a grid search over the vector, \code{gammas},
-of candidate hyperparameter values, and then selects the value that minimizes
+\code{SURE.trendfilter} optimizes the trend filtering
+hyperparameter by running a grid search over the vector, \code{gammas}, of
+candidate hyperparameter values, and then selects the value that minimizes
 an unbiased estimate of the model's generalization error. The full
 generalization error curve and the optimized trend filtering estimate of the
 signal are then returned within a list that also includes useful ancillary
@@ -145,8 +144,8 @@ information.
 mean-squared error of a trend filtering estimator by computing Stein's
 unbiased risk estimate (a.k.a. SURE) over a grid of hyperparameter
 values, which should typically be equally-spaced in log-space. The full error
-curve and the optimized trend filtering estimate are returned within a
-list that also includes useful ancillary information.
+curve and the optimized trend filtering estimate are returned within a list
+that also includes useful ancillary information.
 
 Given the choice of \mjeqn{k}{ascii}, the hyperparameter
 \mjeqn{\gamma}{ascii} is used to tune the complexity (i.e. the wiggliness)
@@ -188,7 +187,7 @@ where \mjeqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}{ascii}
 and \mjeqn{\text{df}(\widehat{f}_0)}{ascii} is defined above. A formula for
 the effective degrees of freedom of the trend filtering estimator is
 available via the generalized lasso results of (link); namely,
-\mjdeqn{\text{df}(\widehat{f}_0) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}_{0}\right] + k + 1.}{ascii}
+\mjdeqn{\text{df}(\widehat{f}_0) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}_0\right] + k + 1.}{ascii}
 We then obtain our hyperparameter estimate \mjeqn{\widehat{\gamma}}{ascii}
 by minimizing the following plug-in estimate for (link):
 \mjdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f}_0)}{n},}{ascii}
@@ -200,6 +199,12 @@ with the observed number of knots, and
 \mjeqn{\overline{\sigma}^2}{ascii} is not available \emph{a priori}, a
 data-driven estimate can be constructed (see, e.g., (link)).
 }
+\seealso{
+\code{\link{bootstrap.trendfilter}}
+}
+\author{
+Collin A. Politsch, Ph.D., \email{collinpolitsch@gmail.com}
+}
 \references{
 \strong{Companion references}
 \enumerate{
@@ -210,30 +215,8 @@ Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018.
 \item{Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
 signals with varying degrees of smoothness. \emph{Monthly Notices of the
 Royal Astronomical Society}, 492(3), p. 4019-4032.
-\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{\link{Link}}} \cr \cr
-}
-\strong{Trend filtering theory}
-\enumerate{
-\item{Tibshirani (2014). Adaptive piecewise polynomial estimation via trend
-filtering. \emph{The Annals of Statistics}. 42(1), p. 285-323.
-\href{https://projecteuclid.org/euclid.aos/1395234979}{\link{Link}}} \cr \cr
-}
-\strong{Trend filtering convex optimization algorithm}
-\enumerate{
-\item{Ramdas and Tibshirani (2016). Fast and Flexible ADMM Algorithms
-for Trend Filtering. \emph{Journal of Computational and Graphical
-Statistics}, 25(3), p. 839-858.
-\href{https://amstat.tandfonline.com/doi/abs/10.1080/10618600.2015.1054033#.XfJpNpNKju0}{\link{Link}}} \cr
-\item{Arnold, Sadhanala, and Tibshirani (2014). Fast algorithms for
-generalized lasso problems. R package \emph{glmgen}. Version 0.0.3.
-\href{https://github.com/glmgen/glmgen}{\link{Link}}}
-(Software implementation of Ramdas and Tibshirani algorithm)} \cr \cr
-\strong{Effect degrees of freedom for trend filtering}
-\enumerate{
-\item{Tibshirani and Taylor (2012). Degrees of freedom in lasso problems.
-\emph{The Annals of Statistics}, 40(2), p. 1198-1232.
-\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{\link{Link}}}
-} \cr
+\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{\link{Link}}}}
+
 \strong{Stein's unbiased risk estimate}
 \enumerate{
 \item{Tibshirani and Wasserman (2015). Stein’s Unbiased Risk Estimate.
@@ -245,40 +228,31 @@ and Cross-Validation. \emph{Journal of the American Statistical Association}.
 \href{https://www.tandfonline.com/doi/abs/10.1198/016214504000000692}{\link{Link}}} \cr
 \item{Stein (1981). Estimation of the Mean of a Multivariate Normal
 Distribution. \emph{The Annals of Statistics}. 9(6), p. 1135-1151.
-\href{https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full}{\link{Link}}} \cr
-} \cr
-\strong{The Bootstrap and variations}
+\href{https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full}{\link{Link}}}}
+
+\strong{Trend filtering theory}
 \enumerate{
-\item{Efron and Tibshirani (1986). Bootstrap Methods for Standard Errors,
-Confidence Intervals, and Other Measures of Statistical Accuracy. Statistical
-Science, 1(1), p. 54-75.
-\href{https://projecteuclid.org/journals/statistical-science/volume-1/issue-1/Bootstrap-Methods-for-Standard-Errors-Confidence-Intervals-and-Other-Measures/10.1214/ss/1177013815.full}{\link{Link}}} \cr
-\item{Mammen (1993). Bootstrap and Wild Bootstrap for High Dimensional
-Linear Models. \emph{The Annals of Statistics}, 21(1), p. 255-285.
-\href{https://projecteuclid.org/journals/annals-of-statistics/volume-21/issue-1/Bootstrap-and-Wild-Bootstrap-for-High-Dimensional-Linear-Models/10.1214/aos/1176349025.full}{\link{Link}}} \cr
-\item{Efron (1979). Bootstrap Methods: Another Look at the Jackknife.
-\emph{The Annals of Statistics}, 7(1), p. 1-26.
-\href{https://projecteuclid.org/journals/annals-of-statistics/volume-7/issue-1/Bootstrap-Methods-Another-Look-at-the-Jackknife/10.1214/aos/1176344552.full}{\link{Link}}} \cr
-} \cr
-\strong{Cross validation}
+\item{Tibshirani (2014). Adaptive piecewise polynomial estimation via trend
+filtering. \emph{The Annals of Statistics}. 42(1), p. 285-323.
+\href{https://projecteuclid.org/euclid.aos/1395234979}{\link{Link}}} \cr
+\item{Tibshirani (2020). Divided Differences, Falling Factorials, and
+Discrete Splines: Another Look at Trend Filtering and Related Problems.
+arXiv e-print: \href{https://arxiv.org/abs/2003.03886}{\link{Link}}.}}
+
+\strong{Trend filtering convex optimization algorithm}
 \enumerate{
-\item Hastie, Tibshirani, and Friedman (2009). The Elements of Statistical
-Learning: Data Mining, Inference, and Prediction. 2nd edition. Springer
-Series in Statistics.
-\href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{
-\link{Online print #12}}. (See Sections 7.10 and 7.12) \cr
-\item James, Witten, Hastie, and Tibshirani (2013). An Introduction to
-Statistical Learning : with Applications in R. Springer.
-\href{https://www.statlearning.com/}{\link{Most recent online print}} (See
-Section 5.1). \emph{Less technical than the above reference.}\cr
-\item Tibshirani (2013). Model selection and validation 2: Model
-assessment, more cross-validation. \emph{36-462: Data Mining course notes}
-(Carnegie Mellon).
-\href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{\link{Link}}}
-}
-\seealso{
-\code{\link{bootstrap.trendfilter}}
-}
-\author{
-Collin A. Politsch, Ph.D., \email{collinpolitsch@gmail.com}
+\item{Ramdas and Tibshirani (2016). Fast and Flexible ADMM Algorithms
+for Trend Filtering. \emph{Journal of Computational and Graphical
+Statistics}, 25(3), p. 839-858.
+\href{https://amstat.tandfonline.com/doi/abs/10.1080/10618600.2015.1054033#.XfJpNpNKju0}{\link{Link}}}
+\item{Arnold, Sadhanala, and Tibshirani (2014). Fast algorithms for
+generalized lasso problems. R package \emph{glmgen}. Version 0.0.3.
+\href{https://github.com/glmgen/glmgen}{\link{Link}}}
+(Software implementation of Ramdas and Tibshirani algorithm)}
+
+\strong{Effect degrees of freedom for trend filtering}
+\enumerate{
+\item{Tibshirani and Taylor (2012). Degrees of freedom in lasso problems.
+\emph{The Annals of Statistics}, 40(2), p. 1198-1232.
+\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{\link{Link}}}}
 }
