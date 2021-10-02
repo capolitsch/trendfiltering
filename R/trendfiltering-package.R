@@ -10,7 +10,7 @@
 # filtering estimator by cross validation or Stein's unbiased risk estimate and 
 # various bootstrap algorithms for producing variability bands to quantify the 
 # uncertainty in the optimized trend filtering estimate.
-#' @name trendfilteringSupp-package
+#' @name trendfiltering-package
 #' @docType package
 #' @author Collin A. Politsch \cr \cr 
 #' \strong{Maintainer}: Collin A. Politsch <collinpolitsch@@gmail.com>
