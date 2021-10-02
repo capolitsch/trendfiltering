@@ -172,10 +172,6 @@
 #' \mjeqn{\overline{\sigma}^2}{ascii} is not available \emph{a priori}, a
 #' data-driven estimate can be constructed (see, e.g., (link)).
 #' 
-#' @export SURE.trendfilter
-#' @author Collin A. Politsch, Ph.D., \email{collinpolitsch@@gmail.com}
-#' @seealso \code{\link{bootstrap.trendfilter}}
-#' 
 #' @references 
 #' \strong{Companion references} 
 #' \enumerate{
@@ -251,6 +247,10 @@
 #' assessment, more cross-validation. \emph{36-462: Data Mining course notes} 
 #' (Carnegie Mellon).
 #' \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{[Link]}}
+#' 
+#' @export SURE.trendfilter
+#' @author Collin A. Politsch, Ph.D., \email{collinpolitsch@@gmail.com}
+#' @seealso \code{\link{bootstrap.trendfilter}}
 
 #' @importFrom glmgen trendfilter.control.list
 #' @importFrom tidyr drop_na tibble
