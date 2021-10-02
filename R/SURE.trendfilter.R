@@ -177,7 +177,7 @@
 #' @seealso \code{\link{bootstrap.trendfilter}}
 #' 
 #' @references 
-#' \strong{Main references} 
+#' \strong{Companion references} 
 #' \enumerate{
 #' \item{Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
 #' for time-domain astronomy and astronomical spectroscopy. \emph{Monthly 

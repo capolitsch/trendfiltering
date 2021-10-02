@@ -183,15 +183,15 @@ We elaborate on SURE here and refer the reader to (link) for
 
 The SURE formula provides an unbiased estimate of the fixed-input MSPE of a
 statistical estimator:
-\mjdeqn{\widehat{R}_0(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}_0)}{n},}{ascii}
-where \mjeqn{\overline{\sigma}^{2} = n^{-1}\sum}{i=1}^{n} \sigma_i^2}{ascii}
+\mjdeqn{\widehat{R}_0(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}_0)}{n},}{ascii}
+where \mjeqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}{ascii}
 and \mjeqn{\text{df}(\widehat{f}_0)}{ascii} is defined above. A formula for
 the effective degrees of freedom of the trend filtering estimator is
 available via the generalized lasso results of (link); namely,
 \mjdeqn{\text{df}(\widehat{f}_0) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}_{0\right] + k + 1.}{ascii}
 We then obtain our hyperparameter estimate \mjeqn{\widehat{\gamma}}{ascii}
 by minimizing the following plug-in estimate for (link):
-\mjdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f}_0)}{n},}{ascii}
+\mjdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f}_0)}{n},}{ascii}
 where \mjeqn{\widehat{\text{df}}}{ascii} is the estimate for the effective
 degrees of freedom that is obtained by replacing the expectation in (link)
 with the observed number of knots, and
@@ -201,7 +201,7 @@ with the observed number of knots, and
 data-driven estimate can be constructed (see, e.g., (link)).
 }
 \references{
-\strong{Main references}
+\strong{Companion references}
 \enumerate{
 \item{Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
 for time-domain astronomy and astronomical spectroscopy. \emph{Monthly
