@@ -6,12 +6,11 @@ trendfilter.interval <- function(x, y, weights,
                                  B = 100, alpha = 0.05, bootstrap.bands = T,
                                  max_iter = 5000, obj_tol = 1e-12, ...){
   
-  SURE.out <- SURE.trendfilter(x = x,
-                               y = y,
-                               weights = weights,
-                               thinning = NULL,
+  SURE.out <- SURE.trendfilter(x, y, weights,
                                optimization.params = list(max_iter = max_iter, 
-                                                          obj_tol = obj_tol))
+                                                          obj_tol = obj_tol,
+                                                          thinning = NULL)
+                               )
   if ( !bootstrap.bands ){
     return(SURE.out)
   }else{
@@ -95,8 +94,7 @@ plot_spectrum <- function(denoise.out){
 #' @export
 transparency <- function(color, trans){
   
-  num2hex <- function(x)
-  {
+  num2hex <- function(x){
     hex <- unlist(strsplit("0123456789ABCDEF",split=""))
     return(paste(hex[(x-x%%16)/16+1],hex[x%%16+1],sep=""))
   }

@@ -14,8 +14,8 @@ SURE.trendfilter(
   x.eval = x,
   nx.eval,
   k = 2L,
-  optimization.params = list(max_iter = 600L, obj_tol = 1e-10, thinning = NULL)
-)
+  optimization.params = list(max_iter = 600L, obj_tol = 1e-10, thinning = NULL),
+  ...)
 }
 \arguments{
 \item{x}{The vector of observed values of the input variable (a.k.a. the
@@ -90,6 +90,8 @@ controlled by the \code{x_tol} argument below.
 applied to the data. If we make bins of size \code{x_tol} and find at least two
 elements of \code{x} that fall into the same bin, then we thin the data.
 }}
+\item{\code{...}}{Additional named arguments to be passed to 
+\code{\link[glmgen]{glmgen::trendfilter.control.list}}.}
 }
 \value{
 An object of class 'SURE.trendfilter'. This is a list with the

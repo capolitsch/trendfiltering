@@ -73,6 +73,8 @@
 #' applied to the data. If we make bins of size `x_tol` and find at least two
 #' elements of `x` that fall into the same bin, then we thin the data.
 #' }
+#' @param ... Additional named arguments to be passed to 
+#' \code{\link[glmgen]{trendfilter.control.list}}.
 #' 
 #' @return An object of class 'SURE.trendfilter'. This is a list with the 
 #' following elements:
@@ -226,7 +228,7 @@
 #' @author Collin A. Politsch, Ph.D., \email{collinpolitsch@@gmail.com}
 #' @seealso \code{\link{bootstrap.trendfilter}}
 
-#' @importFrom glmgen trendfilter.control.list
+#' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom tidyr drop_na tibble
 #' @importFrom dplyr %>% arrange filter
 #' @importFrom magrittr %$%
@@ -240,8 +242,8 @@ SURE.trendfilter <- function(x,
                              k = 2L,
                              optimization.params = list(max_iter = 600L,
                                                         obj_tol = 1e-10,
-                                                        thinning = NULL)
-                             ){
+                                                        thinning = NULL),
+                             ...){
   
   if ( missing(x) || is.null(x) ) stop("x must be passed.")
   if ( missing(y) || is.null(y) ) stop("y must be passed.")
@@ -299,7 +301,8 @@ SURE.trendfilter <- function(x,
   rm(x,y,weights)
   thinning <- optimization.params$thinning
   optimization.params <- trendfilter.control.list(max_iter = optimization.params$max_iter,
-                                                  obj_tol = optimization.params$obj_tol)
+                                                  obj_tol = optimization.params$obj_tol,
+                                                  ...)
   x.scale <- median(diff(data$x))
   y.scale <- median(abs(data$y)) / 10
   optimization.params$x_tol <- optimization.params$x_tol / x.scale
@@ -316,14 +319,14 @@ SURE.trendfilter <- function(x,
     gammas <- sort(gammas, decreasing = T)
   }
   
-  out <- glmgen::trendfilter(x = data.scaled$x,
-                             y = data.scaled$y,
-                             weights = data.scaled$weights,
-                             lambda = gammas,
-                             k = k,
-                             thinning = thinning,
-                             control = optimization.params
-                             )
+  out <- trendfilter(x = data.scaled$x,
+                     y = data.scaled$y,
+                     weights = data.scaled$weights,
+                     lambda = gammas,
+                     k = k,
+                     thinning = thinning,
+                     control = optimization.params
+                     )
   
   training.error <- colMeans( (out$beta - data.scaled$y) ^ 2 ) 
   optimism <- 2 * out$df / nrow(data) * mean(1 / data.scaled$weights)
@@ -342,14 +345,14 @@ SURE.trendfilter <- function(x,
   # Increase the algorithmic precision for the optimized TF estimate
   optimization.params$obj_tol <- optimization.params$obj_tol * 1e-2
   
-  out <- glmgen::trendfilter(x = data.scaled$x,
-                             y = data.scaled$y,
-                             weights = data.scaled$weights,
-                             lambda = gamma.min,
-                             k = k,
-                             thinning = thinning,
-                             control = optimization.params
-                             )
+  out <- trendfilter(x = data.scaled$x,
+                     y = data.scaled$y,
+                     weights = data.scaled$weights,
+                     lambda = gamma.min,
+                     k = k,
+                     thinning = thinning,
+                     control = optimization.params
+                     )
   
   optimization.params$obj_tol <- optimization.params$obj_tol * 1e2
   
