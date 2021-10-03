@@ -14,7 +14,7 @@ library(trendfilteringSupp)
 library(tidyverse)
 library(magrittr)
 
-data(sample_spec)
+data(SALT_spectrum)
 
 min.mask.width <- 20
 variability.bands <- FALSE

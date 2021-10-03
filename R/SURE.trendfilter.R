@@ -248,19 +248,19 @@ SURE.trendfilter <- function(x,
   if ( length(x) != length(y) ) stop("x and y must have the same length.")
   
   if ( missing(weights) || !(class(weights) %in% c("numeric","integer")) ){
-    stop(paste0("Currently, the user must pass weights to compute SURE."))
+    stop(paste0("weights must be passed to compute SURE."))
   }
   
   if ( !(length(weights) %in% c(1,length(y))) ){
-    stop("weights must either be have length 1 or length(y).")
+    stop("weights must either be have length 1 or length(y)")
   }
   
   if ( length(y) < k + 2 ){
-    stop("y must have length >= k+2 for kth order trend filtering.")
+    stop("length(y) must be >= k + 2")
   }
   
   if ( k < 0 || k != round(k) ){
-    stop("k must be a nonnegative integer. k=2 recommended")
+    stop("k must be a nonnegative integer.")
   }
   
   if ( k > 3 ){
@@ -296,13 +296,10 @@ SURE.trendfilter <- function(x,
     arrange(x) %>% 
     filter( weights != 0 ) %>%
     drop_na
-  
   rm(x,y,weights)
-  
   thinning <- optimization.params$thinning
   optimization.params <- trendfilter.control.list(max_iter = optimization.params$max_iter,
                                                   obj_tol = optimization.params$obj_tol)
-  
   x.scale <- median(diff(data$x))
   y.scale <- median(abs(data$y)) / 10
   optimization.params$x_tol <- optimization.params$x_tol / x.scale
@@ -314,9 +311,9 @@ SURE.trendfilter <- function(x,
     select(x, y, weights)
   
   if ( missing(gammas) ){
-    gammas <- seq(16, -10, length = ngammas) %>% exp 
+    gammas <- exp(seq(16, -10, length = ngammas))
   }else{
-    gammas <- sort(gammas, decreasing = TRUE)
+    gammas <- sort(gammas, decreasing = T)
   }
   
   out <- glmgen::trendfilter(x = data.scaled$x,
@@ -326,14 +323,13 @@ SURE.trendfilter <- function(x,
                              k = k,
                              thinning = thinning,
                              control = optimization.params
-  )
+                             )
   
   training.error <- colMeans( (out$beta - data.scaled$y) ^ 2 ) 
   optimism <- 2 * out$df / nrow(data) * mean(1 / data.scaled$weights)
   errors <- as.numeric(training.error + optimism)
   edfs <- out$df
   n.iter <- out$iter
-  
   i.min <- as.integer(which.min(errors))
   gamma.min <- gammas[i.min]
   
@@ -343,6 +339,7 @@ SURE.trendfilter <- function(x,
     x.eval <- sort(x.eval)
   }
   
+  # Increase the algorithmic precision for the optimized TF estimate
   optimization.params$obj_tol <- optimization.params$obj_tol * 1e-2
   
   out <- glmgen::trendfilter(x = data.scaled$x,
@@ -352,15 +349,17 @@ SURE.trendfilter <- function(x,
                              k = k,
                              thinning = thinning,
                              control = optimization.params
-  )
+                             )
   
   optimization.params$obj_tol <- optimization.params$obj_tol * 1e2
   
-  tf.estimate <- glmgen:::predict.trendfilter(out, lambda = gamma.min, 
+  tf.estimate <- glmgen:::predict.trendfilter(out, 
+                                              lambda = gamma.min, 
                                               x.new = x.eval / x.scale) %>%
     as.numeric
   
-  data.scaled$fitted.values <- glmgen:::predict.trendfilter(out, lambda = gamma.min, 
+  data.scaled$fitted.values <- glmgen:::predict.trendfilter(out, 
+                                                            lambda = gamma.min, 
                                                             x.new = data.scaled$x) %>% 
     as.numeric
   
