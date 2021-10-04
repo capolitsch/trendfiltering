@@ -1,13 +1,12 @@
 #' Optimize the trend filtering hyperparameter by minimizing Stein's unbiased 
 #' risk estimate
 #'
-#' @description \code{SURE.trendfilter} optimizes the trend filtering
-#' hyperparameter by running a grid search over the vector, `gammas`, of
-#' candidate hyperparameter values, and then selects the value that minimizes
-#' an unbiased estimate of the model's generalization error. The full 
-#' generalization error curve and the optimized trend filtering estimate of the
-#' signal are then returned within a list that also includes useful ancillary
-#' information.
+#' `SURE.trendfilter` optimizes the trend filtering hyperparameter by running a
+#' grid search over the vector, `gammas`, of candidate hyperparameter values,
+#' and then selects the value that minimizes an unbiased estimate of the model's
+#' generalization error. The full generalization error curve and the optimized
+#' trend filtering estimate of the signal are then returned within a list that
+#' also includes useful ancillary information.
 #' 
 #' @param x The vector of observed values of the input variable (a.k.a. the 
 #' predictor, covariate, explanatory variable, regressor, independent variable, 
@@ -76,45 +75,7 @@
 #' @param ... Additional named arguments to be passed to 
 #' \code{\link[glmgen]{trendfilter.control.list}}.
 #' 
-#' @return An object of class 'SURE.trendfilter'. This is a list with the 
-#' following elements:
-#' \item{x.eval}{The grid of inputs the optimized trend filtering estimate was 
-#' evaluated on.}
-#' \item{tf.estimate}{The optimized trend filtering estimate of the signal, 
-#' evaluated on `x.eval`.}
-#' \item{validation.method}{"SURE"}
-#' \item{gammas}{Vector of hyperparameter values tested during validation
-#' (always returned in descending order).}
-#' \item{errors}{Vector of SURE error estimates corresponding to the 
-#' **descending** set of gamma values tested during validation.}
-#' \item{gamma.min}{Hyperparameter value that minimizes the SURE error curve.}
-#' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
-#' estimators fit during validation.}
-#' \item{edf.min}{The effective degrees of freedom of the optimally-tuned trend 
-#' filtering estimator.}
-#' \item{i.min}{The index of \code{gammas} (descending order) that minimizes 
-#' the SURE error curve.}
-#' \item{x}{The vector of the observed inputs.}
-#' \item{y}{The vector of the observed outputs.}
-#' \item{weights}{A vector of weights for the observed outputs. These are
-#' defined as `weights = 1 / sigmas^2`, where `sigmas` is a vector of 
-#' standard errors of the uncertainty in the observed outputs.}
-#' \item{fitted.values}{The optimized trend filtering estimate of the signal, 
-#' evaluated at the observed inputs `x`.}
-#' \item{residuals}{`residuals = y - fitted.values`}
-#' \item{k}{The degree of the trend filtering estimator.}
-#' \item{optimization.params}{A list of parameters that control the trend
-#' filtering convex optimization.}
-#' \item{n.iter}{Vector of the number of iterations needed for the ADMM
-#' algorithm to converge within the given tolerance, for each hyperparameter
-#' value. If many of these are exactly equal to `max_iter`, then their
-#' solutions have not converged with the tolerance specified by `obj_tol`.
-#' In which case, it is often prudent to increase `max_iter`.}
-#' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so 
-#' that a smaller, better conditioned data set is used for fitting.}
-#' \item{x.scale, y.scale, data.scaled}{For internal use}
-#' 
-#' @details \loadmathjax \code{SURE.trendfilter} estimates the fixed-input
+#' @details \loadmathjax `SURE.trendfilter` estimates the fixed-input
 #' mean-squared error of a trend filtering estimator by computing Stein's
 #' unbiased risk estimate (a.k.a. SURE) over a grid of hyperparameter
 #' values, which should typically be equally-spaced in log-space. The full error
@@ -173,59 +134,94 @@
 #' \mjeqn{\overline{\sigma}^2}{ascii} is not available \emph{a priori}, a
 #' data-driven estimate can be constructed.
 #' 
-#' @references 
+#' @return An object of class 'SURE.trendfilter'. This is a list with the 
+#' following elements:
+#' \item{x.eval}{The grid of inputs the optimized trend filtering estimate was 
+#' evaluated on.}
+#' \item{tf.estimate}{The optimized trend filtering estimate of the signal, 
+#' evaluated on `x.eval`.}
+#' \item{validation.method}{"SURE"}
+#' \item{gammas}{Vector of hyperparameter values tested during validation
+#' (always returned in descending order).}
+#' \item{errors}{Vector of SURE error estimates corresponding to the 
+#' **descending** set of gamma values tested during validation.}
+#' \item{gamma.min}{Hyperparameter value that minimizes the SURE error curve.}
+#' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
+#' estimators fit during validation.}
+#' \item{edf.min}{The effective degrees of freedom of the optimally-tuned trend 
+#' filtering estimator.}
+#' \item{i.min}{The index of `gammas` (descending order) that minimizes the
+#' SURE error curve.}
+#' \item{x}{The vector of the observed inputs.}
+#' \item{y}{The vector of the observed outputs.}
+#' \item{weights}{A vector of weights for the observed outputs. These are
+#' defined as `weights = 1 / sigmas^2`, where `sigmas` is a vector of 
+#' standard errors of the uncertainty in the observed outputs.}
+#' \item{fitted.values}{The optimized trend filtering estimate of the signal, 
+#' evaluated at the observed inputs `x`.}
+#' \item{residuals}{`residuals = y - fitted.values`}
+#' \item{k}{The degree of the trend filtering estimator.}
+#' \item{optimization.params}{A list of parameters that control the trend
+#' filtering convex optimization.}
+#' \item{n.iter}{Vector of the number of iterations needed for the ADMM
+#' algorithm to converge within the given tolerance, for each hyperparameter
+#' value. If many of these are exactly equal to `max_iter`, then their
+#' solutions have not converged with the tolerance specified by `obj_tol`.
+#' In which case, it is often prudent to increase `max_iter`.}
+#' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so 
+#' that a smaller, better conditioned data set is used for fitting.}
+#' \item{x.scale, y.scale, data.scaled}{For internal use.}
+#' 
+#' @export SURE.trendfilter
+#' 
+#' @author
+#' \strong{Collin A. Politsch, Ph.D.}
+#' ---
+#' **Email**: collinpolitsch@@gmail.com \cr
+#' **Website**: [collinpolitsch.com](https://collinpolitsch.com/) \cr
+#' **GitHub**: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
+#' 
+#' @references
 #' \strong{Companion references} 
 #' \enumerate{
-#' \item{Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
+#' \item{\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
+#' Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
 #' for time-domain astronomy and astronomical spectroscopy. \emph{Monthly 
-#' Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018. 
-#' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{[Link]}} \cr
-#' \item{Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical 
+#' Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018.}} \cr
+#' \item{\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
+#' Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical 
 #' signals with varying degrees of smoothness. \emph{Monthly Notices of the 
-#' Royal Astronomical Society}, 492(3), p. 4019-4032.
-#' \href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{[Link]}}} \cr \cr
-#' 
-#' \strong{Stein's unbiased risk estimate}
-#' \enumerate{
-#' \item{Tibshirani and Wasserman (2015). Stein’s Unbiased Risk Estimate.
-#' \emph{36-702: Statistical Machine Learning course notes} (Carnegie Mellon).
-#' \href{http://www.stat.cmu.edu/~larry/=sml/stein.pdf}{[Link]}} \cr
-#' \item{Efron (2014). The Estimation of Prediction Error: Covariance Penalties 
-#' and Cross-Validation. \emph{Journal of the American Statistical Association}.
-#' 99(467), p. 619-632.
-#' \href{https://www.tandfonline.com/doi/abs/10.1198/016214504000000692}{[Link]}} \cr
-#' \item{Stein (1981). Estimation of the Mean of a Multivariate Normal 
-#' Distribution. \emph{The Annals of Statistics}. 9(6), p. 1135-1151.
-#' \href{https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full}{[Link]}}} \cr \cr 
+#' Royal Astronomical Society}, 492(3), p. 4019-4032.}}}
 #' 
 #' \strong{Trend filtering theory}
 #' \enumerate{
-#' \item{Tibshirani (2014). Adaptive piecewise polynomial estimation via trend 
-#' filtering. \emph{The Annals of Statistics}. 42(1), p. 285-323.
-#' \href{https://projecteuclid.org/euclid.aos/1395234979}{[Link]}} \cr
-#' \item{Tibshirani (2020). Divided Differences, Falling Factorials, and
-#' Discrete Splines: Another Look at Trend Filtering and Related Problems.
-#' arXiv e-print: \href{https://arxiv.org/abs/2003.03886}{[Link]}.}} \cr \cr
+#' \item{\href{https://projecteuclid.org/euclid.aos/1395234979}{
+#' Tibshirani (2014). Adaptive piecewise polynomial estimation via trend 
+#' filtering. \emph{The Annals of Statistics}. 42(1), p. 285-323.}} \cr
+#' \item{\href{https://arxiv.org/abs/2003.03886}{
+#' Tibshirani (2020). Divided Differences, Falling Factorials, and
+#' Discrete Splines: Another Look at Trend Filtering and Related Problems.}}}
 #' 
-#' \strong{Trend filtering convex optimization algorithm}
+#' \strong{Stein's unbiased risk estimate}
 #' \enumerate{
-#' \item{Ramdas and Tibshirani (2016). Fast and Flexible ADMM Algorithms 
-#' for Trend Filtering. \emph{Journal of Computational and Graphical 
-#' Statistics}, 25(3), p. 839-858.
-#' \href{https://amstat.tandfonline.com/doi/abs/10.1080/10618600.2015.1054033#.XfJpNpNKju0}{[Link]}} \cr
-#' \item{Arnold, Sadhanala, and Tibshirani (2014). Fast algorithms for 
-#' generalized lasso problems. R package \emph{glmgen}. Version 0.0.3. 
-#' \href{https://github.com/glmgen/glmgen}{[Link]}}
-#' (Software implementation of Ramdas and Tibshirani algorithm)} \cr \cr
+#' \item{\href{http://www.stat.cmu.edu/~larry/=sml/stein.pdf}{
+#' Tibshirani and Wasserman (2015). Stein’s Unbiased Risk Estimate.
+#' \emph{36-702: Statistical Machine Learning course notes} (Carnegie Mellon
+#' University).}} \cr
+#' \item{\href{https://www.tandfonline.com/doi/abs/10.1198/016214504000000692}{
+#' Efron (2014). The Estimation of Prediction Error: Covariance Penalties 
+#' and Cross-Validation. \emph{Journal of the American Statistical Association}.
+#' 99(467), p. 619-632.}} \cr
+#' \item{\href{https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full}{
+#' Stein (1981). Estimation of the Mean of a Multivariate Normal 
+#' Distribution. \emph{The Annals of Statistics}. 9(6), p. 1135-1151.}}}
 #' 
-#' \strong{Effect degrees of freedom for trend filtering}
+#' \strong{Effective degrees of freedom for trend filtering}
 #' \enumerate{
-#' \item{Tibshirani and Taylor (2012). Degrees of freedom in lasso problems.
-#' \emph{The Annals of Statistics}, 40(2), p. 1198-1232.
-#' \href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{[Link]}}}
+#' \item{\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{
+#' Tibshirani and Taylor (2012). Degrees of freedom in lasso problems.
+#' \emph{The Annals of Statistics}, 40(2), p. 1198-1232.}}}
 #' 
-#' @export SURE.trendfilter
-#' @author Collin A. Politsch, Ph.D., \email{collinpolitsch@@gmail.com}
 #' @seealso \code{\link{cv.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 
 #' @importFrom glmgen trendfilter trendfilter.control.list
@@ -299,6 +295,7 @@ SURE.trendfilter <- function(x,
     filter( weights != 0 ) %>%
     drop_na
   rm(x,y,weights)
+  
   thinning <- optimization.params$thinning
   optimization.params <- trendfilter.control.list(max_iter = optimization.params$max_iter,
                                                   obj_tol = optimization.params$obj_tol,

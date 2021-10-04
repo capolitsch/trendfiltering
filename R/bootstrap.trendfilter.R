@@ -125,8 +125,12 @@ bootstrap.trendfilter <- function(obj,
   stopifnot( B >= 10 )
   
   if ( !prune ) warning("I hope you know what you are doing!")
-  if ( mc.cores > detectCores() ){
+  if ( mc.cores < detectCores() ){
     warning(paste0("Your machine only has ", detectCores(), " cores. Consider increasing `mc.cores` for computational speedups."))
+  }
+  if ( mc.cores > detectCores() ){
+    warning(paste0("Your machine only has ", detectCores(), " cores. Adjusting mc.cores accordingly."))
+    mc.cores <- detectCores()
   }
   
   sampler <- case_when(

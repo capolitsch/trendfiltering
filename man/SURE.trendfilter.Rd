@@ -15,7 +15,8 @@ SURE.trendfilter(
   nx.eval,
   k = 2L,
   optimization.params = list(max_iter = 600L, obj_tol = 1e-10, thinning = NULL),
-  ...)
+  ...
+)
 }
 \arguments{
 \item{x}{The vector of observed values of the input variable (a.k.a. the
@@ -23,7 +24,7 @@ predictor, covariate, explanatory variable, regressor, independent variable,
 control variable, etc.)}
 
 \item{y}{The vector of observed values of the output variable (a.k.a. the
-response, target, outcome, regressand, dependent variable, etc.)}
+response, target, outcome, regressand, dependent variable, etc.).}
 
 \item{weights}{\strong{Must be passed.} A vector of weights for the observed
 outputs, defined as the reciprocal of the variance of the error distribution.
@@ -50,7 +51,7 @@ argument alone unless you know what you are doing.}
 \item{x.eval}{A grid of inputs to evaluate the optimized trend filtering
 estimate on. Defaults to the observed inputs, \code{x}.}
 
-\item{nx.eval}{Integer. If passed, then \code{x.eval} is overridden with
+\item{nx.eval}{Integer. If passed, overrides \code{x.eval} with
 \code{x.eval = seq(min(x), max(x), length = nx.eval)}}
 
 \item{k}{The degree of the trend filtering estimator. More precisely, with
@@ -90,8 +91,9 @@ controlled by the \code{x_tol} argument below.
 applied to the data. If we make bins of size \code{x_tol} and find at least two
 elements of \code{x} that fall into the same bin, then we thin the data.
 }}
-\item{\code{...}}{Additional named arguments to be passed to 
-\code{\link[glmgen]{glmgen::trendfilter.control.list}}.}
+
+\item{...}{Additional named arguments to be passed to
+\code{\link[glmgen]{trendfilter.control.list}}.}
 }
 \value{
 An object of class 'SURE.trendfilter'. This is a list with the
@@ -104,14 +106,14 @@ evaluated on \code{x.eval}.}
 \item{gammas}{Vector of hyperparameter values tested during validation
 (always returned in descending order).}
 \item{errors}{Vector of SURE error estimates corresponding to the
-\emph{descending} set of gamma values tested during validation.}
+\strong{descending} set of gamma values tested during validation.}
 \item{gamma.min}{Hyperparameter value that minimizes the SURE error curve.}
 \item{edfs}{Vector of effective degrees of freedom for all trend filtering
 estimators fit during validation.}
 \item{edf.min}{The effective degrees of freedom of the optimally-tuned trend
 filtering estimator.}
-\item{i.min}{The index of \code{gammas} (descending order) that minimizes
-the SURE error curve.}
+\item{i.min}{The index of \code{gammas} (descending order) that minimizes the
+SURE error curve.}
 \item{x}{The vector of the observed inputs.}
 \item{y}{The vector of the observed outputs.}
 \item{weights}{A vector of weights for the observed outputs. These are
@@ -130,16 +132,15 @@ solutions have not converged with the tolerance specified by \code{obj_tol}.
 In which case, it is often prudent to increase \code{max_iter}.}
 \item{thinning}{Logical. If \code{TRUE}, then the data are preprocessed so
 that a smaller, better conditioned data set is used for fitting.}
-\item{x.scale, y.scale, data.scaled}{For internal use}
+\item{x.scale, y.scale, data.scaled}{For internal use.}
 }
 \description{
-\code{SURE.trendfilter} optimizes the trend filtering
-hyperparameter by running a grid search over the vector, \code{gammas}, of
-candidate hyperparameter values, and then selects the value that minimizes
-an unbiased estimate of the model's generalization error. The full
-generalization error curve and the optimized trend filtering estimate of the
-signal are then returned within a list that also includes useful ancillary
-information.
+\code{SURE.trendfilter} optimizes the trend filtering hyperparameter by running a
+grid search over the vector, \code{gammas}, of candidate hyperparameter values,
+and then selects the value that minimizes an unbiased estimate of the model's
+generalization error. The full generalization error curve and the optimized
+trend filtering estimate of the signal are then returned within a list that
+also includes useful ancillary information.
 }
 \details{
 \loadmathjax \code{SURE.trendfilter} estimates the fixed-input
@@ -167,7 +168,7 @@ respect to random-input error on irregularly-sampled data.
 Recall the DGP stated in (link). Further, let
 \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i}).}{ascii}
 The fixed-input MSPE is given by
-\mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(f(t_{i}) - \widehat{f}_{0}(t_{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right]}{ascii}
+\mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(f(t_{i}) - \widehat{f}\emph{{0}(t}{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right]}{ascii}
 and the random-input MSPE is given by
 \mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}\left[\left(f(t) - \widehat{f}_{0}(t;\gamma)\right)^{2}\right],}{ascii}
 where, in the latter, \mjeqn{t}{ascii} is considered to be a random
@@ -184,77 +185,72 @@ We elaborate on SURE here and refer the reader to (link) for
 
 The SURE formula provides an unbiased estimate of the fixed-input MSPE of a
 statistical estimator:
-\mjdeqn{\widehat{R}_0(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}_0)}{n},}{ascii}
-where \mjeqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}{ascii}
+\mjdeqn{\widehat{R}\emph{0(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}\emph{0)}{n},}{ascii}
+where \mjeqn{\overline{\sigma}^{2} = n^{-1}\sum}{i=1}^{n} \sigma_i^2}{ascii}
 and \mjeqn{\text{df}(\widehat{f}_0)}{ascii} is defined above. A formula for
 the effective degrees of freedom of the trend filtering estimator is
 available via the generalized lasso results of (link); namely,
-\mjdeqn{\text{df}(\widehat{f}_0) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}_0\right] + k + 1.}{ascii}
+\mjdeqn{\text{df}(\widehat{f}_0) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}\emph{0\right] + k + 1.}{ascii}
 We then obtain our hyperparameter estimate \mjeqn{\widehat{\gamma}}{ascii}
 by minimizing the following plug-in estimate for (link):
-\mjdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f}_0)}{n},}{ascii}
+\mjdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f}_0)}{n},}{ascii}
 where \mjeqn{\widehat{\text{df}}}{ascii} is the estimate for the effective
 degrees of freedom that is obtained by replacing the expectation in (link)
 with the observed number of knots, and
 \mjeqn{\widehat{\overline{\sigma}}^2}{ascii} is an estimate of
 \mjeqn{\overline{\sigma}^2}{ascii}. If a reliable estimate of
 \mjeqn{\overline{\sigma}^2}{ascii} is not available \emph{a priori}, a
-data-driven estimate can be constructed (see, e.g., (link)).
+data-driven estimate can be constructed.
+}
+\references{
+\strong{Companion references}
+\enumerate{
+\item{\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
+Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
+for time-domain astronomy and astronomical spectroscopy. \emph{Monthly
+Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018.}} \cr
+\item{\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
+Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
+signals with varying degrees of smoothness. \emph{Monthly Notices of the
+Royal Astronomical Society}, 492(3), p. 4019-4032.}}}
+
+\strong{Trend filtering theory}
+\enumerate{
+\item{\href{https://projecteuclid.org/euclid.aos/1395234979}{
+Tibshirani (2014). Adaptive piecewise polynomial estimation via trend
+filtering. \emph{The Annals of Statistics}. 42(1), p. 285-323.}} \cr
+\item{\href{https://arxiv.org/abs/2003.03886}{
+Tibshirani (2020). Divided Differences, Falling Factorials, and
+Discrete Splines: Another Look at Trend Filtering and Related Problems.}}}
+
+\strong{Stein's unbiased risk estimate}
+\enumerate{
+\item{\href{http://www.stat.cmu.edu/~larry/=sml/stein.pdf}{
+Tibshirani and Wasserman (2015). Stein’s Unbiased Risk Estimate.
+\emph{36-702: Statistical Machine Learning course notes} (Carnegie Mellon
+University).}} \cr
+\item{\href{https://www.tandfonline.com/doi/abs/10.1198/016214504000000692}{
+Efron (2014). The Estimation of Prediction Error: Covariance Penalties
+and Cross-Validation. \emph{Journal of the American Statistical Association}.
+99(467), p. 619-632.}} \cr
+\item{\href{https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full}{
+Stein (1981). Estimation of the Mean of a Multivariate Normal
+Distribution. \emph{The Annals of Statistics}. 9(6), p. 1135-1151.}}}
+
+\strong{Effective degrees of freedom for trend filtering}
+\enumerate{
+\item{\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{
+Tibshirani and Taylor (2012). Degrees of freedom in lasso problems.
+\emph{The Annals of Statistics}, 40(2), p. 1198-1232.}}}
 }
 \seealso{
 \code{\link{cv.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 }
 \author{
-Collin A. Politsch, Ph.D., \email{collinpolitsch@gmail.com}
+\subsection{\strong{Collin A. Politsch, Ph.D.}}{
+
+\strong{Email}: collinpolitsch@gmail.com \cr
+\strong{Website}: \href{https://collinpolitsch.com/}{collinpolitsch.com} \cr
+\strong{GitHub}: \href{https://github.com/capolitsch/}{github.com/capolitsch} \cr \cr
 }
-\references{
-\strong{Companion references}
-\enumerate{
-\item{Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
-for time-domain astronomy and astronomical spectroscopy. \emph{Monthly
-Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018.
-\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{\link{Link}}} \cr
-\item{Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
-signals with varying degrees of smoothness. \emph{Monthly Notices of the
-Royal Astronomical Society}, 492(3), p. 4019-4032.
-\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{\link{Link}}}}
-
-\strong{Stein's unbiased risk estimate}
-\enumerate{
-\item{Tibshirani and Wasserman (2015). Stein’s Unbiased Risk Estimate.
-\emph{36-702: Statistical Machine Learning course notes} (Carnegie Mellon).
-\href{http://www.stat.cmu.edu/~larry/=sml/stein.pdf}{\link{Link}}} \cr
-\item{Efron (2014). The Estimation of Prediction Error: Covariance Penalties
-and Cross-Validation. \emph{Journal of the American Statistical Association}.
-99(467), p. 619-632.
-\href{https://www.tandfonline.com/doi/abs/10.1198/016214504000000692}{\link{Link}}} \cr
-\item{Stein (1981). Estimation of the Mean of a Multivariate Normal
-Distribution. \emph{The Annals of Statistics}. 9(6), p. 1135-1151.
-\href{https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full}{\link{Link}}}}
-
-\strong{Trend filtering theory}
-\enumerate{
-\item{Tibshirani (2014). Adaptive piecewise polynomial estimation via trend
-filtering. \emph{The Annals of Statistics}. 42(1), p. 285-323.
-\href{https://projecteuclid.org/euclid.aos/1395234979}{\link{Link}}} \cr
-\item{Tibshirani (2020). Divided Differences, Falling Factorials, and
-Discrete Splines: Another Look at Trend Filtering and Related Problems.
-arXiv e-print: \href{https://arxiv.org/abs/2003.03886}{\link{Link}}.}}
-
-\strong{Trend filtering convex optimization algorithm}
-\enumerate{
-\item{Ramdas and Tibshirani (2016). Fast and Flexible ADMM Algorithms
-for Trend Filtering. \emph{Journal of Computational and Graphical
-Statistics}, 25(3), p. 839-858.
-\href{https://amstat.tandfonline.com/doi/abs/10.1080/10618600.2015.1054033#.XfJpNpNKju0}{\link{Link}}}
-\item{Arnold, Sadhanala, and Tibshirani (2014). Fast algorithms for
-generalized lasso problems. R package \emph{glmgen}. Version 0.0.3.
-\href{https://github.com/glmgen/glmgen}{\link{Link}}}
-(Software implementation of Ramdas and Tibshirani algorithm)}
-
-\strong{Effect degrees of freedom for trend filtering}
-\enumerate{
-\item{Tibshirani and Taylor (2012). Degrees of freedom in lasso problems.
-\emph{The Annals of Statistics}, 40(2), p. 1198-1232.
-\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{\link{Link}}}}
 }

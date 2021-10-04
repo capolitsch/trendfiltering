@@ -2,7 +2,7 @@
 % Please edit documentation in R/cv.trendfilter.R
 \name{cv.trendfilter}
 \alias{cv.trendfilter}
-\title{Optimize the trend filtering hyperparameter (by V-fold cross validation)}
+\title{Optimize the trend filtering hyperparameter by V-fold cross validation}
 \usage{
 cv.trendfilter(
   x,
@@ -16,8 +16,7 @@ cv.trendfilter(
   k = 2L,
   gamma.choice = c("gamma.min", "gamma.1se"),
   validation.error.type = c("WMAE", "WMSE", "MAE", "MSE"),
-  optimization.params = trendfilter.control.list(max_iter = 600L, obj_tol = 1e-10,
-    thinning = NULL),
+  optimization.params = list(max_iter = 600L, obj_tol = 1e-10, thinning = NULL),
   mc.cores = detectCores(),
   ...
 )
@@ -119,8 +118,8 @@ applied to the data. If we make bins of size \code{x_tol} and find at least two
 elements of \code{x} that fall into the same bin, then we thin the data.
 }}
 
-\item{mc.cores}{Multi-core computing (for speedups): The number of cores to
-utilize. Defaults to the number of cores detected.}
+\item{mc.cores}{Parallel computing: The number of cores to utilize. Defaults
+to the number of cores detected.}
 
 \item{...}{Additional named arguments to be passed to
 \code{\link[glmgen]{trendfilter.control.list}}.}
@@ -141,6 +140,14 @@ One of \code{c("WMAE","WMSE","MAE","MSE")}.}
 vector will always be returned in descending order, regardless of the
 ordering provided by the user. The indices \code{i.min} and \code{i.1se}
 correspond to this descending ordering.}
+\item{errors}{Vector of cross validation errors for the given hyperparameter
+values.}
+\item{se.errors}{The standard errors of the cross validation errors.
+These are particularly useful for implementing the ``1-standard-error rule''.
+The 1-SE rule favors a smoother trend filtering estimate by, instead of
+using the hyperparameter that minimizes the CV error, instead uses the
+largest hyperparameter that has a CV error within 1 standard error of the
+smallest CV error.}
 \item{gamma.min}{Hyperparameter value that minimizes the SURE error curve.}
 \item{gamma.1se}{The largest hyperparameter value that is still within one
 standard error of the minimum hyperparameter's cross validation error.}
@@ -157,33 +164,25 @@ error.}
 \item{i.1se}{The index of \code{gammas} that gives the largest hyperparameter
 value that has a cross validation error within 1 standard error of the
 minimum of the cross validation error curves.}
-\item{errors}{Vector of cross validation errors for the given hyperparameter
-values.}
-\item{se.errors}{The standard errors of the cross validation errors.
-These are particularly useful for implementing the ``1-standard-error rule''.
-The 1-SE rule favors a smoother trend filtering estimate by, instead of
-using the hyperparameter that minimizes the CV error, instead uses the
-largest hyperparameter that has a CV error within 1 standard error of the
-smallest CV error.}
 \item{x}{The vector of the observed inputs.}
 \item{y}{The vector of the observed outputs.}
 \item{weights}{A vector of weights for the observed outputs. These are
-defined as \code{weights = 1/sigma^2}, where \code{sigma} is a vector of
-standard errors of the uncertainty in the measured outputs.}
-\item{fitted.values}{The trend filtering estimate of the signal, evaluated at
-the observed inputs \code{x}.}
-\item{residuals}{\code{residuals = y - fitted.values}}
+defined as \code{weights = 1 / sigmas^2}, where `sigmas` is a vector of
+standard errors of the uncertainty in the observed outputs.}
+\item{fitted.values}{The optimized trend filtering estimate of the signal,
+evaluated at the observed inputs `x`.}
+\item{residuals}{`residuals = y - fitted.values`}
 \item{k}{The degree of the trend filtering estimator.}
-\item{thinning}{logical. If \code{TRUE}, then the data are preprocessed so
-that a smaller, better conditioned data set is used for fitting.}
-\item{optimization.params}{a list of parameters that control the trend
+\item{optimization.params}{A list of parameters that control the trend
 filtering convex optimization.}
 \item{n.iter}{Vector of the number of iterations needed for the ADMM
 algorithm to converge within the given tolerance, for each hyperparameter
-value. If many of these are exactly equal to \code{max_iter}, then their
-solutions have not converged with the tolerance specified by \code{obj_tol}.
-In which case, it is often prudent to increase \code{max_iter}.}
-\item{x.scale, y.scale, data.scaled}{for internal use.}
+value. If many of these are exactly equal to `max_iter`, then their
+solutions have not converged with the tolerance specified by `obj_tol`.
+In which case, it is often prudent to increase `max_iter`.}
+\item{thinning}{Logical. If `TRUE`, then the data are preprocessed so
+that a smaller, better conditioned data set is used for fitting.}
+\item{x.scale, y.scale, data.scaled}{For internal use.}
 }
 \description{
 \loadmathjax \code{cv.trendfilter} performs V-fold cross
@@ -287,8 +286,7 @@ Section 5.1). \emph{Less technical than the above reference.}\cr
 assessment, more cross-validation. \emph{36-462: Data Mining course notes}
 (Carnegie Mellon).
 \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
-\link{Link}}
-}
+\link{Link}}}
 }
 \seealso{
 \code{\link{SURE.trendfilter}}, \code{\link{bootstrap.trendfilter}}

@@ -1,4 +1,4 @@
-#' Optimize the trend filtering hyperparameter (by V-fold cross validation)
+#' Optimize the trend filtering hyperparameter by V-fold cross validation
 #'
 #' @description \loadmathjax \code{cv.trendfilter} performs V-fold cross 
 #' validation to estimate the random-input squared error of a trend filtering 
@@ -89,10 +89,11 @@
 #' applied to the data. If we make bins of size `x_tol` and find at least two
 #' elements of `x` that fall into the same bin, then we thin the data.
 #' }
-#' @param mc.cores Multi-core computing (for speedups): The number of cores to
-#' utilize. Defaults to the number of cores detected.
+#' @param mc.cores Parallel computing: The number of cores to utilize. Defaults
+#' to the number of cores detected.
 #' @param ... Additional named arguments to be passed to 
 #' \code{\link[glmgen]{trendfilter.control.list}}.
+#' 
 #' @return An object of class 'cv.trendfilter'. This is a list with the 
 #' following elements:
 #' \item{x.eval}{The grid of inputs the optimized trend filtering estimate was 
@@ -108,6 +109,14 @@
 #' vector will always be returned in descending order, regardless of the 
 #' ordering provided by the user. The indices \code{i.min} and \code{i.1se}
 #' correspond to this descending ordering.}
+#' \item{errors}{Vector of cross validation errors for the given hyperparameter 
+#' values.}
+#' \item{se.errors}{The standard errors of the cross validation errors.
+#' These are particularly useful for implementing the ``1-standard-error rule''. 
+#' The 1-SE rule favors a smoother trend filtering estimate by, instead of 
+#' using the hyperparameter that minimizes the CV error, instead uses the 
+#' largest hyperparameter that has a CV error within 1 standard error of the
+#' smallest CV error.}
 #' \item{gamma.min}{Hyperparameter value that minimizes the SURE error curve.}
 #' \item{gamma.1se}{The largest hyperparameter value that is still within one
 #' standard error of the minimum hyperparameter's cross validation error.}
@@ -124,33 +133,26 @@
 #' \item{i.1se}{The index of \code{gammas} that gives the largest hyperparameter
 #' value that has a cross validation error within 1 standard error of the 
 #' minimum of the cross validation error curves.}
-#' \item{errors}{Vector of cross validation errors for the given hyperparameter 
-#' values.}
-#' \item{se.errors}{The standard errors of the cross validation errors.
-#' These are particularly useful for implementing the ``1-standard-error rule''. 
-#' The 1-SE rule favors a smoother trend filtering estimate by, instead of 
-#' using the hyperparameter that minimizes the CV error, instead uses the 
-#' largest hyperparameter that has a CV error within 1 standard error of the
-#' smallest CV error.}
 #' \item{x}{The vector of the observed inputs.}
 #' \item{y}{The vector of the observed outputs.}
 #' \item{weights}{A vector of weights for the observed outputs. These are
-#' defined as \code{weights = 1/sigma^2}, where \code{sigma} is a vector of 
-#' standard errors of the uncertainty in the measured outputs.}
-#' \item{fitted.values}{The trend filtering estimate of the signal, evaluated at
-#' the observed inputs \code{x}.}
-#' \item{residuals}{\code{residuals = y - fitted.values}}
+#' defined as `weights = 1 / sigmas^2`, where `sigmas` is a vector of 
+#' standard errors of the uncertainty in the observed outputs.}
+#' \item{fitted.values}{The optimized trend filtering estimate of the signal, 
+#' evaluated at the observed inputs `x`.}
+#' \item{residuals}{`residuals = y - fitted.values`}
 #' \item{k}{The degree of the trend filtering estimator.}
-#' \item{thinning}{logical. If \code{TRUE}, then the data are preprocessed so 
-#' that a smaller, better conditioned data set is used for fitting.}
-#' \item{optimization.params}{a list of parameters that control the trend
+#' \item{optimization.params}{A list of parameters that control the trend
 #' filtering convex optimization.}
 #' \item{n.iter}{Vector of the number of iterations needed for the ADMM
 #' algorithm to converge within the given tolerance, for each hyperparameter
-#' value. If many of these are exactly equal to \code{max_iter}, then their
-#' solutions have not converged with the tolerance specified by \code{obj_tol}.
-#' In which case, it is often prudent to increase \code{max_iter}.}
-#' \item{x.scale, y.scale, data.scaled}{for internal use.}
+#' value. If many of these are exactly equal to `max_iter`, then their
+#' solutions have not converged with the tolerance specified by `obj_tol`.
+#' In which case, it is often prudent to increase `max_iter`.}
+#' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so 
+#' that a smaller, better conditioned data set is used for fitting.}
+#' \item{x.scale, y.scale, data.scaled}{For internal use.}
+#' 
 #' @details This will be a very detailed description... \cr \cr
 #' \mjeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}{ascii} \cr 
 #' \mjeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}{ascii} \cr 
@@ -266,9 +268,7 @@ cv.trendfilter <- function(x, y, weights = NULL,
                            k = 2L,
                            gamma.choice = c("gamma.min","gamma.1se"),
                            validation.error.type = c("WMAE","WMSE","MAE","MSE"),
-                           optimization.params = trendfilter.control.list(max_iter = 600L,
-                                                                          obj_tol = 1e-10,
-                                                                          thinning = NULL),
+                           optimization.params = list(max_iter = 600L, obj_tol = 1e-10, thinning = NULL),
                            mc.cores = detectCores(),
                            ...){
   
@@ -319,6 +319,10 @@ cv.trendfilter <- function(x, y, weights = NULL,
     }
   }
   
+  if ( mc.cores < detectCores() ){
+    warning(paste0("Your machine only has ", detectCores(), " cores. Consider increasing `mc.cores` for computational speedups."))
+  }
+  
   if ( mc.cores > detectCores() ){
     warning(paste0("Your machine only has ", detectCores(), " cores. Adjusting mc.cores accordingly."))
     mc.cores <- detectCores()
@@ -346,8 +350,12 @@ cv.trendfilter <- function(x, y, weights = NULL,
     arrange(x) %>% 
     filter( weights != 0 ) %>%
     drop_na 
-  
   rm(x,y,weights)
+  
+  thinning <- optimization.params$thinning
+  optimization.params <- trendfilter.control.list(max_iter = optimization.params$max_iter,
+                                                  obj_tol = optimization.params$obj_tol,
+                                                  ...)
   
   x.scale <- median(diff(data$x))
   y.scale <- median(abs(data$y)) / 10
@@ -458,6 +466,7 @@ cv.trendfilter <- function(x, y, weights = NULL,
 }
 
 trendfilter.validate <- function(validation.index, data.folded, obj){
+  
   data.train <- data.folded[-validation.index] %>% bind_rows
   data.validate <- data.folded[[validation.index]]
   
