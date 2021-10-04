@@ -46,17 +46,17 @@
 #' @param optimization.params A named list of parameters that contains all
 #' parameter choices to be passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
-#' Tibshirani 2016}). See the documentation for the \pkg{glmgen} function 
-#' \code{\link[glmgen]{trendfilter.control.list}} for full details. 
-#' No technical understanding of the ADMM algorithm is needed and the default
-#' parameter choices will almost always suffice. However, the following
+#' Tibshirani 2016}). See the
+#' \code{\link[glmgen]{glmgen::trendfilter.control.list}} documentation for full
+#' details. No technical understanding of the ADMM algorithm is needed and the
+#' default parameter choices will almost always suffice. However, the following
 #' parameters may require some adjustments to ensure that your trend filtering
 #' estimate has sufficiently converged:
 #' \enumerate{
-#' \item{`max_iter`}: Maximum iterations allowed for the trend filtering 
-#' convex optimization. Defaults to `max_iter = 600L`. Increase this if 
-#' the trend filtering estimate does not appear to have fully converged to a 
-#' reasonable estimate of the signal.
+#' \item{`max_iter`}: Maximum iterations allowed for the trend filtering convex
+#' optimization. Defaults to `max_iter = 600L`. Increase this if the trend
+#' filtering estimate does not appear to have fully converged to a reasonable
+#' estimate of the signal.
 #' \item{`obj_tol`}: The tolerance used in the convex optimization stopping 
 #' criterion; when the relative change in the objective function is less than 
 #' this value, the algorithm terminates. Decrease this if the trend filtering 
