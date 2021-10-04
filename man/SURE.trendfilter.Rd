@@ -168,7 +168,7 @@ respect to random-input error on irregularly-sampled data.
 Recall the DGP stated in (link). Further, let
 \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i}).}{ascii}
 The fixed-input MSPE is given by
-\mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(f(t_{i}) - \widehat{f}\emph{{0}(t}{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right]}{ascii}
+\mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(f(t_{i}) - \widehat{f}_{0}(t_{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right]}{ascii}
 and the random-input MSPE is given by
 \mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}\left[\left(f(t) - \widehat{f}_{0}(t;\gamma)\right)^{2}\right],}{ascii}
 where, in the latter, \mjeqn{t}{ascii} is considered to be a random
@@ -185,12 +185,12 @@ We elaborate on SURE here and refer the reader to (link) for
 
 The SURE formula provides an unbiased estimate of the fixed-input MSPE of a
 statistical estimator:
-\mjdeqn{\widehat{R}\emph{0(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}\emph{0)}{n},}{ascii}
+\mjdeqn{\widehat{R}_0(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}_0)}{n},}{ascii}
 where \mjeqn{\overline{\sigma}^{2} = n^{-1}\sum}{i=1}^{n} \sigma_i^2}{ascii}
 and \mjeqn{\text{df}(\widehat{f}_0)}{ascii} is defined above. A formula for
 the effective degrees of freedom of the trend filtering estimator is
 available via the generalized lasso results of (link); namely,
-\mjdeqn{\text{df}(\widehat{f}_0) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}\emph{0\right] + k + 1.}{ascii}
+\mjdeqn{\text{df}(\widehat{f}_0) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}_0\right] + k + 1.}{ascii}
 We then obtain our hyperparameter estimate \mjeqn{\widehat{\gamma}}{ascii}
 by minimizing the following plug-in estimate for (link):
 \mjdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f}_0)}{n},}{ascii}
