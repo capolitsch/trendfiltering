@@ -3,7 +3,7 @@
 ## Installation
 
 ``` r
-devtools::install_github(repo = "capolitsch", subdir = "trendfiltering")
+devtools::install_github(repo = "capolitsch/trendfiltering")
 ```
 
 ## Denoising SALT Observatory spectra

@@ -10,6 +10,6 @@ bibentry(bibtype = "Manual",
                              role = "aut",
                              comment = c(ORCID = "0000-0003-3727-9167"))
                    )
-         year = year,
-         note = note,,
+         year = 2021,
+         note = note,
          key = "trendfiltering")

@@ -13,8 +13,8 @@
 #' predictor, covariate, explanatory variable, regressor, independent variable, 
 #' control variable, etc.)
 #' @param y The vector of observed values of the output variable (a.k.a. the
-#' response, target, outcome, regressand, dependent variable, etc.)
-#' @param weights \strong{Must be passed.} A vector of weights for the observed
+#' response, target, outcome, regressand, dependent variable, etc.).
+#' @param weights **Must be passed.** A vector of weights for the observed
 #' outputs, defined as the reciprocal of the variance of the error distribution.
 #' That is, `weights = 1 / sigmas^2`, where `sigmas` is a vector of standard
 #' errors of the uncertainty in the observed outputs. `weights` should either
@@ -42,7 +42,7 @@
 #' argument alone unless you know what you are doing.
 #' @param x.eval A grid of inputs to evaluate the optimized trend filtering 
 #' estimate on. Defaults to the observed inputs, `x`.
-#' @param nx.eval Integer. If passed, then `x.eval` is overridden with
+#' @param nx.eval Integer. If passed, overrides `x.eval` with
 #' `x.eval = seq(min(x), max(x), length = nx.eval)`
 #' @param optimization.params A named list of parameters that contains all
 #' parameter choices to be passed to the trend filtering ADMM algorithm
@@ -86,7 +86,7 @@
 #' \item{gammas}{Vector of hyperparameter values tested during validation
 #' (always returned in descending order).}
 #' \item{errors}{Vector of SURE error estimates corresponding to the 
-#' *descending* set of gamma values tested during validation.}
+#' **descending** set of gamma values tested during validation.}
 #' \item{gamma.min}{Hyperparameter value that minimizes the SURE error curve.}
 #' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
 #' estimators fit during validation.}
@@ -171,7 +171,7 @@
 #' \mjeqn{\widehat{\overline{\sigma}}^2}{ascii} is an estimate of
 #' \mjeqn{\overline{\sigma}^2}{ascii}. If a reliable estimate of 
 #' \mjeqn{\overline{\sigma}^2}{ascii} is not available \emph{a priori}, a
-#' data-driven estimate can be constructed (see, e.g., (link)).
+#' data-driven estimate can be constructed.
 #' 
 #' @references 
 #' \strong{Companion references} 
@@ -226,7 +226,7 @@
 #' 
 #' @export SURE.trendfilter
 #' @author Collin A. Politsch, Ph.D., \email{collinpolitsch@@gmail.com}
-#' @seealso \code{\link{bootstrap.trendfilter}}
+#' @seealso \code{\link{cv.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom tidyr drop_na tibble

@@ -202,7 +202,7 @@ with the observed number of knots, and
 data-driven estimate can be constructed (see, e.g., (link)).
 }
 \seealso{
-\code{\link{bootstrap.trendfilter}}
+\code{\link{cv.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 }
 \author{
 Collin A. Politsch, Ph.D., \email{collinpolitsch@gmail.com}

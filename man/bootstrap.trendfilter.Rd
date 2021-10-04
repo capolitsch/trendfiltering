@@ -6,15 +6,19 @@
 \usage{
 bootstrap.trendfilter(
   obj,
-  B = 100L,
-  return.full.ensemble = FALSE,
   alpha = 0.05,
+  B = 100L,
+  bootstrap.algorithm = c("nonparametric", "parametric", "wild"),
+  return.full.ensemble = FALSE,
   prune = TRUE,
   mc.cores = detectCores()
 )
 }
 \arguments{
 \item{obj}{An object of class '\link{SURE.trendfilter}'.}
+
+\item{alpha}{Specifies the width of the \code{1-alpha} pointwise variability
+bands. Defaults to \code{alpha = 0.05}.}
 
 \item{B}{The number of bootstrap samples used to estimate the pointwise
 variability bands. Defaults to \code{B = 100}. Increase this for more precise
@@ -25,21 +29,19 @@ bootstrap ensemble is returned as an \mjeqn{n \times B}{ascii} matrix, less
 any columns potentially pruned post-hoc (see \code{prune} below). Defaults to
 \code{return.full.ensemble = FALSE}.}
 
-\item{alpha}{Specifies the width of the \code{1-alpha} pointwise variability
-bands. Defaults to \code{alpha = 0.05}.}
-
 \item{prune}{Logical. If \code{TRUE}, then the trend filtering bootstrap
 ensemble is examined for rare instances in which the optimization has
 stopped at zero knots (most likely erroneously), and removes them from the
-ensemble. Defaults to \code{TRUE}. Do not change this unless you really know
-what you are doing!}
+ensemble. Defaults to \code{TRUE}. Do not change this unless you know what you are
+doing!}
 
-\item{mc.cores}{Multi-core computing (for speedups): The number of cores to
-utilize. Defaults to the number of cores detected.}
+\item{mc.cores}{Parallel computing: The number of cores to utilize. Defaults
+to the number of cores detected.}
 }
 \value{
 An object of class 'bootstrap.trendfilter'. This is a comprehensive
-list containing all of the analysis' important information, data, and results:
+list containing all of the analysis' important information, data, and
+results:
 \item{x.eval}{(Inherited from \code{obj}) The grid of inputs the trend
 filtering estimate and variability bands were evaluated on.}
 \item{tf.estimate}{The trend filtering estimate of the signal, evaluated on
@@ -58,9 +60,8 @@ produces a \code{100*(1-alpha)}\\% pointwise variability band.}
 variability bands.}
 \item{tf.bootstrap.ensemble}{(Optional) If \code{return.full.ensemble = TRUE}, the
 full trend filtering bootstrap ensemble as an \mjeqn{n \times B}{ascii}
-matrix, less any columns potentially pruned post-hoc
-(if \code{prune = TRUE}). If \code{return.full.ensemble = FALSE}, then this will
-return \code{NULL}.}
+matrix, less any columns potentially pruned post-hoc (if \code{prune = TRUE}).
+If \code{return.full.ensemble = FALSE}, then this will return \code{NULL}.}
 \item{edf.boots}{An integer vector of the estimated number of effective
 degrees of freedom of each trend filtering bootstrap estimate. These should
 all be relatively close to \code{edf.min} (below).}
@@ -72,47 +73,43 @@ ensemble.}
 estimates pruned from the ensemble.}
 \item{x}{(Inherited from \code{obj}) The vector of the observed inputs.}
 \item{y}{(Inherited from \code{obj}) The vector of the observed outputs.}
-\item{weights}{(Inherited from \code{obj}) A vector of weights for the
-observed outputs. These are defined as \code{weights = 1 / sigma^2}, where
-\code{sigma} is a vector of standard errors of the uncertainty in the output
-measurements.}
-\item{residuals}{(Inherited from \code{obj})
-\code{residuals = y - fitted.values}.}
-\item{k}{(Inherited from \code{obj}) The degree of the trend filtering
-estimator.}
-\item{gammas}{(Inherited from \code{obj}) Vector of hyperparameter values
-tested during validation.}
-\item{gammas.min}{(Inherited from \code{obj}) Hyperparameter value that
-minimizes the validation error curve.}
-\item{edf}{(Inherited from \code{obj}) Integer vector of effective degrees of
+\item{weights}{(Inherited from \code{obj}) A vector of weights for the observed
+outputs. These are defined as \code{weights = 1 / sigma^2}, where \code{sigma} is a
+vector of standard errors of the uncertainty in the output measurements.}
+\item{residuals}{(Inherited from \code{obj}) \code{residuals = y - fitted.values}}
+\item{k}{(Inherited from \code{obj}) The degree of the trend filtering estimator.}
+\item{gammas}{(Inherited from \code{obj}) Vector of hyperparameter values tested
+during validation.}
+\item{gammas.min}{(Inherited from \code{obj}) Hyperparameter value that minimizes
+the validation error curve.}
+\item{edf}{(Inherited from \code{obj}}) Integer vector of effective degrees of
 freedom for trend filtering estimators fit during validation.}
-\item{edf.min}{(Inherited from \code{obj}) The effective degrees of freedom
-of the optimally-tuned trend filtering estimator.}
-\item{i.min}{(Inherited from \code{obj}) The index of \code{gammas} that
-minimizes the validation error.}
+\item{edf.min}{(Inherited from \code{obj}) The effective degrees of freedom of the
+optimally-tuned trend filtering estimator.}
+\item{i.min}{(Inherited from \code{obj}) The index of \code{gammas} that minimizes the
+validation error.}
 \item{validation.method}{"SURE"}
 \item{error}{(Inherited from \code{obj}) Vector of hyperparameter validation
-errors, inherited from \code{obj} (an object of class 'SURE.trendfilter')}
-\item{optimization.params}{(Inherited from \code{obj}) a list of parameters
-that control the trend filtering convex optimization.}
+errors, inherited from \code{obj} (an object of class 'SURE.trendfilter').}
+\item{optimization.params}{(Inherited from \code{obj}) a list of parameters that
+control the trend filtering convex optimization.}
 \item{n.iter}{(Inherited from \code{obj}) Vector of the number of iterations
 needed for the ADMM algorithm to converge within the given tolerance, for
-each hyperparameter value. If many of these are exactly equal to
-\code{max_iter}, then their solutions have not converged with the tolerance
-specified by \code{obj_tol}. In which case, it is often prudent to increase
-\code{max_iter}.}
+each hyperparameter value. If many of these are exactly equal to \code{max_iter},
+then their solutions have not converged with the tolerance specified by
+\code{obj_tol}. In which case, it is often prudent to increase \code{max_iter}.}
 \item{n.iter.boots}{Vector of the number of iterations needed for the ADMM
-algorithm to converge within the given tolerance, for each bootstrap
-trend filtering estimate.}
-\item{x.scale, y.scale, data.scaled}{For internal use}
+algorithm to converge within the given tolerance, for each bootstrap trend
+filtering estimate.}
+\item{x.scale, y.scale, data.scaled}{For internal use.}
 }
 \description{
-\loadmathjax{} \code{bootstrap.trendfilter} implements a
+\loadmathjax \code{bootstrap.trendfilter} implements a
 parametric bootstrap algorithm to obtain one or both of the following:
 \enumerate{
 \item{Standard errors of the optimized trend filtering point estimator}
-\item{Percentile-based \code{1-alpha} variability bands of the optimized
-trend filtering point estimator.}}
+\item{Percentile-based \code{1-alpha} variability bands of the optimized trend
+filtering point estimator.}}
 }
 \details{
 See
