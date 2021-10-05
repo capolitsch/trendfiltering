@@ -2,9 +2,7 @@
 #' 
 #' `cv.trendfilter` optimizes the trend filtering hyperparameter 
 #' by performing V-fold cross validation on a vector, `gammas`, of candidate 
-#' hyperparameter values, and
-#' then selects the value that minimizes an unbiased estimate of the model's
-#' generalization error. The full generalization error curve and the optimized
+#' hyperparameter values. The full generalization error curve and the optimized
 #' trend filtering estimate are then returned within a list that also includes 
 #' a detailed summary of the analysis. One of `c("gamma.min", "gamma.1se")`.
 #' 
@@ -49,7 +47,7 @@
 #' @param x.eval A grid of inputs to evaluate the optimized trend filtering 
 #' estimate on. Defaults to the observed inputs, `x`.
 #' @param nx.eval Integer. If passed, overrides `x.eval` with
-#' `x.eval = seq(min(x), max(x), length = nx.eval)`
+#' `seq(min(x), max(x), length = nx.eval)`
 #' @param gamma.choice One of \code{c("gamma.min","gamma.1se")}. The choice
 #' of hyperparameter that is used for optimized trend filtering estimate. 
 #' \cr \cr
@@ -242,8 +240,6 @@
 #' # | -0.4978067| 0.9295757| 0.010162|
 #' # | -0.4957892| 0.9438493| 0.010162|
 #' 
-#' # I did not think up this specific choice of grid a priori
-#' # It required some empirical honing
 #' gamma.grid <- exp( seq(7, 16, length = 150) )
 #' 
 #' cv.out <- cv.trendfilter(x = df$phase, 

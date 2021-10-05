@@ -57,7 +57,7 @@ are doing.}
 estimate on. Defaults to the observed inputs, \code{x}.}
 
 \item{nx.eval}{Integer. If passed, overrides \code{x.eval} with
-\code{x.eval = seq(min(x), max(x), length = nx.eval)}}
+\code{seq(min(x), max(x), length = nx.eval)}}
 
 \item{k}{The degree of the trend filtering estimator. More precisely, with
 the trend filtering estimator defined as a piecewise function of polynomials
@@ -185,9 +185,7 @@ that a smaller, better conditioned data set is used for fitting.}
 \description{
 \code{cv.trendfilter} optimizes the trend filtering hyperparameter
 by performing V-fold cross validation on a vector, \code{gammas}, of candidate
-hyperparameter values, and
-then selects the value that minimizes an unbiased estimate of the model's
-generalization error. The full generalization error curve and the optimized
+hyperparameter values. The full generalization error curve and the optimized
 trend filtering estimate are then returned within a list that also includes
 a detailed summary of the analysis. One of \code{c("gamma.min", "gamma.1se")}.
 }
@@ -242,8 +240,6 @@ data(eclipsing_binary)
 # | -0.4978067| 0.9295757| 0.010162|
 # | -0.4957892| 0.9438493| 0.010162|
 
-# I did not think up this specific choice of grid a priori
-# It required some empirical honing
 gamma.grid <- exp( seq(7, 16, length = 150) )
 
 cv.out <- cv.trendfilter(x = df$phase, 

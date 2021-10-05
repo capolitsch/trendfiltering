@@ -2,7 +2,7 @@
 #' risk estimate
 #'
 #' `SURE.trendfilter` optimizes the trend filtering hyperparameter via a grid
-#' search over the vector, `gammas`, of candidate hyperparameter values, and
+#' search over a vector, `gammas`, of candidate hyperparameter values, and
 #' then selects the value that minimizes an unbiased estimate of the model's
 #' generalization error. The full generalization error curve and the optimized
 #' trend filtering estimate are then returned within a list that also includes 
@@ -42,7 +42,7 @@
 #' @param x.eval A grid of inputs to evaluate the optimized trend filtering 
 #' estimate on. Defaults to the observed inputs, `x`.
 #' @param nx.eval Integer. If passed, overrides `x.eval` with
-#' `x.eval = seq(min(x), max(x), length = nx.eval)`
+#' `seq(min(x), max(x), length = nx.eval)`
 #' @param optimization.params A named list of parameters that contains all
 #' parameter choices to be passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
