@@ -155,80 +155,83 @@ following data generating process (DGP):
 where \mjeqn{f(t_i)}{ascii} is a noisy measurement of the signal
 \mjeqn{f_0(t_i)}{ascii}, \mjeqn{\mathbb{E}\link[=\\epsilon_i]{\epsilon_i} = 0}{ascii}, and
 \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}{ascii}.
-Let \mjeqn{\widehat{f}\emph{0}{ascii} denote the trend filtering estimator of
+Let \mjeqn{\widehat{f}_0}{ascii} denote the trend filtering estimator of
 order \mjeqn{k}{ascii} with free hyperparameter \mjeqn{\gamma}{ascii}.
 The fixed-input mean-squared prediction error (MSPE) of the estimator
-\mjeqn{\widehat{f}\emph{0}{ascii} is given by
-\mjdeqn{R(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\;\mathbb{E}\left[\left(f(t}{i}) - \widehat{f}\emph{{0}(t}{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right]}{ascii}
+\mjeqn{\widehat{f}_0}{ascii} is given by
+\mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(f(t}{i}) - \widehat{f}_{0}(t}{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right]}{ascii}
 \mjdeqn{= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left[\left(f_0(t_i) - \widehat{f}_0(t_i;\gamma)\right)^2\;|\;t_1,\dots,t_n\right] + \sigma_i^2\right).}{ascii}
 
 Stein's unbiased risk estimate (SURE) provides an unbiased estimate of the
 fixed-input MSPE of any regression estimator of the signal
 \mjeqn{f_0}{ascii}.
-\mjdeqn{\widehat{R}\emph{0(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}\emph{0)}{n},}{ascii}
-where \mjeqn{\overline{\sigma}^{2} = n^{-1}\sum}{i=1}^{n} \sigma_i^2}{ascii}
+\mjdeqn{\widehat{R}_0(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}_0)}{n},}{ascii}
+where \mjeqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}{ascii}
 and \mjeqn{\text{df}(\widehat{f}_0)}{ascii} is the effective degrees of
 freedom for a trend filtering estimator (with a fixed choice of
 hyperparameter). A formula for the effective degrees of freedom of the trend
 filtering estimator is available via the generalized lasso results of
 \href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{Tibshirani and Taylor (2012)};
 namely,
-\mjdeqn{\text{df}(\widehat{f}_0) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}\emph{0\right] + k + 1.}{ascii}
+\mjdeqn{\text{df}(\widehat{f}_0) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}_0\right] + k + 1.}{ascii}
 We then obtain our hyperparameter estimate \mjeqn{\widehat{\gamma}}{ascii}
 by minimizing the following plug-in estimate:
-\mjdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum}{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f}_0)}{n},}{ascii}
+\mjdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f}_0)}{n},}{ascii}
 where \mjeqn{\widehat{\text{df}}}{ascii} is the estimate for the effective
 degrees of freedom that is obtained by replacing the expectation with the
 observed number of knots, and \mjeqn{\widehat{\overline{\sigma}}^2}{ascii}
 is an estimate of \mjeqn{\overline{\sigma}^2}{ascii}.
 }
 \references{
-\strong{Companion references}
+\bold{Companion references}
 \enumerate{
-\item{\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
-for time-domain astronomy and astronomical spectroscopy. \emph{Monthly
-Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018.}} \cr
-\item{\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
-Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
-signals with varying degrees of smoothness. \emph{Monthly Notices of the
-Royal Astronomical Society}, 492(3), p. 4019-4032.}}}
+\item{Politsch et al. (2020a).
+\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
+Trend filtering – I. A modern statistical tool for time-domain astronomy and
+astronomical spectroscopy}. \emph{MNRAS}, 492(3), p. 4005-4018.} \cr
+\item{Politsch et al. (2020b).
+\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
+Trend Filtering – II. Denoising astronomical signals with varying degrees of
+smoothness}. \emph{MNRAS}, 492(3), p. 4019-4032.}}
 
-\strong{Trend filtering theory}
+\bold{Trend filtering theory}
 \enumerate{
-\item{\href{https://projecteuclid.org/euclid.aos/1395234979}{
-Tibshirani (2014). Adaptive piecewise polynomial estimation via trend
-filtering. \emph{The Annals of Statistics}. 42(1), p. 285-323.}} \cr
-\item{\href{https://arxiv.org/abs/2003.03886}{
-Tibshirani (2020). Divided Differences, Falling Factorials, and
-Discrete Splines: Another Look at Trend Filtering and Related Problems.}}}
+\item{Tibshirani (2014).
+\href{https://projecteuclid.org/euclid.aos/1395234979}{Adaptive piecewise
+polynomial estimation via trend filtering}. \emph{The Annals of Statistics}.
+42(1), p. 285-323.} \cr
+\item{Tibshirani (2020). \href{https://arxiv.org/abs/2003.03886}{Divided
+Differences, Falling Factorials, and Discrete Splines: Another Look at Trend
+Filtering and Related Problems}. arXiv preprint.}}
 
-\strong{Stein's unbiased risk estimate}
+\bold{Stein's unbiased risk estimate}
 \enumerate{
-\item{\href{http://www.stat.cmu.edu/~larry/=sml/stein.pdf}{
-Tibshirani and Wasserman (2015). Stein’s Unbiased Risk Estimate.
-\emph{36-702: Statistical Machine Learning course notes} (Carnegie Mellon
-University).}} \cr
-\item{\href{https://www.tandfonline.com/doi/abs/10.1198/016214504000000692}{
-Efron (2014). The Estimation of Prediction Error: Covariance Penalties
-and Cross-Validation. \emph{Journal of the American Statistical Association}.
-99(467), p. 619-632.}} \cr
-\item{\href{https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full}{
-Stein (1981). Estimation of the Mean of a Multivariate Normal
-Distribution. \emph{The Annals of Statistics}. 9(6), p. 1135-1151.}}}
+\item{Tibshirani and Wasserman (2015).
+\href{http://www.stat.cmu.edu/~larry/=sml/stein.pdf}{Stein’s Unbiased Risk
+Estimate}. \emph{36-702: Statistical Machine Learning course notes}
+(Carnegie Mellon University).} \cr
+\item{Efron (2014).
+\href{https://www.tandfonline.com/doi/abs/10.1198/016214504000000692}{
+The Estimation of Prediction Error: Covariance Penalties
+and Cross-Validation}. \emph{Journal of the American Statistical
+Association}. 99(467), p. 619-632.} \cr
+\item{Stein (1981).
+\href{https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full}{
+Estimation of the Mean of a Multivariate Normal Distribution}.
+\emph{The Annals of Statistics}. 9(6), p. 1135-1151.}}
 
-\strong{Effective degrees of freedom for trend filtering}
+\bold{Effective degrees of freedom for trend filtering}
 \enumerate{
-\item{\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{
-Tibshirani and Taylor (2012). Degrees of freedom in lasso problems.
-\emph{The Annals of Statistics}, 40(2), p. 1198-1232.}}}
+\item{Tibshirani and Taylor (2012)}.
+\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{
+Degrees of freedom in lasso problems}. \emph{The Annals of Statistics},
+40(2), p. 1198-1232.}
 }
 \seealso{
 \code{\link{cv.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 }
 \author{
-\subsection{\cr
-\strong{Collin A. Politsch, Ph.D.}}{
+\subsection{\bold{Collin A. Politsch, Ph.D.}}{
 
 Email: collinpolitsch@gmail.com \cr
 Website: \href{https://collinpolitsch.com/}{collinpolitsch.com} \cr

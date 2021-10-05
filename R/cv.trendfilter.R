@@ -155,59 +155,60 @@
 #' @details \loadmathjax Suppose we observe noisy measurements of a response
 #' variable of interest (e.g., flux, magnitude, photon counts) according to the
 #' data generating process (DGP)
-#' \deqn{f(t_i) = f_0(t_i) + \epsilon_i,  \quad\quad t_1,\dots,t_n\in(a,b),}
-#' where \eqn{f(t_i)} is a noisy measurement of the signal
-#' \eqn{f_0(t_i)}, and \eqn{\mathbb{E}(\epsilon_i) = 0}.
-#' Further, let \eqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}{ascii}.
+#' \mjsdeqn{f(t_i) = f_0(t_i) + \epsilon_i,  \quad\quad t_1,\dots,t_n\in(a,b),}
+#' where \mjseqn{f(t_i)} is a noisy measurement of the signal
+#' \mjseqn{f_0(t_i)}, and \eqn{\mathbb{E}(\epsilon_i) = 0}.
+#' Further, let \mjseqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}.
 #' The random-input mean-squared prediction error (MSPE) is given by
-#' \deqn{\widetilde{R}(\gamma) = \mathbb{E}\left\[\left(f(t) - \widehat{f}_{0}(t;\gamma)\right)^{2}\right\],}
-#' where \mjeqn{t}{ascii} is considered to be a random component of the DGP with
-#' a marginal probability density \eqn{p_t(t)} supported on the
+#' \mjsdeqn{\widetilde{R}(\gamma) = \mathbb{E}\left\[\left(f(t) - \widehat{f}_{0}(t;\gamma)\right)^{2}\right\],}
+#' where \mjseqn{t} is considered to be a random component of the DGP with
+#' a marginal probability density \mjseqn{p_t(t)} supported on the
 #' observed input interval. The theoretically optimal choice of
-#' \mjeqn{\gamma}{ascii} is defined as the minimizer of this error.
-#' \deqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-#' \deqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}
+#' \mjseqn{\gamma} is defined as the minimizer of this error.
+#' \mjsdeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
+#' \mjsdeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}
 #' \mjsdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}
 #' \mjsdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}
-#' where \mjeqn{\widehat{f}(x_i; \gamma)}{ascii} is the trend filtering 
-#' estimate with hyperparameter \mjeqn{\gamma}{ascii}, evaluated at 
-#' \mjeqn{x_i}{ascii}.
+#' where \mjseqn{\widehat{f}(x_i; \gamma)} is the trend filtering 
+#' estimate with hyperparameter \mjseqn{\gamma}, evaluated at 
+#' \mjseqn{x_i}.
 #' 
 #' @export cv.trendfilter
 #' 
-#' @author \cr
-#' \strong{Collin A. Politsch, Ph.D.}
+#' @author
+#' \bold{Collin A. Politsch, Ph.D.}
 #' ---
 #' Email: collinpolitsch@@gmail.com \cr
 #' Website: [collinpolitsch.com](https://collinpolitsch.com/) \cr
 #' GitHub: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
 #' 
 #' @references 
-#' \strong{Companion references} 
+#' \bold{Companion references} 
 #' \enumerate{
-#' \item{\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-#' Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
-#' for time-domain astronomy and astronomical spectroscopy. \emph{Monthly 
-#' Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018.}} \cr
-#' \item{\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
-#' Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical 
-#' signals with varying degrees of smoothness. \emph{Monthly Notices of the 
-#' Royal Astronomical Society}, 492(3), p. 4019-4032.}}}
+#' \item{Politsch et al. (2020a). 
+#' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
+#' Trend filtering – I. A modern statistical tool for time-domain astronomy and
+#' astronomical spectroscopy}. \emph{MNRAS}, 492(3), p. 4005-4018.} \cr
+#' \item{Politsch et al. (2020b). 
+#' \href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
+#' Trend Filtering – II. Denoising astronomical signals with varying degrees of
+#' smoothness}. \emph{MNRAS}, 492(3), p. 4019-4032.}}
 #' 
-#' \strong{Cross validation}
+#' \bold{Cross validation}
 #' \enumerate{
-#' \item \href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{
-#' Hastie, Tibshirani, and Friedman (2009). The Elements of Statistical 
-#' Learning: Data Mining, Inference, and Prediction. 2nd edition. Springer 
-#' Series in Statistics. (See Sections 7.10 and 7.12)} \cr
-#' \item \href{https://www.statlearning.com/}{
-#' James, Witten, Hastie, and Tibshirani (2013). An Introduction to 
-#' Statistical Learning : with Applications in R. Springer. (See 
-#' Section 5.1; Less technical than ESL)} \cr
-#' \item \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
-#' Tibshirani (2013). Model selection and validation 2: Model
-#' assessment, more cross-validation. \emph{36-462: Data Mining course notes} 
-#' (Carnegie Mellon).}}
+#' \item{Hastie, Tibshirani, and Friedman (2009). 
+#' \href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{
+#' The Elements of Statistical Learning: Data Mining, Inference, and
+#' Prediction}. 2nd edition. Springer Series in Statistics. (See Sections 7.10
+#' and 7.12)} \cr
+#' \item{James, Witten, Hastie, and Tibshirani (2013).
+#' \href{https://www.statlearning.com/}{An Introduction to Statistical Learning:
+#' with Applications in R}. Springer. (See Section 5.1; Less technical than
+#' ESL)} \cr
+#' \item{Tibshirani (2013). 
+#' \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
+#' Model selection and validation 2: Model assessment, more cross-validation}.
+#' \emph{36-462: Data Mining course notes} (Carnegie Mellon University).}}
 #' 
 #' @seealso \code{\link{SURE.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 #' 

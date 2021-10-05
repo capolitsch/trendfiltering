@@ -1,9 +1,10 @@
 Package: trendfiltering
 Type: Package
 Title: Optimal one-dimensional data analysis with trend filtering
-Description: State-of-the-art one-dimensional data analysis with trend filtering (Tibshirani 2014).
-Version: 0.0.1
-Date: 2021-10-05
+Description: State-of-the-art one-dimensional data analysis with trend
+  filtering (Tibshirani 2014).
+Version: 0.1.0
+Date: 2021-10-06
 Authors@R: c(person(given = "Collin A.",
                     family = "Politsch",
                     role = c("aut","cre"),
