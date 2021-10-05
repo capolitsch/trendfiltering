@@ -190,22 +190,22 @@ trend filtering estimate are then returned within a list that also includes
 a detailed summary of the analysis. One of \code{c("gamma.min", "gamma.1se")}.
 }
 \details{
-@noMd \loadmathjax Suppose we observe noisy measurements of a response
+\loadmathjax Suppose we observe noisy measurements of a response
 variable of interest (e.g., flux, magnitude, photon counts) according to the
 data generating process (DGP)
-\mjdeqn{f(t_i) = f_0(t_i) + \epsilon_i,  \hfill t_1,\dots,t_n\in(a,b),}{ascii}
-where \mjeqn{f(t_i)}{ascii} is a noisy measurement of the signal
-\mjeqn{f_0(t_i)}{ascii}, and \mjeqn{\mathbb{E}\link[=\\epsilon_i]{\epsilon_i} = 0}{ascii}.
-Further, let \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}{ascii}.
+\deqn{f(t_i) = f_0(t_i) + \epsilon_i,  \quad\quad t_1,\dots,t_n\in(a,b),}
+where \eqn{f(t_i)} is a noisy measurement of the signal
+\eqn{f_0(t_i)}, and \eqn{\mathbb{E}(\epsilon_i) = 0}.
+Further, let \eqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}{ascii}.
 The random-input mean-squared prediction error (MSPE) is given by
-\mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}\left[\left(f(t) - \widehat{f}\emph{{0}(t;\gamma)\right)^{2}\right],}{ascii}
+\deqn{\widetilde{R}(\gamma) = \mathbb{E}\left\[\left(f(t) - \widehat{f}_{0}(t;\gamma)\right)^{2}\right\],}
 where \mjeqn{t}{ascii} is considered to be a random component of the DGP with
-a marginal probability density \mjeqn{p_t(t)}{ascii} supported on the
+a marginal probability density \eqn{p_t(t)} supported on the
 observed input interval. The theoretically optimal choice of
 \mjeqn{\gamma}{ascii} is defined as the minimizer of this error.
 \deqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
 \deqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}
-\mjsdeqn{MAE(\gamma) = \frac{1}{n}\sum}{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}
+\mjsdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}
 \mjsdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}
 where \mjeqn{\widehat{f}(x_i; \gamma)}{ascii} is the trend filtering
 estimate with hyperparameter \mjeqn{\gamma}{ascii}, evaluated at
