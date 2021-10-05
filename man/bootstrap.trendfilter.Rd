@@ -3,7 +3,7 @@
 \name{bootstrap.trendfilter}
 \alias{bootstrap.trendfilter}
 \title{Obtain \code{1-alpha} pointwise variability bands by bootstrapping the optimized
-trend filtering estimator}
+trend filtering estimator...}
 \usage{
 bootstrap.trendfilter(
   obj,
@@ -30,7 +30,7 @@ bootstrap to use. One of \code{c("nonparametric","parametric","wild")}. See
 details below for recommendations on when each option is appropriate.}
 
 \item{return.full.ensemble}{Logical. If \code{TRUE}, the full trend filtering
-bootstrap ensemble is returned as an \mjeqn{n \times B}{ascii} matrix, less
+bootstrap ensemble is returned as an \mjseqn{n \times B} matrix, less
 any columns from post-hoc pruning (see \code{prune} below). Defaults to
 \code{return.full.ensemble = FALSE}.}
 
@@ -45,7 +45,7 @@ to the number of cores detected.}
 }
 \value{
 An object of class 'bootstrap.trendfilter'. This is a comprehensive
-list containing all of the analysis' important information, data, and
+list containing all of the analysis important information, data, and
 results:
 \item{x.eval}{(Inherited from \code{obj}) The grid of inputs the optimized trend
 filtering estimate was evaluated on.}
@@ -63,8 +63,8 @@ bootstrap was used to obtain the variability bands.}
 produces a \code{100*(1-alpha)}\% pointwise variability band.}
 \item{B}{The number of bootstrap samples used to estimate the pointwise
 variability bands.}
-\item{tf.bootstrap.ensemble}{(Optional) If \code{return.full.ensemble = TRUE}, the
-full trend filtering bootstrap ensemble as an \mjeqn{n \times B}{ascii}
+\item{tf.bootstrap.ensemble}{If \code{return.full.ensemble = TRUE}, the
+full trend filtering bootstrap ensemble as an \mjseqn{n \times B}
 matrix, less any columns from post-hoc pruning (if \code{prune = TRUE}).
 If \code{return.full.ensemble = FALSE}, then this will return \code{NULL}.}
 \item{edf.boots}{An integer vector of the estimated number of effective
@@ -109,14 +109,12 @@ filtering estimate.}
 \item{x.scale, y.scale, data.scaled}{For internal use.}
 }
 \description{
-\code{bootstrap.trendfilter} implements...
+\loadmathjax \code{bootstrap.trendfilter} implements
 }
 \details{
-\loadmathjax
-
 See
 \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-Politsch et al. (2020a)} for the full parametric bootstrap algorithm.
+Politsch et al. (2020a)}.
 }
 \references{
 \strong{Companion references}

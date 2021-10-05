@@ -5,8 +5,8 @@
 #' grid search over a vector, `gammas`, of candidate hyperparameter values, and
 #' selecting the value that minimizes an unbiased estimate of the model's
 #' generalization error. The full generalization error curve and the optimized
-#' trend filtering estimate are then returned within a list that also includes 
-#' a detailed summary of the analysis.
+#' trend filtering estimate are then returned within a list that
+#' comprehensively summarizes the analysis.
 #' 
 #' @param x The vector of observed values of the input variable (a.k.a. the 
 #' predictor, covariate, explanatory variable, regressor, independent variable, 
@@ -46,7 +46,8 @@
 #' @param optimization.params A named list of parameters that contains all
 #' parameter choices to be passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
-#' Tibshirani 2016}). See the \code{\link[glmgen]{trendfilter.control.list}}
+#' Tibshirani 2016}). See the 
+#' \code{\link[glmgen::trendfilter.control.list]{glmgen::trendfilter.control.list}}
 #' documentation for full details. No technical understanding of the ADMM
 #' algorithm is needed and the default parameter choices will almost always
 #' suffice. However, the following parameters may require some adjustments to
@@ -71,7 +72,7 @@
 #' applied to the data. If we make bins of size `x_tol` and find at least two
 #' elements of `x` that fall into the same bin, then we thin the data.}
 #' @param ... Additional named arguments to be passed to 
-#' \code{\link[glmgen]{trendfilter.control.list}}.
+#' \code{\link[glmgen::trendfilter.control.list]{glmgen::trendfilter.control.list}}.
 #' 
 #' @details \loadmathjax As a general rule-of-thumb...
 #' 

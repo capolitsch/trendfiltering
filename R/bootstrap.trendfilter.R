@@ -1,11 +1,9 @@
 #' Obtain `1-alpha` pointwise variability bands by bootstrapping the optimized
-#' trend filtering estimator
+#' trend filtering estimator...
 #'
-#' `bootstrap.trendfilter` implements...
+#' \loadmathjax `bootstrap.trendfilter` implements
 #' 
-#' \loadmathjax
-#' 
-#' @param obj An object of class '\link{SURE.trendfilter}' or 
+#' @param obj An object of class '\link{SURE.trendfilter}' or
 #' '\link{cv.trendfilter}'.
 #' @param alpha Determines the width of the `1-alpha` pointwise variability 
 #' bands. Defaults to `alpha = 0.05`.
@@ -15,7 +13,7 @@
 #' bootstrap to use. One of `c("nonparametric","parametric","wild")`. See
 #' details below for recommendations on when each option is appropriate.
 #' @param return.full.ensemble Logical. If `TRUE`, the full trend filtering 
-#' bootstrap ensemble is returned as an \mjeqn{n \times B}{ascii} matrix, less 
+#' bootstrap ensemble is returned as an \mjseqn{n \times B} matrix, less 
 #' any columns from post-hoc pruning (see `prune` below). Defaults to 
 #' `return.full.ensemble = FALSE`.
 #' @param prune Logical. If `TRUE`, then the trend filtering bootstrap 
@@ -27,7 +25,7 @@
 #' to the number of cores detected.
 #' 
 #' @return An object of class 'bootstrap.trendfilter'. This is a comprehensive
-#' list containing all of the analysis' important information, data, and
+#' list containing all of the analysis important information, data, and
 #' results:
 #' \item{x.eval}{(Inherited from `obj`) The grid of inputs the optimized trend
 #' filtering estimate was evaluated on.}
@@ -45,8 +43,8 @@
 #' produces a `100*(1-alpha)`% pointwise variability band.}
 #' \item{B}{The number of bootstrap samples used to estimate the pointwise
 #' variability bands.}
-#' \item{tf.bootstrap.ensemble}{(Optional) If `return.full.ensemble = TRUE`, the 
-#' full trend filtering bootstrap ensemble as an \mjeqn{n \times B}{ascii} 
+#' \item{tf.bootstrap.ensemble}{If `return.full.ensemble = TRUE`, the 
+#' full trend filtering bootstrap ensemble as an \mjseqn{n \times B}
 #' matrix, less any columns from post-hoc pruning (if `prune = TRUE`). 
 #' If `return.full.ensemble = FALSE`, then this will return `NULL`.}
 #' \item{edf.boots}{An integer vector of the estimated number of effective 
@@ -92,7 +90,7 @@
 #' 
 #' @details See
 #' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-#' Politsch et al. (2020a)} for the full parametric bootstrap algorithm. 
+#' Politsch et al. (2020a)}. 
 #' 
 #' @export bootstrap.trendfilter
 #' 

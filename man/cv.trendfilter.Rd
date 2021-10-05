@@ -89,8 +89,9 @@ error decreases sensitivity to outliers. Defaults to \code{"WMAE"}.}
 \item{optimization.params}{A named list of parameters that contains all
 parameter choices to be passed to the trend filtering ADMM algorithm
 (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
-Tibshirani 2016}). See the documentation for the \pkg{glmgen} function
-\code{\link[glmgen]{trendfilter.control.list}} for full details.
+Tibshirani 2016}). See the
+\code{\link[glmgen::trendfilter.control.list]{glmgen::trendfilter.control.list}}
+documentation for full details.
 No technical understanding of the ADMM algorithm is needed and the default
 parameter choices will almost always suffice. However, the following
 parameters may require some adjustments to ensure that your trend filtering
@@ -120,7 +121,7 @@ elements of \code{x} that fall into the same bin, then we thin the data.
 to the number of cores detected.}
 
 \item{...}{Additional named arguments to be passed to
-\code{\link[glmgen]{trendfilter.control.list}}.}
+\code{\link[glmgen::trendfilter.control.list]{glmgen::trendfilter.control.list}}.}
 }
 \value{
 An object of class 'cv.trendfilter'. This is a list with the
@@ -189,7 +190,7 @@ trend filtering estimate are then returned within a list that also includes
 a detailed summary of the analysis. One of \code{c("gamma.min", "gamma.1se")}.
 }
 \details{
-\loadmathjax Suppose we observe noisy measurements of a response
+@noMd \loadmathjax Suppose we observe noisy measurements of a response
 variable of interest (e.g., flux, magnitude, photon counts) according to the
 data generating process (DGP)
 \mjdeqn{f(t_i) = f_0(t_i) + \epsilon_i,  \hfill t_1,\dots,t_n\in(a,b),}{ascii}
@@ -197,15 +198,15 @@ where \mjeqn{f(t_i)}{ascii} is a noisy measurement of the signal
 \mjeqn{f_0(t_i)}{ascii}, and \mjeqn{\mathbb{E}\link[=\\epsilon_i]{\epsilon_i} = 0}{ascii}.
 Further, let \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}{ascii}.
 The random-input mean-squared prediction error (MSPE) is given by
-\mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}\left[\left(f(t) - \widehat{f}_{0}(t;\gamma)\right)^{2}\right],}{ascii}
+\mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}\left[\left(f(t) - \widehat{f}\emph{{0}(t;\gamma)\right)^{2}\right],}{ascii}
 where \mjeqn{t}{ascii} is considered to be a random component of the DGP with
 a marginal probability density \mjeqn{p_t(t)}{ascii} supported on the
 observed input interval. The theoretically optimal choice of
 \mjeqn{\gamma}{ascii} is defined as the minimizer of this error.
-\mjdeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}{ascii}
-\mjdeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}{ascii}
-\mjdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}{ascii}
-\mjdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}{ascii}
+\deqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
+\deqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}
+\mjsdeqn{MAE(\gamma) = \frac{1}{n}\sum}{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}
+\mjsdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}
 where \mjeqn{\widehat{f}(x_i; \gamma)}{ascii} is the trend filtering
 estimate with hyperparameter \mjeqn{\gamma}{ascii}, evaluated at
 \mjeqn{x_i}{ascii}.

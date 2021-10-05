@@ -62,8 +62,9 @@
 #' @param optimization.params A named list of parameters that contains all
 #' parameter choices to be passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
-#' Tibshirani 2016}). See the documentation for the \pkg{glmgen} function 
-#' \code{\link[glmgen]{trendfilter.control.list}} for full details. 
+#' Tibshirani 2016}). See the 
+#' \code{\link[glmgen::trendfilter.control.list]{glmgen::trendfilter.control.list}}
+#' documentation for full details. 
 #' No technical understanding of the ADMM algorithm is needed and the default
 #' parameter choices will almost always suffice. However, the following
 #' parameters may require some adjustments to ensure that your trend filtering
@@ -91,7 +92,7 @@
 #' @param mc.cores Parallel computing: The number of cores to utilize. Defaults
 #' to the number of cores detected.
 #' @param ... Additional named arguments to be passed to 
-#' \code{\link[glmgen]{trendfilter.control.list}}.
+#' \code{\link[glmgen::trendfilter.control.list]{glmgen::trendfilter.control.list}}.
 #' 
 #' @return An object of class 'cv.trendfilter'. This is a list with the 
 #' following elements:
@@ -151,7 +152,7 @@
 #' that a smaller, better conditioned data set is used for fitting.}
 #' \item{x.scale, y.scale, data.scaled}{For internal use.}
 #' 
-#' @details \loadmathjax Suppose we observe noisy measurements of a response
+#' @details @noMd \loadmathjax Suppose we observe noisy measurements of a response
 #' variable of interest (e.g., flux, magnitude, photon counts) according to the
 #' data generating process (DGP)
 #' \mjdeqn{f(t_i) = f_0(t_i) + \epsilon_i,  \hfill t_1,\dots,t_n\in(a,b),}{ascii}
@@ -164,10 +165,10 @@
 #' a marginal probability density \mjeqn{p_t(t)}{ascii} supported on the
 #' observed input interval. The theoretically optimal choice of
 #' \mjeqn{\gamma}{ascii} is defined as the minimizer of this error.
-#' \mjdeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}{ascii}
-#' \mjdeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}{ascii}
-#' \mjdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}{ascii}
-#' \mjdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}{ascii}
+#' \deqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
+#' \deqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}
+#' \mjsdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}
+#' \mjsdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}
 #' where \mjeqn{\widehat{f}(x_i; \gamma)}{ascii} is the trend filtering 
 #' estimate with hyperparameter \mjeqn{\gamma}{ascii}, evaluated at 
 #' \mjeqn{x_i}{ascii}.
