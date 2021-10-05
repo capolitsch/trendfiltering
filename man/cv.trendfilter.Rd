@@ -57,7 +57,7 @@ are doing.}
 estimate on. Defaults to the observed inputs, \code{x}.}
 
 \item{nx.eval}{Integer. If passed, overrides \code{x.eval} with
-\code{seq(min(x), max(x), length = nx.eval)}}
+\code{seq(min(x), max(x), length = nx.eval)}.}
 
 \item{k}{The degree of the trend filtering estimator. More precisely, with
 the trend filtering estimator defined as a piecewise function of polynomials
@@ -69,15 +69,15 @@ gives a visually indistinguishable estimate anyway.}
 
 \item{gamma.choice}{One of \code{c("gamma.min","gamma.1se")}. The choice
 of hyperparameter that is used for optimized trend filtering estimate.
-\cr \cr
-\code{gamma.min}: the hyperparameter value that minimizes the cross
-validation error curve. \cr \cr
-\code{gamma.1se}: the largest hyperparameter value with a cross
+\itemize{
+\item{\code{gamma.min}}: The hyperparameter value that minimizes the cross
+validation error curve.
+\item{\code{gamma.1se}}: The largest hyperparameter value with a cross
 validation error within 1 standard error of the minimum cross validation
 error. This choice therefore favors simpler (i.e. smoother) trend filtering
 estimates. The motivation here is essentially Occam's razor: the two models
 yield results that are quantitatively very close, so we favor the simpler
-model.}
+model.}}
 
 \item{validation.error.type}{Type of error to optimize during cross
 validation. One of \code{c("WMAE","WMSE","MAE","MSE")}, i.e. mean-absolute
@@ -136,8 +136,8 @@ validation.}
 One of \code{c("WMAE","WMSE","MAE","MSE")}.}
 \item{gammas}{Vector of hyperparameter values tested during validation. This
 vector will always be returned in descending order, regardless of the
-ordering provided by the user. The indices \code{i.min} and \code{i.1se}
-correspond to this descending ordering.}
+ordering provided by the user. The indices \code{i.min} and \code{i.1se} correspond to
+this descending ordering.}
 \item{errors}{Vector of cross validation errors for the given hyperparameter
 values.}
 \item{se.errors}{The standard errors of the cross validation errors.
@@ -157,9 +157,8 @@ estimators fit during validation.}
 filtering estimator.}
 \item{edf.1se}{The effective degrees of freedom of the 1-stand-error rule
 trend filtering estimator.}
-\item{i.min}{The index of \code{gammas} that minimizes the cross validation
-error.}
-\item{i.1se}{The index of \code{gammas} that gives the largest hyperparameter
+\item{i.min}{The index of `gammas` that minimizes the cross validation error.}
+\item{i.1se}{The index of `gammas` that gives the largest hyperparameter
 value that has a cross validation error within 1 standard error of the
 minimum of the cross validation error curves.}
 \item{x}{The vector of the observed inputs.}
@@ -190,24 +189,23 @@ trend filtering estimate are then returned within a list that also includes
 a detailed summary of the analysis. One of \code{c("gamma.min", "gamma.1se")}.
 }
 \details{
-\loadmathjax Recall the DGP stated in (link). Further, let
-\mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i}).}{ascii}
-The fixed-input MSPE is given by
-\mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(f(t_{i}) - \widehat{f}\emph{{0}(t}{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right]}{ascii}
-and the random-input MSPE is given by
+\loadmathjax Suppose we observe noisy measurements of a response
+variable of interest (e.g., flux, magnitude, photon counts) according to the
+data generating process (DGP)
+\mjdeqn{f(t_i) = f_0(t_i) + \epsilon_i,  \hfill t_1,\dots,t_n\in(a,b),}{ascii}
+where \mjeqn{f(t_i)}{ascii} is a noisy measurement of the signal
+\mjeqn{f_0(t_i)}{ascii}, and \mjeqn{\mathbb{E}\link[=\\epsilon_i]{\epsilon_i} = 0}{ascii}.
+Further, let \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}{ascii}.
+The random-input mean-squared prediction error (MSPE) is given by
 \mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}\left[\left(f(t) - \widehat{f}_{0}(t;\gamma)\right)^{2}\right],}{ascii}
-where, in the latter, \mjeqn{t}{ascii} is considered to be a random
-component of the DGP with a marginal probability density
-\mjeqn{p_t(t)}{ascii} supported on the observed input interval. In each case,
-the theoretically optimal choice of \mjeqn{\gamma}{ascii} is defined as the
-minimizer of the respective choice of error. For fixed-input error we recommend Stein's
-unbiased risk estimate (SURE) and for random-input error we
-recommend \mjeqn{V}{ascii}-fold cross validation with \mjeqn{V = 10}{ascii}. \cr \cr
-
-\mjeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}{ascii} \cr
-\mjeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}{ascii} \cr
-\mjeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}{ascii} \cr
-\mjeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}{ascii} \cr \cr
+where \mjeqn{t}{ascii} is considered to be a random component of the DGP with
+a marginal probability density \mjeqn{p_t(t)}{ascii} supported on the
+observed input interval. The theoretically optimal choice of
+\mjeqn{\gamma}{ascii} is defined as the minimizer of this error.
+\mjdeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}{ascii}
+\mjdeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}{ascii}
+\mjdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}{ascii}
+\mjdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}{ascii}
 where \mjeqn{\widehat{f}(x_i; \gamma)}{ascii} is the trend filtering
 estimate with hyperparameter \mjeqn{\gamma}{ascii}, evaluated at
 \mjeqn{x_i}{ascii}.
@@ -247,10 +245,7 @@ cv.out <- cv.trendfilter(x = df$phase,
                          weights = 1 / df$std.err ^ 2,
                          gammas = gamma.grid,
                          validation.error.type = "MAE",
-                         thinning = TRUE, 
-                         optimization.params = glmgen::trendfilter.control.list(max_iter = 5e3,
-                                                                                obj_tol = 1e-6)
-                         )
+                         optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T))
 
 # Plot the results
 
@@ -273,30 +268,29 @@ lines(cv.out$x.eval, cv.out$tf.estimate, col = "orange", lwd = 2.5)
 \references{
 \strong{Companion references}
 \enumerate{
-\item{Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
+\item{\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
+Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
 for time-domain astronomy and astronomical spectroscopy. \emph{Monthly
-Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018.
-\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{\link{Link}}} \cr
-\item{Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
+Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018.}} \cr
+\item{\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
+Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
 signals with varying degrees of smoothness. \emph{Monthly Notices of the
-Royal Astronomical Society}, 492(3), p. 4019-4032.
-\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{\link{Link}}}} \cr \cr
+Royal Astronomical Society}, 492(3), p. 4019-4032.}}}
+
 \strong{Cross validation}
 \enumerate{
-\item Hastie, Tibshirani, and Friedman (2009). The Elements of Statistical
+\item \href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{
+Hastie, Tibshirani, and Friedman (2009). The Elements of Statistical
 Learning: Data Mining, Inference, and Prediction. 2nd edition. Springer
-Series in Statistics.
-\href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{
-\link{Online print #12}}. (See Sections 7.10 and 7.12) \cr
-\item James, Witten, Hastie, and Tibshirani (2013). An Introduction to
-Statistical Learning : with Applications in R. Springer.
-\href{https://www.statlearning.com/}{\link{Most recent online print}} (See
-Section 5.1). \emph{Less technical than the above reference.}\cr
-\item Tibshirani (2013). Model selection and validation 2: Model
+Series in Statistics. (See Sections 7.10 and 7.12)} \cr
+\item \href{https://www.statlearning.com/}{
+James, Witten, Hastie, and Tibshirani (2013). An Introduction to
+Statistical Learning : with Applications in R. Springer. (See
+Section 5.1; Less technical than ESL)} \cr
+\item \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
+Tibshirani (2013). Model selection and validation 2: Model
 assessment, more cross-validation. \emph{36-462: Data Mining course notes}
-(Carnegie Mellon).
-\href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
-\link{Link}}}
+(Carnegie Mellon).}}
 }
 \seealso{
 \code{\link{SURE.trendfilter}}, \code{\link{bootstrap.trendfilter}}

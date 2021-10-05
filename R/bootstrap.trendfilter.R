@@ -1,54 +1,62 @@
-#' Bootstrap the optimized trend filtering estimator to obtain variability bands
+#' Obtain `1-alpha` pointwise variability bands by bootstrapping the optimized
+#' trend filtering estimator
 #'
-#' @description \loadmathjax \code{bootstrap.trendfilter} implements...
-#' @param obj An object of class '\link{SURE.trendfilter}'.
-#' @param alpha Specifies the width of the `1-alpha` pointwise variability 
+#' `bootstrap.trendfilter` implements...
+#' 
+#' \loadmathjax
+#' 
+#' @param obj An object of class '\link{SURE.trendfilter}' or 
+#' '\link{cv.trendfilter}'.
+#' @param alpha Determines the width of the `1-alpha` pointwise variability 
 #' bands. Defaults to `alpha = 0.05`.
 #' @param B The number of bootstrap samples used to estimate the pointwise
-#' variability bands. Defaults to `B = 100`. Increase this for more precise
-#' bands (e.g. for the final analysis you intend to publish).
+#' variability bands. Defaults to `B = 100`.
+#' @param bootstrap.algorithm A string specifying which variation of the 
+#' bootstrap to use. One of `c("nonparametric","parametric","wild")`. See
+#' details below for recommendations on when each option is appropriate.
 #' @param return.full.ensemble Logical. If `TRUE`, the full trend filtering 
 #' bootstrap ensemble is returned as an \mjeqn{n \times B}{ascii} matrix, less 
-#' any columns potentially pruned post-hoc (see `prune` below). Defaults to 
+#' any columns from post-hoc pruning (see `prune` below). Defaults to 
 #' `return.full.ensemble = FALSE`.
 #' @param prune Logical. If `TRUE`, then the trend filtering bootstrap 
 #' ensemble is examined for rare instances in which the optimization has 
-#' stopped at zero knots (most likely erroneously), and removes them from the 
+#' stopped at zero knots (likely erroneously), and removes them from the 
 #' ensemble. Defaults to `TRUE`. Do not change this unless you know what you are
 #' doing!
 #' @param mc.cores Parallel computing: The number of cores to utilize. Defaults
 #' to the number of cores detected.
+#' 
 #' @return An object of class 'bootstrap.trendfilter'. This is a comprehensive
 #' list containing all of the analysis' important information, data, and
 #' results:
-#' \item{x.eval}{(Inherited from `obj`) The grid of inputs the trend 
-#' filtering estimate and variability bands were evaluated on.}
+#' \item{x.eval}{(Inherited from `obj`) The grid of inputs the optimized trend
+#' filtering estimate was evaluated on.}
 #' \item{tf.estimate}{The trend filtering estimate of the signal, evaluated on 
-#' \code{x.eval}.}
+#' `x.eval`.}
 #' \item{tf.standard.errors}{The standard errors of the optimized trend 
 #' filtering point estimator.}
 #' \item{bootstrap.lower.band}{Vector of lower bounds for the 
-#' \code{1-alpha} pointwise variability band, evaluated on `x.eval`.}
+#' `1-alpha` pointwise variability band, evaluated on `x.eval`.}
 #' \item{bootstrap.upper.band}{Vector of upper bounds for the 
-#' \code{1-alpha} pointwise variability band, evaluated on `x.eval`.}
-#' \item{bootstrap.algorithm}{The string specifying the bootstrap algorithms 
-#' that was used. Here, always "parametric".}
+#' `1-alpha` pointwise variability band, evaluated on `x.eval`.}
+#' \item{bootstrap.algorithm}{A string specifying which variation of the 
+#' bootstrap was used to obtain the variability bands.}
 #' \item{alpha}{The 'level' of the variability bands, i.e. `alpha`
 #' produces a `100*(1-alpha)`% pointwise variability band.}
 #' \item{B}{The number of bootstrap samples used to estimate the pointwise
 #' variability bands.}
 #' \item{tf.bootstrap.ensemble}{(Optional) If `return.full.ensemble = TRUE`, the 
 #' full trend filtering bootstrap ensemble as an \mjeqn{n \times B}{ascii} 
-#' matrix, less any columns potentially pruned post-hoc (if `prune = TRUE`). 
+#' matrix, less any columns from post-hoc pruning (if `prune = TRUE`). 
 #' If `return.full.ensemble = FALSE`, then this will return `NULL`.}
 #' \item{edf.boots}{An integer vector of the estimated number of effective 
 #' degrees of freedom of each trend filtering bootstrap estimate. These should
 #' all be relatively close to `edf.min` (below).}
 #' \item{prune}{Logical. If `TRUE`, then the trend filtering bootstrap 
 #' ensemble is examined for rare instances in which the optimization has 
-#' stopped at zero knots (most likely erroneously), and removes them from the 
+#' stopped at zero knots (likely erroneously), and removes them from the 
 #' ensemble.}
-#' \item{n.pruned}{The number of badly-converged bootstrap trend filtering 
+#' \item{n.pruned}{The number of poorly-converged bootstrap trend filtering 
 #' estimates pruned from the ensemble.}
 #' \item{x}{(Inherited from `obj`) The vector of the observed inputs.}
 #' \item{y}{(Inherited from `obj`) The vector of the observed outputs.}
@@ -58,8 +66,8 @@
 #' \item{residuals}{(Inherited from `obj`) `residuals = y - fitted.values`}
 #' \item{k}{(Inherited from `obj`) The degree of the trend filtering estimator.}
 #' \item{gammas}{(Inherited from `obj`) Vector of hyperparameter values tested
-#' during validation.}
-#' \item{gammas.min}{(Inherited from `obj`) Hyperparameter value that minimizes
+#' during validation (always returned in descending order).}
+#' \item{gamma.min}{(Inherited from `obj`) Hyperparameter value that minimizes
 #' the validation error curve.}
 #' \item{edf}{(Inherited from `obj`) Integer vector of effective degrees of
 #' freedom for trend filtering estimators fit during validation.}
@@ -68,7 +76,7 @@
 #' \item{i.min}{(Inherited from `obj`) The index of `gammas` that minimizes the
 #' validation error.}
 #' \item{validation.method}{One of `c("SURE", paste0(V,"-fold CV"))`.}
-#' \item{error}{(Inherited from `obj`) Vector of hyperparameter validation
+#' \item{errors}{(Inherited from `obj`) Vector of hyperparameter validation
 #' errors, inherited from `obj` (an object of class 'SURE.trendfilter').}
 #' \item{optimization.params}{(Inherited from `obj`) a list of parameters that
 #' control the trend filtering convex optimization.}
@@ -81,6 +89,7 @@
 #' algorithm to converge within the given tolerance, for each bootstrap trend
 #' filtering estimate.}
 #' \item{x.scale, y.scale, data.scaled}{For internal use.}
+#' 
 #' @details See
 #' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
 #' Politsch et al. (2020a)} for the full parametric bootstrap algorithm. 
@@ -94,8 +103,6 @@
 #' Website: [collinpolitsch.com](https://collinpolitsch.com/) \cr
 #' GitHub: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
 #' 
-#' @seealso \code{\link{SURE.trendfilter}}
-#' 
 #' @references
 #' \strong{Companion references} 
 #' \enumerate{
@@ -107,6 +114,22 @@
 #' Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical 
 #' signals with varying degrees of smoothness. \emph{Monthly Notices of the 
 #' Royal Astronomical Society}, 492(3), p. 4019-4032.}}}
+#' 
+#' \strong{The Bootstrap and variations}
+#' \enumerate{
+#' \item{\href{https://projecteuclid.org/journals/statistical-science/volume-1/issue-1/Bootstrap-Methods-for-Standard-Errors-Confidence-Intervals-and-Other-Measures/10.1214/ss/1177013815.full}{
+#' Efron and Tibshirani (1986). Bootstrap Methods for Standard Errors, 
+#' Confidence Intervals, and Other Measures of Statistical Accuracy.
+#' \emph{Statistical Science}, 1(1), p. 54-75.}} \cr
+#' \item{\href{https://projecteuclid.org/journals/annals-of-statistics/volume-21/issue-1/Bootstrap-and-Wild-Bootstrap-for-High-Dimensional-Linear-Models/10.1214/aos/1176349025.full}{
+#' Mammen (1993). Bootstrap and Wild Bootstrap for High Dimensional 
+#' Linear Models. \emph{The Annals of Statistics}, 21(1), p. 255-285.}} \cr
+#' \item{\href{https://projecteuclid.org/journals/annals-of-statistics/volume-7/issue-1/Bootstrap-Methods-Another-Look-at-the-Jackknife/10.1214/aos/1176344552.full}{
+#' Efron (1979). Bootstrap Methods: Another Look at the Jackknife.
+#' \emph{The Annals of Statistics}, 7(1), p. 1-26.}}}
+#' 
+#' @seealso {\link{SURE.trendfilter}}, \code{\link{cv.trendfilter}}
+
 
 #' @importFrom glmgen trendfilter
 #' @importFrom dplyr %>% mutate case_when n
@@ -127,11 +150,13 @@ bootstrap.trendfilter <- function(obj,
   stopifnot( B >= 10 )
   
   if ( !prune ) warning("I hope you know what you are doing!")
+  
   if ( mc.cores < detectCores() ){
-    warning(paste0("Your machine only has ", detectCores(), " cores. Consider increasing `mc.cores` for computational speedups."))
+    warning(paste0("Your machine has ", detectCores(), " cores. Consider increasing `mc.cores` to speed up computation."))
   }
+  
   if ( mc.cores > detectCores() ){
-    warning(paste0("Your machine only has ", detectCores(), " cores. Adjusting mc.cores accordingly."))
+    warning(paste0("Your machine only has ", detectCores(), " cores. Adjusting `mc.cores` accordingly."))
     mc.cores <- detectCores()
   }
   

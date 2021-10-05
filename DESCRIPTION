@@ -1,11 +1,9 @@
 Package: trendfiltering
 Type: Package
-Title: Denoising one-dimensional data with trend filtering
-Description: This package serves as a software supplement to 
-[Politsch et al. (2020a)](https://academic.oup.com/mnras/article/492/3/4005/5704413)
-and [Politsch et al. (2020b)](https://academic.oup.com/mnras/article/492/3/4019/5704414).
-Version: 0.1.0
-Date: 2021-10-04
+Title: Optimal one-dimensional data analysis with trend filtering
+Description: State-of-the-art one-dimensional data analysis with trend filtering (Tibshirani 2014).
+Version: 0.0.1
+Date: 2021-10-05
 Authors@R: c(person(given = "Collin A.",
                     family = "Politsch",
                     role = c("aut","cre"),

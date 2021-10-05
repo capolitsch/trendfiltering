@@ -47,18 +47,18 @@
 #' @param x.eval A grid of inputs to evaluate the optimized trend filtering 
 #' estimate on. Defaults to the observed inputs, `x`.
 #' @param nx.eval Integer. If passed, overrides `x.eval` with
-#' `seq(min(x), max(x), length = nx.eval)`
-#' @param gamma.choice One of \code{c("gamma.min","gamma.1se")}. The choice
-#' of hyperparameter that is used for optimized trend filtering estimate. 
-#' \cr \cr
-#' \code{gamma.min}: the hyperparameter value that minimizes the cross
-#' validation error curve. \cr \cr
-#' \code{gamma.1se}: the largest hyperparameter value with a cross
+#' `seq(min(x), max(x), length = nx.eval)`.
+#' @param gamma.choice One of `c("gamma.min","gamma.1se")`. The choice
+#' of hyperparameter that is used for optimized trend filtering estimate.
+#' \itemize{
+#' \item{`gamma.min`}: The hyperparameter value that minimizes the cross
+#' validation error curve.
+#' \item{`gamma.1se`}: The largest hyperparameter value with a cross
 #' validation error within 1 standard error of the minimum cross validation 
 #' error. This choice therefore favors simpler (i.e. smoother) trend filtering 
 #' estimates. The motivation here is essentially Occam's razor: the two models
 #' yield results that are quantitatively very close, so we favor the simpler
-#' model.
+#' model.}
 #' @param optimization.params A named list of parameters that contains all
 #' parameter choices to be passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
@@ -106,8 +106,8 @@
 #' One of \code{c("WMAE","WMSE","MAE","MSE")}.}
 #' \item{gammas}{Vector of hyperparameter values tested during validation. This
 #' vector will always be returned in descending order, regardless of the 
-#' ordering provided by the user. The indices \code{i.min} and \code{i.1se}
-#' correspond to this descending ordering.}
+#' ordering provided by the user. The indices `i.min` and `i.1se` correspond to
+#' this descending ordering.}
 #' \item{errors}{Vector of cross validation errors for the given hyperparameter 
 #' values.}
 #' \item{se.errors}{The standard errors of the cross validation errors.
@@ -127,9 +127,8 @@
 #' filtering estimator.}
 #' \item{edf.1se}{The effective degrees of freedom of the 1-stand-error rule
 #' trend filtering estimator.}
-#' \item{i.min}{The index of \code{gammas} that minimizes the cross validation 
-#' error.}
-#' \item{i.1se}{The index of \code{gammas} that gives the largest hyperparameter
+#' \item{i.min}{The index of `gammas` that minimizes the cross validation error.}
+#' \item{i.1se}{The index of `gammas` that gives the largest hyperparameter
 #' value that has a cross validation error within 1 standard error of the 
 #' minimum of the cross validation error curves.}
 #' \item{x}{The vector of the observed inputs.}
@@ -152,24 +151,23 @@
 #' that a smaller, better conditioned data set is used for fitting.}
 #' \item{x.scale, y.scale, data.scaled}{For internal use.}
 #' 
-#' @details \loadmathjax Recall the DGP stated in (link). Further, let 
-#' \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i}).}{ascii} 
-#' The fixed-input MSPE is given by
-#' \mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left\[\left(f(t_{i}) - \widehat{f}_{0}(t_{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right\]}{ascii}
-#' and the random-input MSPE is given by
+#' @details \loadmathjax Suppose we observe noisy measurements of a response
+#' variable of interest (e.g., flux, magnitude, photon counts) according to the
+#' data generating process (DGP)
+#' \mjdeqn{f(t_i) = f_0(t_i) + \epsilon_i,  \hfill t_1,\dots,t_n\in(a,b),}{ascii}
+#' where \mjeqn{f(t_i)}{ascii} is a noisy measurement of the signal
+#' \mjeqn{f_0(t_i)}{ascii}, and \mjeqn{\mathbb{E}[\epsilon_i] = 0}{ascii}.
+#' Further, let \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}{ascii}.
+#' The random-input mean-squared prediction error (MSPE) is given by
 #' \mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}\left\[\left(f(t) - \widehat{f}_{0}(t;\gamma)\right)^{2}\right\],}{ascii}
-#' where, in the latter, \mjeqn{t}{ascii} is considered to be a random
-#' component of the DGP with a marginal probability density
-#' \mjeqn{p_t(t)}{ascii} supported on the observed input interval. In each case,
-#' the theoretically optimal choice of \mjeqn{\gamma}{ascii} is defined as the
-#' minimizer of the respective choice of error. For fixed-input error we recommend Stein's
-#' unbiased risk estimate (SURE) and for random-input error we
-#' recommend \mjeqn{V}{ascii}-fold cross validation with \mjeqn{V = 10}{ascii}. \cr \cr
-#' 
-#' \mjeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}{ascii} \cr 
-#' \mjeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}{ascii} \cr 
-#' \mjeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}{ascii} \cr 
-#' \mjeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}{ascii} \cr \cr 
+#' where \mjeqn{t}{ascii} is considered to be a random component of the DGP with
+#' a marginal probability density \mjeqn{p_t(t)}{ascii} supported on the
+#' observed input interval. The theoretically optimal choice of
+#' \mjeqn{\gamma}{ascii} is defined as the minimizer of this error.
+#' \mjdeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}{ascii}
+#' \mjdeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}{ascii}
+#' \mjdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}{ascii}
+#' \mjdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}{ascii}
 #' where \mjeqn{\widehat{f}(x_i; \gamma)}{ascii} is the trend filtering 
 #' estimate with hyperparameter \mjeqn{\gamma}{ascii}, evaluated at 
 #' \mjeqn{x_i}{ascii}.
@@ -183,35 +181,35 @@
 #' Website: [collinpolitsch.com](https://collinpolitsch.com/) \cr
 #' GitHub: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
 #' 
-#' @seealso \code{\link{SURE.trendfilter}}, \code{\link{bootstrap.trendfilter}}
-#' 
 #' @references 
 #' \strong{Companion references} 
 #' \enumerate{
-#' \item{Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
+#' \item{\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
+#' Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
 #' for time-domain astronomy and astronomical spectroscopy. \emph{Monthly 
-#' Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018. 
-#' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{[Link]}} \cr
-#' \item{Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical 
+#' Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018.}} \cr
+#' \item{\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
+#' Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical 
 #' signals with varying degrees of smoothness. \emph{Monthly Notices of the 
-#' Royal Astronomical Society}, 492(3), p. 4019-4032.
-#' \href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{[Link]}}} \cr \cr
+#' Royal Astronomical Society}, 492(3), p. 4019-4032.}}}
+#' 
 #' \strong{Cross validation}
 #' \enumerate{
-#' \item Hastie, Tibshirani, and Friedman (2009). The Elements of Statistical 
+#' \item \href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{
+#' Hastie, Tibshirani, and Friedman (2009). The Elements of Statistical 
 #' Learning: Data Mining, Inference, and Prediction. 2nd edition. Springer 
-#' Series in Statistics. 
-#' \href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{
-#' [Online print #12]}. (See Sections 7.10 and 7.12) \cr
-#' \item James, Witten, Hastie, and Tibshirani (2013). An Introduction to 
-#' Statistical Learning : with Applications in R. Springer.
-#' \href{https://www.statlearning.com/}{[Most recent online print]} (See 
-#' Section 5.1). \emph{Less technical than the above reference.}\cr
-#' \item Tibshirani (2013). Model selection and validation 2: Model
+#' Series in Statistics. (See Sections 7.10 and 7.12)} \cr
+#' \item \href{https://www.statlearning.com/}{
+#' James, Witten, Hastie, and Tibshirani (2013). An Introduction to 
+#' Statistical Learning : with Applications in R. Springer. (See 
+#' Section 5.1; Less technical than ESL)} \cr
+#' \item \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
+#' Tibshirani (2013). Model selection and validation 2: Model
 #' assessment, more cross-validation. \emph{36-462: Data Mining course notes} 
-#' (Carnegie Mellon).
-#' \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
-#' [Link]}}
+#' (Carnegie Mellon).}}
+#' 
+#' @seealso \code{\link{SURE.trendfilter}}, \code{\link{bootstrap.trendfilter}}
+#' 
 #' @examples 
 #' #######################################################################
 #' ###  Phase-folded light curve of an eclipsing binary star system   ####
@@ -247,10 +245,7 @@
 #'                          weights = 1 / df$std.err ^ 2,
 #'                          gammas = gamma.grid,
 #'                          validation.error.type = "MAE",
-#'                          thinning = TRUE, 
-#'                          optimization.params = glmgen::trendfilter.control.list(max_iter = 5e3,
-#'                                                                                 obj_tol = 1e-6)
-#'                          )
+#'                          optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T))
 #' 
 #' # Plot the results
 #' 
@@ -338,11 +333,11 @@ cv.trendfilter <- function(x, y, weights = NULL,
   }
   
   if ( mc.cores < detectCores() ){
-    warning(paste0("Your machine only has ", detectCores(), " cores. Consider increasing `mc.cores` for computational speedups."))
+    warning(paste0("Your machine has ", detectCores(), " cores. Consider increasing `mc.cores` to speed up computation."))
   }
   
   if ( mc.cores > detectCores() ){
-    warning(paste0("Your machine only has ", detectCores(), " cores. Adjusting mc.cores accordingly."))
+    warning(paste0("Your machine only has ", detectCores(), " cores. Adjusting `mc.cores` accordingly."))
     mc.cores <- detectCores()
   }
   
@@ -374,10 +369,10 @@ cv.trendfilter <- function(x, y, weights = NULL,
   optimization.params <- trendfilter.control.list(max_iter = optimization.params$max_iter,
                                                   obj_tol = optimization.params$obj_tol,
                                                   ...)
-  
   x.scale <- median(diff(data$x))
   y.scale <- median(abs(data$y)) / 10
   optimization.params$x_tol <- optimization.params$x_tol / x.scale
+  
   data.scaled <- data %>%
     mutate(x = x / x.scale,
            y = y / y.scale,
@@ -453,6 +448,8 @@ cv.trendfilter <- function(x, y, weights = NULL,
   obj$edfs <- out$df
   obj$edf.min <- out$df[obj$i.min]
   obj$edf.1se <- out$df[obj$i.1se]
+  
+  # Increase the algorithmic precision for the optimized TF estimate
   obj$optimization.params$obj_tol <- obj$optimization.params$obj_tol * 1e-2
   
   out <- obj %$% trendfilter(x = data.scaled$x,
@@ -463,6 +460,8 @@ cv.trendfilter <- function(x, y, weights = NULL,
                              thinning = thinning,
                              control = optimization.params)
   
+  optimization.params$obj_tol <- optimization.params$obj_tol * 1e2
+  
   obj$data.scaled$fitted.values <- glmgen:::predict.trendfilter(out, lambda = gamma.pred,
                                                                 x.new = obj$data.scaled$x) %>% 
     as.numeric
@@ -471,7 +470,7 @@ cv.trendfilter <- function(x, y, weights = NULL,
                                                   x.new = obj$x.eval / obj$x.scale) * obj$y.scale %>%
     as.numeric
   obj$fitted.values <- as.numeric( obj$data.scaled$fitted.values * obj$y.scale )
-  obj$residuals <- (obj$y - obj$fitted.values)
+  obj$residuals <- obj$y - obj$fitted.values
   
   obj <- obj[c("x.eval","tf.estimate","validation.method","V",
                "validation.error.type","gammas","gamma.min","gamma.1se",
@@ -513,6 +512,5 @@ trendfilter.validate <- function(validation.index, data.folded, obj){
       sqrt(data.validate$weights) / sum(sqrt(data.validate$weights))
   }
   
-  validation.error.sum <- colMeans(validation.error.mat) %>% as.numeric
-  return(validation.error.sum)
+  colMeans(validation.error.mat) %>% as.numeric
 }

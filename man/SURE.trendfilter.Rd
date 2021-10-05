@@ -52,7 +52,7 @@ what you are doing.}
 estimate on. Defaults to the observed inputs, \code{x}.}
 
 \item{nx.eval}{Integer. If passed, overrides \code{x.eval} with
-\code{seq(min(x), max(x), length = nx.eval)}}
+\code{seq(min(x), max(x), length = nx.eval)}.}
 
 \item{k}{The degree of the trend filtering estimator. More precisely, with
 the trend filtering estimator defined as a piecewise function of polynomials
@@ -101,7 +101,7 @@ evaluated on.}
 \item{tf.estimate}{The optimized trend filtering estimate of the signal,
 evaluated on \code{x.eval}.}
 \item{validation.method}{"SURE"}
-\item{gammas}{Vector of hyperparameter values tested during validation
+\item{gammas}{Vector of hyperparameter values evaluated in the grid search
 (always returned in descending order).}
 \item{errors}{Vector of SURE error estimates corresponding to the
 \strong{descending} set of gamma values tested during validation.}
@@ -133,42 +133,53 @@ smaller, better conditioned data set is used for fitting.}
 \item{x.scale, y.scale, data.scaled}{For internal use.}
 }
 \description{
-\code{SURE.trendfilter} optimizes the trend filtering hyperparameter via a grid
-search over a vector, \code{gammas}, of candidate hyperparameter values, and
-then selects the value that minimizes an unbiased estimate of the model's
+\code{SURE.trendfilter} optimizes the trend filtering hyperparameter by running a
+grid search over a vector, \code{gammas}, of candidate hyperparameter values, and
+selecting the value that minimizes an unbiased estimate of the model's
 generalization error. The full generalization error curve and the optimized
 trend filtering estimate are then returned within a list that also includes
 a detailed summary of the analysis.
 }
 \details{
-\loadmathjax Recall the DGP stated in (link). Further, let
-\mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i}).}{ascii}
-The fixed-input MSPE is given by
-\mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(f(t_{i}) - \widehat{f}_{0}(t_{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right]}{ascii}
-and the random-input MSPE is given by
-\mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}\left[\left(f(t) - \widehat{f}_{0}(t;\gamma)\right)^{2}\right],}{ascii}
-where, in the latter, \mjeqn{t}{ascii} is considered to be a random
-component of the DGP with a marginal probability density
-\mjeqn{p_t(t)}{ascii} supported on the observed input interval. In each case,
-the theoretically optimal choice of \mjeqn{\gamma}{ascii} is defined as the
-minimizer of the respective choice of error.
+\loadmathjax As a general rule-of-thumb...
 
-The SURE formula provides an unbiased estimate of the fixed-input MSPE of a
-statistical estimator:
-\mjdeqn{\widehat{R}_{0}(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}_0)}{n},}{ascii}
+Below we summarize the general setup
+\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
+for a detailed
+
+Suppose we observe noisy measurements of a response
+variable of interest (e.g., flux, magnitude, photon counts) according to the
+following data generating process (DGP):
+\mjdeqn{f(t_i) = f_0(t_i) + \epsilon_i,  \hfill t_1,\dots,t_n\in(a,b),}{ascii}
+where \mjeqn{f(t_i)}{ascii} is a noisy measurement of the signal
+\mjeqn{f_0(t_i)}{ascii}, \mjeqn{\mathbb{E}\link[=\\epsilon_i]{\epsilon_i} = 0}{ascii}, and
+\mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}{ascii}.
+Let \mjeqn{\widehat{f}_{0}}{ascii} denote the trend filtering estimator of
+order \mjeqn{k}{ascii} with free hyperparameter \mjeqn{\gamma}{ascii}.
+The fixed-input mean-squared prediction error (MSPE) of the estimator
+\mjeqn{\widehat{f}_0}{ascii} is given by
+\mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(f(t}{i}) - \widehat{f}_{0}(t}{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right]}{ascii}
+\mjdeqn{= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left[\left(f_0(t_i) - \widehat{f}_0(t_i;\gamma)\right)^2\;|\;t_1,\dots,t_n\right] + \sigma_i^2\right).}{ascii}
+
+Stein's unbiased risk estimate (SURE) provides an unbiased estimate of the
+fixed-input MSPE of any regression estimator of the signal
+\mjeqn{f_0}{ascii}.
+\mjdeqn{\widehat{R}_0(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}_0)}{n},}{ascii}
 where \mjeqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}{ascii}
-and \mjeqn{\text{df}(\widehat{f}_0)}{ascii} is defined above. A formula for
-the effective degrees of freedom of the trend filtering estimator is
-available via the generalized lasso results of (link); namely,
+and \mjeqn{\text{df}(\widehat{f}_0)}{ascii} is the effective degrees of
+freedom for a trend filtering estimator (with a fixed choice of
+hyperparameter). A formula for the effective degrees of freedom of the trend
+filtering estimator is available via the generalized lasso results of
+\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{Tibshirani and Taylor (2012)};
+namely,
 \mjdeqn{\text{df}(\widehat{f}_0) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}_0\right] + k + 1.}{ascii}
 We then obtain our hyperparameter estimate \mjeqn{\widehat{\gamma}}{ascii}
-by minimizing the following plug-in estimate for (link):
+by minimizing the following plug-in estimate:
 \mjdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f}_0)}{n},}{ascii}
 where \mjeqn{\widehat{\text{df}}}{ascii} is the estimate for the effective
-degrees of freedom that is obtained by replacing the expectation in (link)
-with the observed number of knots, and
-\mjeqn{\widehat{\overline{\sigma}}^2}{ascii} is an estimate of
-\mjeqn{\overline{\sigma}^2}{ascii}.
+degrees of freedom that is obtained by replacing the expectation with the
+observed number of knots, and \mjeqn{\widehat{\overline{\sigma}}^2}{ascii}
+is an estimate of \mjeqn{\overline{\sigma}^2}{ascii}.
 }
 \references{
 \strong{Companion references}
