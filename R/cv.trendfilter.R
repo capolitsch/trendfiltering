@@ -1,22 +1,24 @@
 #' Optimize the trend filtering hyperparameter by V-fold cross validation
-#'
-#' @description \loadmathjax \code{cv.trendfilter} performs V-fold cross 
-#' validation to estimate the random-input squared error of a trend filtering 
-#' estimator on a grid of values for the hyperparameter \code{gamma}, and 
-#' returns the full error curve and the optimized trend filtering estimate 
-#' within a larger list with useful ancillary information.
+#' 
+#' `cv.trendfilter` optimizes the trend filtering hyperparameter 
+#' by performing V-fold cross validation on a vector, `gammas`, of candidate 
+#' hyperparameter values, and
+#' then selects the value that minimizes an unbiased estimate of the model's
+#' generalization error. The full generalization error curve and the optimized
+#' trend filtering estimate are then returned within a list that also includes 
+#' a detailed summary of the analysis. One of `c("gamma.min", "gamma.1se")`.
+#' 
 #' @param x The vector of observed values of the input variable (a.k.a. the 
 #' predictor, covariate, explanatory variable, regressor, independent variable, 
 #' control variable, etc.)
 #' @param y The vector of observed values of the output variable (a.k.a. the
 #' response, target, outcome, regressand, dependent variable, etc.).
-#' @param weights A vector of weights for the observed outputs, defined as 
-#' the reciprocal of the variance of the error distribution. That is, 
-#' `weights = 1 / sigmas^2`, where `sigmas` is a vector of standard errors
-#' of the uncertainty in the observed outputs. `weights` should either
-#' have length equal to 1 (corresponding to an error distribution with a
-#' constant variance) or length equal to `length(y)` (i.e. heteroskedastic
-#' errors). 
+#' @param weights A vector of weights for the observed outputs, defined as the
+#' reciprocal of the variance of the error distribution. That is, 
+#' `weights = 1 / sigmas^2`, where `sigmas` is a vector of standard errors of
+#' the uncertainty in the observed outputs. `weights` should either have length
+#' equal to 1 (corresponding to an error distribution with a constant variance)
+#' or length equal to `length(y)` (i.e. heteroskedastic errors). 
 #' @param k The degree of the trend filtering estimator. More precisely, with
 #' the trend filtering estimator defined as a piecewise function of polynomials
 #' smoothly connected at a set of "knots", `k` controls the degree of the
@@ -29,22 +31,21 @@
 #' are automatically chosen by `SURE.trendfilter` and `ngammas` simply controls
 #' the granularity of the grid.
 #' @param gammas Overrides `ngammas` if passed. A vector of trend filtering
-#' hyperparameter values to run the grid search over. It is advisable to let
-#' the vector be equally-spaced in log-space and passed to `SURE.trendfilter`
-#' in descending order. The function output will contain the sorted
-#' hyperparameter vector regardless of the user-supplied ordering, and all
-#' related output objects (e.g. the `errors` vector) will correspond to this
-#' descending ordering. It's best to leave this
-#' argument alone unless you know what you are doing.
+#' hyperparameter values to run the grid search over. It is advisable to let the
+#' vector be equally-spaced in log-space and passed to `SURE.trendfilter` in
+#' descending order. The function output will contain the sorted hyperparameter
+#' vector regardless of the user-supplied ordering, and all related output
+#' objects (e.g. the `errors` vector) will correspond to this descending
+#' ordering. It's best to leave this argument alone unless you know what you
+#' are doing.
 #' @param V The number of folds the data are split into for the V-fold cross
-#' validation. Defaults to \code{V=5} (recommended).
+#' validation. Defaults to `V = 10` (recommended).
 #' @param validation.error.type Type of error to optimize during cross
-#' validation. One of \code{c("WMAE","WMSE","MAE","MSE")}, i.e. mean-absolute 
+#' validation. One of `c("WMAE","WMSE","MAE","MSE")`, i.e. mean-absolute 
 #' deviations error, mean-squared error, and their weighted counterparts. 
-#' If \code{weights = NULL}, then the weighted and 
-#' unweighted counterparts are equivalent. In short, weighting helps combat
-#' heteroskedasticity and absolute error decreases sensitivity to outliers.
-#' Defaults to \code{"WMAE"}.
+#' If `weights = NULL`, then the weighted and unweighted counterparts are
+#' equivalent. In short, weighting helps combat heteroskedasticity and absolute
+#' error decreases sensitivity to outliers. Defaults to `"WMAE"`.
 #' @param x.eval A grid of inputs to evaluate the optimized trend filtering 
 #' estimate on. Defaults to the observed inputs, `x`.
 #' @param nx.eval Integer. If passed, overrides `x.eval` with
@@ -120,7 +121,7 @@
 #' \item{gamma.min}{Hyperparameter value that minimizes the SURE error curve.}
 #' \item{gamma.1se}{The largest hyperparameter value that is still within one
 #' standard error of the minimum hyperparameter's cross validation error.}
-#' \item{gamma.choice}{One of \code{c("gamma.min","gamma.1se")}. The choice
+#' \item{gamma.choice}{One of `c("gamma.min","gamma.1se")`. The choice
 #' of hyperparameter that is used for optimized trend filtering estimate.}
 #' \item{edfs}{Vector of effective degrees of freedom for trend filtering
 #' estimators fit during validation.}
@@ -153,16 +154,37 @@
 #' that a smaller, better conditioned data set is used for fitting.}
 #' \item{x.scale, y.scale, data.scaled}{For internal use.}
 #' 
-#' @details This will be a very detailed description... \cr \cr
+#' @details \loadmathjax Recall the DGP stated in (link). Further, let 
+#' \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i}).}{ascii} 
+#' The fixed-input MSPE is given by
+#' \mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left\[\left(f(t_{i}) - \widehat{f}_{0}(t_{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right\]}{ascii}
+#' and the random-input MSPE is given by
+#' \mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}\left\[\left(f(t) - \widehat{f}_{0}(t;\gamma)\right)^{2}\right\],}{ascii}
+#' where, in the latter, \mjeqn{t}{ascii} is considered to be a random
+#' component of the DGP with a marginal probability density
+#' \mjeqn{p_t(t)}{ascii} supported on the observed input interval. In each case,
+#' the theoretically optimal choice of \mjeqn{\gamma}{ascii} is defined as the
+#' minimizer of the respective choice of error. For fixed-input error we recommend Stein's
+#' unbiased risk estimate (SURE) and for random-input error we
+#' recommend \mjeqn{V}{ascii}-fold cross validation with \mjeqn{V = 10}{ascii}. \cr \cr
+#' 
 #' \mjeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}{ascii} \cr 
 #' \mjeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}{ascii} \cr 
 #' \mjeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}{ascii} \cr 
 #' \mjeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}{ascii} \cr \cr 
 #' where \mjeqn{\widehat{f}(x_i; \gamma)}{ascii} is the trend filtering 
-#' estimate with hyperparameter \eqn{\gamma}, evaluated at \mjeqn{x_i}{ascii}.
+#' estimate with hyperparameter \mjeqn{\gamma}{ascii}, evaluated at 
+#' \mjeqn{x_i}{ascii}.
 #' 
 #' @export cv.trendfilter
-#' @author Collin A. Politsch, \email{collinpolitsch@@gmail.com}
+#' 
+#' @author \cr
+#' \strong{Collin A. Politsch, Ph.D.}
+#' ---
+#' Email: collinpolitsch@@gmail.com \cr
+#' Website: [collinpolitsch.com](https://collinpolitsch.com/) \cr
+#' GitHub: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
+#' 
 #' @seealso \code{\link{SURE.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 #' 
 #' @references 
@@ -258,9 +280,9 @@
 #' @importFrom parallel mclapply detectCores
 #' @importFrom matrixStats rowSds
 #' @importFrom magrittr %$% %>%
-#' @importFrom tidyr drop_na
+#' @importFrom tidyr tibble drop_na
 cv.trendfilter <- function(x, y, weights = NULL, 
-                           V = 5L,
+                           V = 10L,
                            ngammas = 250L,
                            gammas,
                            x.eval = x,
@@ -283,11 +305,11 @@ cv.trendfilter <- function(x, y, weights = NULL,
   }
   
   if ( length(y) < k + 2 ){
-    stop("y must have length >= k+2 for kth order trend filtering.")
+    stop("y must have length >= k + 2 for kth order trend filtering.")
   }
   
   if ( k < 0 || k != round(k) ){
-    stop("k must be a nonnegative integer. k=2 recommended")
+    stop("k must be a nonnegative integer. `k = 2` recommended")
   }
   
   if ( k > 3 ){
@@ -296,8 +318,8 @@ cv.trendfilter <- function(x, y, weights = NULL,
   }
   
   if ( k == 3 ){
-    warning(paste0("k = 3 can have poor conditioning...\n", 
-                   "k = 2 is more stable and visually indistinguishable."))
+    warning(paste0("`k = 3` can have poor conditioning...\n", 
+                   "`k = 2` is more stable and visually indistinguishable."))
   }
   
   if ( is.null(gammas) && (ngammas != round(ngammas) || ngammas < 25L) ){
@@ -400,8 +422,7 @@ cv.trendfilter <- function(x, y, weights = NULL,
                                    obj = obj, 
                                    mc.cores = mc.cores)
                           ),
-                   ncol = obj$V
-                   )
+                   ncol = obj$V)
   
   errors <- rowMeans(cv.out)
   se.errors <- rowSds(cv.out) / sqrt(obj$V)

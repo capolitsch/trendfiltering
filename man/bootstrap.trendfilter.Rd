@@ -55,7 +55,7 @@ filtering point estimator.}
 \item{bootstrap.algorithm}{The string specifying the bootstrap algorithms
 that was used. Here, always "parametric".}
 \item{alpha}{The 'level' of the variability bands, i.e. \code{alpha}
-produces a \code{100*(1-alpha)}\\% pointwise variability band.}
+produces a \code{100*(1-alpha)}\% pointwise variability band.}
 \item{B}{The number of bootstrap samples used to estimate the pointwise
 variability bands.}
 \item{tf.bootstrap.ensemble}{(Optional) If \code{return.full.ensemble = TRUE}, the
@@ -82,13 +82,13 @@ vector of standard errors of the uncertainty in the output measurements.}
 during validation.}
 \item{gammas.min}{(Inherited from \code{obj}) Hyperparameter value that minimizes
 the validation error curve.}
-\item{edf}{(Inherited from \code{obj}}) Integer vector of effective degrees of
+\item{edf}{(Inherited from \code{obj}) Integer vector of effective degrees of
 freedom for trend filtering estimators fit during validation.}
 \item{edf.min}{(Inherited from \code{obj}) The effective degrees of freedom of the
 optimally-tuned trend filtering estimator.}
 \item{i.min}{(Inherited from \code{obj}) The index of \code{gammas} that minimizes the
 validation error.}
-\item{validation.method}{"SURE"}
+\item{validation.method}{One of \code{c("SURE", paste0(V,"-fold CV"))}.}
 \item{error}{(Inherited from \code{obj}) Vector of hyperparameter validation
 errors, inherited from \code{obj} (an object of class 'SURE.trendfilter').}
 \item{optimization.params}{(Inherited from \code{obj}) a list of parameters that
@@ -104,12 +104,7 @@ filtering estimate.}
 \item{x.scale, y.scale, data.scaled}{For internal use.}
 }
 \description{
-\loadmathjax \code{bootstrap.trendfilter} implements a
-parametric bootstrap algorithm to obtain one or both of the following:
-\enumerate{
-\item{Standard errors of the optimized trend filtering point estimator}
-\item{Percentile-based \code{1-alpha} variability bands of the optimized trend
-filtering point estimator.}}
+\loadmathjax \code{bootstrap.trendfilter} implements...
 }
 \details{
 See
@@ -117,20 +112,26 @@ See
 Politsch et al. (2020a)} for the full parametric bootstrap algorithm.
 }
 \references{
+\strong{Companion references}
 \enumerate{
-\item{Politsch et al. (2020a). Trend filtering – I. A modern
-statistical tool for time-domain astronomy and astronomical spectroscopy.
-\emph{Monthly Notices of the Royal Astronomical Society}, 492(3),
-p. 4005-4018.
-\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{\link{Link}}} \cr
-\item{Politsch et al. (2020b). Trend Filtering – II. Denoising
-astronomical signals with varying degrees of smoothness. \emph{Monthly
-Notices of the Royal Astronomical Society}, 492(3), p. 4019-4032.
-\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{\link{Link}}}}
+\item{\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
+Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
+for time-domain astronomy and astronomical spectroscopy. \emph{Monthly
+Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018.}} \cr
+\item{\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
+Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
+signals with varying degrees of smoothness. \emph{Monthly Notices of the
+Royal Astronomical Society}, 492(3), p. 4019-4032.}}}
 }
 \seealso{
 \code{\link{SURE.trendfilter}}
 }
 \author{
-Collin A. Politsch, Ph.D., \email{collinpolitsch@gmail.com}
+\subsection{\cr
+\strong{Collin A. Politsch, Ph.D.}}{
+
+Email: collinpolitsch@gmail.com \cr
+Website: \href{https://collinpolitsch.com/}{collinpolitsch.com} \cr
+GitHub: \href{https://github.com/capolitsch/}{github.com/capolitsch} \cr \cr
+}
 }

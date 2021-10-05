@@ -8,7 +8,7 @@ cv.trendfilter(
   x,
   y,
   weights = NULL,
-  V = 5L,
+  V = 10L,
   ngammas = 250L,
   gammas,
   x.eval = x,
@@ -29,16 +29,15 @@ control variable, etc.)}
 \item{y}{The vector of observed values of the output variable (a.k.a. the
 response, target, outcome, regressand, dependent variable, etc.).}
 
-\item{weights}{A vector of weights for the observed outputs, defined as
-the reciprocal of the variance of the error distribution. That is,
-\code{weights = 1 / sigmas^2}, where \code{sigmas} is a vector of standard errors
-of the uncertainty in the observed outputs. \code{weights} should either
-have length equal to 1 (corresponding to an error distribution with a
-constant variance) or length equal to \code{length(y)} (i.e. heteroskedastic
-errors).}
+\item{weights}{A vector of weights for the observed outputs, defined as the
+reciprocal of the variance of the error distribution. That is,
+\code{weights = 1 / sigmas^2}, where \code{sigmas} is a vector of standard errors of
+the uncertainty in the observed outputs. \code{weights} should either have length
+equal to 1 (corresponding to an error distribution with a constant variance)
+or length equal to \code{length(y)} (i.e. heteroskedastic errors).}
 
 \item{V}{The number of folds the data are split into for the V-fold cross
-validation. Defaults to \code{V=5} (recommended).}
+validation. Defaults to \code{V = 10} (recommended).}
 
 \item{ngammas}{Integer. The number of trend filtering hyperparameter values
 to run the grid search over. In this default case, the hyperparameter values
@@ -46,13 +45,13 @@ are automatically chosen by \code{SURE.trendfilter} and \code{ngammas} simply co
 the granularity of the grid.}
 
 \item{gammas}{Overrides \code{ngammas} if passed. A vector of trend filtering
-hyperparameter values to run the grid search over. It is advisable to let
-the vector be equally-spaced in log-space and passed to \code{SURE.trendfilter}
-in descending order. The function output will contain the sorted
-hyperparameter vector regardless of the user-supplied ordering, and all
-related output objects (e.g. the \code{errors} vector) will correspond to this
-descending ordering. It's best to leave this
-argument alone unless you know what you are doing.}
+hyperparameter values to run the grid search over. It is advisable to let the
+vector be equally-spaced in log-space and passed to \code{SURE.trendfilter} in
+descending order. The function output will contain the sorted hyperparameter
+vector regardless of the user-supplied ordering, and all related output
+objects (e.g. the \code{errors} vector) will correspond to this descending
+ordering. It's best to leave this argument alone unless you know what you
+are doing.}
 
 \item{x.eval}{A grid of inputs to evaluate the optimized trend filtering
 estimate on. Defaults to the observed inputs, \code{x}.}
@@ -83,10 +82,9 @@ model.}
 \item{validation.error.type}{Type of error to optimize during cross
 validation. One of \code{c("WMAE","WMSE","MAE","MSE")}, i.e. mean-absolute
 deviations error, mean-squared error, and their weighted counterparts.
-If \code{weights = NULL}, then the weighted and
-unweighted counterparts are equivalent. In short, weighting helps combat
-heteroskedasticity and absolute error decreases sensitivity to outliers.
-Defaults to \code{"WMAE"}.}
+If \code{weights = NULL}, then the weighted and unweighted counterparts are
+equivalent. In short, weighting helps combat heteroskedasticity and absolute
+error decreases sensitivity to outliers. Defaults to \code{"WMAE"}.}
 
 \item{optimization.params}{A named list of parameters that contains all
 parameter choices to be passed to the trend filtering ADMM algorithm
@@ -167,7 +165,7 @@ minimum of the cross validation error curves.}
 \item{x}{The vector of the observed inputs.}
 \item{y}{The vector of the observed outputs.}
 \item{weights}{A vector of weights for the observed outputs. These are
-defined as \code{weights = 1 / sigmas^2}, where `sigmas` is a vector of
+defined as `weights = 1 / sigmas^2`, where `sigmas` is a vector of
 standard errors of the uncertainty in the observed outputs.}
 \item{fitted.values}{The optimized trend filtering estimate of the signal,
 evaluated at the observed inputs `x`.}
@@ -185,20 +183,36 @@ that a smaller, better conditioned data set is used for fitting.}
 \item{x.scale, y.scale, data.scaled}{For internal use.}
 }
 \description{
-\loadmathjax \code{cv.trendfilter} performs V-fold cross
-validation to estimate the random-input squared error of a trend filtering
-estimator on a grid of values for the hyperparameter \code{gamma}, and
-returns the full error curve and the optimized trend filtering estimate
-within a larger list with useful ancillary information.
+\code{cv.trendfilter} optimizes the trend filtering hyperparameter
+by performing V-fold cross validation on a vector, \code{gammas}, of candidate
+hyperparameter values, and
+then selects the value that minimizes an unbiased estimate of the model's
+generalization error. The full generalization error curve and the optimized
+trend filtering estimate are then returned within a list that also includes
+a detailed summary of the analysis. One of \code{c("gamma.min", "gamma.1se")}.
 }
 \details{
-This will be a very detailed description... \cr \cr
+\loadmathjax Recall the DGP stated in (link). Further, let
+\mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i}).}{ascii}
+The fixed-input MSPE is given by
+\mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(f(t_{i}) - \widehat{f}\emph{{0}(t}{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right]}{ascii}
+and the random-input MSPE is given by
+\mjdeqn{\widetilde{R}(\gamma) = \mathbb{E}\left[\left(f(t) - \widehat{f}_{0}(t;\gamma)\right)^{2}\right],}{ascii}
+where, in the latter, \mjeqn{t}{ascii} is considered to be a random
+component of the DGP with a marginal probability density
+\mjeqn{p_t(t)}{ascii} supported on the observed input interval. In each case,
+the theoretically optimal choice of \mjeqn{\gamma}{ascii} is defined as the
+minimizer of the respective choice of error. For fixed-input error we recommend Stein's
+unbiased risk estimate (SURE) and for random-input error we
+recommend \mjeqn{V}{ascii}-fold cross validation with \mjeqn{V = 10}{ascii}. \cr \cr
+
 \mjeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}{ascii} \cr
 \mjeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}{ascii} \cr
 \mjeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}{ascii} \cr
 \mjeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}{ascii} \cr \cr
 where \mjeqn{\widehat{f}(x_i; \gamma)}{ascii} is the trend filtering
-estimate with hyperparameter \eqn{\gamma}, evaluated at \mjeqn{x_i}{ascii}.
+estimate with hyperparameter \mjeqn{\gamma}{ascii}, evaluated at
+\mjeqn{x_i}{ascii}.
 }
 \examples{
 #######################################################################
@@ -292,5 +306,11 @@ assessment, more cross-validation. \emph{36-462: Data Mining course notes}
 \code{\link{SURE.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 }
 \author{
-Collin A. Politsch, \email{collinpolitsch@gmail.com}
+\subsection{\cr
+\strong{Collin A. Politsch, Ph.D.}}{
+
+Email: collinpolitsch@gmail.com \cr
+Website: \href{https://collinpolitsch.com/}{collinpolitsch.com} \cr
+GitHub: \href{https://github.com/capolitsch/}{github.com/capolitsch} \cr \cr
+}
 }

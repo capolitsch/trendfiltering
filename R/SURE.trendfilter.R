@@ -1,12 +1,12 @@
 #' Optimize the trend filtering hyperparameter by minimizing Stein's unbiased 
 #' risk estimate
 #'
-#' `SURE.trendfilter` optimizes the trend filtering hyperparameter by running a
-#' grid search over the vector, `gammas`, of candidate hyperparameter values,
-#' and then selects the value that minimizes an unbiased estimate of the model's
+#' `SURE.trendfilter` optimizes the trend filtering hyperparameter via a grid
+#' search over the vector, `gammas`, of candidate hyperparameter values, and
+#' then selects the value that minimizes an unbiased estimate of the model's
 #' generalization error. The full generalization error curve and the optimized
-#' trend filtering estimate of the signal are then returned within a list that
-#' also includes useful ancillary information.
+#' trend filtering estimate are then returned within a list that also includes 
+#' a detailed summary of the analysis.
 #' 
 #' @param x The vector of observed values of the input variable (a.k.a. the 
 #' predictor, covariate, explanatory variable, regressor, independent variable, 
@@ -37,8 +37,8 @@
 #' in descending order. The function output will contain the sorted
 #' hyperparameter vector regardless of the user-supplied ordering, and all
 #' related output objects (e.g. the `errors` vector) will correspond to this
-#' descending ordering. It's best to leave this
-#' argument alone unless you know what you are doing.
+#' descending ordering. It's best to leave this argument alone unless you know
+#' what you are doing.
 #' @param x.eval A grid of inputs to evaluate the optimized trend filtering 
 #' estimate on. Defaults to the observed inputs, `x`.
 #' @param nx.eval Integer. If passed, overrides `x.eval` with
@@ -46,12 +46,11 @@
 #' @param optimization.params A named list of parameters that contains all
 #' parameter choices to be passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
-#' Tibshirani 2016}). See the
-#' \code{\link[glmgen]{glmgen::trendfilter.control.list}} documentation for full
-#' details. No technical understanding of the ADMM algorithm is needed and the
-#' default parameter choices will almost always suffice. However, the following
-#' parameters may require some adjustments to ensure that your trend filtering
-#' estimate has sufficiently converged:
+#' Tibshirani 2016}). See the \code{\link[glmgen]{trendfilter.control.list}}
+#' documentation for full details. No technical understanding of the ADMM
+#' algorithm is needed and the default parameter choices will almost always
+#' suffice. However, the following parameters may require some adjustments to
+#' ensure that your trend filtering estimate has sufficiently converged:
 #' \enumerate{
 #' \item{`max_iter`}: Maximum iterations allowed for the trend filtering convex
 #' optimization. Defaults to `max_iter = 600L`. Increase this if the trend
@@ -70,34 +69,11 @@
 #' controlled by the `x_tol` argument below.
 #' \item{`x_tol`}: Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
-#' elements of `x` that fall into the same bin, then we thin the data.
-#' }
+#' elements of `x` that fall into the same bin, then we thin the data.}
 #' @param ... Additional named arguments to be passed to 
 #' \code{\link[glmgen]{trendfilter.control.list}}.
 #' 
-#' @details \loadmathjax `SURE.trendfilter` estimates the fixed-input
-#' mean-squared error of a trend filtering estimator by computing Stein's
-#' unbiased risk estimate (a.k.a. SURE) over a grid of hyperparameter
-#' values, which should typically be equally-spaced in log-space. The full error
-#' curve and the optimized trend filtering estimate are returned within a list
-#' that also includes useful ancillary information.
-#' 
-#' Given the choice of \mjeqn{k}{ascii}, the hyperparameter
-#' \mjeqn{\gamma}{ascii} is used to tune the complexity (i.e. the wiggliness)
-#' of the trend filtering estimate by weighting the tradeoff between the
-#' complexity of the estimate and the size of the squared residuals. Obtaining
-#' an accurate estimate is therefore intrinsically tied to finding an optimal
-#' choice of \mjeqn{\gamma}{ascii}. The selection of \mjeqn{\gamma}{ascii}
-#' is typically done by minimizing an estimate of the mean-squared prediction
-#' error (MSPE) of the trend filtering estimator. Here, there are two different
-#' notions of error to consider, namely, \emph{fixed-input} error 
-#' and \emph{random-input} error. As the names suggest, the distinction between 
-#' which type of error to consider is made based on how the inputs are sampled. 
-#' As a general rule-of-thumb, we recommend optimizing with respect to 
-#' fixed-input error when the inputs are regularly-sampled and optimizing with 
-#' respect to random-input error on irregularly-sampled data.
-#' 
-#' Recall the DGP stated in (link). Further, let 
+#' @details \loadmathjax Recall the DGP stated in (link). Further, let 
 #' \mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i}).}{ascii} 
 #' The fixed-input MSPE is given by
 #' \mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left\[\left(f(t_{i}) - \widehat{f}_{0}(t_{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right\]}{ascii}
@@ -107,13 +83,7 @@
 #' component of the DGP with a marginal probability density
 #' \mjeqn{p_t(t)}{ascii} supported on the observed input interval. In each case,
 #' the theoretically optimal choice of \mjeqn{\gamma}{ascii} is defined as the
-#' minimizer of the respective choice of error. Empirically, we estimate the 
-#' theoretically optimal choice of \mjeqn{\gamma}{ascii} by minimizing an 
-#' estimate of (link) or (link). For fixed-input error we recommend Stein's
-#' unbiased risk estimate (SURE; (link)) and for random-input error we
-#' recommend \mjeqn{K}{ascii}-fold cross validation with \mjeqn{K = 10}{ascii}. 
-#' We elaborate on SURE here and refer the reader to (link) for
-#' \mjeqn{K}{ascii}-fold cross validation. 
+#' minimizer of the respective choice of error.
 #' 
 #' The SURE formula provides an unbiased estimate of the fixed-input MSPE of a 
 #' statistical estimator:
@@ -130,9 +100,7 @@
 #' degrees of freedom that is obtained by replacing the expectation in (link)
 #' with the observed number of knots, and 
 #' \mjeqn{\widehat{\overline{\sigma}}^2}{ascii} is an estimate of
-#' \mjeqn{\overline{\sigma}^2}{ascii}. If a reliable estimate of 
-#' \mjeqn{\overline{\sigma}^2}{ascii} is not available \emph{a priori}, a
-#' data-driven estimate can be constructed.
+#' \mjeqn{\overline{\sigma}^2}{ascii}.
 #' 
 #' @return An object of class 'SURE.trendfilter'. This is a list with the 
 #' following elements:
@@ -168,18 +136,18 @@
 #' value. If many of these are exactly equal to `max_iter`, then their
 #' solutions have not converged with the tolerance specified by `obj_tol`.
 #' In which case, it is often prudent to increase `max_iter`.}
-#' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so 
-#' that a smaller, better conditioned data set is used for fitting.}
+#' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so that a
+#' smaller, better conditioned data set is used for fitting.}
 #' \item{x.scale, y.scale, data.scaled}{For internal use.}
 #' 
 #' @export SURE.trendfilter
 #' 
-#' @author
+#' @author \cr
 #' \strong{Collin A. Politsch, Ph.D.}
 #' ---
-#' **Email**: collinpolitsch@@gmail.com \cr
-#' **Website**: [collinpolitsch.com](https://collinpolitsch.com/) \cr
-#' **GitHub**: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
+#' Email: collinpolitsch@@gmail.com \cr
+#' Website: [collinpolitsch.com](https://collinpolitsch.com/) \cr
+#' GitHub: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
 #' 
 #' @references
 #' \strong{Companion references} 

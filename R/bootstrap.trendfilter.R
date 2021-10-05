@@ -1,11 +1,6 @@
 #' Bootstrap the optimized trend filtering estimator to obtain variability bands
 #'
-#' @description \loadmathjax \code{bootstrap.trendfilter} implements a
-#' parametric bootstrap algorithm to obtain one or both of the following: 
-#' \enumerate{
-#' \item{Standard errors of the optimized trend filtering point estimator}
-#' \item{Percentile-based `1-alpha` variability bands of the optimized trend
-#' filtering point estimator.}}
+#' @description \loadmathjax \code{bootstrap.trendfilter} implements...
 #' @param obj An object of class '\link{SURE.trendfilter}'.
 #' @param alpha Specifies the width of the `1-alpha` pointwise variability 
 #' bands. Defaults to `alpha = 0.05`.
@@ -39,7 +34,7 @@
 #' \item{bootstrap.algorithm}{The string specifying the bootstrap algorithms 
 #' that was used. Here, always "parametric".}
 #' \item{alpha}{The 'level' of the variability bands, i.e. `alpha`
-#' produces a `100*(1-alpha)`\% pointwise variability band.}
+#' produces a `100*(1-alpha)`% pointwise variability band.}
 #' \item{B}{The number of bootstrap samples used to estimate the pointwise
 #' variability bands.}
 #' \item{tf.bootstrap.ensemble}{(Optional) If `return.full.ensemble = TRUE`, the 
@@ -66,13 +61,13 @@
 #' during validation.}
 #' \item{gammas.min}{(Inherited from `obj`) Hyperparameter value that minimizes
 #' the validation error curve.}
-#' \item{edf}{(Inherited from `obj`}) Integer vector of effective degrees of
+#' \item{edf}{(Inherited from `obj`) Integer vector of effective degrees of
 #' freedom for trend filtering estimators fit during validation.}
 #' \item{edf.min}{(Inherited from `obj`) The effective degrees of freedom of the
 #' optimally-tuned trend filtering estimator.}
 #' \item{i.min}{(Inherited from `obj`) The index of `gammas` that minimizes the
 #' validation error.}
-#' \item{validation.method}{"SURE"}
+#' \item{validation.method}{One of `c("SURE", paste0(V,"-fold CV"))`.}
 #' \item{error}{(Inherited from `obj`) Vector of hyperparameter validation
 #' errors, inherited from `obj` (an object of class 'SURE.trendfilter').}
 #' \item{optimization.params}{(Inherited from `obj`) a list of parameters that
@@ -91,20 +86,27 @@
 #' Politsch et al. (2020a)} for the full parametric bootstrap algorithm. 
 #' 
 #' @export bootstrap.trendfilter
-#' @author Collin A. Politsch, Ph.D., \email{collinpolitsch@@gmail.com}
+#' 
+#' @author \cr
+#' \strong{Collin A. Politsch, Ph.D.}
+#' ---
+#' Email: collinpolitsch@@gmail.com \cr
+#' Website: [collinpolitsch.com](https://collinpolitsch.com/) \cr
+#' GitHub: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
+#' 
 #' @seealso \code{\link{SURE.trendfilter}}
 #' 
-#' @references 
+#' @references
+#' \strong{Companion references} 
 #' \enumerate{
-#' \item{Politsch et al. (2020a). Trend filtering – I. A modern 
-#' statistical tool for time-domain astronomy and astronomical spectroscopy. 
-#' \emph{Monthly Notices of the Royal Astronomical Society}, 492(3), 
-#' p. 4005-4018.
-#' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{[Link]}} \cr
-#' \item{Politsch et al. (2020b). Trend Filtering – II. Denoising 
-#' astronomical signals with varying degrees of smoothness. \emph{Monthly 
-#' Notices of the Royal Astronomical Society}, 492(3), p. 4019-4032.
-#' \href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{[Link]}}}
+#' \item{\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
+#' Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
+#' for time-domain astronomy and astronomical spectroscopy. \emph{Monthly 
+#' Notices of the Royal Astronomical Society}, 492(3), p. 4005-4018.}} \cr
+#' \item{\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
+#' Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical 
+#' signals with varying degrees of smoothness. \emph{Monthly Notices of the 
+#' Royal Astronomical Society}, 492(3), p. 4019-4032.}}}
 
 #' @importFrom glmgen trendfilter
 #' @importFrom dplyr %>% mutate case_when n
