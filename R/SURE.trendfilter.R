@@ -290,7 +290,7 @@
 
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom tidyr drop_na tibble
-#' @importFrom dplyr %>% arrange filter
+#' @importFrom dplyr %>% arrange filter select
 #' @importFrom magrittr %$%
 SURE.trendfilter <- function(x,
                              y,

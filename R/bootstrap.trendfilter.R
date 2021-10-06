@@ -225,7 +225,7 @@
 
 
 #' @importFrom glmgen trendfilter
-#' @importFrom dplyr %>% mutate case_when n
+#' @importFrom dplyr %>% mutate case_when select n
 #' @importFrom tidyr tibble
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats quantile rnorm
