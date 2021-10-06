@@ -190,26 +190,28 @@ trend filtering estimate are then returned within a list that also includes
 a detailed summary of the analysis. One of \code{c("gamma.min", "gamma.1se")}.
 }
 \details{
-\loadmathjax Suppose we observe noisy measurements of a response
-variable of interest (e.g., flux, magnitude, photon counts) according to the
-data generating process (DGP)
-\mjsdeqn{f(t_i) = f_0(t_i) + \epsilon_i,  \quad\quad t_1,\dots,t_n\in(a,b),}
-where \mjseqn{f(t_i)} is a noisy measurement of the signal
-\mjseqn{f_0(t_i)}, and \eqn{\mathbb{E}(\epsilon_i) = 0}.
-Further, let \mjseqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}.
-The random-input mean-squared prediction error (MSPE) is given by
-\mjsdeqn{\widetilde{R}(\gamma) = \mathbb{E}\left[\left(f(t) - \widehat{f}_{0}(t;\gamma)\right)^{2}\right],}
-where \mjseqn{t} is considered to be a random component of the DGP with
-a marginal probability density \mjseqn{p_t(t)} supported on the
-observed input interval. The theoretically optimal choice of
-\mjseqn{\gamma} is defined as the minimizer of this error.
+\loadmathjax As a general rule-of-thumb, we recommend optimizing the
+trend filtering hyperparameter by minimizing Stein's unbiased risk estimate
+(using \code{\link{SURE.trendfilter}}) when the inputs are regularly-sampled
+(either on the raw \code{x} scale or some transformation of it) and optimizing the
+hyperparameter by \mjseqn{V}-fold cross validation when
+the inputs are irregularly-sampled. A regularly-sampled data set with some
+discarded pixels (either sporadically or in large consecutive chunks) is
+still considered regularly sampled. When the inputs are regularly
+sampled on a transformed scale, we recommend transforming to that
+scale and carrying out the full trend filtering analysis (using SURE) on that
+scale. When the inputs do not meet any of these criteria for ``regularly
+sampled,'' \code{cv.trendfilter} should be used to optimize the trend filtering
+hyperparameter. Below we define the various types of validation error that
+can be used with `cv.trendfilter` by passing the appropriate string
+(one of `c("WMAE","WMSE","MAE","MSE")`) to the `validation.error.type`
+argument. For the weighted validation errors, `weights` must be passed.
+
 \mjsdeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
 \mjsdeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}
 \mjsdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}
 \mjsdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}
-where \mjseqn{\widehat{f}(x_i; \gamma)} is the trend filtering
-estimate with hyperparameter \mjseqn{\gamma}, evaluated at
-\mjseqn{x_i}.
+where \mjseqn{w_i} is the \mjseqn{i}th element of the \code{weights} vector.
 }
 \examples{
 #######################################################################

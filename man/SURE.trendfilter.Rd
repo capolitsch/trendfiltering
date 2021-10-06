@@ -138,49 +138,57 @@ smaller, better conditioned data set is used for fitting.}
 grid search over a vector, \code{gammas}, of candidate hyperparameter values, and
 selecting the value that minimizes an unbiased estimate of the model's
 generalization error. The full generalization error curve and the optimized
-trend filtering estimate are then returned within a list that
+trend filtering estimate are then returned as elements of a list object that
 comprehensively summarizes the analysis.
 }
 \details{
-\loadmathjax As a general rule-of-thumb...
+\loadmathjax As a general rule-of-thumb, we recommend optimizing the
+trend filtering hyperparameter by minimizing Stein's unbiased risk estimate
+(SURE) when the inputs are regularly-sampled (either on the raw \code{x} scale or
+some transformation of it) and optimizing the hyperparameter by
+\mjseqn{V}-fold cross validation (using \code{\link{cv.trendfilter}}) when
+the inputs are irregularly-sampled. A regularly-sampled data set with some
+discarded pixels (either sporadically or in large consecutive chunks) is
+still considered regularly sampled. When the inputs are regularly
+sampled on a transformed scale, we recommend transforming to that
+scale and carrying out the full trend filtering analysis (using SURE) on that
+scale. See the example below for a case when the inputs are evenly sample on
+the \code{log10(x)} scale.
 
-Below we summarize the general setup
+Below we describe the general motivation for trend filtering with SURE. See
 \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
-for a detailed
+for more details. \cr
 
-Suppose we observe noisy measurements of a response
-variable of interest (e.g., flux, magnitude, photon counts) according to the
-following data generating process (DGP):
-\mjdeqn{f(t_i) = f_0(t_i) + \epsilon_i,  \hfill t_1,\dots,t_n\in(a,b),}{ascii}
-where \mjeqn{f(t_i)}{ascii} is a noisy measurement of the signal
-\mjeqn{f_0(t_i)}{ascii}, \mjeqn{\mathbb{E}\link[=\\epsilon_i]{\epsilon_i} = 0}{ascii}, and
-\mjeqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}{ascii}.
-Let \mjeqn{\widehat{f}_0}{ascii} denote the trend filtering estimator of
-order \mjeqn{k}{ascii} with free hyperparameter \mjeqn{\gamma}{ascii}.
-The fixed-input mean-squared prediction error (MSPE) of the estimator
-\mjeqn{\widehat{f}_0}{ascii} is given by
-\mjdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(f(t}{i}) - \widehat{f}_{0}(t}{i};\gamma)\right)^2\;|\;t_{1},\dots,t_{n}\right]}{ascii}
-\mjdeqn{= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left[\left(f_0(t_i) - \widehat{f}_0(t_i;\gamma)\right)^2\;|\;t_1,\dots,t_n\right] + \sigma_i^2\right).}{ascii}
-
+Suppose we observe noisy measurements of a response variable of interest
+(e.g., flux, magnitude, photon counts) according to the data generating
+process (DGP)
+\mjsdeqn{y_i = f(x_i) + \epsilon_i, \quad\quad x_1,\dots,x_n\in(a,b),}
+where \mjseqn{y_i} is a noisy observation of a signal \mjseqn{f(x_i)} and the
+\mjseqn{\epsilon_i} have mean zero with variance
+\mjseqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}. Let
+\mjseqn{\widehat{f}(\cdot; \gamma)} denote the trend filtering estimator of
+order \mjseqn{k} with tunable hyperparameter \mjseqn{\gamma}. The fixed-input
+mean-squared prediction error (MSPE) of the estimator \mjseqn{\widehat{f}}
+is defined as
+\mjsdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(y_i - \widehat{f}(x_{i};\gamma)\right)^2\;|\;x_{1},\dots,x_{n}\right]}
+\mjsdeqn{= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left[\left(f(x_i) - \widehat{f}(x_i;\gamma)\right)^2\;|\;x_1,\dots,x_n\right] + \sigma_i^2\right).}
 Stein's unbiased risk estimate (SURE) provides an unbiased estimate of the
-fixed-input MSPE of any regression estimator of the signal
-\mjeqn{f_0}{ascii}.
-\mjdeqn{\widehat{R}_0(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f}_0)}{n},}{ascii}
-where \mjeqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}{ascii}
-and \mjeqn{\text{df}(\widehat{f}_0)}{ascii} is the effective degrees of
-freedom for a trend filtering estimator (with a fixed choice of
-hyperparameter). A formula for the effective degrees of freedom of the trend
-filtering estimator is available via the generalized lasso results of
-\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{Tibshirani and Taylor (2012)};
-namely,
-\mjdeqn{\text{df}(\widehat{f}_0) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}_0\right] + k + 1.}{ascii}
-We then obtain our hyperparameter estimate \mjeqn{\widehat{\gamma}}{ascii}
-by minimizing the following plug-in estimate:
-\mjdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(f(t_i) - \widehat{f}_0(t_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f}_0)}{n},}{ascii}
-where \mjeqn{\widehat{\text{df}}}{ascii} is the estimate for the effective
+fixed-input MSPE via the following formula:
+\mjsdeqn{\widehat{R}_0(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f})}{n},}
+where \mjseqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}
+and \mjseqn{\text{df}(\widehat{f})} is the effective degrees of
+freedom of the trend filtering estimator (with a fixed choice of
+hyperparameter). The generalized lasso results of
+\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{Tibshirani and Taylor (2012)}
+provide the following formula for the effective degrees of freedom of a trend
+filtering estimator (with a fixed hyperparameter choice):
+\mjsdeqn{\text{df}(\widehat{f}) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}\right] + k + 1.}
+The optimal hyperparameter value is then defined as
+\mjsdeqn{\widehat{\gamma} = \text{argmin}_{\gamma} \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f})}{n},}
+where \mjseqn{\widehat{\text{df}}} is the estimate for the effective
 degrees of freedom that is obtained by replacing the expectation with the
-observed number of knots, and \mjeqn{\widehat{\overline{\sigma}}^2}{ascii}
-is an estimate of \mjeqn{\overline{\sigma}^2}{ascii}.
+observed number of knots, and \mjseqn{\widehat{\overline{\sigma}}^2}
+is an estimate of \mjseqn{\overline{\sigma}^2}.
 }
 \references{
 \bold{Companion references}
