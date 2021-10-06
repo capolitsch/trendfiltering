@@ -1,7 +1,7 @@
 # trendfiltering R package
 
 ## Installation
-```
+``` r
 devtools::install_github("capolitsch/trendfilteringSupp")
 ```
 
