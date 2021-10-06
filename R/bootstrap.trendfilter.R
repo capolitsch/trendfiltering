@@ -151,7 +151,6 @@
 #' # masked pixels.
 #' 
 #' data("quasar_spec")
-#' data("plotting_utilities")
 #'
 #' # head(data)
 #' #

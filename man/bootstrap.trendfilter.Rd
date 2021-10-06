@@ -136,7 +136,6 @@ Politsch et al. (2020a)}.
 # masked pixels.
 
 data("quasar_spec")
-data("plotting_utilities")
 
 # head(data)
 #
