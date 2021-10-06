@@ -116,7 +116,7 @@
 #' filtering estimator (with a fixed hyperparameter choice):
 #' \mjsdeqn{\text{df}(\widehat{f}) = \mathbb{E}\left\[\text{number of knots in}\;\widehat{f}\right\] + k + 1.}
 #' The optimal hyperparameter value is then defined as
-#' \mjsdeqn{\widehat{\gamma} = \argmin_{\gamma} \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f})}{n},}
+#' \mjsdeqn{\widehat{\gamma} = \arg\min_{\gamma} \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f})}{n},}
 #' where \mjseqn{\widehat{\text{df}}} is the estimate for the effective 
 #' degrees of freedom that is obtained by replacing the expectation with the
 #' observed number of knots, and \mjseqn{\widehat{\overline{\sigma}}^2}
