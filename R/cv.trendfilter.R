@@ -63,7 +63,7 @@
 #' parameter choices to be passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
 #' Tibshirani 2016}). See the 
-#' \code{\link[trendfilter.control.list]{glmgen::trendfilter.control.list}}
+#' [glmgen::trendfilter.control.list()]
 #' documentation for full details. 
 #' No technical understanding of the ADMM algorithm is needed and the default
 #' parameter choices will almost always suffice. However, the following
@@ -92,7 +92,7 @@
 #' @param mc.cores Parallel computing: The number of cores to utilize. Defaults
 #' to the number of cores detected.
 #' @param ... Additional named arguments to be passed to 
-#' \code{\link[trendfilter.control.list]{glmgen::trendfilter.control.list}}.
+#' [glmgen::trendfilter.control.list()].
 #' 
 #' @return An object of class 'cv.trendfilter'. This is a list with the 
 #' following elements:

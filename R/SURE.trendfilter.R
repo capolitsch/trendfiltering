@@ -47,7 +47,7 @@
 #' parameter choices to be passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
 #' Tibshirani 2016}). See the 
-#' \code{\link[trendfilter.control.list]{glmgen::trendfilter.control.list}}
+#' [glmgen::trendfilter.control.list()]
 #' documentation for full details. No technical understanding of the ADMM
 #' algorithm is needed and the default parameter choices will almost always
 #' suffice. However, the following parameters may require some adjustments to
@@ -72,7 +72,7 @@
 #' applied to the data. If we make bins of size `x_tol` and find at least two
 #' elements of `x` that fall into the same bin, then we thin the data.}
 #' @param ... Additional named arguments to be passed to 
-#' \code{\link[trendfilter.control.list]{glmgen::trendfilter.control.list}}.
+#' [glmgen::trendfilter.control.list()].
 #' 
 #' @details \loadmathjax As a general rule-of-thumb, we recommend optimizing the
 #' trend filtering hyperparameter by minimizing Stein's unbiased risk estimate
@@ -116,19 +116,18 @@
 #' filtering estimator (with a fixed hyperparameter choice):
 #' \mjsdeqn{\text{df}(\widehat{f}) = \mathbb{E}\left\[\text{number of knots in}\;\widehat{f}\right\] + k + 1.}
 #' The optimal hyperparameter value is then defined as
-#' \mjsdeqn{\widehat{\gamma} = \text{argmin}_{\gamma} \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f})}{n},}
+#' \mjsdeqn{\widehat{\gamma} = \argmin_{\gamma} \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f})}{n},}
 #' where \mjseqn{\widehat{\text{df}}} is the estimate for the effective 
 #' degrees of freedom that is obtained by replacing the expectation with the
 #' observed number of knots, and \mjseqn{\widehat{\overline{\sigma}}^2}
 #' is an estimate of \mjseqn{\overline{\sigma}^2}. We define 
 #' \mjseqn{\overline{\sigma}^2} as `mean(1 / weights)`, so `weights` must be
 #' passed in order to use `SURE.trendfilter`. If a reliable estimate of
-#' \mjseqn{\overline{\sigma}^2} is not available \emph{a priori}, a data-driven
+#' \mjseqn{\overline{\sigma}^2} is not available a priori, a data-driven
 #' estimate can be constructed, e.g. see 
-#' \href{https://link.springer.com/book/10.1007/978-0-387-21736-9}{Wasserman (2004)}
+#' [Wasserman (2004)](https://link.springer.com/book/10.1007/978-0-387-21736-9)
 #' or
-#' \href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{
-#' Hastie, Tibshirani, and Friedman (2009)}.
+#' [Hastie, Tibshirani, and Friedman (2009)](https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf).
 #' 
 #' @return An object of class 'SURE.trendfilter'. This is a list with the 
 #' following elements:
