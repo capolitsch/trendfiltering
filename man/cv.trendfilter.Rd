@@ -232,20 +232,9 @@ where \mjseqn{w_i} is the \mjseqn{i}th element of the `weights` vector.
 
 data(eclipsing_binary)
 
-# head(df)
-#
-# |      phase|      flux|  std.err|
-# |----------:|---------:|--------:|
-# | -0.4986308| 0.9384845| 0.010160|
-# | -0.4978067| 0.9295757| 0.010162|
-# | -0.4957892| 0.9438493| 0.010162|
-
-gamma.grid <- exp( seq(7, 16, length = 150) )
-
 cv.out <- cv.trendfilter(x = df$phase, 
                          y = df$flux, 
                          weights = 1 / df$std.err ^ 2,
-                         gammas = gamma.grid,
                          validation.error.type = "MAE",
                          optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T))
 

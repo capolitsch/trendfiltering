@@ -135,15 +135,7 @@ Politsch et al. (2020a)}.
 # are equally spaced in log10 wavelength space, aside from some instances of 
 # masked pixels.
 
-data("quasar_spec")
-
-# head(data)
-#
-# | log10.wavelength|       flux|   weights|
-# |----------------:|----------:|---------:|
-# |           3.5529|  0.4235348| 0.0417015|
-# |           3.5530| -2.1143005| 0.1247811|
-# |           3.5531| -3.7832341| 0.1284383|
+data(quasar_spec)
 
 SURE.out <- SURE.trendfilter(x = data$log10.wavelength, 
                              y = data$flux, 

@@ -305,18 +305,14 @@ cv.trendfilter <- function(x, y, weights = NULL,
                    "`k = 2` is more stable and visually indistinguishable."))
   }
   
-  if ( is.null(gammas) && (ngammas != round(ngammas) || ngammas < 25L) ){
-    stop("ngammas must be a positive integer >= 25.")
-  }
-  
-  if ( !is.null(gammas) ){
+  if ( !missing(gammas) ){
     if ( min(gammas) < 0L ){
       stop("All specified gamma values must be positive.")
     }
     if ( length(gammas) < 25L ) stop("gammas must have length >= 25.")
   }
   
-  if ( is.null(x.eval) ){
+  if ( !missing(nx.eval) ){
     if ( nx.eval != round(nx.eval) ) stop("nx.eval must be a positive integer.")
   }else{
     if ( any(x.eval < min(x) || x.eval > max(x)) ){
@@ -339,12 +335,6 @@ cv.trendfilter <- function(x, y, weights = NULL,
   
   if ( length(weights) == 0 ){
     weights <- rep(1, length(y))
-  }
-  
-  if ( is.null(gammas) ){
-    gammas <- exp(seq(16, -10, length = ngammas))
-  }else{
-    gammas <- sort(gammas, decreasing = TRUE)
   }
   
   mc.cores <- min(mc.cores, V)
@@ -373,7 +363,13 @@ cv.trendfilter <- function(x, y, weights = NULL,
   data.folded <- data.scaled %>% 
     group_split( sample( rep_len(1:V, nrow(data.scaled)) ), .keep = FALSE )
   
-  if ( is.null(x.eval) ){
+  if ( missing(gammas) ){
+    gammas <- exp(seq(16, -10, length = ngammas))
+  }else{
+    gammas <- sort(gammas, decreasing = T)
+  }
+  
+  if ( !missing(x.eval) ){
     x.eval <- seq(min(data$x), max(data$x), length = nx.eval)
   }else{
     x.eval <- sort(x.eval)
