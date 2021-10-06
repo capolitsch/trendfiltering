@@ -66,7 +66,7 @@ gives a visually indistinguishable estimate anyway.}
 parameter choices to be passed to the trend filtering ADMM algorithm
 (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
 Tibshirani 2016}). See the
-\code{\link[glmgen::trendfilter.control.list]{glmgen::trendfilter.control.list}}
+\code{\link[trendfilter.control.list]{glmgen::trendfilter.control.list}}
 documentation for full details. No technical understanding of the ADMM
 algorithm is needed and the default parameter choices will almost always
 suffice. However, the following parameters may require some adjustments to
@@ -92,7 +92,7 @@ applied to the data. If we make bins of size \code{x_tol} and find at least two
 elements of \code{x} that fall into the same bin, then we thin the data.}}
 
 \item{...}{Additional named arguments to be passed to
-\code{\link[glmgen::trendfilter.control.list]{glmgen::trendfilter.control.list}}.}
+\code{\link[trendfilter.control.list]{glmgen::trendfilter.control.list}}.}
 }
 \value{
 An object of class 'SURE.trendfilter'. This is a list with the
@@ -157,7 +157,7 @@ the \code{log10(x)} scale.
 
 Below we describe the general motivation for trend filtering with SURE. See
 \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
-for more details. \cr
+for more details. \cr \cr
 
 Suppose we observe noisy measurements of a response variable of interest
 (e.g., flux, magnitude, photon counts) according to the data generating
@@ -166,7 +166,7 @@ process (DGP)
 where \mjseqn{y_i} is a noisy observation of a signal \mjseqn{f(x_i)} and the
 \mjseqn{\epsilon_i} have mean zero with variance
 \mjseqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}. Let
-\mjseqn{\widehat{f}(\cdot; \gamma)} denote the trend filtering estimator of
+\mjseqn{\widehat{f}(\cdot\;; \gamma)} denote the trend filtering estimator of
 order \mjseqn{k} with tunable hyperparameter \mjseqn{\gamma}. The fixed-input
 mean-squared prediction error (MSPE) of the estimator \mjseqn{\widehat{f}}
 is defined as
@@ -174,7 +174,7 @@ is defined as
 \mjsdeqn{= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left[\left(f(x_i) - \widehat{f}(x_i;\gamma)\right)^2\;|\;x_1,\dots,x_n\right] + \sigma_i^2\right).}
 Stein's unbiased risk estimate (SURE) provides an unbiased estimate of the
 fixed-input MSPE via the following formula:
-\mjsdeqn{\widehat{R}_0(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f})}{n},}
+\mjsdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f})}{n},}
 where \mjseqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}
 and \mjseqn{\text{df}(\widehat{f})} is the effective degrees of
 freedom of the trend filtering estimator (with a fixed choice of
@@ -188,7 +188,15 @@ The optimal hyperparameter value is then defined as
 where \mjseqn{\widehat{\text{df}}} is the estimate for the effective
 degrees of freedom that is obtained by replacing the expectation with the
 observed number of knots, and \mjseqn{\widehat{\overline{\sigma}}^2}
-is an estimate of \mjseqn{\overline{\sigma}^2}.
+is an estimate of \mjseqn{\overline{\sigma}^2}. We define
+\mjseqn{\overline{\sigma}^2} as \code{mean(1 / weights)}, so \code{weights} must be
+passed in order to use \code{SURE.trendfilter}. If a reliable estimate of
+\mjseqn{\overline{\sigma}^2} is not available _a priori}, a data-driven
+estimate can be constructed, e.g. see
+\href{https://link.springer.com/book/10.1007/978-0-387-21736-9}{Wasserman (2004)}
+or
+\href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{
+Hastie, Tibshirani, and Friedman (2009)}.
 }
 \references{
 \bold{Companion references}

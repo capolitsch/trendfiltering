@@ -63,7 +63,7 @@
 #' parameter choices to be passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
 #' Tibshirani 2016}). See the 
-#' \code{\link[glmgen::trendfilter.control.list]{glmgen::trendfilter.control.list}}
+#' \code{\link[trendfilter.control.list]{glmgen::trendfilter.control.list}}
 #' documentation for full details. 
 #' No technical understanding of the ADMM algorithm is needed and the default
 #' parameter choices will almost always suffice. However, the following
@@ -92,7 +92,7 @@
 #' @param mc.cores Parallel computing: The number of cores to utilize. Defaults
 #' to the number of cores detected.
 #' @param ... Additional named arguments to be passed to 
-#' \code{\link[glmgen::trendfilter.control.list]{glmgen::trendfilter.control.list}}.
+#' \code{\link[trendfilter.control.list]{glmgen::trendfilter.control.list}}.
 #' 
 #' @return An object of class 'cv.trendfilter'. This is a list with the 
 #' following elements:
@@ -163,12 +163,11 @@
 #' sampled on a transformed scale, we recommend transforming to that
 #' scale and carrying out the full trend filtering analysis (using SURE) on that
 #' scale. When the inputs do not meet any of these criteria for ``regularly
-#' sampled,'' `cv.trendfilter` should be used to optimize the trend filtering
+#' sampled'', `cv.trendfilter` should be used to optimize the trend filtering
 #' hyperparameter. Below we define the various types of validation error that
 #' can be used with `cv.trendfilter` by passing the appropriate string
 #' (one of `c("WMAE","WMSE","MAE","MSE")`) to the `validation.error.type`
 #' argument. For the weighted validation errors, `weights` must be passed.
-#' 
 #' \mjsdeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
 #' \mjsdeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}
 #' \mjsdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}
