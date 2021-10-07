@@ -5,7 +5,7 @@
 devtools::install_github("capolitsch/trendfiltering")
 ```
 
-## Key references:
+## References:
 
 1. Politsch et al. (2020a). Trend Filtering – I. A modern statistical tool for time-domain astronomy and Astronomical Spectroscopy. 
 *Monthly Notices of the Royal Astronomical Society*, 492(3), p. 4005-4018. [[Link](https://academic.oup.com/mnras/article/492/3/4005/5704413)]
