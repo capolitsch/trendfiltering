@@ -207,20 +207,6 @@ argument. For the weighted validation errors, `weights` must be passed.
 where \mjseqn{w_i} is the \mjseqn{i}th element of the `weights` vector.
 }
 \examples{
-# A binary star system is a pair of closely-separated stars that move
-# in an orbit around a common center of mass. When a binary star system 
-# is oriented in such a way that the stars eclipse one another from our 
-# vantage point on Earth, we call it an 'eclipsing binary (EB) star 
-# system'. From our perspective, the total brightness of an EB dips 
-# periodically over time due to the stars eclipsing one another. And 
-# the shape of the brightness curve is consistent within each period
-# of the orbit. In order to learn about the physics of these EBs,
-# astronomers 'phase-fold' the brightness curve so that all the orbital 
-# periods are stacked on top of one another in a plot of the EB's phase 
-# vs. its apparent brightness, and then find a 'best-fitting' model
-# for the phase-folded curve. Here, we use trend filtering to fit an
-# optimal phase-folded model for an EB.
-
 data(eclipsing_binary)
 
 opt <- cv.trendfilter(EB$phase, EB$flux, 1 / EB$std.err ^ 2,

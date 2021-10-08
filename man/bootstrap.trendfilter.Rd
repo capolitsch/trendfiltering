@@ -144,25 +144,7 @@ where
 \mjsdeqn{\widehat{f}\emph{{\beta}(x_i') = \inf}{g}\left\{g : \frac{1}{B} \sum_{b=1}^{B} \mathbbm{1}\big\{\widehat{f}_{b}(x_i') \leq g\big\} \geq \beta \right\}, \quad\quad \beta\in(0,1).}
 }
 \examples{
-# A quasar is an extremely luminous galaxy with an active central black 
-# hole. Absorptions in the spectra of quasars at vast 
-# cosmological distances from our galaxy reveal the presence of a gaseous 
-# medium permeating the entirety of intergalactic space -- appropriately 
-# named the 'intergalactic medium'. These absorptions allow astronomers to 
-# study the structure of the Universe using the distribution of these 
-# absorptions in quasar spectra. Particularly important is the 'forest' of 
-# absorptions that arise from the Lyman-alpha spectral line, which traces 
-# the presence of neutral hydrogen gas in intergalactic space.
-#
-# Here, we are interested in denoising the Lyman-alpha forest of a quasar 
-# spectroscopically measured by the Sloan Digital Sky Survey. SDSS spectra 
-# are equally spaced in log10 wavelength space, aside from some instances of 
-# masked pixels.
-
 data(quasar_spec)
-
-# Run a parametric bootstrap on the optimized trend filtering estimator to 
-# obtain uncertainty bands
 
 opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
 boot.out <- bootstrap.trendfilter(SURE.out, bootstrap.algorithm = "parametric")

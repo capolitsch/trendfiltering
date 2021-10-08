@@ -159,25 +159,7 @@
 #' @seealso {\link{SURE.trendfilter}}, \code{\link{cv.trendfilter}}
 #' 
 #' @examples 
-#' # A quasar is an extremely luminous galaxy with an active central black 
-#' # hole. Absorptions in the spectra of quasars at vast 
-#' # cosmological distances from our galaxy reveal the presence of a gaseous 
-#' # medium permeating the entirety of intergalactic space -- appropriately 
-#' # named the 'intergalactic medium'. These absorptions allow astronomers to 
-#' # study the structure of the Universe using the distribution of these 
-#' # absorptions in quasar spectra. Particularly important is the 'forest' of 
-#' # absorptions that arise from the Lyman-alpha spectral line, which traces 
-#' # the presence of neutral hydrogen gas in intergalactic space.
-#' #
-#' # Here, we are interested in denoising the Lyman-alpha forest of a quasar 
-#' # spectroscopically measured by the Sloan Digital Sky Survey. SDSS spectra 
-#' # are equally spaced in log10 wavelength space, aside from some instances of 
-#' # masked pixels.
-#' 
 #' data(quasar_spec)
-#' 
-#' # Run a parametric bootstrap on the optimized trend filtering estimator to 
-#' # obtain uncertainty bands
 #' 
 #' opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
 #' boot.out <- bootstrap.trendfilter(SURE.out, bootstrap.algorithm = "parametric")
@@ -188,12 +170,9 @@
 #' @importFrom tidyr tibble
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats quantile rnorm
-bootstrap.trendfilter <- function(obj,
-                                  level = 0.95, 
-                                  B = 100L, 
+bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L, 
                                   bootstrap.algorithm = c("nonparametric","parametric","wild"),
-                                  return.full.ensemble = FALSE,
-                                  prune = TRUE,
+                                  return.full.ensemble = FALSE, prune = TRUE,
                                   mc.cores = detectCores()){
   
   stopifnot( class(obj) %in% c("SURE.trendfilter","cv.trendfilter") )
@@ -303,9 +282,7 @@ tf.estimator <- function(data, obj, mode = "gamma"){
   return(list(tf.estimate = tf.estimate * obj$y.scale, edf = edf.min, n.iter = n.iter))
 }
 
-
 ########################################################
-
 
 #' Resampling functions for various bootstrap algorithms
 #' 
@@ -316,7 +293,6 @@ tf.estimator <- function(data, obj, mode = "gamma"){
 #' @return Bootstrap sample returned in the same format as the input data frame
 #' / tibble.
 
-
 #' @importFrom dplyr %>% mutate n
 #' @rdname samplers
 #' @export
@@ -324,14 +300,12 @@ parametric.sampler <- function(data){
   data %>% mutate(y = fitted.values + rnorm(n = n(), sd = 1 / sqrt(weights)))
 }
 
-
 #' @importFrom dplyr %>% slice_sample n
 #' @rdname samplers
 #' @export
 nonparametric.resampler <- function(data){
   data %>% slice_sample(n = n(), replace = TRUE)
 }
-
 
 #' @importFrom dplyr %>% mutate n
 #' @rdname samplers
