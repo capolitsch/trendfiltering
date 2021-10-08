@@ -9,38 +9,40 @@ SURE.trendfilter(
   x,
   y,
   weights,
+  k = 2L,
   ngammas = 250L,
   gammas,
   x.eval = x,
   nx.eval,
-  k = 2L,
-  optimization.params = list(max_iter = 600L, obj_tol = 1e-10, thinning = NULL),
+  optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
   ...
 )
 }
 \arguments{
-\item{x}{The vector of observed values of the input variable (a.k.a. the
-predictor, covariate, explanatory variable, regressor, independent variable,
-control variable, etc.)}
+\item{x}{Vector of observed values for the input variable.}
 
-\item{y}{The vector of observed values of the output variable (a.k.a. the
-response, target, outcome, regressand, dependent variable, etc.).}
+\item{y}{Vector of observed values for the output variable.}
 
-\item{weights}{\strong{Must be passed.} A vector of weights for the observed
-outputs, defined as the reciprocal of the variance of the error distribution.
-That is, \code{weights = 1 / sigmas^2}, where \code{sigmas} is a vector of standard
-errors of the uncertainty in the observed outputs. \code{weights} should either
-have length equal to 1 (corresponding to an error distribution with a
-constant variance) or length equal to \code{length(y)} (i.e. heteroskedastic
-errors).}
+\item{weights}{Weights for the observed outputs, defined as the reciprocal
+variance of the error distribution. \code{weights} can be passed as a scalar when
+the errors are believed to have equal variance for all observations.
+Otherwise, \code{weights} must have the same length as \code{x} and \code{y}.}
 
-\item{ngammas}{Integer. The number of trend filtering hyperparameter values
+\item{k}{The degree of the trend filtering estimator. More precisely, with
+the trend filtering estimator defined as a piecewise polynomial function
+\code{k} controls the degree of the polynomials that build up the trend filtering
+estimator. Defaults to \code{k = 2} (i.e. a piecewise quadratic estimate). Must be
+one of \verb{k = 0,1,2,3}. However, \code{k = 3} is discouraged due to algorithmic
+instability, and \code{k = 2} typically gives a visually indistinguishable
+estimate anyway.}
+
+\item{ngammas}{The number of trend filtering hyperparameter values
 to run the grid search over. In this default case, the hyperparameter values
 are automatically chosen by \code{SURE.trendfilter} and \code{ngammas} simply controls
 the granularity of the grid.}
 
-\item{gammas}{Overrides \code{ngammas} if passed. A vector of trend filtering
-hyperparameter values to run the grid search over. It is advisable to let
+\item{gammas}{Overrides \code{ngammas} if passed. The vector of trend filtering
+hyperparameter values for the grid search. It is advisable to let
 the vector be equally-spaced in log-space and passed to \code{SURE.trendfilter}
 in descending order. The function output will contain the sorted
 hyperparameter vector regardless of the user-supplied ordering, and all
@@ -49,24 +51,15 @@ descending ordering. It's best to leave this argument alone unless you know
 what you are doing.}
 
 \item{x.eval}{A grid of inputs to evaluate the optimized trend filtering
-estimate on. Defaults to the observed inputs, \code{x}.}
+estimate on. Defaults to \code{sort(x)}.}
 
 \item{nx.eval}{Integer. If passed, overrides \code{x.eval} with
 \code{seq(min(x), max(x), length = nx.eval)}.}
 
-\item{k}{The degree of the trend filtering estimator. More precisely, with
-the trend filtering estimator defined as a piecewise function of polynomials
-smoothly connected at a set of "knots", \code{k} controls the degree of the
-polynomials that build up the trend filtering estimator. Defaults to \code{k = 2}
-(i.e. a piecewise quadratic estimate). Must be one of \verb{k = 0,1,2,3}. However,
-\code{k = 3} is discouraged due to algorithmic instability, and \code{k = 2} typically
-gives a visually indistinguishable estimate anyway.}
-
 \item{optimization.params}{A named list of parameters that contains all
 parameter choices to be passed to the trend filtering ADMM algorithm
 (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
-Tibshirani 2016}). See the
-\code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}
+Tibshirani 2016}). See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}
 documentation for full details. No technical understanding of the ADMM
 algorithm is needed and the default parameter choices will almost always
 suffice. However, the following parameters may require some adjustments to
@@ -113,8 +106,12 @@ estimators fit during validation.}
 filtering estimator.}
 \item{i.min}{The index of \code{gammas} (descending order) that minimizes the
 SURE error curve.}
-\item{x}{The vector of the observed inputs.}
-\item{y}{The vector of the observed outputs.}
+\item{training.error}{The mean-squared error between the observed outputs \code{y}
+and the trend filtering estimate.}
+\item{optimism}{The optimism, i.e. \code{optimism = test.error - training.error},
+provided by the SURE formula.}
+\item{x}{Vector of observed inputs.}
+\item{y}{Vector of observed outputs.}
 \item{weights}{A vector of weights for the observed outputs. These are
 defined as \code{weights = 1 / sigmas^2}, where \code{sigmas} is a vector of
 standard errors of the uncertainty in the observed outputs.}
@@ -134,12 +131,10 @@ smaller, better conditioned data set is used for fitting.}
 \item{x.scale, y.scale, data.scaled}{For internal use.}
 }
 \description{
-\code{SURE.trendfilter} optimizes the trend filtering hyperparameter by running a
-grid search over a vector, \code{gammas}, of candidate hyperparameter values, and
-selecting the value that minimizes an unbiased estimate of the model's
-generalization error. The full generalization error curve and the optimized
-trend filtering estimate are then returned as elements of a list object that
-comprehensively summarizes the analysis.
+\code{SURE.trendfilter} optimizes the trend filtering hyperparameter via a grid
+search over a vector of candidate hyperparameter values and selects the value
+that minimizes an unbiased estimate of the model's generalization error. See
+details for when to use \code{SURE.trendfilter} vs. \code{\link{cv.trendfilter}}.
 }
 \details{
 \loadmathjax As a general rule-of-thumb, we recommend optimizing the
@@ -152,16 +147,16 @@ discarded pixels (either sporadically or in large consecutive chunks) is
 still considered regularly sampled. When the inputs are regularly
 sampled on a transformed scale, we recommend transforming to that
 scale and carrying out the full trend filtering analysis (using SURE) on that
-scale. See the example below for a case when the inputs are evenly sample on
+scale. See the example below for a case when the inputs are evenly sampled on
 the \code{log10(x)} scale.
 
 Below we describe the general motivation for trend filtering with SURE. See
 \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
 for more details. \cr \cr
 
-Suppose we observe noisy measurements of a response variable of interest
+Suppose we observe noisy measurements of an output variable of interest
 (e.g., flux, magnitude, photon counts) according to the data generating
-process (DGP)
+process
 \mjsdeqn{y_i = f(x_i) + \epsilon_i, \quad\quad x_1,\dots,x_n\in(a,b),}
 where \mjseqn{y_i} is a noisy observation of a signal \mjseqn{f(x_i)} and the
 \mjseqn{\epsilon_i} have mean zero with variance
@@ -198,18 +193,15 @@ or
 \href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{Hastie, Tibshirani, and Friedman (2009)}.
 }
 \examples{
-#############################################################################
-##                    Quasar Lyman-alpha forest example                    ##
-#############################################################################
-# A quasar is an extremely luminous galaxy with an active supermassive black 
-# hole at its center. Absorptions in the spectra of quasars at vast 
+# A quasar is an extremely luminous galaxy with an active central black 
+# hole. Absorptions in the spectra of quasars at vast 
 # cosmological distances from our galaxy reveal the presence of a gaseous 
 # medium permeating the entirety of intergalactic space -- appropriately 
 # named the 'intergalactic medium'. These absorptions allow astronomers to 
 # study the structure of the Universe using the distribution of these 
 # absorptions in quasar spectra. Particularly important is the 'forest' of 
 # absorptions that arise from the Lyman-alpha spectral line, which traces 
-# the presence of electrically neutral hydrogen in the intergalactic medium.
+# the presence of neutral hydrogen gas in intergalactic space.
 #
 # Here, we are interested in denoising the Lyman-alpha forest of a quasar 
 # spectroscopically measured by the Sloan Digital Sky Survey. SDSS spectra 
@@ -218,40 +210,7 @@ or
 
 data(quasar_spec)
 
-SURE.out <- SURE.trendfilter(x = data$log10.wavelength, 
-                             y = data$flux, 
-                             weights = data$weights)
-
-
-# Extract the estimated hyperparameter error curve and optimized trend 
-# filtering estimate from the `SURE.trendfilter` output, and transform the 
-# input grid to wavelength space (in Angstroms).
-
-log.gammas <- log(SURE.out$gammas)
-errors <- SURE.out$errors
-log.gamma.min <- log(SURE.out$gamma.min)
-
-wavelength <- 10 ^ (SURE.out$x)
-wavelength.eval <- 10 ^ (SURE.out$x.eval)
-tf.estimate <- SURE.out$tf.estimate
-
-
-# Plot the results
-
-par(mfrow = c(2,1), mar = c(5,4,2.5,1) + 0.1)
-plot(x = log.gammas, y = errors, main = "SURE error curve", 
-     xlab = "log(gamma)", ylab = "SURE error")
-abline(v = log.gamma.min, lty = 2, col = "blue3")
-text(x = log.gamma.min, y = par("usr")[4], 
-     labels = "optimal gamma", pos = 1, col = "blue3")
-
-plot(x = wavelength, y = SURE.out$y, type = "l", 
-     main = "Quasar Lyman-alpha forest", 
-     xlab = "Observed wavelength (Angstroms)", ylab = "Flux")
-lines(wavelength.eval, tf.estimate, col = "orange", lwd = 2.5)
-legend(x = "topleft", lwd = c(1,2), lty = 1, col = c("black","orange"), 
-       legend = c("Noisy quasar Lyman-alpha forest", 
-                  "Trend filtering estimate"))
+opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
 }
 \references{
 \bold{Companion references}
@@ -273,7 +232,7 @@ polynomial estimation via trend filtering}. \emph{The Annals of Statistics}.
 42(1), p. 285-323.} \cr
 \item{Tibshirani (2020). \href{https://arxiv.org/abs/2003.03886}{Divided
 Differences, Falling Factorials, and Discrete Splines: Another Look at Trend
-Filtering and Related Problems}. arXiv preprint.}}
+Filtering and Related Problems}. arXiv: 2003.03886.}}
 
 \bold{Stein's unbiased risk estimate}
 \enumerate{

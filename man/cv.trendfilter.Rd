@@ -7,37 +7,37 @@
 cv.trendfilter(
   x,
   y,
-  weights = NULL,
-  V = 10L,
+  weights,
+  k = 2L,
   ngammas = 250L,
   gammas,
-  x.eval = x,
-  nx.eval,
-  k = 2L,
+  V = 10L,
   gamma.choice = c("gamma.min", "gamma.1se"),
   validation.error.type = c("WMAE", "WMSE", "MAE", "MSE"),
-  optimization.params = list(max_iter = 600L, obj_tol = 1e-10, thinning = NULL),
+  x.eval = x,
+  nx.eval,
+  optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
   mc.cores = detectCores(),
   ...
 )
 }
 \arguments{
-\item{x}{The vector of observed values of the input variable (a.k.a. the
-predictor, covariate, explanatory variable, regressor, independent variable,
-control variable, etc.)}
+\item{x}{Vector of observed values for the input variable.}
 
-\item{y}{The vector of observed values of the output variable (a.k.a. the
-response, target, outcome, regressand, dependent variable, etc.).}
+\item{y}{Vector of observed values for the output variable.}
 
-\item{weights}{A vector of weights for the observed outputs, defined as the
-reciprocal of the variance of the error distribution. That is,
-\code{weights = 1 / sigmas^2}, where \code{sigmas} is a vector of standard errors of
-the uncertainty in the observed outputs. \code{weights} should either have length
-equal to 1 (corresponding to an error distribution with a constant variance)
-or length equal to \code{length(y)} (i.e. heteroskedastic errors).}
+\item{weights}{Weights for the observed outputs, defined as the reciprocal
+variance of the error distribution. \code{weights} can be passed as a scalar when
+the errors are believed to have equal variance for all observations.
+Otherwise, \code{weights} must have the same length as \code{x} and \code{y}.}
 
-\item{V}{The number of folds the data are split into for the V-fold cross
-validation. Defaults to \code{V = 10} (recommended).}
+\item{k}{The degree of the trend filtering estimator. More precisely, with
+the trend filtering estimator defined as a piecewise function of polynomials
+smoothly connected at a set of "knots", \code{k} controls the degree of the
+polynomials that build up the trend filtering estimator. Defaults to \code{k = 2}
+(i.e. a piecewise quadratic estimate). Must be one of \verb{k = 0,1,2,3}. However,
+\code{k = 3} is discouraged due to algorithmic instability, and \code{k = 2} typically
+gives a visually indistinguishable estimate anyway.}
 
 \item{ngammas}{Integer. The number of trend filtering hyperparameter values
 to run the grid search over. In this default case, the hyperparameter values
@@ -53,19 +53,8 @@ objects (e.g. the \code{errors} vector) will correspond to this descending
 ordering. It's best to leave this argument alone unless you know what you
 are doing.}
 
-\item{x.eval}{A grid of inputs to evaluate the optimized trend filtering
-estimate on. Defaults to the observed inputs, \code{x}.}
-
-\item{nx.eval}{Integer. If passed, overrides \code{x.eval} with
-\code{seq(min(x), max(x), length = nx.eval)}.}
-
-\item{k}{The degree of the trend filtering estimator. More precisely, with
-the trend filtering estimator defined as a piecewise function of polynomials
-smoothly connected at a set of "knots", \code{k} controls the degree of the
-polynomials that build up the trend filtering estimator. Defaults to \code{k = 2}
-(i.e. a piecewise quadratic estimate). Must be one of \verb{k = 0,1,2,3}. However,
-\code{k = 3} is discouraged due to algorithmic instability, and \code{k = 2} typically
-gives a visually indistinguishable estimate anyway.}
+\item{V}{The number of folds the data are split into for the V-fold cross
+validation. Defaults to \code{V = 10} (recommended).}
 
 \item{gamma.choice}{One of \code{c("gamma.min","gamma.1se")}. The choice
 of hyperparameter that is used for optimized trend filtering estimate.
@@ -86,11 +75,16 @@ If \code{weights = NULL}, then the weighted and unweighted counterparts are
 equivalent. In short, weighting helps combat heteroskedasticity and absolute
 error decreases sensitivity to outliers. Defaults to \code{"WMAE"}.}
 
+\item{x.eval}{A grid of inputs to evaluate the optimized trend filtering
+estimate on. Defaults to the observed inputs, \code{x}.}
+
+\item{nx.eval}{Integer. If passed, overrides \code{x.eval} with
+\code{seq(min(x), max(x), length = nx.eval)}.}
+
 \item{optimization.params}{A named list of parameters that contains all
 parameter choices to be passed to the trend filtering ADMM algorithm
 (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
-Tibshirani 2016}). See the
-\code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}
+Tibshirani 2016}). See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}
 documentation for full details.
 No technical understanding of the ADMM algorithm is needed and the default
 parameter choices will almost always suffice. However, the following
@@ -162,8 +156,8 @@ trend filtering estimator.}
 \item{i.1se}{The index of `gammas` that gives the largest hyperparameter
 value that has a cross validation error within 1 standard error of the
 minimum of the cross validation error curves.}
-\item{x}{The vector of the observed inputs.}
-\item{y}{The vector of the observed outputs.}
+\item{x}{Vector of observed inputs.}
+\item{y}{Vector of observed outputs.}
 \item{weights}{A vector of weights for the observed outputs. These are
 defined as `weights = 1 / sigmas^2`, where `sigmas` is a vector of
 standard errors of the uncertainty in the observed outputs.}
@@ -186,8 +180,8 @@ that a smaller, better conditioned data set is used for fitting.}
 \code{cv.trendfilter} optimizes the trend filtering hyperparameter
 by performing V-fold cross validation on a vector, \code{gammas}, of candidate
 hyperparameter values. The full generalization error curve and the optimized
-trend filtering estimate are then returned within a list that also includes
-a detailed summary of the analysis. One of \code{c("gamma.min", "gamma.1se")}.
+trend filtering estimate are then returned as elements of a list object that
+provides a comprehensive summary of the analysis.
 }
 \details{
 \loadmathjax As a general rule-of-thumb, we recommend optimizing the
@@ -213,9 +207,6 @@ argument. For the weighted validation errors, `weights` must be passed.
 where \mjseqn{w_i} is the \mjseqn{i}th element of the `weights` vector.
 }
 \examples{
-#######################################################################
-###  Phase-folded light curve of an eclipsing binary star system   ####
-#######################################################################
 # A binary star system is a pair of closely-separated stars that move
 # in an orbit around a common center of mass. When a binary star system 
 # is oriented in such a way that the stars eclipse one another from our 
@@ -232,29 +223,9 @@ where \mjseqn{w_i} is the \mjseqn{i}th element of the `weights` vector.
 
 data(eclipsing_binary)
 
-cv.out <- cv.trendfilter(x = df$phase, 
-                         y = df$flux, 
-                         weights = 1 / df$std.err ^ 2,
-                         validation.error.type = "MAE",
-                         optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T))
-
-# Plot the results
-
-par(mfrow = c(2,1), mar = c(5,4,2.5,1) + 0.1)
-plot(log(cv.out$gammas), cv.out$errors, main = "CV error curve", 
-     xlab = "log(gamma)", ylab = "CV error")
-segments(x0 = log(cv.out$gammas), x1 = log(cv.out$gammas), 
-         y0 = cv.out$errors - cv.out$se.errors, 
-         y1 = cv.out$errors + cv.out$se.errors)
-abline(v = log(cv.out$gamma.min), lty = 2, col = "blue3")
-text(x = log(cv.out$gamma.min), y = par("usr")[4], 
-     labels = "optimal gamma", pos = 1, col = "blue3")
-plot(df$phase, df$flux, cex = 0.15, xlab = "Phase", ylab = "Flux",
-     main = "Eclipsing binary phase-folded light curve")
-segments(x0 = df$phase, x1 = df$phase, 
-         y0 = df$flux - df$std.err, y1 = df$flux + df$std.err, 
-         lwd = 0.25)
-lines(cv.out$x.eval, cv.out$tf.estimate, col = "orange", lwd = 2.5)
+opt <- cv.trendfilter(EB$phase, EB$flux, 1 / EB$std.err ^ 2,
+                      validation.error.type = "MAE",
+                      optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T))
 }
 \references{
 \bold{Companion references}

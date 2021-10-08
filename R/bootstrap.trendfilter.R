@@ -1,12 +1,12 @@
-#' Obtain `1-alpha` pointwise variability bands by bootstrapping the optimized
-#' trend filtering estimator...
+#' Obtain pointwise uncertainty bands by bootstrapping the optimized trend
+#' filtering estimator.
 #'
 #' \loadmathjax `bootstrap.trendfilter` implements
 #' 
 #' @param obj An object of class '\link{SURE.trendfilter}' or
 #' '\link{cv.trendfilter}'.
-#' @param alpha Determines the width of the `1-alpha` pointwise variability 
-#' bands. Defaults to `alpha = 0.05`.
+#' @param level The level of the pointwise variability bands. Defaults to
+#' `level = 0.95`.
 #' @param B The number of bootstrap samples used to estimate the pointwise
 #' variability bands. Defaults to `B = 100`.
 #' @param bootstrap.algorithm A string specifying which variation of the 
@@ -19,8 +19,8 @@
 #' @param prune Logical. If `TRUE`, then the trend filtering bootstrap 
 #' ensemble is examined for rare instances in which the optimization has 
 #' stopped at zero knots (likely erroneously), and removes them from the 
-#' ensemble. Defaults to `TRUE`. Do not change this unless you know what you are
-#' doing!
+#' ensemble that is used to compute the variability bands. Defaults to `TRUE`.
+#' Do not change this unless you know what you are doing!
 #' @param mc.cores Parallel computing: The number of cores to utilize. Defaults
 #' to the number of cores detected.
 #' 
@@ -34,13 +34,12 @@
 #' \item{tf.standard.errors}{The standard errors of the optimized trend 
 #' filtering point estimator.}
 #' \item{bootstrap.lower.band}{Vector of lower bounds for the 
-#' `1-alpha` pointwise variability band, evaluated on `x.eval`.}
+#' pointwise variability bands, evaluated on `x.eval`.}
 #' \item{bootstrap.upper.band}{Vector of upper bounds for the 
-#' `1-alpha` pointwise variability band, evaluated on `x.eval`.}
+#' pointwise variability bands, evaluated on `x.eval`.}
 #' \item{bootstrap.algorithm}{A string specifying which variation of the 
 #' bootstrap was used to obtain the variability bands.}
-#' \item{alpha}{The 'level' of the variability bands, i.e. `alpha`
-#' produces a `100*(1-alpha)`% pointwise variability band.}
+#' \item{level}{The level of the pointwise variability bands.}
 #' \item{B}{The number of bootstrap samples used to estimate the pointwise
 #' variability bands.}
 #' \item{tf.bootstrap.ensemble}{If `return.full.ensemble = TRUE`, the 
@@ -56,8 +55,8 @@
 #' ensemble.}
 #' \item{n.pruned}{The number of poorly-converged bootstrap trend filtering 
 #' estimates pruned from the ensemble.}
-#' \item{x}{(Inherited from `obj`) The vector of the observed inputs.}
-#' \item{y}{(Inherited from `obj`) The vector of the observed outputs.}
+#' \item{x}{(Inherited from `obj`) Vector of observed inputs.}
+#' \item{y}{(Inherited from `obj`) Vector of observed outputs.}
 #' \item{weights}{(Inherited from `obj`) A vector of weights for the observed
 #' outputs. These are defined as `weights = 1 / sigma^2`, where `sigma` is a
 #' vector of standard errors of the uncertainty in the output measurements.}
@@ -73,7 +72,7 @@
 #' optimally-tuned trend filtering estimator.}
 #' \item{i.min}{(Inherited from `obj`) The index of `gammas` that minimizes the
 #' validation error.}
-#' \item{validation.method}{One of `c("SURE", paste0(V,"-fold CV"))`.}
+#' \item{validation.method}{Either `"SURE"` or `paste0(V,"-fold CV")`.}
 #' \item{errors}{(Inherited from `obj`) Vector of hyperparameter validation
 #' errors, inherited from `obj` (an object of class 'SURE.trendfilter').}
 #' \item{optimization.params}{(Inherited from `obj`) a list of parameters that
@@ -88,9 +87,37 @@
 #' filtering estimate.}
 #' \item{x.scale, y.scale, data.scaled}{For internal use.}
 #' 
-#' @details See
+#' @details \loadmathjax See
 #' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-#' Politsch et al. (2020a)}. 
+#' Politsch et al. (2020a)} for more details.
+#' 
+#' \itemize{
+#' \item{The inputs are irregularly sampled}
+#' \item{The inputs are regularly sampled and the noise distribution is known}
+#' \item{The inputs are regularly sampled and the noise distribution is unknown}
+#' }
+#' 
+#' Parametric bootstrap for fixed-input uncertainty quantification (when noise
+#' distribution \mjseqn{\epsilon_i\sim Q_i} is known a priori)
+#' Require: Training Data \mjseqn{(x_1, y_1),\dots,(x_n, y_n)}, hyperparameters
+#' \mjseqn{\gamma} and \mjseqn{k}, assumed noise distribution
+#' \mjseqn{\epsilon_i \sim Q_i}, prediction input grid \mjseqn{x_1',\dots,x_m'}
+#' Compute the trend filtering point estimate at the observed inputs:
+#' \mjseqn{(x_1, y_1),\dots, (x_n, y_n)}
+#' For \mjseqn{b in 1:B}
+#' Define a bootstrap sample by sampling from the assumed noise distribution:
+#' \mjsdeqn{y_i = \widehat{f}(x_i) + \epsilon_i \quad \quad \text{where }\epsilon_i \sim Q_i, \quad i=1,\dots,n}
+#' Let \mjseqn{\widehat{f}(x_1'), \dots, \widehat{f}(x_m')} denote the trend
+#' filtering estimate fit on the bootstrap sample and evaluated on the
+#' prediction grid \mjseqn{x_1',\dots,x_m'}
+#' 
+#' Given the full trend filtering bootstrap ensemble provided by the relevant
+#' bootstrap algorithm, for any \mjseqn{\alpha\in(0,1)}, a
+#' \mjseqn{(1-\alpha)\cdot100}% pointwise variability band is
+#' given by 
+#' \mjsdeqn{B_{1-\alpha}(x_i') = \left(\widehat{f}_{\alpha/2}(x_i'),\;\widehat{f}_{1-\alpha/2}(x_i')\right), \quad\quad i = 1,\dots,m}
+#' where
+#' \mjsdeqn{\widehat{f}_{\beta}(x_i') = \inf_{g}\left\{g : \frac{1}{B} \sum_{b=1}^{B} \mathbbm{1}\big\{\widehat{f}_{b}(x_i') \leq g\big\} \geq \beta \right\}, \quad\quad \beta\in(0,1).}
 #' 
 #' @export bootstrap.trendfilter
 #' 
@@ -132,18 +159,15 @@
 #' @seealso {\link{SURE.trendfilter}}, \code{\link{cv.trendfilter}}
 #' 
 #' @examples 
-#' #############################################################################
-#' ##                    Quasar Lyman-alpha forest example                    ##
-#' #############################################################################
-#' # A quasar is an extremely luminous galaxy with an active supermassive black 
-#' # hole at its center. Absorptions in the spectra of quasars at vast 
+#' # A quasar is an extremely luminous galaxy with an active central black 
+#' # hole. Absorptions in the spectra of quasars at vast 
 #' # cosmological distances from our galaxy reveal the presence of a gaseous 
 #' # medium permeating the entirety of intergalactic space -- appropriately 
 #' # named the 'intergalactic medium'. These absorptions allow astronomers to 
 #' # study the structure of the Universe using the distribution of these 
 #' # absorptions in quasar spectra. Particularly important is the 'forest' of 
 #' # absorptions that arise from the Lyman-alpha spectral line, which traces 
-#' # the presence of electrically neutral hydrogen in the intergalactic medium.
+#' # the presence of neutral hydrogen gas in intergalactic space.
 #' #
 #' # Here, we are interested in denoising the Lyman-alpha forest of a quasar 
 #' # spectroscopically measured by the Sloan Digital Sky Survey. SDSS spectra 
@@ -152,68 +176,11 @@
 #' 
 #' data(quasar_spec)
 #' 
-#' SURE.out <- SURE.trendfilter(x = data$log10.wavelength, 
-#'                              y = data$flux, 
-#'                              weights = data$weights)
-#' 
-#' 
-#' # Extract the estimated hyperparameter error curve and optimized trend 
-#' # filtering estimate from the `SURE.trendfilter` output, and transform the 
-#' # input grid to wavelength space (in Angstroms).
-#' 
-#' log.gammas <- log(SURE.out$gammas)
-#' errors <- SURE.out$errors
-#' log.gamma.min <- log(SURE.out$gamma.min)
-#' 
-#' wavelength <- 10 ^ (SURE.out$x)
-#' wavelength.eval <- 10 ^ (SURE.out$x.eval)
-#' tf.estimate <- SURE.out$tf.estimate
-#'
-#' 
 #' # Run a parametric bootstrap on the optimized trend filtering estimator to 
 #' # obtain uncertainty bands
 #' 
-#' boot.out <- bootstrap.trendfilter(obj = SURE.out, bootstrap.algorithm = "parametric")
-#' 
-#' 
-#' # Plot the results
-#' 
-#' transparency <- function(color, trans){
-#'   
-#'   num2hex <- function(x){
-#'     hex <- unlist(strsplit("0123456789ABCDEF",split=""))
-#'     return(paste(hex[(x-x%%16)/16+1],hex[x%%16+1],sep=""))
-#'   }
-#'   rgb <- rbind(col2rgb(color),trans)
-#'   res <- paste("#",apply(apply(rgb,2,num2hex),2,paste,collapse=""),sep="")
-#'   return(res)
-#'   
-#' }
-#'
-#' par(mfrow = c(2,1), mar = c(5,4,2.5,1) + 0.1)
-#' plot(x = log.gammas, y = errors, main = "SURE error curve", 
-#'      xlab = "log(gamma)", ylab = "SURE error")
-#' abline(v = log.gamma.min, lty = 2, col = "blue3")
-#' text(x = log.gamma.min, y = par("usr")[4], 
-#'      labels = "optimal gamma", pos = 1, col = "blue3")
-#' 
-#' plot(x = wavelength, y = SURE.out$y, type = "l", 
-#'      main = "Quasar Lyman-alpha forest", 
-#'      xlab = "Observed wavelength (Angstroms)", ylab = "Flux")
-#' polygon(c(wavelength.eval, rev(wavelength.eval)), 
-#'         c(boot.out$bootstrap.lower.band, 
-#'         rev(boot.out$bootstrap.upper.band)),
-#'         col = transparency("orange", 90), border = NA)
-#' lines(wavelength.eval, boot.out$bootstrap.lower.band, 
-#'       col = "orange", lwd = 0.5)
-#' lines(wavelength.eval, boot.out$bootstrap.upper.band, 
-#'       col = "orange", lwd = 0.5)
-#' lines(wavelength.eval, tf.estimate, col = "orange", lwd = 2.5)
-#' legend(x = "topleft", lwd = c(1,2,8), lty = 1, cex = 0.75,
-#'        col = c("black","orange", transparency("orange", 90)), 
-#'        legend = c("Noisy quasar spectrum",
-#'                   "Trend filtering estimate",
-#'                   "95% variability band"))
+#' opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
+#' boot.out <- bootstrap.trendfilter(SURE.out, bootstrap.algorithm = "parametric")
 
 
 #' @importFrom glmgen trendfilter
@@ -222,7 +189,7 @@
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats quantile rnorm
 bootstrap.trendfilter <- function(obj,
-                                  alpha = 0.05, 
+                                  level = 0.95, 
                                   B = 100L, 
                                   bootstrap.algorithm = c("nonparametric","parametric","wild"),
                                   return.full.ensemble = FALSE,
@@ -231,19 +198,16 @@ bootstrap.trendfilter <- function(obj,
   
   stopifnot( class(obj) %in% c("SURE.trendfilter","cv.trendfilter") )
   bootstrap.algorithm <- match.arg(bootstrap.algorithm)
-  stopifnot( is.numeric(alpha) & alpha > 0 & alpha < 1 )
+  stopifnot( is.numeric(level) & level > 0 & level < 1 )
   stopifnot( B >= 10 )
   
   if ( !prune ) warning("I hope you know what you are doing!")
   
   if ( mc.cores < detectCores() ){
-    warning(paste0("Your machine has ", detectCores(), " cores. Consider increasing `mc.cores` to speed up computation."))
+    warning(paste0("Your machine has ", detectCores(), " cores. Consider increasing mc.cores to speed up computation."))
   }
   
-  if ( mc.cores > detectCores() ){
-    warning(paste0("Your machine only has ", detectCores(), " cores. Adjusting `mc.cores` accordingly."))
-    mc.cores <- detectCores()
-  }
+  if ( mc.cores > detectCores() ) mc.cores <- detectCores()
   
   sampler <- case_when(
     bootstrap.algorithm == "nonparametric" ~ list(nonparametric.resampler),
@@ -268,10 +232,10 @@ bootstrap.trendfilter <- function(obj,
   
   obj$n.pruned <- (B - ncol(tf.boot.ensemble)) %>% as.integer
   obj$tf.standard.errors <- apply(tf.boot.ensemble, 1, sd) 
-  obj$bootstrap.lower.band <- apply(tf.boot.ensemble, 1, quantile, probs = alpha / 2) 
-  obj$bootstrap.upper.band <- apply(tf.boot.ensemble, 1, quantile, probs = 1 - alpha / 2)
+  obj$bootstrap.lower.band <- apply(tf.boot.ensemble, 1, quantile, probs = (1 - level) / 2) 
+  obj$bootstrap.upper.band <- apply(tf.boot.ensemble, 1, quantile, probs = 1 - (1 - level) / 2)
   
-  obj <- c(obj, list(bootstrap.algorithm = bootstrap.algorithm, alpha = alpha, B = B))
+  obj <- c(obj, list(bootstrap.algorithm = bootstrap.algorithm, level = level, B = B))
   
   if ( return.full.ensemble ){
     obj$tf.bootstrap.ensemble <- tf.boot.ensemble
@@ -280,7 +244,7 @@ bootstrap.trendfilter <- function(obj,
   }
   
   obj <- obj[c("x.eval","tf.estimate","tf.standard.errors","bootstrap.lower.band",
-               "bootstrap.upper.band","bootstrap.algorithm","alpha","B",
+               "bootstrap.upper.band","bootstrap.algorithm","level","B",
                "edf.boots","tf.bootstrap.ensemble","prune","n.pruned","x","y",
                "weights","fitted.values","residuals","k","gammas","gamma.min",
                "edfs","edf.min","i.min","validation.method","errors",

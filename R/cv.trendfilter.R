@@ -3,20 +3,15 @@
 #' `cv.trendfilter` optimizes the trend filtering hyperparameter 
 #' by performing V-fold cross validation on a vector, `gammas`, of candidate 
 #' hyperparameter values. The full generalization error curve and the optimized
-#' trend filtering estimate are then returned within a list that also includes 
-#' a detailed summary of the analysis. One of `c("gamma.min", "gamma.1se")`.
+#' trend filtering estimate are then returned as elements of a list object that
+#' provides a comprehensive summary of the analysis.
 #' 
-#' @param x The vector of observed values of the input variable (a.k.a. the 
-#' predictor, covariate, explanatory variable, regressor, independent variable, 
-#' control variable, etc.)
-#' @param y The vector of observed values of the output variable (a.k.a. the
-#' response, target, outcome, regressand, dependent variable, etc.).
-#' @param weights A vector of weights for the observed outputs, defined as the
-#' reciprocal of the variance of the error distribution. That is, 
-#' `weights = 1 / sigmas^2`, where `sigmas` is a vector of standard errors of
-#' the uncertainty in the observed outputs. `weights` should either have length
-#' equal to 1 (corresponding to an error distribution with a constant variance)
-#' or length equal to `length(y)` (i.e. heteroskedastic errors). 
+#' @param x Vector of observed values for the input variable.
+#' @param y Vector of observed values for the output variable.
+#' @param weights Weights for the observed outputs, defined as the reciprocal
+#' variance of the error distribution. `weights` can be passed as a scalar when
+#' the errors are believed to have equal variance for all observations.
+#' Otherwise, `weights` must have the same length as `x` and `y`.
 #' @param k The degree of the trend filtering estimator. More precisely, with
 #' the trend filtering estimator defined as a piecewise function of polynomials
 #' smoothly connected at a set of "knots", `k` controls the degree of the
@@ -62,8 +57,7 @@
 #' @param optimization.params A named list of parameters that contains all
 #' parameter choices to be passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
-#' Tibshirani 2016}). See the 
-#' [glmgen::trendfilter.control.list()]
+#' Tibshirani 2016}). See the [glmgen::trendfilter.control.list()]
 #' documentation for full details. 
 #' No technical understanding of the ADMM algorithm is needed and the default
 #' parameter choices will almost always suffice. However, the following
@@ -132,8 +126,8 @@
 #' \item{i.1se}{The index of `gammas` that gives the largest hyperparameter
 #' value that has a cross validation error within 1 standard error of the 
 #' minimum of the cross validation error curves.}
-#' \item{x}{The vector of the observed inputs.}
-#' \item{y}{The vector of the observed outputs.}
+#' \item{x}{Vector of observed inputs.}
+#' \item{y}{Vector of observed outputs.}
 #' \item{weights}{A vector of weights for the observed outputs. These are
 #' defined as `weights = 1 / sigmas^2`, where `sigmas` is a vector of 
 #' standard errors of the uncertainty in the observed outputs.}
@@ -214,9 +208,6 @@
 #' @seealso \code{\link{SURE.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 #' 
 #' @examples 
-#' #######################################################################
-#' ###  Phase-folded light curve of an eclipsing binary star system   ####
-#' #######################################################################
 #' # A binary star system is a pair of closely-separated stars that move
 #' # in an orbit around a common center of mass. When a binary star system 
 #' # is oriented in such a way that the stars eclipse one another from our 
@@ -233,29 +224,9 @@
 #' 
 #' data(eclipsing_binary)
 #' 
-#' cv.out <- cv.trendfilter(x = df$phase, 
-#'                          y = df$flux, 
-#'                          weights = 1 / df$std.err ^ 2,
-#'                          validation.error.type = "MAE",
-#'                          optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T))
-#' 
-#' # Plot the results
-#' 
-#' par(mfrow = c(2,1), mar = c(5,4,2.5,1) + 0.1)
-#' plot(log(cv.out$gammas), cv.out$errors, main = "CV error curve", 
-#'      xlab = "log(gamma)", ylab = "CV error")
-#' segments(x0 = log(cv.out$gammas), x1 = log(cv.out$gammas), 
-#'          y0 = cv.out$errors - cv.out$se.errors, 
-#'          y1 = cv.out$errors + cv.out$se.errors)
-#' abline(v = log(cv.out$gamma.min), lty = 2, col = "blue3")
-#' text(x = log(cv.out$gamma.min), y = par("usr")[4], 
-#'      labels = "optimal gamma", pos = 1, col = "blue3")
-#' plot(df$phase, df$flux, cex = 0.15, xlab = "Phase", ylab = "Flux",
-#'      main = "Eclipsing binary phase-folded light curve")
-#' segments(x0 = df$phase, x1 = df$phase, 
-#'          y0 = df$flux - df$std.err, y1 = df$flux + df$std.err, 
-#'          lwd = 0.25)
-#' lines(cv.out$x.eval, cv.out$tf.estimate, col = "orange", lwd = 2.5)
+#' opt <- cv.trendfilter(EB$phase, EB$flux, 1 / EB$std.err ^ 2,
+#'                       validation.error.type = "MAE",
+#'                       optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T))
 
 
 #' @importFrom dplyr mutate arrange case_when group_split bind_rows
@@ -264,16 +235,12 @@
 #' @importFrom matrixStats rowSds
 #' @importFrom magrittr %$% %>%
 #' @importFrom tidyr tibble drop_na
-cv.trendfilter <- function(x, y, weights = NULL, 
-                           V = 10L,
-                           ngammas = 250L,
-                           gammas,
-                           x.eval = x,
-                           nx.eval,
-                           k = 2L,
-                           gamma.choice = c("gamma.min","gamma.1se"),
+cv.trendfilter <- function(x, y, weights, k = 2L,
+                           ngammas = 250L, gammas,
+                           V = 10L, gamma.choice = c("gamma.min","gamma.1se"),
                            validation.error.type = c("WMAE","WMSE","MAE","MSE"),
-                           optimization.params = list(max_iter = 600L, obj_tol = 1e-10, thinning = NULL),
+                           x.eval = x, nx.eval,
+                           optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
                            mc.cores = detectCores(),
                            ...){
   
@@ -292,7 +259,7 @@ cv.trendfilter <- function(x, y, weights = NULL,
   }
   
   if ( k < 0 || k != round(k) ){
-    stop("k must be a nonnegative integer. `k = 2` recommended")
+    stop("k must be a nonnegative integer.")
   }
   
   if ( k > 3 ){
@@ -301,8 +268,8 @@ cv.trendfilter <- function(x, y, weights = NULL,
   }
   
   if ( k == 3 ){
-    warning(paste0("`k = 3` can have poor conditioning...\n", 
-                   "`k = 2` is more stable and visually indistinguishable."))
+    warning(paste0("k = 3 can have poor conditioning...\n", 
+                   "k = 2 is more stable and visually indistinguishable."))
   }
   
   if ( !missing(gammas) ){
@@ -321,21 +288,12 @@ cv.trendfilter <- function(x, y, weights = NULL,
   }
   
   if ( mc.cores < detectCores() ){
-    warning(paste0("Your machine has ", detectCores(), " cores. Consider increasing `mc.cores` to speed up computation."))
+    warning(paste0("Your machine has ", detectCores(), " cores. Consider increasing mc.cores to speed up computation."))
   }
   
-  if ( mc.cores > detectCores() ){
-    warning(paste0("Your machine only has ", detectCores(), " cores. Adjusting `mc.cores` accordingly."))
-    mc.cores <- detectCores()
-  }
-  
-  if ( length(weights) == 1 ){
-    weights <- rep(weights, length(y))
-  }
-  
-  if ( length(weights) == 0 ){
-    weights <- rep(1, length(y))
-  }
+  if ( mc.cores > detectCores() ) mc.cores <- detectCores()
+  if ( length(weights) == 1 ) weights <- rep(weights, length(y))
+  if ( length(weights) == 0 ) weights <- rep(1, length(y))
   
   mc.cores <- min(mc.cores, V)
   gamma.choice <- match.arg(gamma.choice)
@@ -437,7 +395,7 @@ cv.trendfilter <- function(x, y, weights = NULL,
   obj$edf.min <- out$df[obj$i.min]
   obj$edf.1se <- out$df[obj$i.1se]
   
-  # Increase the algorithmic precision for the optimized TF estimate
+  # Increase the TF solution's algorithmic precision for the optimized estimate
   obj$optimization.params$obj_tol <- obj$optimization.params$obj_tol * 1e-2
   
   out <- obj %$% trendfilter(x = data.scaled$x,

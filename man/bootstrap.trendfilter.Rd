@@ -2,12 +2,12 @@
 % Please edit documentation in R/bootstrap.trendfilter.R
 \name{bootstrap.trendfilter}
 \alias{bootstrap.trendfilter}
-\title{Obtain \code{1-alpha} pointwise variability bands by bootstrapping the optimized
-trend filtering estimator...}
+\title{Obtain pointwise uncertainty bands by bootstrapping the optimized trend
+filtering estimator.}
 \usage{
 bootstrap.trendfilter(
   obj,
-  alpha = 0.05,
+  level = 0.95,
   B = 100L,
   bootstrap.algorithm = c("nonparametric", "parametric", "wild"),
   return.full.ensemble = FALSE,
@@ -19,8 +19,8 @@ bootstrap.trendfilter(
 \item{obj}{An object of class '\link{SURE.trendfilter}' or
 '\link{cv.trendfilter}'.}
 
-\item{alpha}{Determines the width of the \code{1-alpha} pointwise variability
-bands. Defaults to \code{alpha = 0.05}.}
+\item{level}{The level of the pointwise variability bands. Defaults to
+\code{level = 0.95}.}
 
 \item{B}{The number of bootstrap samples used to estimate the pointwise
 variability bands. Defaults to \code{B = 100}.}
@@ -37,8 +37,8 @@ any columns from post-hoc pruning (see \code{prune} below). Defaults to
 \item{prune}{Logical. If \code{TRUE}, then the trend filtering bootstrap
 ensemble is examined for rare instances in which the optimization has
 stopped at zero knots (likely erroneously), and removes them from the
-ensemble. Defaults to \code{TRUE}. Do not change this unless you know what you are
-doing!}
+ensemble that is used to compute the variability bands. Defaults to \code{TRUE}.
+Do not change this unless you know what you are doing!}
 
 \item{mc.cores}{Parallel computing: The number of cores to utilize. Defaults
 to the number of cores detected.}
@@ -54,13 +54,12 @@ filtering estimate was evaluated on.}
 \item{tf.standard.errors}{The standard errors of the optimized trend
 filtering point estimator.}
 \item{bootstrap.lower.band}{Vector of lower bounds for the
-\code{1-alpha} pointwise variability band, evaluated on \code{x.eval}.}
+pointwise variability bands, evaluated on \code{x.eval}.}
 \item{bootstrap.upper.band}{Vector of upper bounds for the
-\code{1-alpha} pointwise variability band, evaluated on \code{x.eval}.}
+pointwise variability bands, evaluated on \code{x.eval}.}
 \item{bootstrap.algorithm}{A string specifying which variation of the
 bootstrap was used to obtain the variability bands.}
-\item{alpha}{The 'level' of the variability bands, i.e. \code{alpha}
-produces a \code{100*(1-alpha)}\% pointwise variability band.}
+\item{level}{The level of the pointwise variability bands.}
 \item{B}{The number of bootstrap samples used to estimate the pointwise
 variability bands.}
 \item{tf.bootstrap.ensemble}{If \code{return.full.ensemble = TRUE}, the
@@ -76,8 +75,8 @@ stopped at zero knots (likely erroneously), and removes them from the
 ensemble.}
 \item{n.pruned}{The number of poorly-converged bootstrap trend filtering
 estimates pruned from the ensemble.}
-\item{x}{(Inherited from \code{obj}) The vector of the observed inputs.}
-\item{y}{(Inherited from \code{obj}) The vector of the observed outputs.}
+\item{x}{(Inherited from \code{obj}) Vector of observed inputs.}
+\item{y}{(Inherited from \code{obj}) Vector of observed outputs.}
 \item{weights}{(Inherited from \code{obj}) A vector of weights for the observed
 outputs. These are defined as \code{weights = 1 / sigma^2}, where \code{sigma} is a
 vector of standard errors of the uncertainty in the output measurements.}
@@ -93,7 +92,7 @@ freedom for trend filtering estimators fit during validation.}
 optimally-tuned trend filtering estimator.}
 \item{i.min}{(Inherited from \code{obj}) The index of \code{gammas} that minimizes the
 validation error.}
-\item{validation.method}{One of \code{c("SURE", paste0(V,"-fold CV"))}.}
+\item{validation.method}{Either \code{"SURE"} or \code{paste0(V,"-fold CV")}.}
 \item{errors}{(Inherited from \code{obj}) Vector of hyperparameter validation
 errors, inherited from \code{obj} (an object of class 'SURE.trendfilter').}
 \item{optimization.params}{(Inherited from \code{obj}) a list of parameters that
@@ -112,23 +111,48 @@ filtering estimate.}
 \loadmathjax \code{bootstrap.trendfilter} implements
 }
 \details{
-See
+\loadmathjax See
 \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-Politsch et al. (2020a)}.
+Politsch et al. (2020a)} for more details.
+
+\itemize{
+\item{The inputs are irregularly sampled}
+\item{The inputs are regularly sampled and the noise distribution is known}
+\item{The inputs are regularly sampled and the noise distribution is unknown}
+}
+
+Parametric bootstrap for fixed-input uncertainty quantification (when noise
+distribution \mjseqn{\epsilon_i\sim Q_i} is known a priori)
+Require: Training Data \mjseqn{(x_1, y_1),\dots,(x_n, y_n)}, hyperparameters
+\mjseqn{\gamma} and \mjseqn{k}, assumed noise distribution
+\mjseqn{\epsilon_i \sim Q_i}, prediction input grid \mjseqn{x_1',\dots,x_m'}
+Compute the trend filtering point estimate at the observed inputs:
+\mjseqn{(x_1, y_1),\dots, (x_n, y_n)}
+For \mjseqn{b in 1:B}
+Define a bootstrap sample by sampling from the assumed noise distribution:
+\mjsdeqn{y_i = \widehat{f}(x_i) + \epsilon_i \quad \quad \text{where }\epsilon_i \sim Q_i, \quad i=1,\dots,n}
+Let \mjseqn{\widehat{f}(x_1'), \dots, \widehat{f}(x_m')} denote the trend
+filtering estimate fit on the bootstrap sample and evaluated on the
+prediction grid \mjseqn{x_1',\dots,x_m'}
+
+Given the full trend filtering bootstrap ensemble provided by the relevant
+bootstrap algorithm, for any \mjseqn{\alpha\in(0,1)}, a
+\mjseqn{(1-\alpha)\cdot100}\% pointwise variability band is
+given by
+\mjsdeqn{B_{1-\alpha}(x_i') = \left(\widehat{f}\emph{{\alpha/2}(x_i'),\;\widehat{f}}{1-\alpha/2}(x_i')\right), \quad\quad i = 1,\dots,m}
+where
+\mjsdeqn{\widehat{f}\emph{{\beta}(x_i') = \inf}{g}\left\{g : \frac{1}{B} \sum_{b=1}^{B} \mathbbm{1}\big\{\widehat{f}_{b}(x_i') \leq g\big\} \geq \beta \right\}, \quad\quad \beta\in(0,1).}
 }
 \examples{
-#############################################################################
-##                    Quasar Lyman-alpha forest example                    ##
-#############################################################################
-# A quasar is an extremely luminous galaxy with an active supermassive black 
-# hole at its center. Absorptions in the spectra of quasars at vast 
+# A quasar is an extremely luminous galaxy with an active central black 
+# hole. Absorptions in the spectra of quasars at vast 
 # cosmological distances from our galaxy reveal the presence of a gaseous 
 # medium permeating the entirety of intergalactic space -- appropriately 
 # named the 'intergalactic medium'. These absorptions allow astronomers to 
 # study the structure of the Universe using the distribution of these 
 # absorptions in quasar spectra. Particularly important is the 'forest' of 
 # absorptions that arise from the Lyman-alpha spectral line, which traces 
-# the presence of electrically neutral hydrogen in the intergalactic medium.
+# the presence of neutral hydrogen gas in intergalactic space.
 #
 # Here, we are interested in denoising the Lyman-alpha forest of a quasar 
 # spectroscopically measured by the Sloan Digital Sky Survey. SDSS spectra 
@@ -137,68 +161,11 @@ Politsch et al. (2020a)}.
 
 data(quasar_spec)
 
-SURE.out <- SURE.trendfilter(x = data$log10.wavelength, 
-                             y = data$flux, 
-                             weights = data$weights)
-
-
-# Extract the estimated hyperparameter error curve and optimized trend 
-# filtering estimate from the `SURE.trendfilter` output, and transform the 
-# input grid to wavelength space (in Angstroms).
-
-log.gammas <- log(SURE.out$gammas)
-errors <- SURE.out$errors
-log.gamma.min <- log(SURE.out$gamma.min)
-
-wavelength <- 10 ^ (SURE.out$x)
-wavelength.eval <- 10 ^ (SURE.out$x.eval)
-tf.estimate <- SURE.out$tf.estimate
-
-
 # Run a parametric bootstrap on the optimized trend filtering estimator to 
 # obtain uncertainty bands
 
-boot.out <- bootstrap.trendfilter(obj = SURE.out, bootstrap.algorithm = "parametric")
-
-
-# Plot the results
-
-transparency <- function(color, trans){
-  
-  num2hex <- function(x){
-    hex <- unlist(strsplit("0123456789ABCDEF",split=""))
-    return(paste(hex[(x-x\%\%16)/16+1],hex[x\%\%16+1],sep=""))
-  }
-  rgb <- rbind(col2rgb(color),trans)
-  res <- paste("#",apply(apply(rgb,2,num2hex),2,paste,collapse=""),sep="")
-  return(res)
-  
-}
-
-par(mfrow = c(2,1), mar = c(5,4,2.5,1) + 0.1)
-plot(x = log.gammas, y = errors, main = "SURE error curve", 
-     xlab = "log(gamma)", ylab = "SURE error")
-abline(v = log.gamma.min, lty = 2, col = "blue3")
-text(x = log.gamma.min, y = par("usr")[4], 
-     labels = "optimal gamma", pos = 1, col = "blue3")
-
-plot(x = wavelength, y = SURE.out$y, type = "l", 
-     main = "Quasar Lyman-alpha forest", 
-     xlab = "Observed wavelength (Angstroms)", ylab = "Flux")
-polygon(c(wavelength.eval, rev(wavelength.eval)), 
-        c(boot.out$bootstrap.lower.band, 
-        rev(boot.out$bootstrap.upper.band)),
-        col = transparency("orange", 90), border = NA)
-lines(wavelength.eval, boot.out$bootstrap.lower.band, 
-      col = "orange", lwd = 0.5)
-lines(wavelength.eval, boot.out$bootstrap.upper.band, 
-      col = "orange", lwd = 0.5)
-lines(wavelength.eval, tf.estimate, col = "orange", lwd = 2.5)
-legend(x = "topleft", lwd = c(1,2,8), lty = 1, cex = 0.75,
-       col = c("black","orange", transparency("orange", 90)), 
-       legend = c("Noisy quasar spectrum",
-                  "Trend filtering estimate",
-                  "95\% variability band"))
+opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
+boot.out <- bootstrap.trendfilter(SURE.out, bootstrap.algorithm = "parametric")
 }
 \references{
 \bold{Companion references}

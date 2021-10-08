@@ -29,7 +29,7 @@ polynomial estimation via trend filtering}. \emph{The Annals of Statistics}.
 42(1), p. 285-323.} \cr
 \item{Tibshirani (2020). \href{https://arxiv.org/abs/2003.03886}{Divided
 Differences, Falling Factorials, and Discrete Splines: Another Look at Trend
-Filtering and Related Problems}. arXiv preprint.}}
+Filtering and Related Problems}. arXiv: 2003.03886.}}
 
 \bold{Trend filtering convex optimization algorithm}
 \enumerate{

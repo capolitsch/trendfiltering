@@ -1,38 +1,30 @@
 #' Optimize the trend filtering hyperparameter by minimizing Stein's unbiased 
 #' risk estimate
 #'
-#' `SURE.trendfilter` optimizes the trend filtering hyperparameter by running a
-#' grid search over a vector, `gammas`, of candidate hyperparameter values, and
-#' selecting the value that minimizes an unbiased estimate of the model's
-#' generalization error. The full generalization error curve and the optimized
-#' trend filtering estimate are then returned as elements of a list object that
-#' comprehensively summarizes the analysis.
+#' `SURE.trendfilter` optimizes the trend filtering hyperparameter via a grid
+#' search over a vector of candidate hyperparameter values and selects the value
+#' that minimizes an unbiased estimate of the model's generalization error. See
+#' details for when to use `SURE.trendfilter` vs. \code{\link{cv.trendfilter}}.
 #' 
-#' @param x The vector of observed values of the input variable (a.k.a. the 
-#' predictor, covariate, explanatory variable, regressor, independent variable, 
-#' control variable, etc.)
-#' @param y The vector of observed values of the output variable (a.k.a. the
-#' response, target, outcome, regressand, dependent variable, etc.).
-#' @param weights **Must be passed.** A vector of weights for the observed
-#' outputs, defined as the reciprocal of the variance of the error distribution.
-#' That is, `weights = 1 / sigmas^2`, where `sigmas` is a vector of standard
-#' errors of the uncertainty in the observed outputs. `weights` should either
-#' have length equal to 1 (corresponding to an error distribution with a
-#' constant variance) or length equal to `length(y)` (i.e. heteroskedastic
-#' errors). 
+#' @param x Vector of observed values for the input variable.
+#' @param y Vector of observed values for the output variable.
+#' @param weights Weights for the observed outputs, defined as the reciprocal
+#' variance of the error distribution. `weights` can be passed as a scalar when
+#' the errors are believed to have equal variance for all observations.
+#' Otherwise, `weights` must have the same length as `x` and `y`.
 #' @param k The degree of the trend filtering estimator. More precisely, with
-#' the trend filtering estimator defined as a piecewise function of polynomials
-#' smoothly connected at a set of "knots", `k` controls the degree of the
-#' polynomials that build up the trend filtering estimator. Defaults to `k = 2`
-#' (i.e. a piecewise quadratic estimate). Must be one of `k = 0,1,2,3`. However,
-#' `k = 3` is discouraged due to algorithmic instability, and `k = 2` typically
-#' gives a visually indistinguishable estimate anyway.
-#' @param ngammas Integer. The number of trend filtering hyperparameter values 
+#' the trend filtering estimator defined as a piecewise polynomial function
+#' `k` controls the degree of the polynomials that build up the trend filtering
+#' estimator. Defaults to `k = 2` (i.e. a piecewise quadratic estimate). Must be
+#' one of `k = 0,1,2,3`. However, `k = 3` is discouraged due to algorithmic
+#' instability, and `k = 2` typically gives a visually indistinguishable
+#' estimate anyway.
+#' @param ngammas The number of trend filtering hyperparameter values 
 #' to run the grid search over. In this default case, the hyperparameter values
 #' are automatically chosen by `SURE.trendfilter` and `ngammas` simply controls
 #' the granularity of the grid.
-#' @param gammas Overrides `ngammas` if passed. A vector of trend filtering
-#' hyperparameter values to run the grid search over. It is advisable to let
+#' @param gammas Overrides `ngammas` if passed. The vector of trend filtering
+#' hyperparameter values for the grid search. It is advisable to let
 #' the vector be equally-spaced in log-space and passed to `SURE.trendfilter`
 #' in descending order. The function output will contain the sorted
 #' hyperparameter vector regardless of the user-supplied ordering, and all
@@ -40,14 +32,13 @@
 #' descending ordering. It's best to leave this argument alone unless you know
 #' what you are doing.
 #' @param x.eval A grid of inputs to evaluate the optimized trend filtering 
-#' estimate on. Defaults to the observed inputs, `x`.
+#' estimate on. Defaults to `sort(x)`.
 #' @param nx.eval Integer. If passed, overrides `x.eval` with
 #' `seq(min(x), max(x), length = nx.eval)`.
 #' @param optimization.params A named list of parameters that contains all
 #' parameter choices to be passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
-#' Tibshirani 2016}). See the 
-#' [glmgen::trendfilter.control.list()]
+#' Tibshirani 2016}). See the [glmgen::trendfilter.control.list()]
 #' documentation for full details. No technical understanding of the ADMM
 #' algorithm is needed and the default parameter choices will almost always
 #' suffice. However, the following parameters may require some adjustments to
@@ -84,16 +75,16 @@
 #' still considered regularly sampled. When the inputs are regularly
 #' sampled on a transformed scale, we recommend transforming to that
 #' scale and carrying out the full trend filtering analysis (using SURE) on that
-#' scale. See the example below for a case when the inputs are evenly sample on
+#' scale. See the example below for a case when the inputs are evenly sampled on
 #' the `log10(x)` scale.
 #' 
 #' Below we describe the general motivation for trend filtering with SURE. See
 #' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
 #' for more details. \cr \cr
 #' 
-#' Suppose we observe noisy measurements of a response variable of interest
+#' Suppose we observe noisy measurements of an output variable of interest
 #' (e.g., flux, magnitude, photon counts) according to the data generating
-#' process (DGP)
+#' process
 #' \mjsdeqn{y_i = f(x_i) + \epsilon_i, \quad\quad x_1,\dots,x_n\in(a,b),}
 #' where \mjseqn{y_i} is a noisy observation of a signal \mjseqn{f(x_i)} and the
 #' \mjseqn{\epsilon_i} have mean zero with variance
@@ -147,8 +138,12 @@
 #' filtering estimator.}
 #' \item{i.min}{The index of `gammas` (descending order) that minimizes the
 #' SURE error curve.}
-#' \item{x}{The vector of the observed inputs.}
-#' \item{y}{The vector of the observed outputs.}
+#' \item{training.error}{The mean-squared error between the observed outputs `y`
+#' and the trend filtering estimate.}
+#' \item{optimism}{The optimism, i.e. `optimism = test.error - training.error`,
+#' provided by the SURE formula.}
+#' \item{x}{Vector of observed inputs.}
+#' \item{y}{Vector of observed outputs.}
 #' \item{weights}{A vector of weights for the observed outputs. These are
 #' defined as `weights = 1 / sigmas^2`, where `sigmas` is a vector of 
 #' standard errors of the uncertainty in the observed outputs.}
@@ -196,7 +191,7 @@
 #' 42(1), p. 285-323.} \cr
 #' \item{Tibshirani (2020). \href{https://arxiv.org/abs/2003.03886}{Divided
 #' Differences, Falling Factorials, and Discrete Splines: Another Look at Trend
-#' Filtering and Related Problems}. arXiv preprint.}}
+#' Filtering and Related Problems}. arXiv: 2003.03886.}}
 #' 
 #' \bold{Stein's unbiased risk estimate}
 #' \enumerate{
@@ -224,18 +219,15 @@
 #' @seealso \code{\link{cv.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 #' 
 #' @examples 
-#' #############################################################################
-#' ##                    Quasar Lyman-alpha forest example                    ##
-#' #############################################################################
-#' # A quasar is an extremely luminous galaxy with an active supermassive black 
-#' # hole at its center. Absorptions in the spectra of quasars at vast 
+#' # A quasar is an extremely luminous galaxy with an active central black 
+#' # hole. Absorptions in the spectra of quasars at vast 
 #' # cosmological distances from our galaxy reveal the presence of a gaseous 
 #' # medium permeating the entirety of intergalactic space -- appropriately 
 #' # named the 'intergalactic medium'. These absorptions allow astronomers to 
 #' # study the structure of the Universe using the distribution of these 
 #' # absorptions in quasar spectra. Particularly important is the 'forest' of 
 #' # absorptions that arise from the Lyman-alpha spectral line, which traces 
-#' # the presence of electrically neutral hydrogen in the intergalactic medium.
+#' # the presence of neutral hydrogen gas in intergalactic space.
 #' #
 #' # Here, we are interested in denoising the Lyman-alpha forest of a quasar 
 #' # spectroscopically measured by the Sloan Digital Sky Survey. SDSS spectra 
@@ -244,111 +236,52 @@
 #' 
 #' data(quasar_spec)
 #' 
-#' SURE.out <- SURE.trendfilter(x = data$log10.wavelength, 
-#'                              y = data$flux, 
-#'                              weights = data$weights)
-#' 
-#' 
-#' # Extract the estimated hyperparameter error curve and optimized trend 
-#' # filtering estimate from the `SURE.trendfilter` output, and transform the 
-#' # input grid to wavelength space (in Angstroms).
-#' 
-#' log.gammas <- log(SURE.out$gammas)
-#' errors <- SURE.out$errors
-#' log.gamma.min <- log(SURE.out$gamma.min)
-#' 
-#' wavelength <- 10 ^ (SURE.out$x)
-#' wavelength.eval <- 10 ^ (SURE.out$x.eval)
-#' tf.estimate <- SURE.out$tf.estimate
-#' 
-#' 
-#' # Plot the results
-#'
-#' par(mfrow = c(2,1), mar = c(5,4,2.5,1) + 0.1)
-#' plot(x = log.gammas, y = errors, main = "SURE error curve", 
-#'      xlab = "log(gamma)", ylab = "SURE error")
-#' abline(v = log.gamma.min, lty = 2, col = "blue3")
-#' text(x = log.gamma.min, y = par("usr")[4], 
-#'      labels = "optimal gamma", pos = 1, col = "blue3")
-#' 
-#' plot(x = wavelength, y = SURE.out$y, type = "l", 
-#'      main = "Quasar Lyman-alpha forest", 
-#'      xlab = "Observed wavelength (Angstroms)", ylab = "Flux")
-#' lines(wavelength.eval, tf.estimate, col = "orange", lwd = 2.5)
-#' legend(x = "topleft", lwd = c(1,2), lty = 1, col = c("black","orange"), 
-#'        legend = c("Noisy quasar Lyman-alpha forest", 
-#'                   "Trend filtering estimate"))
+#' opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
 
 
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom tidyr drop_na tibble
 #' @importFrom dplyr %>% arrange filter select
 #' @importFrom magrittr %$%
-SURE.trendfilter <- function(x,
-                             y,
-                             weights,
-                             ngammas = 250L,
-                             gammas,
-                             x.eval = x,
-                             nx.eval,
-                             k = 2L,
-                             optimization.params = list(max_iter = 600L,
-                                                        obj_tol = 1e-10,
-                                                        thinning = NULL),
+SURE.trendfilter <- function(x, y, weights,
+                             k = 2L, ngammas = 250L, gammas,
+                             x.eval = x, nx.eval,
+                             optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
                              ...){
   
   if ( missing(x) || is.null(x) ) stop("x must be passed.")
   if ( missing(y) || is.null(y) ) stop("y must be passed.")
   if ( length(x) != length(y) ) stop("x and y must have the same length.")
-  
-  if ( missing(weights) || !(class(weights) %in% c("numeric","integer")) ){
-    stop(paste0("weights must be passed to compute SURE."))
-  }
-  
-  if ( !(length(weights) %in% c(1,length(y))) ){
-    stop("weights must either be have length 1 or length(y)")
-  }
-  
-  if ( length(y) < k + 2 ){
-    stop("length(y) must be >= k + 2")
-  }
-  
-  if ( k < 0 || k != round(k) ){
-    stop("k must be a nonnegative integer.")
-  }
-  
-  if ( k > 3 ){
-    stop(paste0("Large k leads to generally worse conditioning.\n", 
-                "k = 0,1,2 are the most stable choices."))
-  }
-  
-  if ( k == 3 ){
-    warning(paste0("k = 3 can have poor conditioning...\n", 
-                   "k = 2 is more stable and visually indistinguishable."))
-  }
+  if ( length(y) < k + 2 ) stop("length(y) must be >= k + 2")
+  if ( k < 0 || k != round(k) ) stop("k must be a nonnegative integer.")
+  if ( k > 3 ) stop("k > 3 are algorithmically unstable.")
+  if ( k == 3 ) warning("k = 3 can be algorithmically unstable. k = 2 is more stable and visually indistinguishable.")
   
   if ( !missing(gammas) ){
-    if ( min(gammas) < 0L ){
-      stop("All specified gamma values must be positive.")
-    }
+    if ( min(gammas) < 0L ) stop("All specified gamma values must be positive.")
     if ( length(gammas) < 25L ) stop("gammas must have length >= 25.")
+    if ( !all( gammas == sort(gammas, decreasing = T) ) ) warning("Returning gammas in descending order.")
   }
   
   if ( !missing(nx.eval) ){
     if ( nx.eval != round(nx.eval) ) stop("nx.eval must be a positive integer.")
   }else{
-    if ( any(x.eval < min(x) || x.eval > max(x)) ){
-      stop("x.eval should all be in range(x).")
-    }
+    if ( any(x.eval < min(x) || x.eval > max(x)) ) stop("x.eval should all be in range(x).")
   }
   
-  if ( length(weights) == 1 ){
-    weights <- rep(weights, length(x))
+  if ( missing(weights) || !( class(weights) %in% c("numeric","integer") ) ){
+    stop("weights must be passed to use SURE.trendfilter.")
   }
+  
+  if ( !( length(weights) %in% c(1,length(y)) ) ){
+    stop("weights must either have length 1 or length(y) to use SURE.trendfilter.")
+  }
+  
+  if ( length(weights) == 1 ) weights <- rep(weights, length(x))
 
   data <- tibble(x, y, weights) %>% 
     arrange(x) %>% 
-    filter( weights != 0 ) %>%
+    filter( weights > 0 ) %>%
     drop_na
   rm(x,y,weights)
   
@@ -366,10 +299,10 @@ SURE.trendfilter <- function(x,
            weights = weights * y.scale ^ 2) %>%
     select(x, y, weights)
   
-  if ( missing(gammas) ){
-    gammas <- exp(seq(16, -10, length = ngammas))
-  }else{
+  if ( !missing(gammas) ){
     gammas <- sort(gammas, decreasing = T)
+  }else{
+    gammas <- exp(seq(16, -10, length = ngammas))
   }
   
   out <- trendfilter(x = data.scaled$x,
@@ -385,62 +318,57 @@ SURE.trendfilter <- function(x,
   errors <- as.numeric(training.error + optimism)
   edfs <- out$df
   n.iter <- out$iter
-  i.min <- as.integer(which.min(errors))
+  i.min <- max(which.min(errors))
   gamma.min <- gammas[i.min]
   
-  if ( !missing(x.eval) ){
+  if ( !missing(nx.eval) ){
     x.eval <- seq(min(data$x), max(data$x), length = nx.eval)
   }else{
     x.eval <- sort(x.eval)
   }
   
-  # Increase the algorithmic precision for the optimized TF estimate
+  # Increase the TF solution's algorithmic precision for the optimized estimate
   optimization.params$obj_tol <- optimization.params$obj_tol * 1e-2
   
-  out <- trendfilter(x = data.scaled$x,
-                     y = data.scaled$y,
-                     weights = data.scaled$weights,
-                     lambda = gamma.min,
-                     k = k,
-                     thinning = thinning,
-                     control = optimization.params)
+  out <- trendfilter(data.scaled$x, data.scaled$y, data.scaled$weights,
+                     lambda = gamma.min, k = k,
+                     thinning = thinning, control = optimization.params)
   
   optimization.params$obj_tol <- optimization.params$obj_tol * 1e2
   
-  tf.estimate <- glmgen:::predict.trendfilter(out, 
-                                              lambda = gamma.min, 
+  tf.estimate <- glmgen:::predict.trendfilter(out, lambda = gamma.min, 
                                               x.new = x.eval / x.scale) %>%
     as.numeric
   
-  data.scaled$fitted.values <- glmgen:::predict.trendfilter(out, 
-                                                            lambda = gamma.min, 
+  data.scaled$fitted.values <- glmgen:::predict.trendfilter(out, lambda = gamma.min, 
                                                             x.new = data.scaled$x) %>% 
     as.numeric
   
   data.scaled <- data.scaled %>% mutate(residuals = y - fitted.values)
   
-  obj <- structure(list(x.eval = x.eval,
-                        tf.estimate = tf.estimate * y.scale,
-                        validation.method = "SURE",
-                        gammas = gammas, 
-                        gamma.min = gamma.min,
-                        edfs = edfs,
-                        edf.min = out$df,
-                        i.min = i.min,
-                        errors = errors * y.scale ^ 2,
-                        x = data$x,
-                        y = data$y,
-                        weights = data$weights,
-                        fitted.values = data.scaled$fitted.values * y.scale,
-                        residuals = data.scaled$residuals * y.scale,
-                        k = as.integer(k),
-                        optimization.params = optimization.params,
-                        thinning = thinning,
-                        n.iter = n.iter,
-                        x.scale = x.scale, 
-                        y.scale = y.scale,
-                        data.scaled = data.scaled),
-                   class = "SURE.trendfilter"
-                   )
-  return(obj)
+  structure(list(x.eval = x.eval,
+                 tf.estimate = tf.estimate * y.scale,
+                 validation.method = "SURE",
+                 gammas = gammas, 
+                 errors = errors * y.scale ^ 2,
+                 gamma.min = gamma.min,
+                 edfs = edfs,
+                 edf.min = out$df,
+                 i.min = i.min,
+                 training.error = training.error * y.scale ^ 2,
+                 optimism = optimism * y.scale ^ 2,
+                 x = data$x,
+                 y = data$y,
+                 weights = data$weights,
+                 fitted.values = data.scaled$fitted.values * y.scale,
+                 residuals = data.scaled$residuals * y.scale,
+                 k = as.integer(k),
+                 optimization.params = optimization.params,
+                 thinning = thinning,
+                 n.iter = n.iter,
+                 x.scale = x.scale, 
+                 y.scale = y.scale,
+                 data.scaled = data.scaled),
+            class = "SURE.trendfilter"
+            )
 }
