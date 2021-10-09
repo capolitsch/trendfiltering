@@ -12,8 +12,8 @@ SURE.trendfilter(
   k = 2L,
   ngammas = 250L,
   gammas,
-  x.eval = x,
-  nx.eval,
+  x.eval,
+  nx.eval = 1500L,
   optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
   ...
 )
@@ -24,40 +24,34 @@ SURE.trendfilter(
 \item{y}{Vector of observed values for the output variable.}
 
 \item{weights}{Weights for the observed outputs, defined as the reciprocal
-variance of the error distribution. \code{weights} can be passed as a scalar when
-the errors are believed to have equal variance for all observations.
-Otherwise, \code{weights} must have the same length as \code{x} and \code{y}.}
+variance of the additive noise that contaminates the signal. \code{weights} can be
+passed as a scalar when the noise is expected to have equal variance for all
+observations. Otherwise, \code{weights} must have the same length as \code{x} and \code{y}.}
 
-\item{k}{The degree of the trend filtering estimator. More precisely, with
-the trend filtering estimator defined as a piecewise polynomial function
-\code{k} controls the degree of the polynomials that build up the trend filtering
-estimator. Defaults to \code{k = 2} (i.e. a piecewise quadratic estimate). Must be
-one of \verb{k = 0,1,2,3}. However, \code{k = 3} is discouraged due to algorithmic
-instability, and \code{k = 2} typically gives a visually indistinguishable
-estimate anyway.}
+\item{k}{Degree of the piecewise polynomials that make up the trend
+filtering estimate. Defaults to \code{k = 2} (i.e. a piecewise quadratic
+estimate). Must be one of \verb{k = 0,1,2}. Higher order polynomials are
+disallowed since their smoothness is indistinguishable from \code{k = 2} and
+their use can lead to instability in the convex optimization.}
 
-\item{ngammas}{The number of trend filtering hyperparameter values
-to run the grid search over. In this default case, the hyperparameter values
-are automatically chosen by \code{SURE.trendfilter} and \code{ngammas} simply controls
-the granularity of the grid.}
+\item{ngammas}{The number of hyperparameter settings to test during
+validation. When nothing is passed to \code{gammas} (highly recommended for
+general use), the grid is automatically constructed by \code{SURE.trendfilter},
+with \code{ngammas} controlling the granularity of the grid.}
 
-\item{gammas}{Overrides \code{ngammas} if passed. The vector of trend filtering
-hyperparameter values for the grid search. It is advisable to let
-the vector be equally-spaced in log-space and passed to \code{SURE.trendfilter}
-in descending order. The function output will contain the sorted
-hyperparameter vector regardless of the user-supplied ordering, and all
-related output objects (e.g. the \code{errors} vector) will correspond to this
-descending ordering. It's best to leave this argument alone unless you know
-what you are doing.}
+\item{gammas}{(Optional) Overrides \code{ngammas} if passed. The vector of trend
+filtering hyperparameter values for the grid search. Use of this argument is
+discouraged unless you know what you are doing.}
 
-\item{x.eval}{A grid of inputs to evaluate the optimized trend filtering
-estimate on. Defaults to \code{sort(x)}.}
+\item{x.eval}{(Optional) A grid of inputs to evaluate the optimized trend
+filtering estimate on. May be ignored, in which case the grid is determined
+by \code{nx.eval}.}
 
-\item{nx.eval}{Integer. If passed, overrides \code{x.eval} with
-\code{seq(min(x), max(x), length = nx.eval)}.}
+\item{nx.eval}{Integer. If nothing is passed to \code{x.eval}, then it is defined
+as \code{x.eval = seq(min(x), max(x), length = nx.eval)}.}
 
-\item{optimization.params}{A named list of parameters that contains all
-parameter choices to be passed to the trend filtering ADMM algorithm
+\item{optimization.params}{A named list of parameter choices to be passed to
+the trend filtering ADMM algorithm
 (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
 Tibshirani 2016}). See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}
 documentation for full details. No technical understanding of the ADMM
@@ -66,14 +60,19 @@ suffice. However, the following parameters may require some adjustments to
 ensure that your trend filtering estimate has sufficiently converged:
 \enumerate{
 \item{\code{max_iter}}: Maximum iterations allowed for the trend filtering convex
-optimization. Defaults to \code{max_iter = 600L}. Increase this if the trend
-filtering estimate does not appear to have fully converged to a reasonable
-estimate of the signal.
+optimization. Defaults to \code{max_iter = 600L}. See the \code{n.iter} element
+of the function output for the actual number of iterations taken for every
+hyperparameter choice in \code{gammas}. If any of the elements of \code{n.iter} are
+equal to \code{max_iter}, the objective function's tolerance has not been
+achieved and \code{max_iter} may need to be increased.
 \item{\code{obj_tol}}: The tolerance used in the convex optimization stopping
 criterion; when the relative change in the objective function is less than
-this value, the algorithm terminates. Decrease this if the trend filtering
-estimate does not appear to have fully converged to a reasonable estimate of
-the signal.
+this value, the algorithm terminates. Thus, decreasing this setting will
+increase the precision of the solution returned by the optimization. Defaults
+to \code{obj_tol = 1e-10}. If the returned trend filtering estimate does not
+appear to have fully converged to a reasonable estimate of the signal, this
+issue can be resolve by some combination of decreasing \code{obj_tol} and
+increasing \code{max_iter}.
 \item{\code{thinning}}: Logical. If \code{TRUE}, then the data are preprocessed so that
 a smaller, better conditioned data set is used for fitting. When left \code{NULL}
 (the default setting), the optimization will automatically detect whether
@@ -132,17 +131,25 @@ smaller, better conditioned data set is used for fitting.}
 }
 \description{
 \code{SURE.trendfilter} optimizes the trend filtering hyperparameter via a grid
-search over a vector of candidate hyperparameter values and selects the value
-that minimizes an unbiased estimate of the model's generalization error. See
-details for when to use \code{SURE.trendfilter} vs. \code{\link{cv.trendfilter}}.
+search over a vector of candidate hyperparameter settings and selects the
+value that minimizes an unbiased estimate of the model's generalization
+error. See details for when to use \code{SURE.trendfilter} vs.
+\code{\link{cv.trendfilter}}.
 }
 \details{
-\loadmathjax As a general rule-of-thumb, we recommend optimizing the
-trend filtering hyperparameter by minimizing Stein's unbiased risk estimate
-(SURE) when the inputs are regularly-sampled (either on the raw \code{x} scale or
-some transformation of it) and optimizing the hyperparameter by
-\mjseqn{V}-fold cross validation (using \code{\link{cv.trendfilter}}) when
-the inputs are irregularly-sampled. A regularly-sampled data set with some
+\loadmathjax\tabular{lrr}{
+   Scenario \tab Hyperparameter optimization \tab \code{bootstrap.algorithm} \cr
+   \code{x} is irregularly sampled \tab Use \code{cv.trendfilter} \tab "nonparametric" \cr
+   \code{x} is regularly sampled and \code{weights} are not available \tab Use \code{cv.trendfilter} \tab "wild" \cr
+   \code{x} is regularly sampled and \code{weights} are available \tab Use \code{SURE.trendfilter} \tab "parametric" \cr
+}
+
+
+Our recommendations for when to use \code{cv.trendfilter} vs. \code{SURE.trendfilter},
+as well as each of the settings for \code{bootstrap.algorithm} are shown in the
+table above.
+
+A regularly-sampled data set with some
 discarded pixels (either sporadically or in large consecutive chunks) is
 still considered regularly sampled. When the inputs are regularly
 sampled on a transformed scale, we recommend transforming to that

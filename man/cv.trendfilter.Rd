@@ -13,9 +13,9 @@ cv.trendfilter(
   gammas,
   V = 10L,
   gamma.choice = c("gamma.min", "gamma.1se"),
-  validation.error.type = c("WMAE", "WMSE", "MAE", "MSE"),
-  x.eval = x,
-  nx.eval,
+  loss.metric = c("WMAE", "WMSE", "MAE", "MSE"),
+  x.eval,
+  nx.eval = 1500L,
   optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
   mc.cores = detectCores(),
   ...
@@ -28,30 +28,23 @@ cv.trendfilter(
 
 \item{weights}{Weights for the observed outputs, defined as the reciprocal
 variance of the error distribution. \code{weights} can be passed as a scalar when
-the errors are believed to have equal variance for all observations.
-Otherwise, \code{weights} must have the same length as \code{x} and \code{y}.}
+all errors are believed to have equal variance. Otherwise, \code{weights} must
+have the same length as \code{x} and \code{y}.}
 
-\item{k}{The degree of the trend filtering estimator. More precisely, with
-the trend filtering estimator defined as a piecewise function of polynomials
-smoothly connected at a set of "knots", \code{k} controls the degree of the
-polynomials that build up the trend filtering estimator. Defaults to \code{k = 2}
-(i.e. a piecewise quadratic estimate). Must be one of \verb{k = 0,1,2,3}. However,
-\code{k = 3} is discouraged due to algorithmic instability, and \code{k = 2} typically
-gives a visually indistinguishable estimate anyway.}
+\item{k}{Degree of the piecewise polynomials that make up the trend
+filtering estimate. Defaults to \code{k = 2} (i.e. a piecewise quadratic
+estimate). Must be one of \verb{k = 0,1,2}. Higher order polynomials are
+disallowed since their smoothness is indistinguishable from \code{k = 2} and
+their use can lead to instability in the convex optimization.}
 
-\item{ngammas}{Integer. The number of trend filtering hyperparameter values
-to run the grid search over. In this default case, the hyperparameter values
-are automatically chosen by \code{SURE.trendfilter} and \code{ngammas} simply controls
-the granularity of the grid.}
+\item{ngammas}{The number of hyperparameter settings to test during
+validation. When \code{gammas} is left blank (highly recommended for general use),
+the grid is automatically chosen by \code{SURE.trendfilter}, with \code{ngammas}
+controlling the granularity of the grid.}
 
-\item{gammas}{Overrides \code{ngammas} if passed. A vector of trend filtering
-hyperparameter values to run the grid search over. It is advisable to let the
-vector be equally-spaced in log-space and passed to \code{SURE.trendfilter} in
-descending order. The function output will contain the sorted hyperparameter
-vector regardless of the user-supplied ordering, and all related output
-objects (e.g. the \code{errors} vector) will correspond to this descending
-ordering. It's best to leave this argument alone unless you know what you
-are doing.}
+\item{gammas}{Overrides \code{ngammas} if passed. The vector of trend filtering
+hyperparameter values for the grid search. Use is discouraged unless you
+know what you are doing.}
 
 \item{V}{The number of folds the data are split into for the V-fold cross
 validation. Defaults to \code{V = 10} (recommended).}
@@ -68,18 +61,17 @@ estimates. The motivation here is essentially Occam's razor: the two models
 yield results that are quantitatively very close, so we favor the simpler
 model.}}
 
-\item{validation.error.type}{Type of error to optimize during cross
-validation. One of \code{c("WMAE","WMSE","MAE","MSE")}, i.e. mean-absolute
+\item{loss.metric}{Type of error to optimize during cross
+validation. One of \code{c("MAE","MSE","WMAE","WMSE")}, i.e. mean-absolute
 deviations error, mean-squared error, and their weighted counterparts.
-If \code{weights = NULL}, then the weighted and unweighted counterparts are
-equivalent. In short, weighting helps combat heteroskedasticity and absolute
-error decreases sensitivity to outliers. Defaults to \code{"WMAE"}.}
+Defaults to \code{"WMAE"}.}
 
 \item{x.eval}{A grid of inputs to evaluate the optimized trend filtering
-estimate on. Defaults to the observed inputs, \code{x}.}
+estimate on. May be ignored, in which case the grid is determined by
+\code{nx.eval}.}
 
-\item{nx.eval}{Integer. If passed, overrides \code{x.eval} with
-\code{seq(min(x), max(x), length = nx.eval)}.}
+\item{nx.eval}{Integer. If nothing is passed to \code{x.eval}, then it is defined
+as \code{x.eval = seq(min(x), max(x), length = nx.eval)}.}
 
 \item{optimization.params}{A named list of parameters that contains all
 parameter choices to be passed to the trend filtering ADMM algorithm
@@ -127,7 +119,7 @@ evaluated on \code{x.eval}.}
 \item{validation.method}{\code{paste0(V,"-fold CV")}}
 \item{V}{The number of folds the data are split into for the V-fold cross
 validation.}
-\item{validation.error.type}{Type of error that validation was performed on.
+\item{loss.metric}{Type of error that validation was performed on.
 One of \code{c("WMAE","WMSE","MAE","MSE")}.}
 \item{gammas}{Vector of hyperparameter values tested during validation. This
 vector will always be returned in descending order, regardless of the
@@ -177,14 +169,21 @@ that a smaller, better conditioned data set is used for fitting.}
 \item{x.scale, y.scale, data.scaled}{For internal use.}
 }
 \description{
-\code{cv.trendfilter} optimizes the trend filtering hyperparameter
-by performing V-fold cross validation on a vector, \code{gammas}, of candidate
-hyperparameter values. The full generalization error curve and the optimized
-trend filtering estimate are then returned as elements of a list object that
-provides a comprehensive summary of the analysis.
+\code{cv.trendfilter} optimizes the trend filtering hyperparameter via V-fold
+cross validation on a grid of candidate hyperparameter settings and selects
+the value that minimizes a user-specified loss metric. See details for when
+to use \code{\link{`SURE.trendfilter`}} vs. \code{cv.trendfilter}.
 }
 \details{
-\loadmathjax As a general rule-of-thumb, we recommend optimizing the
+\loadmathjax\tabular{lrr}{
+   Scenario \tab Hyperparameter optimization \tab \code{bootstrap.algorithm} \cr
+   \code{x} is irregularly sampled \tab Use \code{cv.trendfilter} \tab "nonparametric" \cr
+   \code{x} is regularly sampled and \code{weights} are not available \tab Use \code{cv.trendfilter} \tab "wild" \cr
+   \code{x} is regularly sampled and \code{weights} are available \tab Use \code{SURE.trendfilter} \tab "parametric" \cr
+}
+
+
+As a general rule-of-thumb, we recommend optimizing the
 trend filtering hyperparameter by minimizing Stein's unbiased risk estimate
 (using \code{\link{SURE.trendfilter}}) when the inputs are regularly-sampled
 (either on the raw \code{x} scale or some transformation of it) and optimizing the
@@ -198,19 +197,23 @@ scale. When the inputs do not meet any of these criteria for ``regularly
 sampled'', \code{cv.trendfilter} should be used to optimize the trend filtering
 hyperparameter. Below we define the various types of validation error that
 can be used with `cv.trendfilter` by passing the appropriate string
-(one of `c("WMAE","WMSE","MAE","MSE")`) to the `validation.error.type`
+(one of `c("WMAE","WMSE","MAE","MSE")`) to the `loss.metric`
 argument. For the weighted validation errors, `weights` must be passed.
-\mjsdeqn{WMAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-\mjsdeqn{WMSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}
+\mjsdeqn{WMAE(\gamma) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
+\mjsdeqn{WMSE(\gamma) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}
 \mjsdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}
 \mjsdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}
 where \mjseqn{w_i} is the \mjseqn{i}th element of the `weights` vector.
+
+Concisely stated, weighting helps combat heteroskedasticity and
+absolute error decreases sensitivity to outliers. If \code{weights = NULL}, then
+the weighted and unweighted counterparts are equivalent.
 }
 \examples{
 data(eclipsing_binary)
 
 opt <- cv.trendfilter(EB$phase, EB$flux, 1 / EB$std.err ^ 2,
-                      validation.error.type = "MAE",
+                      loss.metric = "MAE",
                       optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T))
 }
 \references{
