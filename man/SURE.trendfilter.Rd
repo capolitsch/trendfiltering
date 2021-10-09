@@ -149,17 +149,17 @@ Our recommendations for when to use \code{cv.trendfilter} vs. \code{SURE.trendfi
 as well as each of the settings for \code{bootstrap.algorithm} are shown in the
 table above.
 
-A regularly-sampled data set with some
-discarded pixels (either sporadically or in large consecutive chunks) is
-still considered regularly sampled. When the inputs are regularly
-sampled on a transformed scale, we recommend transforming to that
-scale and carrying out the full trend filtering analysis (using SURE) on that
-scale. See the example below for a case when the inputs are evenly sampled on
-the \code{log10(x)} scale.
+A regularly-sampled data set with some discarded pixels (either sporadically
+or in large consecutive chunks) is still considered regularly sampled. When
+the inputs are regularly sampled on a transformed scale, we recommend
+transforming to that scale and carrying out the full trend filtering analysis
+(using \code{SURE.trendfilter}) on that scale. See the example below for a case
+when the inputs are evenly sampled on the \code{log10(x)} scale.
 
-Below we describe the general motivation for trend filtering with SURE. See
+\subsection{Trend filtering with Stein's unbiased risk estimate}
+Here we describe the general motivation for trend filtering with SURE. See
 \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
-for more details. \cr \cr
+for more details. \cr
 
 Suppose we observe noisy measurements of an output variable of interest
 (e.g., flux, magnitude, photon counts) according to the data generating
