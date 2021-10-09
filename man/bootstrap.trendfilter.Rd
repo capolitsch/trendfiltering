@@ -97,7 +97,7 @@ Politsch et al. (2020a)} for more details.\tabular{lrr}{
 Parametric bootstrap for fixed-input uncertainty quantification (when noise
 distribution \mjseqn{\epsilon_i\sim Q_i} is known a priori)
 Require: Training Data \mjseqn{(x_1, y_1),\dots,(x_n, y_n)}, hyperparameters
-\mjseqn{\gamma} and \mjseqn{k}, assumed noise distribution
+\mjseqn{\lambda} and \mjseqn{k}, assumed noise distribution
 \mjseqn{\epsilon_i \sim Q_i}, prediction input grid \mjseqn{x_1',\dots,x_m'}
 Compute the trend filtering point estimate at the observed inputs:
 \mjseqn{(x_1, y_1),\dots, (x_n, y_n)}

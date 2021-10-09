@@ -9,10 +9,10 @@ cv.trendfilter(
   y,
   weights,
   k = 2L,
-  ngammas = 250L,
-  gammas,
+  nlambdas = 250L,
+  lambdas,
   V = 10L,
-  gamma.choice = c("gamma.min", "gamma.1se"),
+  lambda.choice = c("lambda.min", "lambda.1se"),
   loss.metric = c("WMAE", "WMSE", "MAE", "MSE"),
   x.eval,
   nx.eval = 1500L,
@@ -37,24 +37,24 @@ estimate). Must be one of \verb{k = 0,1,2}. Higher order polynomials are
 disallowed since their smoothness is indistinguishable from \code{k = 2} and
 their use can lead to instability in the convex optimization.}
 
-\item{ngammas}{The number of hyperparameter settings to test during
-validation. When \code{gammas} is left blank (highly recommended for general use),
-the grid is automatically chosen by \code{SURE.trendfilter}, with \code{ngammas}
+\item{nlambdas}{The number of hyperparameter settings to test during
+validation. When \code{lambdas} is left blank (highly recommended for general use),
+the grid is automatically chosen by \code{cv.trendfilter}, with \code{nlambdas}
 controlling the granularity of the grid.}
 
-\item{gammas}{Overrides \code{ngammas} if passed. The vector of trend filtering
+\item{lambdas}{Overrides \code{nlambdas} if passed. The vector of trend filtering
 hyperparameter values for the grid search. Use is discouraged unless you
 know what you are doing.}
 
 \item{V}{The number of folds the data are split into for the V-fold cross
 validation. Defaults to \code{V = 10} (recommended).}
 
-\item{gamma.choice}{One of \code{c("gamma.min","gamma.1se")}. The choice
+\item{lambda.choice}{One of \code{c("lambda.min","lambda.1se")}. The choice
 of hyperparameter that is used for optimized trend filtering estimate.
 \itemize{
-\item{\code{gamma.min}}: The hyperparameter value that minimizes the cross
+\item{\code{lambda.min}}: The hyperparameter value that minimizes the cross
 validation error curve.
-\item{\code{gamma.1se}}: The largest hyperparameter value with a cross
+\item{\code{lambda.1se}}: The largest hyperparameter value with a cross
 validation error within 1 standard error of the minimum cross validation
 error. This choice therefore favors simpler (i.e. smoother) trend filtering
 estimates. The motivation here is essentially Occam's razor: the two models
@@ -120,7 +120,7 @@ on.}
 validation.}
 \item{loss.metric}{Type of error that validation was performed on.
 One of \code{c("WMAE","WMSE","MAE","MSE")}.}
-\item{gammas}{Vector of hyperparameter values tested during validation. This
+\item{lambdas}{Vector of hyperparameter values tested during validation. This
 vector will always be returned in descending order, regardless of the
 ordering provided by the user. The indices \code{i.min} and \code{i.1se} correspond to
 this descending ordering.}
@@ -132,10 +132,10 @@ The 1-SE rule favors a smoother trend filtering estimate by, instead of
 using the hyperparameter that minimizes the CV error, instead uses the
 largest hyperparameter that has a CV error within 1 standard error of the
 smallest CV error.}
-\item{gamma.min}{Hyperparameter value that minimizes the SURE error curve.}
-\item{gamma.1se}{The largest hyperparameter value that is still within one
+\item{lambda.min}{Hyperparameter value that minimizes the SURE error curve.}
+\item{lambda.1se}{The largest hyperparameter value that is still within one
 standard error of the minimum hyperparameter's cross validation error.}
-\item{gamma.choice}{One of \code{c("gamma.min","gamma.1se")}. The choice
+\item{lambda.choice}{One of \code{c("lambda.min","lambda.1se")}. The choice
 of hyperparameter that is used for optimized trend filtering estimate.}
 \item{edfs}{Vector of effective degrees of freedom for trend filtering
 estimators fit during validation.}
@@ -143,8 +143,8 @@ estimators fit during validation.}
 filtering estimator.}
 \item{edf.1se}{The effective degrees of freedom of the 1-stand-error rule
 trend filtering estimator.}
-\item{i.min}{The index of `gammas` that minimizes the cross validation error.}
-\item{i.1se}{The index of `gammas` that gives the largest hyperparameter
+\item{i.min}{The index of `lambdas` that minimizes the cross validation error.}
+\item{i.1se}{The index of `lambdas` that gives the largest hyperparameter
 value that has a cross validation error within 1 standard error of the
 minimum of the cross validation error curves.}
 \item{x}{Vector of observed inputs.}
@@ -197,10 +197,10 @@ Below we define the various types of validation error that
 can be used with \code{cv.trendfilter} by passing the appropriate string
 (one of \code{c("WMAE","WMSE","MAE","MSE")}) to the \code{loss.metric}
 argument. For the weighted validation errors, \code{weights} must be passed.
-\mjsdeqn{WMAE(\gamma) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-\mjsdeqn{WMSE(\gamma) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}
-\mjsdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}
-\mjsdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}
+\mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
+\mjsdeqn{WMSE(\lambda) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
+\mjsdeqn{MAE(\lambda) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|}
+\mjsdeqn{MSE(\lambda) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|^2}
 where \mjseqn{w_i} is the \mjseqn{i}th element of the \code{weights} vector.
 
 Concisely stated, weighting helps combat heteroskedasticity and

@@ -10,8 +10,8 @@ SURE.trendfilter(
   y,
   weights,
   k = 2L,
-  ngammas = 250L,
-  gammas,
+  nlambdas = 250L,
+  lambdas,
   x.eval,
   nx.eval = 1500L,
   optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
@@ -34,12 +34,12 @@ estimate). Must be one of \verb{k = 0,1,2}. Higher order polynomials are
 disallowed since their smoothness is indistinguishable from \code{k = 2} and
 their use can lead to instability in the convex optimization.}
 
-\item{ngammas}{The number of hyperparameter settings to test during
-validation. When nothing is passed to \code{gammas} (highly recommended for
+\item{nlambdas}{The number of hyperparameter settings to test during
+validation. When nothing is passed to \code{lambdas} (highly recommended for
 general use), the grid is automatically constructed by \code{SURE.trendfilter},
-with \code{ngammas} controlling the granularity of the grid.}
+with \code{nlambdas} controlling the granularity of the grid.}
 
-\item{gammas}{(Optional) Overrides \code{ngammas} if passed. The vector of trend
+\item{lambdas}{(Optional) Overrides \code{nlambdas} if passed. The vector of trend
 filtering hyperparameter values for the grid search. Use of this argument is
 discouraged unless you know what you are doing.}
 
@@ -62,7 +62,7 @@ ensure that your trend filtering estimate has sufficiently converged:
 \item{\code{max_iter}}: Maximum iterations allowed for the trend filtering convex
 optimization. Defaults to \code{max_iter = 600L}. See the \code{n.iter} element
 of the function output for the actual number of iterations taken for every
-hyperparameter choice in \code{gammas}. If any of the elements of \code{n.iter} are
+hyperparameter choice in \code{lambdas}. If any of the elements of \code{n.iter} are
 equal to \code{max_iter}, the objective function's tolerance has not been
 achieved and \code{max_iter} may need to be increased.
 \item{\code{obj_tol}}: The tolerance used in the convex optimization stopping
@@ -93,17 +93,17 @@ following elements:
 estimate on.}
 \item{tf.estimate}{Optimized trend filtering estimate, evaluated at \code{x.eval}.}
 \item{validation.method}{"SURE"}
-\item{gammas}{Vector of hyperparameter values evaluated in the grid search
+\item{lambdas}{Vector of hyperparameter values evaluated in the grid search
 (always returned in descending order).}
 \item{generalization.errors}{Vector of SURE generalization error estimates,
-corresponding to the descending-ordered \code{gammas} vector.}
-\item{gamma.min}{Hyperparameter value that minimizes the SURE generalization
+corresponding to the descending-ordered \code{lambdas} vector.}
+\item{lambda.min}{Hyperparameter value that minimizes the SURE generalization
 error curve.}
 \item{edfs}{Vector of effective degrees of freedom for all trend filtering
 estimators fit during validation.}
 \item{edf.min}{Effective degrees of freedom of the optimized trend
 filtering estimator.}
-\item{i.min}{Index of \code{gammas} that minimizes the SURE error curve.}
+\item{i.min}{Index of \code{lambdas} that minimizes the SURE error curve.}
 \item{n.iter}{The number of iterations needed for the ADMM algorithm to
 converge within the given tolerance, for each hyperparameter value. If many
 of these are exactly equal to \code{max_iter}, then their solutions have not
@@ -164,15 +164,15 @@ process
 where \mjseqn{y_i} is a noisy observation of a signal \mjseqn{f(x_i)} and the
 \mjseqn{\epsilon_i} have mean zero with variance
 \mjseqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}. Let
-\mjseqn{\widehat{f}(\cdot\;; \gamma)} denote the trend filtering estimator of
-order \mjseqn{k} with tunable hyperparameter \mjseqn{\gamma}. The fixed-input
+\mjseqn{\widehat{f}(\cdot\;; \lambda)} denote the trend filtering estimator of
+order \mjseqn{k} with tunable hyperparameter \mjseqn{\lambda}. The fixed-input
 mean-squared prediction error (MSPE) of the estimator \mjseqn{\widehat{f}}
 is defined as
-\mjsdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(y_i - \widehat{f}(x_{i};\gamma)\right)^2\;|\;x_{1},\dots,x_{n}\right]}
-\mjsdeqn{= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left[\left(f(x_i) - \widehat{f}(x_i;\gamma)\right)^2\;|\;x_1,\dots,x_n\right] + \sigma_i^2\right).}
+\mjsdeqn{R(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(y_i - \widehat{f}(x_{i};\lambda)\right)^2\;|\;x_{1},\dots,x_{n}\right]}
+\mjsdeqn{= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left[\left(f(x_i) - \widehat{f}(x_i;\lambda)\right)^2\;|\;x_1,\dots,x_n\right] + \sigma_i^2\right).}
 Stein's unbiased risk estimate (SURE) provides an unbiased estimate of the
 fixed-input MSPE via the following formula:
-\mjsdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f})}{n},}
+\mjsdeqn{\widehat{R}(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \lambda)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f})}{n},}
 where \mjseqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}
 and \mjseqn{\text{df}(\widehat{f})} is the effective degrees of
 freedom of the trend filtering estimator (with a fixed choice of
@@ -182,7 +182,7 @@ provide the following formula for the effective degrees of freedom of a trend
 filtering estimator (with a fixed hyperparameter choice):
 \mjsdeqn{\text{df}(\widehat{f}) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}\right] + k + 1.}
 The optimal hyperparameter value is then defined as
-\mjsdeqn{\widehat{\gamma} = \arg\min_{\gamma} \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f})}{n},}
+\mjsdeqn{\widehat{\lambda} = \arg\min_{\lambda} \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \lambda)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f})}{n},}
 where \mjseqn{\widehat{\text{df}}} is the estimate for the effective
 degrees of freedom that is obtained by replacing the expectation with the
 observed number of knots, and \mjseqn{\widehat{\overline{\sigma}}^2}

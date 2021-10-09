@@ -18,11 +18,11 @@
 #' estimate). Must be one of `k = 0,1,2`. Higher order polynomials are
 #' disallowed since their smoothness is indistinguishable from `k = 2` and
 #' their use can lead to instability in the convex optimization.
-#' @param ngammas The number of hyperparameter settings to test during
-#' validation. When nothing is passed to `gammas` (highly recommended for
+#' @param nlambdas The number of hyperparameter settings to test during
+#' validation. When nothing is passed to `lambdas` (highly recommended for
 #' general use), the grid is automatically constructed by `SURE.trendfilter`,
-#' with `ngammas` controlling the granularity of the grid.
-#' @param gammas (Optional) Overrides `ngammas` if passed. The vector of trend
+#' with `nlambdas` controlling the granularity of the grid.
+#' @param lambdas (Optional) Overrides `nlambdas` if passed. The vector of trend
 #' filtering hyperparameter values for the grid search. Use of this argument is
 #' discouraged unless you know what you are doing.
 #' @param x.eval (Optional) A grid of inputs to evaluate the optimized trend
@@ -42,7 +42,7 @@
 #' \item{`max_iter`}: Maximum iterations allowed for the trend filtering convex
 #' optimization. Defaults to `max_iter = 600L`. See the `n.iter` element
 #' of the function output for the actual number of iterations taken for every
-#' hyperparameter choice in `gammas`. If any of the elements of `n.iter` are
+#' hyperparameter choice in `lambdas`. If any of the elements of `n.iter` are
 #' equal to `max_iter`, the objective function's tolerance has not been
 #' achieved and `max_iter` may need to be increased.
 #' \item{`obj_tol`}: The tolerance used in the convex optimization stopping
@@ -96,15 +96,15 @@
 #' where \mjseqn{y_i} is a noisy observation of a signal \mjseqn{f(x_i)} and the
 #' \mjseqn{\epsilon_i} have mean zero with variance
 #' \mjseqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}. Let
-#' \mjseqn{\widehat{f}(\cdot\;; \gamma)} denote the trend filtering estimator of
-#' order \mjseqn{k} with tunable hyperparameter \mjseqn{\gamma}. The fixed-input
+#' \mjseqn{\widehat{f}(\cdot\;; \lambda)} denote the trend filtering estimator of
+#' order \mjseqn{k} with tunable hyperparameter \mjseqn{\lambda}. The fixed-input
 #' mean-squared prediction error (MSPE) of the estimator \mjseqn{\widehat{f}}
 #' is defined as
-#' \mjsdeqn{R(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left\[\left(y_i - \widehat{f}(x_{i};\gamma)\right)^2\;|\;x_{1},\dots,x_{n}\right\]}
-#' \mjsdeqn{= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left\[\left(f(x_i) - \widehat{f}(x_i;\gamma)\right)^2\;|\;x_1,\dots,x_n\right\] + \sigma_i^2\right).}
+#' \mjsdeqn{R(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left\[\left(y_i - \widehat{f}(x_{i};\lambda)\right)^2\;|\;x_{1},\dots,x_{n}\right\]}
+#' \mjsdeqn{= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left\[\left(f(x_i) - \widehat{f}(x_i;\lambda)\right)^2\;|\;x_1,\dots,x_n\right\] + \sigma_i^2\right).}
 #' Stein's unbiased risk estimate (SURE) provides an unbiased estimate of the
 #' fixed-input MSPE via the following formula:
-#' \mjsdeqn{\widehat{R}(\gamma) = \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \gamma)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f})}{n},}
+#' \mjsdeqn{\widehat{R}(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \lambda)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f})}{n},}
 #' where \mjseqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}
 #' and \mjseqn{\text{df}(\widehat{f})} is the effective degrees of
 #' freedom of the trend filtering estimator (with a fixed choice of
@@ -114,7 +114,7 @@
 #' filtering estimator (with a fixed hyperparameter choice):
 #' \mjsdeqn{\text{df}(\widehat{f}) = \mathbb{E}\left\[\text{number of knots in}\;\widehat{f}\right\] + k + 1.}
 #' The optimal hyperparameter value is then defined as
-#' \mjsdeqn{\widehat{\gamma} = \arg\min_{\gamma} \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \gamma)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f})}{n},}
+#' \mjsdeqn{\widehat{\lambda} = \arg\min_{\lambda} \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \lambda)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f})}{n},}
 #' where \mjseqn{\widehat{\text{df}}} is the estimate for the effective
 #' degrees of freedom that is obtained by replacing the expectation with the
 #' observed number of knots, and \mjseqn{\widehat{\overline{\sigma}}^2}
@@ -134,17 +134,17 @@
 #' estimate on.}
 #' \item{tf.estimate}{Optimized trend filtering estimate, evaluated at `x.eval`.}
 #' \item{validation.method}{"SURE"}
-#' \item{gammas}{Vector of hyperparameter values evaluated in the grid search
+#' \item{lambdas}{Vector of hyperparameter values evaluated in the grid search
 #' (always returned in descending order).}
 #' \item{generalization.errors}{Vector of SURE generalization error estimates,
-#' corresponding to the descending-ordered `gammas` vector.}
-#' \item{gamma.min}{Hyperparameter value that minimizes the SURE generalization
+#' corresponding to the descending-ordered `lambdas` vector.}
+#' \item{lambda.min}{Hyperparameter value that minimizes the SURE generalization
 #' error curve.}
 #' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
 #' estimators fit during validation.}
 #' \item{edf.min}{Effective degrees of freedom of the optimized trend
 #' filtering estimator.}
-#' \item{i.min}{Index of `gammas` that minimizes the SURE error curve.}
+#' \item{i.min}{Index of `lambdas` that minimizes the SURE error curve.}
 #' \item{n.iter}{The number of iterations needed for the ADMM algorithm to
 #' converge within the given tolerance, for each hyperparameter value. If many
 #' of these are exactly equal to `max_iter`, then their solutions have not
@@ -234,7 +234,7 @@
 #' @importFrom dplyr %>% arrange filter select
 #' @importFrom magrittr %$%
 SURE.trendfilter <- function(x, y, weights,
-                             k = 2L, ngammas = 250L, gammas,
+                             k = 2L, nlambdas = 250L, lambdas,
                              x.eval, nx.eval = 1500L,
                              optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
                              ...){
@@ -246,10 +246,10 @@ SURE.trendfilter <- function(x, y, weights,
   if ( k < 0 || k != round(k) ) stop("k must be a nonnegative integer.")
   if ( k > 2 ) stop("k > 2 are algorithmically unstable and do not improve upon k = 2.")
 
-  if ( !missing(gammas) ){
-    if ( min(gammas) < 0L ) stop("All specified gamma values must be positive.")
-    if ( length(gammas) < 25L ) warning("gammas must have length >= 25.")
-    if ( !all( gammas == sort(gammas, decreasing = T) ) ) warning("Returning gammas in descending order.")
+  if ( !missing(lambdas) ){
+    if ( min(lambdas) < 0L ) stop("All specified lambda values must be positive.")
+    if ( length(lambdas) < 25L ) warning("lambdas must have length >= 25.")
+    if ( !all( lambdas == sort(lambdas, decreasing = T) ) ) warning("Returning lambdas in descending order.")
   }
 
   if ( !missing(nx.eval) ){
@@ -288,16 +288,16 @@ SURE.trendfilter <- function(x, y, weights,
            weights = weights * y.scale ^ 2) %>%
     select(x, y, weights)
 
-  if ( !missing(gammas) ){
-    gammas <- sort(gammas, decreasing = T)
+  if ( !missing(lambdas) ){
+    lambdas <- sort(lambdas, decreasing = T)
   }else{
-    gammas <- exp(seq(16, -10, length = ngammas))
+    lambdas <- exp(seq(16, -10, length = nlambdas))
   }
 
   out <- trendfilter(x = data.scaled$x,
                      y = data.scaled$y,
                      weights = data.scaled$weights,
-                     lambda = gammas,
+                     lambda = lambdas,
                      k = k,
                      thinning = thinning,
                      control = optimization.params)
@@ -308,7 +308,7 @@ SURE.trendfilter <- function(x, y, weights,
   edfs <- out$df
   n.iter <- out$iter
   i.min <- min(which.min(errors))
-  gamma.min <- gammas[i.min]
+  lambda.min <- lambdas[i.min]
 
   if ( !missing(nx.eval) ){
     x.eval <- seq(min(data$x), max(data$x), length = nx.eval)
@@ -320,16 +320,16 @@ SURE.trendfilter <- function(x, y, weights,
   optimization.params$obj_tol <- optimization.params$obj_tol * 1e-2
 
   out <- trendfilter(data.scaled$x, data.scaled$y, data.scaled$weights,
-                     lambda = gamma.min, k = k,
+                     lambda = lambda.min, k = k,
                      thinning = thinning, control = optimization.params)
 
   optimization.params$obj_tol <- optimization.params$obj_tol * 1e2
 
-  tf.estimate <- glmgen:::predict.trendfilter(out, lambda = gamma.min,
+  tf.estimate <- glmgen:::predict.trendfilter(out, lambda = lambda.min,
                                               x.new = x.eval / x.scale) %>%
     as.double
 
-  data.scaled$fitted.values <- glmgen:::predict.trendfilter(out, lambda = gamma.min,
+  data.scaled$fitted.values <- glmgen:::predict.trendfilter(out, lambda = lambda.min,
                                                             x.new = data.scaled$x) %>%
     as.double
 
@@ -338,9 +338,9 @@ SURE.trendfilter <- function(x, y, weights,
   structure(list(x.eval = x.eval,
                  tf.estimate = tf.estimate * y.scale,
                  validation.method = "SURE",
-                 gammas = gammas,
+                 lambdas = lambdas,
                  errors = errors * y.scale ^ 2,
-                 gamma.min = gamma.min,
+                 lambda.min = lambda.min,
                  edfs = edfs,
                  edf.min = out$df,
                  i.min = i.min,

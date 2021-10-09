@@ -16,11 +16,11 @@
 #' estimate). Must be one of `k = 0,1,2`. Higher order polynomials are
 #' disallowed since their smoothness is indistinguishable from `k = 2` and
 #' their use can lead to instability in the convex optimization.
-#' @param ngammas The number of hyperparameter settings to test during
-#' validation. When `gammas` is left blank (highly recommended for general use),
-#' the grid is automatically chosen by `SURE.trendfilter`, with `ngammas`
+#' @param nlambdas The number of hyperparameter settings to test during
+#' validation. When `lambdas` is left blank (highly recommended for general use),
+#' the grid is automatically chosen by `cv.trendfilter`, with `nlambdas`
 #' controlling the granularity of the grid.
-#' @param gammas Overrides `ngammas` if passed. The vector of trend filtering
+#' @param lambdas Overrides `nlambdas` if passed. The vector of trend filtering
 #' hyperparameter values for the grid search. Use is discouraged unless you
 #' know what you are doing.
 #' @param x.eval A grid of inputs to evaluate the optimized trend filtering
@@ -34,12 +34,12 @@
 #' validation. One of `c("MAE","MSE","WMAE","WMSE")`, i.e. mean-absolute
 #' deviations error, mean-squared error, and their weighted counterparts.
 #' Defaults to `"WMAE"`.
-#' @param gamma.choice One of `c("gamma.min","gamma.1se")`. The choice
+#' @param lambda.choice One of `c("lambda.min","lambda.1se")`. The choice
 #' of hyperparameter that is used for optimized trend filtering estimate.
 #' \itemize{
-#' \item{`gamma.min`}: The hyperparameter value that minimizes the cross
+#' \item{`lambda.min`}: The hyperparameter value that minimizes the cross
 #' validation error curve.
-#' \item{`gamma.1se`}: The largest hyperparameter value with a cross
+#' \item{`lambda.1se`}: The largest hyperparameter value with a cross
 #' validation error within 1 standard error of the minimum cross validation
 #' error. This choice therefore favors simpler (i.e. smoother) trend filtering
 #' estimates. The motivation here is essentially Occam's razor: the two models
@@ -89,7 +89,7 @@
 #' validation.}
 #' \item{loss.metric}{Type of error that validation was performed on.
 #' One of \code{c("WMAE","WMSE","MAE","MSE")}.}
-#' \item{gammas}{Vector of hyperparameter values tested during validation. This
+#' \item{lambdas}{Vector of hyperparameter values tested during validation. This
 #' vector will always be returned in descending order, regardless of the
 #' ordering provided by the user. The indices `i.min` and `i.1se` correspond to
 #' this descending ordering.}
@@ -101,10 +101,10 @@
 #' using the hyperparameter that minimizes the CV error, instead uses the
 #' largest hyperparameter that has a CV error within 1 standard error of the
 #' smallest CV error.}
-#' \item{gamma.min}{Hyperparameter value that minimizes the SURE error curve.}
-#' \item{gamma.1se}{The largest hyperparameter value that is still within one
+#' \item{lambda.min}{Hyperparameter value that minimizes the SURE error curve.}
+#' \item{lambda.1se}{The largest hyperparameter value that is still within one
 #' standard error of the minimum hyperparameter's cross validation error.}
-#' \item{gamma.choice}{One of `c("gamma.min","gamma.1se")`. The choice
+#' \item{lambda.choice}{One of `c("lambda.min","lambda.1se")`. The choice
 #' of hyperparameter that is used for optimized trend filtering estimate.}
 #' \item{edfs}{Vector of effective degrees of freedom for trend filtering
 #' estimators fit during validation.}
@@ -112,8 +112,8 @@
 #' filtering estimator.}
 #' \item{edf.1se}{The effective degrees of freedom of the 1-stand-error rule
 #' trend filtering estimator.}
-#' \item{i.min}{The index of `gammas` that minimizes the cross validation error.}
-#' \item{i.1se}{The index of `gammas` that gives the largest hyperparameter
+#' \item{i.min}{The index of `lambdas` that minimizes the cross validation error.}
+#' \item{i.1se}{The index of `lambdas` that gives the largest hyperparameter
 #' value that has a cross validation error within 1 standard error of the
 #' minimum of the cross validation error curves.}
 #' \item{x}{Vector of observed inputs.}
@@ -159,10 +159,10 @@
 #' can be used with `cv.trendfilter` by passing the appropriate string
 #' (one of `c("WMAE","WMSE","MAE","MSE")`) to the `loss.metric`
 #' argument. For the weighted validation errors, `weights` must be passed.
-#' \mjsdeqn{WMAE(\gamma) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-#' \mjsdeqn{WMSE(\gamma) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}
-#' \mjsdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}
-#' \mjsdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}
+#' \mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
+#' \mjsdeqn{WMSE(\lambda) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
+#' \mjsdeqn{MAE(\lambda) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|}
+#' \mjsdeqn{MSE(\lambda) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|^2}
 #' where \mjseqn{w_i} is the \mjseqn{i}th element of the `weights` vector.
 #'
 #' Concisely stated, weighting helps combat heteroskedasticity and
@@ -222,8 +222,8 @@
 #' @importFrom magrittr %$% %>%
 #' @importFrom tidyr tibble drop_na
 cv.trendfilter <- function(x, y, weights,
-                           k = 2L, ngammas = 250L, gammas,
-                           V = 10L, gamma.choice = c("gamma.min","gamma.1se"),
+                           k = 2L, nlambdas = 250L, lambdas,
+                           V = 10L, lambda.choice = c("lambda.min","lambda.1se"),
                            loss.metric = c("WMAE","WMSE","MAE","MSE"),
                            x.eval, nx.eval = 1500L,
                            optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
@@ -258,11 +258,11 @@ cv.trendfilter <- function(x, y, weights,
                    "k = 2 is more stable and visually indistinguishable."))
   }
 
-  if ( !missing(gammas) ){
-    if ( min(gammas) < 0L ){
-      stop("All specified gamma values must be positive.")
+  if ( !missing(lambdas) ){
+    if ( min(lambdas) < 0L ){
+      stop("All specified lambda values must be positive.")
     }
-    if ( length(gammas) < 25L ) stop("gammas must have length >= 25.")
+    if ( length(lambdas) < 25L ) stop("lambdas must have length >= 25.")
   }
 
   if ( !missing(nx.eval) ){
@@ -282,7 +282,7 @@ cv.trendfilter <- function(x, y, weights,
   if ( length(weights) == 0 ) weights <- rep(1, length(y))
 
   mc.cores <- min(mc.cores, V)
-  gamma.choice <- match.arg(gamma.choice)
+  lambda.choice <- match.arg(lambda.choice)
   loss.metric <- match.arg(loss.metric)
 
   data <- tibble(x, y, weights) %>%
@@ -307,10 +307,10 @@ cv.trendfilter <- function(x, y, weights,
   data.folded <- data.scaled %>%
     group_split( sample( rep_len(1:V, nrow(data.scaled)) ), .keep = FALSE )
 
-  if ( missing(gammas) ){
-    gammas <- exp(seq(16, -10, length = ngammas))
+  if ( missing(lambdas) ){
+    lambdas <- exp(seq(16, -10, length = nlambdas))
   }else{
-    gammas <- sort(gammas, decreasing = T)
+    lambdas <- sort(lambdas, decreasing = T)
   }
 
   if ( !missing(x.eval) ){
@@ -323,8 +323,8 @@ cv.trendfilter <- function(x, y, weights,
                         validation.method = paste0(V,"-fold CV"),
                         V = V,
                         loss.metric = loss.metric,
-                        gammas = gammas,
-                        gamma.choice = gamma.choice,
+                        lambdas = lambdas,
+                        lambda.choice = lambda.choice,
                         x = data$x,
                         y = data$y,
                         weights = data$weights,
@@ -337,7 +337,7 @@ cv.trendfilter <- function(x, y, weights,
                    class = "cv.trendfilter"
                    )
 
-  rm(V,loss.metric,gammas,ngammas,gamma.choice,k,thinning,data,nx.eval,
+  rm(V,loss.metric,lambdas,nlambdas,lambda.choice,k,thinning,data,nx.eval,
      optimization.params,data.scaled,x.eval,x.scale,y.scale)
 
   cv.out <- matrix(unlist(mclapply(1:(obj$V), FUN = trendfilter.validate,
@@ -351,8 +351,8 @@ cv.trendfilter <- function(x, y, weights,
   se.errors <- rowSds(cv.out) / sqrt(obj$V) %>% as.double
   obj$i.min <- which.min(errors) %>% min
   obj$i.1se <- which(errors <= errors[obj$i.min] + se.errors[obj$i.min]) %>% min
-  obj$gamma.min <- obj$gammas[obj$i.min]
-  obj$gamma.1se <- obj$gammas[obj$i.1se]
+  obj$lambda.min <- obj$lambdas[obj$i.min]
+  obj$lambda.1se <- obj$lambdas[obj$i.1se]
 
   if ( obj$loss.metric %in% c("MSE","WMSE") ){
     obj$errors <- errors * obj$y.scale ^ 2
@@ -366,14 +366,14 @@ cv.trendfilter <- function(x, y, weights,
   out <- obj %$% trendfilter(x = data.scaled$x,
                              y = data.scaled$y,
                              weights = data.scaled$weights,
-                             lambda = gammas,
+                             lambda = lambdas,
                              k = k,
                              thinning = thinning,
                              control = optimization.params)
 
-  gamma.pred <- case_when(
-    obj$gamma.choice == "gamma.min" ~ obj$gamma.min,
-    obj$gamma.choice == "gamma.1se" ~ obj$gamma.1se
+  lambda.pred <- case_when(
+    obj$lambda.choice == "lambda.min" ~ obj$lambda.min,
+    obj$lambda.choice == "lambda.1se" ~ obj$lambda.1se
   )
 
   obj$n.iter <- out$iter
@@ -387,26 +387,26 @@ cv.trendfilter <- function(x, y, weights,
   out <- obj %$% trendfilter(x = data.scaled$x,
                              y = data.scaled$y,
                              weights = data.scaled$weights,
-                             lambda = gammas,
+                             lambda = lambdas,
                              k = k,
                              thinning = thinning,
                              control = optimization.params)
 
   obj$optimization.params$obj_tol <- obj$optimization.params$obj_tol * 1e2
 
-  obj$data.scaled$fitted.values <- glmgen:::predict.trendfilter(out, lambda = gamma.pred,
+  obj$data.scaled$fitted.values <- glmgen:::predict.trendfilter(out, lambda = lambda.pred,
                                                                 x.new = obj$data.scaled$x) %>%
     as.double
   obj$data.scaled$residuals <- obj$data.scaled$y - obj$data.scaled$fitted.values
-  obj$tf.estimate <- glmgen:::predict.trendfilter(out, lambda = gamma.pred,
+  obj$tf.estimate <- glmgen:::predict.trendfilter(out, lambda = lambda.pred,
                                                   x.new = obj$x.eval / obj$x.scale) * obj$y.scale %>%
     as.double
   obj$fitted.values <- obj$data.scaled$fitted.values * obj$y.scale
   obj$residuals <- obj$y - obj$fitted.values
 
   obj <- obj[c("x.eval","tf.estimate","validation.method","V",
-               "loss.metric","gammas","gamma.min","gamma.1se",
-               "gamma.choice","errors","se.errors","edfs","edf.min","edf.1se",
+               "loss.metric","lambdas","lambda.min","lambda.1se",
+               "lambda.choice","errors","se.errors","edfs","edf.min","edf.1se",
                "i.min","i.1se","x","y","weights","fitted.values", "residuals",
                "k","thinning","optimization.params","n.iter","x.scale","y.scale",
                "data.scaled")]
@@ -423,11 +423,11 @@ trendfilter.validate <- function(validation.index, data.folded, obj){
                      y = data.train$y,
                      weights = data.train$weights,
                      k = obj$k,
-                     lambda = obj$gammas,
+                     lambda = obj$lambdas,
                      thinning = obj$thinning,
                      control = obj$optimization.params)
 
-  tf.validate.preds <- glmgen:::predict.trendfilter(out, lambda = obj$gammas, x.new = data.validate$x) %>%
+  tf.validate.preds <- glmgen:::predict.trendfilter(out, lambda = obj$lambdas, x.new = data.validate$x) %>%
     suppressWarnings
 
   if ( obj$loss.metric == "MSE" ){

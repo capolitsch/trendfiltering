@@ -73,7 +73,7 @@
 #' Parametric bootstrap for fixed-input uncertainty quantification (when noise
 #' distribution \mjseqn{\epsilon_i\sim Q_i} is known a priori)
 #' Require: Training Data \mjseqn{(x_1, y_1),\dots,(x_n, y_n)}, hyperparameters
-#' \mjseqn{\gamma} and \mjseqn{k}, assumed noise distribution
+#' \mjseqn{\lambda} and \mjseqn{k}, assumed noise distribution
 #' \mjseqn{\epsilon_i \sim Q_i}, prediction input grid \mjseqn{x_1',\dots,x_m'}
 #' Compute the trend filtering point estimate at the observed inputs:
 #' \mjseqn{(x_1, y_1),\dots, (x_n, y_n)}
@@ -197,7 +197,7 @@ bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
   obj <- obj[c("x.eval","tf.estimate","tf.standard.errors","bootstrap.lower.band",
                "bootstrap.upper.band","bootstrap.algorithm","level","B",
                "edf.boots","tf.bootstrap.ensemble","prune","n.pruned","x","y",
-               "weights","fitted.values","residuals","k","gammas","gamma.min",
+               "weights","fitted.values","residuals","k","lambdas","lambda.min",
                "edfs","edf.min","i.min","validation.method","errors",
                "optimization.params","n.iter","n.iter.boots","x.scale","y.scale",
                "data.scaled")]
@@ -211,19 +211,19 @@ bootstrap.estimator <- function(b){
 }
 
 
-tf.estimator <- function(data, obj, mode = "gamma"){
+tf.estimator <- function(data, obj, mode = "lambda"){
 
   if ( mode == "edf" ){
     tf.fit <- trendfilter(x = data$x,
                           y = data$y,
                           weights = data$weights,
                           k = obj$k,
-                          lambda = obj$gammas,
+                          lambda = obj$lambdas,
                           thinning = obj$thinning,
                           control = obj$optimization.params)
 
     i.min <- which.min( abs(tf.fit$df - obj$edf.min) )
-    gamma.min <- obj$gammas[i.min]
+    lambda.min <- obj$lambdas[i.min]
     edf.min <- tf.fit$df[i.min]
     n.iter <- tf.fit$iter[i.min]
 
@@ -232,23 +232,23 @@ tf.estimator <- function(data, obj, mode = "gamma"){
     }
   }
 
-  if ( mode == "gamma" ){
+  if ( mode == "lambda" ){
     tf.fit <- trendfilter(x = data$x,
                           y = data$y,
                           weights = data$weights,
                           k = obj$k,
-                          lambda = obj$gamma.min,
+                          lambda = obj$lambda.min,
                           thinning = obj$thinning,
                           control = obj$optimization.params)
 
-    gamma.min <- obj$gamma.min
+    lambda.min <- obj$lambda.min
     edf.min <- tf.fit$df
     n.iter <- as.integer(tf.fit$iter)
   }
 
   tf.estimate <- glmgen:::predict.trendfilter(object = tf.fit,
                                               x.new = obj$x.eval / obj$x.scale,
-                                              lambda = gamma.min) %>%
+                                              lambda = lambda.min) %>%
     as.numeric
 
   return(list(tf.estimate = tf.estimate * obj$y.scale, edf = edf.min, n.iter = n.iter))
