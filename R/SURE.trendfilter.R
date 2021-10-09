@@ -84,7 +84,7 @@
 #' (using `SURE.trendfilter`) on that scale. See the example below for a case
 #' when the inputs are evenly sampled on the `log10(x)` scale.
 #'
-#' \subsection{Trend filtering with Stein's unbiased risk estimate}
+#' # Trend filtering with Stein's unbiased risk estimate
 #' Here we describe the general motivation for trend filtering with SURE. See
 #' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
 #' for more details. \cr
