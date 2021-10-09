@@ -181,10 +181,8 @@ Bootstrap Methods: Another Look at the Jackknife}.
 {\link{SURE.trendfilter}}, \code{\link{cv.trendfilter}}
 }
 \author{
-\subsection{\bold{Collin A. Politsch, Ph.D.}}{
-
+\emph{\bold{Collin A. Politsch, Ph.D.}} \cr
 Email: collinpolitsch@gmail.com \cr
 Website: \href{https://collinpolitsch.com/}{collinpolitsch.com} \cr
 GitHub: \href{https://github.com/capolitsch/}{github.com/capolitsch} \cr \cr
-}
 }

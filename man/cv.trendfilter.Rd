@@ -112,10 +112,9 @@ to the number of cores detected.}
 \value{
 An object of class 'cv.trendfilter'. This is a list with the
 following elements:
-\item{x.eval}{The grid of inputs the optimized trend filtering estimate was
-evaluated on.}
-\item{tf.estimate}{The optimized trend filtering estimate of the signal,
-evaluated on \code{x.eval}.}
+\item{x.eval}{Input grid to evaluate the optimized trend filtering estimate
+on.}
+\item{tf.estimate}{Optimized trend filtering estimate, evaluated at \code{x.eval}.}
 \item{validation.method}{\code{paste0(V,"-fold CV")}}
 \item{V}{The number of folds the data are split into for the V-fold cross
 validation.}
@@ -183,31 +182,30 @@ to use \code{\link{`SURE.trendfilter`}} vs. \code{cv.trendfilter}.
 }
 
 
-As a general rule-of-thumb, we recommend optimizing the
-trend filtering hyperparameter by minimizing Stein's unbiased risk estimate
-(using \code{\link{SURE.trendfilter}}) when the inputs are regularly-sampled
-(either on the raw \code{x} scale or some transformation of it) and optimizing the
-hyperparameter by \mjseqn{V}-fold cross validation when
-the inputs are irregularly-sampled. A regularly-sampled data set with some
-discarded pixels (either sporadically or in large consecutive chunks) is
-still considered regularly sampled. When the inputs are regularly
-sampled on a transformed scale, we recommend transforming to that
-scale and carrying out the full trend filtering analysis (using SURE) on that
-scale. When the inputs do not meet any of these criteria for ``regularly
-sampled'', \code{cv.trendfilter} should be used to optimize the trend filtering
-hyperparameter. Below we define the various types of validation error that
-can be used with `cv.trendfilter` by passing the appropriate string
-(one of `c("WMAE","WMSE","MAE","MSE")`) to the `loss.metric`
-argument. For the weighted validation errors, `weights` must be passed.
+Our recommendations for when to use \code{\link{`cv.trendfilter`}} vs.
+\code{SURE.trendfilter}, as well as each of the settings for \code{bootstrap.algorithm}
+are shown in the table above.
+
+A regularly-sampled data set with some discarded pixels (either sporadically
+or in large consecutive chunks) is still considered regularly sampled. When
+the inputs are regularly sampled on a transformed scale, we recommend
+transforming to that scale and carrying out the full trend filtering analysis
+(using \code{SURE.trendfilter}) on that scale. See the example below for a case
+when the inputs are evenly sampled on the \code{log10(x)} scale.
+
+Below we define the various types of validation error that
+can be used with \code{cv.trendfilter} by passing the appropriate string
+(one of \code{c("WMAE","WMSE","MAE","MSE")}) to the \code{loss.metric}
+argument. For the weighted validation errors, \code{weights} must be passed.
 \mjsdeqn{WMAE(\gamma) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
 \mjsdeqn{WMSE(\gamma) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2\frac{w_i}{\sum_jw_j}}
 \mjsdeqn{MAE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|}
 \mjsdeqn{MSE(\gamma) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \gamma)|^2}
-where \mjseqn{w_i} is the \mjseqn{i}th element of the `weights` vector.
+where \mjseqn{w_i} is the \mjseqn{i}th element of the \code{weights} vector.
 
 Concisely stated, weighting helps combat heteroskedasticity and
 absolute error decreases sensitivity to outliers. If \code{weights = NULL}, then
-the weighted and unweighted counterparts are equivalent.
+the weighted and unweighted counterparts are equivalent. \cr
 }
 \examples{
 data(eclipsing_binary)
@@ -248,10 +246,8 @@ Model selection and validation 2: Model assessment, more cross-validation}.
 \code{\link{SURE.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 }
 \author{
-\subsection{\bold{Collin A. Politsch, Ph.D.}}{
-
+\emph{\bold{Collin A. Politsch, Ph.D.}} \cr
 Email: collinpolitsch@gmail.com \cr
 Website: \href{https://collinpolitsch.com/}{collinpolitsch.com} \cr
 GitHub: \href{https://github.com/capolitsch/}{github.com/capolitsch} \cr \cr
-}
 }

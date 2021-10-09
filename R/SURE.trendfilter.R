@@ -65,17 +65,9 @@
 #' @param ... Additional named arguments to be passed to
 #' [glmgen::trendfilter.control.list()].
 #'
-#' @details \loadmathjax
-#'
-#' | Scenario                                                 | Hyperparameter optimization | `bootstrap.algorithm` |
-#' | :------------                                            |     ------------:           |         ------------: |
-#' | `x` is irregularly sampled                               | Use `cv.trendfilter`        | "nonparametric"       |
-#' | `x` is regularly sampled and `weights` are not available | Use `cv.trendfilter`        | "wild"                |
-#' | `x` is regularly sampled and `weights` are available     | Use `SURE.trendfilter`      | "parametric"          |
-#'
-#' Our recommendations for when to use `cv.trendfilter` vs. `SURE.trendfilter`,
-#' as well as each of the settings for `bootstrap.algorithm` are shown in the
-#' table above.
+#' @details \loadmathjax Our recommendations for when to use
+#' \code{\link{`cv.trendfilter`}} vs. `SURE.trendfilter`, as well as each of the
+#' available settings for `bootstrap.algorithm` are shown in the table below.
 #'
 #' A regularly-sampled data set with some discarded pixels (either sporadically
 #' or in large consecutive chunks) is still considered regularly sampled. When
@@ -84,8 +76,16 @@
 #' (using `SURE.trendfilter`) on that scale. See the example below for a case
 #' when the inputs are evenly sampled on the `log10(x)` scale.
 #'
+#' | Scenario                                                 | Hyperparameter optimization | `bootstrap.algorithm` |
+#' | :------------                                            |     ------------:           |         ------------: |
+#' | `x` is irregularly sampled                               | Use `cv.trendfilter`        | "nonparametric"       |
+#' | `x` is regularly sampled and `weights` are not available | Use `cv.trendfilter`        | "wild"                |
+#' | `x` is regularly sampled and `weights` are available     | Use `SURE.trendfilter`      | "parametric"          |
+#'
+#'
 #' # Trend filtering with Stein's unbiased risk estimate
-#' Here we describe the general motivation for trend filtering with SURE. See
+#' Here we describe the general motivation for optimizing a trend filtering
+#' estimator with respect to Stein's unbiased risk estimate. See
 #' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
 #' for more details. \cr
 #'
@@ -126,46 +126,45 @@
 #' [Wasserman (2004)](https://link.springer.com/book/10.1007/978-0-387-21736-9)
 #' or
 #' [Hastie, Tibshirani, and Friedman (2009)](https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf).
-#'
+#' \cr \cr
 #'
 #' @return An object of class 'SURE.trendfilter'. This is a list with the
 #' following elements:
-#' \item{x.eval}{The grid of inputs the optimized trend filtering estimate was
-#' evaluated on.}
-#' \item{tf.estimate}{The optimized trend filtering estimate of the signal,
-#' evaluated on `x.eval`.}
+#' \item{x.eval}{Input grid used to evaluate the optimized trend filtering
+#' estimate on.}
+#' \item{tf.estimate}{Optimized trend filtering estimate, evaluated at `x.eval`.}
 #' \item{validation.method}{"SURE"}
 #' \item{gammas}{Vector of hyperparameter values evaluated in the grid search
 #' (always returned in descending order).}
-#' \item{errors}{Vector of SURE error estimates corresponding to the
-#' **descending** set of gamma values tested during validation.}
-#' \item{gamma.min}{Hyperparameter value that minimizes the SURE error curve.}
+#' \item{generalization.errors}{Vector of SURE generalization error estimates,
+#' corresponding to the **descending** set of gamma values tested during
+#' validation.}
+#' \item{gamma.min}{Hyperparameter value that minimizes the SURE generalization
+#' error curve.}
 #' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
 #' estimators fit during validation.}
-#' \item{edf.min}{The effective degrees of freedom of the optimally-tuned trend
+#' \item{edf.min}{Effective degrees of freedom of the optimized trend
 #' filtering estimator.}
-#' \item{i.min}{The index of `gammas` (descending order) that minimizes the
-#' SURE error curve.}
-#' \item{training.error}{The mean-squared error between the observed outputs `y`
-#' and the trend filtering estimate.}
-#' \item{optimism}{The optimism, i.e. `optimism = test.error - training.error`,
-#' provided by the SURE formula.}
+#' \item{i.min}{Index of `gammas` that minimizes the SURE error curve.}
+#' \item{n.iter}{The number of iterations needed for the ADMM algorithm to
+#' converge within the given tolerance, for each hyperparameter value. If many
+#' of these are exactly equal to `max_iter`, then their solutions have not
+#' converged with the tolerance specified by `obj_tol`. In which case, it is
+#' often prudent to increase `max_iter`.}
+#' \item{training.errors}{Vector of MSEs between the observed outputs `y` and the
+#' trend filtering estimate, for every hyperparameter choice.}
+#' \item{optimisms}{The SURE-estimated optimisms, i.e.
+#' `optimisms = generalization.errors - training.errors`.}
 #' \item{x}{Vector of observed inputs.}
 #' \item{y}{Vector of observed outputs.}
-#' \item{weights}{A vector of weights for the observed outputs. These are
-#' defined as `weights = 1 / sigmas^2`, where `sigmas` is a vector of
-#' standard errors of the uncertainty in the observed outputs.}
-#' \item{fitted.values}{The optimized trend filtering estimate of the signal,
-#' evaluated at the observed inputs `x`.}
+#' \item{weights}{Weights for the observed outputs, defined as the reciprocal
+#' variance of the additive noise that contaminates the signal.}
+#' \item{fitted.values}{Optimized trend filtering estimate, evaluated at the
+#' observed inputs `x`.}
 #' \item{residuals}{`residuals = y - fitted.values`}
-#' \item{k}{The degree of the trend filtering estimator.}
-#' \item{optimization.params}{A list of parameters that control the trend
-#' filtering convex optimization.}
-#' \item{n.iter}{Vector of the number of iterations needed for the ADMM
-#' algorithm to converge within the given tolerance, for each hyperparameter
-#' value. If many of these are exactly equal to `max_iter`, then their
-#' solutions have not converged with the tolerance specified by `obj_tol`.
-#' In which case, it is often prudent to increase `max_iter`.}
+#' \item{k}{Degree of the trend filtering estimator.}
+#' \item{ADMM.params}{List of parameter settings for the trend filtering convex
+#' optimization algorithm.}
 #' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so that a
 #' smaller, better conditioned data set is used for fitting.}
 #' \item{x.scale, y.scale, data.scaled}{For internal use.}
@@ -173,8 +172,7 @@
 #' @export SURE.trendfilter
 #'
 #' @author
-#' \bold{Collin A. Politsch, Ph.D.}
-#' ---
+#' \emph{\bold{Collin A. Politsch, Ph.D.}} \cr
 #' Email: collinpolitsch@@gmail.com \cr
 #' Website: [collinpolitsch.com](https://collinpolitsch.com/) \cr
 #' GitHub: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
@@ -247,12 +245,11 @@ SURE.trendfilter <- function(x, y, weights,
   if ( length(x) != length(y) ) stop("x and y must have the same length.")
   if ( length(y) < k + 2 ) stop("length(y) must be >= k + 2")
   if ( k < 0 || k != round(k) ) stop("k must be a nonnegative integer.")
-  if ( k > 3 ) stop("k > 3 are algorithmically unstable.")
-  if ( k == 3 ) warning("k = 3 can be algorithmically unstable. k = 2 is more stable and visually indistinguishable.")
+  if ( k > 2 ) stop("k > 2 are algorithmically unstable and do not improve upon k = 2.")
 
   if ( !missing(gammas) ){
     if ( min(gammas) < 0L ) stop("All specified gamma values must be positive.")
-    if ( length(gammas) < 25L ) stop("gammas must have length >= 25.")
+    if ( length(gammas) < 25L ) warning("gammas must have length >= 25.")
     if ( !all( gammas == sort(gammas, decreasing = T) ) ) warning("Returning gammas in descending order.")
   }
 
