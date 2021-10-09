@@ -96,8 +96,7 @@ estimate on.}
 \item{gammas}{Vector of hyperparameter values evaluated in the grid search
 (always returned in descending order).}
 \item{generalization.errors}{Vector of SURE generalization error estimates,
-corresponding to the \strong{descending} set of gamma values tested during
-validation.}
+corresponding to the descending-ordered \code{gammas} vector.}
 \item{gamma.min}{Hyperparameter value that minimizes the SURE generalization
 error curve.}
 \item{edfs}{Vector of effective degrees of freedom for all trend filtering
@@ -137,19 +136,19 @@ error. See details for when to use \code{SURE.trendfilter} vs.
 }
 \details{
 \loadmathjax Our recommendations for when to use
-\code{\link{`cv.trendfilter`}} vs. \code{SURE.trendfilter}, as well as each of the
+\code{\link{cv.trendfilter}} vs. \code{SURE.trendfilter}, as well as each of the
 available settings for \code{bootstrap.algorithm} are shown in the table below.
 
 A regularly-sampled data set with some discarded pixels (either sporadically
 or in large consecutive chunks) is still considered regularly sampled. When
 the inputs are regularly sampled on a transformed scale, we recommend
 transforming to that scale and carrying out the full trend filtering analysis
-(using \code{SURE.trendfilter}) on that scale. See the example below for a case
-when the inputs are evenly sampled on the \code{log10(x)} scale.\tabular{lrr}{
+on that scale. See the example below for a case when the inputs are evenly
+sampled on the \code{log10(x)} scale.\tabular{lrr}{
    Scenario \tab Hyperparameter optimization \tab \code{bootstrap.algorithm} \cr
-   \code{x} is irregularly sampled \tab Use \code{cv.trendfilter} \tab "nonparametric" \cr
-   \code{x} is regularly sampled and \code{weights} are not available \tab Use \code{cv.trendfilter} \tab "wild" \cr
-   \code{x} is regularly sampled and \code{weights} are available \tab Use \code{SURE.trendfilter} \tab "parametric" \cr
+   \code{x} is irregularly sampled \tab \code{cv.trendfilter} \tab "nonparametric" \cr
+   \code{x} is regularly sampled & reciprocal variances are not available \tab \code{cv.trendfilter} \tab "wild" \cr
+   \code{x} is regularly sampled & reciprocal variances are available \tab \code{SURE.trendfilter} \tab "parametric" \cr
 }
 }
 \section{Trend filtering with Stein's unbiased risk estimate}{

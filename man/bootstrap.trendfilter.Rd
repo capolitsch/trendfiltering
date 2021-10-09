@@ -47,10 +47,6 @@ to the number of cores detected.}
 An object of class 'bootstrap.trendfilter'. This is a comprehensive
 list containing all of the analysis important information, data, and
 results:
-\item{x.eval}{(Inherited from \code{obj}) The grid of inputs the optimized trend
-filtering estimate was evaluated on.}
-\item{tf.estimate}{The trend filtering estimate of the signal, evaluated on
-\code{x.eval}.}
 \item{tf.standard.errors}{The standard errors of the optimized trend
 filtering point estimator.}
 \item{bootstrap.lower.band}{Vector of lower bounds for the
@@ -75,51 +71,28 @@ stopped at zero knots (likely erroneously), and removes them from the
 ensemble.}
 \item{n.pruned}{The number of poorly-converged bootstrap trend filtering
 estimates pruned from the ensemble.}
-\item{x}{(Inherited from \code{obj}) Vector of observed inputs.}
-\item{y}{(Inherited from \code{obj}) Vector of observed outputs.}
-\item{weights}{(Inherited from \code{obj}) A vector of weights for the observed
-outputs. These are defined as \code{weights = 1 / sigma^2}, where \code{sigma} is a
-vector of standard errors of the uncertainty in the output measurements.}
-\item{residuals}{(Inherited from \code{obj}) \code{residuals = y - fitted.values}}
-\item{k}{(Inherited from \code{obj}) The degree of the trend filtering estimator.}
-\item{gammas}{(Inherited from \code{obj}) Vector of hyperparameter values tested
-during validation (always returned in descending order).}
-\item{gamma.min}{(Inherited from \code{obj}) Hyperparameter value that minimizes
-the validation error curve.}
-\item{edf}{(Inherited from \code{obj}) Integer vector of effective degrees of
-freedom for trend filtering estimators fit during validation.}
-\item{edf.min}{(Inherited from \code{obj}) The effective degrees of freedom of the
-optimally-tuned trend filtering estimator.}
-\item{i.min}{(Inherited from \code{obj}) The index of \code{gammas} that minimizes the
-validation error.}
-\item{validation.method}{Either \code{"SURE"} or \code{paste0(V,"-fold CV")}.}
-\item{errors}{(Inherited from \code{obj}) Vector of hyperparameter validation
-errors, inherited from \code{obj} (an object of class 'SURE.trendfilter').}
-\item{optimization.params}{(Inherited from \code{obj}) a list of parameters that
-control the trend filtering convex optimization.}
-\item{n.iter}{(Inherited from \code{obj}) Vector of the number of iterations
-needed for the ADMM algorithm to converge within the given tolerance, for
-each hyperparameter value. If many of these are exactly equal to \code{max_iter},
-then their solutions have not converged with the tolerance specified by
-\code{obj_tol}. In which case, it is often prudent to increase \code{max_iter}.}
 \item{n.iter.boots}{Vector of the number of iterations needed for the ADMM
 algorithm to converge within the given tolerance, for each bootstrap trend
 filtering estimate.}
-\item{x.scale, y.scale, data.scaled}{For internal use.}
+\item{...}{All elements of \code{obj} --- an object either of class
+\link{SURE.trendfilter}' or '\link{cv.trendfilter}' --- that was passed to
+\code{bootstrap.trendfilter}. See the relevant function documentation for details.}
 }
 \description{
 \loadmathjax \code{bootstrap.trendfilter} implements
 }
 \details{
-\loadmathjax See
-\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-Politsch et al. (2020a)} for more details.
-
-\itemize{
-\item{The inputs are irregularly sampled}
-\item{The inputs are regularly sampled and the noise distribution is known}
-\item{The inputs are regularly sampled and the noise distribution is unknown}
+\loadmathjax Our recommendations for when to use
+\code{\link{cv.trendfilter}} vs. \code{SURE.trendfilter}, as well as each of the
+available settings for \code{bootstrap.algorithm} are shown in the table below.
+See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
+Politsch et al. (2020a)} for more details.\tabular{lrr}{
+   Scenario \tab Hyperparameter optimization \tab \code{bootstrap.algorithm} \cr
+   \code{x} is irregularly sampled \tab \code{cv.trendfilter} \tab "nonparametric" \cr
+   \code{x} is regularly sampled & reciprocal variances are not available \tab \code{cv.trendfilter} \tab "wild" \cr
+   \code{x} is regularly sampled & reciprocal variances are available \tab \code{SURE.trendfilter} \tab "parametric" \cr
 }
+
 
 Parametric bootstrap for fixed-input uncertainty quantification (when noise
 distribution \mjseqn{\epsilon_i\sim Q_i} is known a priori)

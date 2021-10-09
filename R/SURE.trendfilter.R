@@ -66,21 +66,21 @@
 #' [glmgen::trendfilter.control.list()].
 #'
 #' @details \loadmathjax Our recommendations for when to use
-#' \code{\link{`cv.trendfilter`}} vs. `SURE.trendfilter`, as well as each of the
+#' \code{\link{cv.trendfilter}} vs. `SURE.trendfilter`, as well as each of the
 #' available settings for `bootstrap.algorithm` are shown in the table below.
 #'
 #' A regularly-sampled data set with some discarded pixels (either sporadically
 #' or in large consecutive chunks) is still considered regularly sampled. When
 #' the inputs are regularly sampled on a transformed scale, we recommend
 #' transforming to that scale and carrying out the full trend filtering analysis
-#' (using `SURE.trendfilter`) on that scale. See the example below for a case
-#' when the inputs are evenly sampled on the `log10(x)` scale.
+#' on that scale. See the example below for a case when the inputs are evenly
+#' sampled on the `log10(x)` scale.
 #'
-#' | Scenario                                                 | Hyperparameter optimization | `bootstrap.algorithm` |
-#' | :------------                                            |     ------------:           |         ------------: |
-#' | `x` is irregularly sampled                               | Use `cv.trendfilter`        | "nonparametric"       |
-#' | `x` is regularly sampled and `weights` are not available | Use `cv.trendfilter`        | "wild"                |
-#' | `x` is regularly sampled and `weights` are available     | Use `SURE.trendfilter`      | "parametric"          |
+#' | Scenario                                                          | Hyperparameter optimization | `bootstrap.algorithm` |
+#' | :------------                                                     |     ------------:           |         ------------: |
+#' | `x` is irregularly sampled                                        | `cv.trendfilter`            | "nonparametric"       |
+#' | `x` is regularly sampled & reciprocal variances are not available | `cv.trendfilter`            | "wild"                |
+#' | `x` is regularly sampled & reciprocal variances are available     | `SURE.trendfilter`          | "parametric"          |
 #'
 #'
 #' # Trend filtering with Stein's unbiased risk estimate
@@ -137,8 +137,7 @@
 #' \item{gammas}{Vector of hyperparameter values evaluated in the grid search
 #' (always returned in descending order).}
 #' \item{generalization.errors}{Vector of SURE generalization error estimates,
-#' corresponding to the **descending** set of gamma values tested during
-#' validation.}
+#' corresponding to the descending-ordered `gammas` vector.}
 #' \item{gamma.min}{Hyperparameter value that minimizes the SURE generalization
 #' error curve.}
 #' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
