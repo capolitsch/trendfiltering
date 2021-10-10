@@ -305,7 +305,7 @@ SURE.trendfilter <- function(x, y, weights,
 
   training.errors <- (out$beta - data.scaled$y) ^ 2 %>% colMeans %>% as.double
   optimisms <- 2 * out$df / nrow(data) * mean(1 / data.scaled$weights) %>% as.double
-  generalization.errors <- training.error + optimism
+  generalization.errors <- training.errors + optimisms
   edfs <- out$df
   n.iter <- out$iter %>% as.integer
   i.min <- min(which.min(generalization.errors)) %>% as.integer
