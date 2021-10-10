@@ -121,8 +121,9 @@ variance of the additive noise that contaminates the signal.}
 observed inputs \code{x}.}
 \item{residuals}{\code{residuals = y - fitted.values}}
 \item{k}{Degree of the trend filtering estimator.}
-\item{ADMM.params}{List of parameter settings for the trend filtering convex
-optimization algorithm.}
+\item{ADMM.params}{List of parameter settings for the trend filtering ADMM
+algorithm, constructed by passing \code{optimization.params} list to
+\code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}.}
 \item{thinning}{Logical. If \code{TRUE}, then the data are preprocessed so that a
 smaller, better conditioned data set is used for fitting.}
 \item{x.scale, y.scale, data.scaled}{For internal use.}

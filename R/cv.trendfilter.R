@@ -3,7 +3,7 @@
 #' `cv.trendfilter` optimizes the trend filtering hyperparameter via V-fold
 #' cross validation on a grid of candidate hyperparameter settings and selects
 #' the value that minimizes a user-specified loss metric. See details for when
-#' to use \code{\link{`SURE.trendfilter`}} vs. `cv.trendfilter`.
+#' to use \code{\link{SURE.trendfilter}} vs. `cv.trendfilter`.
 #'
 #' @param x Vector of observed values for the input variable.
 #' @param y Vector of observed values for the output variable.

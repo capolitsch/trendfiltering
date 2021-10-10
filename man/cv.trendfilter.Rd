@@ -171,7 +171,7 @@ that a smaller, better conditioned data set is used for fitting.}
 \code{cv.trendfilter} optimizes the trend filtering hyperparameter via V-fold
 cross validation on a grid of candidate hyperparameter settings and selects
 the value that minimizes a user-specified loss metric. See details for when
-to use \code{\link{`SURE.trendfilter`}} vs. \code{cv.trendfilter}.
+to use \code{\link{SURE.trendfilter}} vs. \code{cv.trendfilter}.
 }
 \details{
 \loadmathjax\tabular{lrr}{
