@@ -253,7 +253,7 @@ SURE.trendfilter <- function(x, y, weights,
     if ( !all( lambdas == sort(lambdas, decreasing = T) ) ) warning("Sorting lambdas to descending order.")
   }
 
-  if ( !missing(nx.eval) ){
+  if ( missing(x.eval) ){
     if ( nx.eval != round(nx.eval) ) stop("nx.eval must be a positive integer.")
   }else{
     if ( any(x.eval < min(x) || x.eval > max(x)) ) stop("x.eval should all be in range(x).")
@@ -311,10 +311,10 @@ SURE.trendfilter <- function(x, y, weights,
   i.min <- min(which.min(generalization.errors)) %>% as.integer
   lambda.min <- lambdas[i.min]
 
-  if ( !missing(nx.eval) ){
-    x.eval <- seq(min(data$x), max(data$x), length = nx.eval)
-  }else{
+  if ( !missing(x.eval) ){
     x.eval <- x.eval %>% as.double %>% sort
+  }else{
+    x.eval <- seq(min(data$x), max(data$x), length = nx.eval)
   }
 
   # Increase the TF solution's algorithmic precision for the optimized estimate
@@ -336,7 +336,7 @@ SURE.trendfilter <- function(x, y, weights,
 
   data.scaled <- data.scaled %>% mutate(residuals = y - fitted.values)
 
-  structure(list(x.eval = x.eval %>% as.double,
+  structure(list(x.eval = x.eval,
                  tf.estimate = tf.estimate * y.scale,
                  validation.method = "SURE",
                  lambdas = lambdas,
