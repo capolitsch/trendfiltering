@@ -18,4 +18,4 @@ devtools::install_github("capolitsch/trendfiltering")
 
 4. Ramdas & Tibshirani (2016). Fast and Flexible ADMM Algorithms for Trend Filtering.
 *Journal of Computational and Graphical Statistics*, 25(3), p. 839-858.
-[[Link](https://amstat.tandfonline.com/doi/abs/10.1080/10618600.2015.1054033#.XfJpNpNKju0)] [[*glmgen* R package](https://github.com/glmgen/glmgen)]
+[[Paper](https://amstat.tandfonline.com/doi/abs/10.1080/10618600.2015.1054033#.XfJpNpNKju0)] [[*glmgen* R package](https://github.com/glmgen/glmgen)]
