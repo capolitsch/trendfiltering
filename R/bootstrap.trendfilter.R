@@ -12,7 +12,7 @@
 #' @param return.full.ensemble \loadmathjax Logical. If `TRUE`, the full trend
 #' filtering bootstrap ensemble is returned as an \mjseqn{n \times B} matrix,
 #' less any columns from post-hoc pruning (see `prune` below). Defaults to
-#' `return.full.ensemble = FALSE`.
+#' `return.full.ensemble = FALSE` to save memory.
 #' @param prune Logical. If `TRUE`, then the trend filtering bootstrap
 #' ensemble is examined for rare instances in which the optimization has
 #' stopped at zero knots (likely erroneously), and removes them from the
@@ -190,6 +190,7 @@ bootstrap.estimator <- function(b) {
   tf.estimator(data = sampler(data.scaled), obj = obj, mode = "edf")
 }
 
+#' @importFrom glmgen trendfilter
 tf.estimator <- function(data, obj, mode = "lambda") {
   if (mode == "edf") {
     tf.fit <- trendfilter(

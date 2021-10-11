@@ -31,7 +31,7 @@ details below for recommendations on when each option is appropriate.}
 \item{return.full.ensemble}{\loadmathjax Logical. If \code{TRUE}, the full trend
 filtering bootstrap ensemble is returned as an \mjseqn{n \times B} matrix,
 less any columns from post-hoc pruning (see \code{prune} below). Defaults to
-\code{return.full.ensemble = FALSE}.}
+\code{return.full.ensemble = FALSE} to save memory.}
 
 \item{prune}{Logical. If \code{TRUE}, then the trend filtering bootstrap
 ensemble is examined for rare instances in which the optimization has
