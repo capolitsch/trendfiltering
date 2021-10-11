@@ -7,6 +7,6 @@ citEntry(entry = "Misc",
          title = "trendfiltering: Denoising 1D signals, the state of the art",
          year = "2021",
          url = "https://github.com/capolitsch/trendfiltering",
-         textVersion = "C.A. Politsch (2021). trendfiltering: Denoising 1D signals, the state of the art. R package version 0.1.0."
+         textVersion = "C.A. Politsch (2021). trendfiltering: Denoising 1D signals, the state of the art. R package version 0.1.0.",
          note = note,
          key = "trendfiltering")
