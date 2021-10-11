@@ -339,6 +339,7 @@ SURE.trendfilter <- function(x, y, weights,
     thinning = thinning, control = ADMM.params
   )
 
+  # Return the objective tolerance to its previous setting
   ADMM.params$obj_tol <- ADMM.params$obj_tol * 1e2
 
   tf.estimate <- glmgen:::predict.trendfilter(out,

@@ -226,6 +226,12 @@
 #' @examples
 #' data(eclipsing_binary)
 #'
+#' # |      phase|      flux|  std.err|
+#' # |----------:|---------:|--------:|
+#' # | -0.4986308| 0.9384845| 0.010160|
+#' # | -0.4978067| 0.9295757| 0.010162|
+#' # | -0.4957892| 0.9438493| 0.010162|
+#'
 #' opt <- cv.trendfilter(EB$phase, EB$flux, 1 / EB$std.err^2,
 #'   validation.functional = "MAE",
 #'   optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T)
@@ -313,7 +319,7 @@ cv.trendfilter <- function(x, y, weights,
 
   thinning <- optimization.params$thinning
   optimization.params$thinning <- NULL
-  ADMM.params <- trendfilter.control.list(optimization.params)
+  ADMM.params <- do.call(trendfilter.control.list, optimization.params)
   x.scale <- median(diff(data$x))
   y.scale <- median(abs(data$y)) / 10
   ADMM.params$x_tol <- ADMM.params$x_tol / x.scale
@@ -435,6 +441,7 @@ cv.trendfilter <- function(x, y, weights,
     control = optimization.params
   )
 
+  # Return the objective tolerance to its previous setting
   obj$optimization.params$obj_tol <- obj$optimization.params$obj_tol * 1e2
 
   obj$data.scaled$fitted.values <- glmgen:::predict.trendfilter(out,
@@ -486,23 +493,24 @@ trendfilter.validate <- function(validation.index, data.folded, obj) {
     obj$validation.functional == "WMAE" ~ list(WMAE)
   )[[1]]
 
-  validation.error.mat <- loss.func(data.validate$y, tf.validate.preds, data.validate$weights) %>%
-    colSums() %>%
+  validation.errors <- loss.func(data.validate$y, tf.validate.preds, data.validate$weights) %>%
     as.double()
+
+  validation.errors <- apply(validation.error.mat, 2, mean)
 }
 
 MSE <- function(y, tf.estimate, weights) {
-  (tf.estimate - y)^2
+  colMeans( (tf.estimate - y)^2 )
 }
 
 MAE <- function(y, tf.estimate, weights) {
-  abs(tf.estimate - y)
+  colMeans( abs(tf.estimate - y) )
 }
 
 WMSE <- function(y, tf.estimate, weights) {
-  (tf.estimate - y)^2 * weights / sum(weights)
+  colSums( (tf.estimate - y)^2 * weights / sum(weights) )
 }
 
 WMAE <- function(y, tf.estimate, weights) {
-  abs(tf.estimate - y) * sqrt(weights) / sum(sqrt(weights))
+  colSums( abs(tf.estimate - y) * sqrt(weights) / sum(sqrt(weights)) )
 }

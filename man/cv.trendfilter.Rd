@@ -223,6 +223,12 @@ sensitive to outliers than squared error.
 \examples{
 data(eclipsing_binary)
 
+# |      phase|      flux|  std.err|
+# |----------:|---------:|--------:|
+# | -0.4986308| 0.9384845| 0.010160|
+# | -0.4978067| 0.9295757| 0.010162|
+# | -0.4957892| 0.9438493| 0.010162|
+
 opt <- cv.trendfilter(EB$phase, EB$flux, 1 / EB$std.err^2,
   validation.functional = "MAE",
   optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T)
