@@ -273,7 +273,6 @@ SURE.trendfilter <- function(x, y, weights,
   y <- y %>% as.double()
   weights <- weights %>% as.double()
   k <- k %>% as.integer()
-  V <- V %>% as.integer()
 
   data <- tibble(x, y, weights) %>%
     arrange(x) %>%

@@ -1,6 +1,16 @@
-citHeader("To cite the modeltools package in publications use:")
+citHeader("To cite the trendfiltering package in publications use:")
 
 note <- sprintf("R package version %s", meta$Version)
+
+citEntry(entry = "book",
+  author = "Hadley Wickham",
+  title = "ggplot2: Elegant Graphics for Data Analysis",
+  publisher = "Springer-Verlag New York",
+  year = "2016",
+  isbn = "978-3-319-24277-4",
+  url = "https://ggplot2.tidyverse.org",
+  textVersion = "H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016."
+)
 
 bibentry(bibtype = "Manual",
          title = "trendfiltering: Denoising one-dimensional signals with trend filtering",
