@@ -1,1 +1,1 @@
-# trendfiltering <tt>R</tt> package
+# trendfiltering R package
