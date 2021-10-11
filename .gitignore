@@ -37,6 +37,3 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
-
-# roxygen-generated Rd file that requires manual corrections before pushing
-man/SURE.trendfilter.Rd
