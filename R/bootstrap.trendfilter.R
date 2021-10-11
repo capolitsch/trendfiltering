@@ -1,5 +1,4 @@
-#' Obtain pointwise uncertainty bands by bootstrapping the optimized trend
-#' filtering estimator
+#' Construct pointwise variability bands via a bootstrap
 #'
 #' @param obj An object of class '\link{SURE.trendfilter}' or
 #' '\link{cv.trendfilter}'.
@@ -10,9 +9,9 @@
 #' @param bootstrap.algorithm A string specifying which variation of the
 #' bootstrap to use. One of `c("nonparametric","parametric","wild")`. See
 #' details below for recommendations on when each option is appropriate.
-#' @param return.full.ensemble Logical. If `TRUE`, the full trend filtering
-#' bootstrap ensemble is returned as an \mjseqn{n \times B} matrix, less
-#' any columns from post-hoc pruning (see `prune` below). Defaults to
+#' @param return.full.ensemble \loadmathjax Logical. If `TRUE`, the full trend
+#' filtering bootstrap ensemble is returned as an \mjseqn{n \times B} matrix,
+#' less any columns from post-hoc pruning (see `prune` below). Defaults to
 #' `return.full.ensemble = FALSE`.
 #' @param prune Logical. If `TRUE`, then the trend filtering bootstrap
 #' ensemble is examined for rare instances in which the optimization has
@@ -22,10 +21,10 @@
 #' @param mc.cores Parallel computing: The number of cores to utilize. Defaults
 #' to the number of cores detected.
 #'
-#' @details \loadmathjax Our recommendations for when to use
-#' \code{\link{cv.trendfilter}} vs. `SURE.trendfilter`, as well as each of the
-#' available settings for `bootstrap.algorithm` are shown in the table below.
-#' See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
+#' @details Our recommendations for when to use \code{\link{cv.trendfilter}} vs.
+#' `SURE.trendfilter`, as well as each of the available settings for
+#' `bootstrap.algorithm` are shown in the table below. See
+#' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
 #' for more details.
 #'
 #' | Scenario                                                          | Hyperparameter optimization | `bootstrap.algorithm` |
@@ -33,14 +32,6 @@
 #' | `x` is irregularly sampled                                        | `cv.trendfilter`            | "nonparametric"       |
 #' | `x` is regularly sampled & reciprocal variances are not available | `cv.trendfilter`            | "wild"                |
 #' | `x` is regularly sampled & reciprocal variances are available     | `SURE.trendfilter`          | "parametric"          |
-#'
-#' Given the full trend filtering bootstrap ensemble provided by the relevant
-#' bootstrap algorithm, for any \mjseqn{\alpha\in(0,1)}, a
-#' \mjseqn{(1-\alpha)\cdot100}% pointwise variability band is
-#' given by
-#' \mjsdeqn{B_{1-\alpha}(x_i') = \left(\widehat{f}_{\alpha/2}(x_i'),\;\widehat{f}_{1-\alpha/2}(x_i')\right), \quad\quad i = 1,\dots,m}
-#' where
-#' \mjsdeqn{\widehat{f}_{\beta}(x_i') = \inf_{g}\left\{g : \frac{1}{B} \sum_{b=1}^{B} \mathbbm{1}\big\{\widehat{f}_{b}(x_i') \leq g\big\} \geq \beta \right\}, \quad\quad \beta\in(0,1).}
 #'
 #' @return An object of class 'bootstrap.trendfilter'. This is a comprehensive
 #' list containing all of the analysis important information, data, and
@@ -58,8 +49,8 @@
 #' variability bands.}
 #' \item{tf.bootstrap.ensemble}{If `return.full.ensemble = TRUE`, the
 #' full trend filtering bootstrap ensemble as an \mjseqn{n \times B} matrix,
-#' less any columns from post-hoc pruning (if `prune = TRUE`). If
-#' `return.full.ensemble = FALSE`, then this will return `NULL`.}
+#' less any columns from post-hoc pruning (if `prune = TRUE`). Else, this will
+#' return `NULL`.}
 #' \item{edf.boots}{An integer vector of the estimated number of effective
 #' degrees of freedom of each trend filtering bootstrap estimate. These should
 #' all be relatively close to `edf.min` (below).}

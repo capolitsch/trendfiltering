@@ -2,8 +2,7 @@
 % Please edit documentation in R/bootstrap.trendfilter.R
 \name{bootstrap.trendfilter}
 \alias{bootstrap.trendfilter}
-\title{Obtain pointwise uncertainty bands by bootstrapping the optimized trend
-filtering estimator}
+\title{Construct pointwise variability bands via a bootstrap}
 \usage{
 bootstrap.trendfilter(
   obj,
@@ -29,9 +28,9 @@ variability bands. Defaults to \code{B = 100}.}
 bootstrap to use. One of \code{c("nonparametric","parametric","wild")}. See
 details below for recommendations on when each option is appropriate.}
 
-\item{return.full.ensemble}{Logical. If \code{TRUE}, the full trend filtering
-bootstrap ensemble is returned as an \mjseqn{n \times B} matrix, less
-any columns from post-hoc pruning (see \code{prune} below). Defaults to
+\item{return.full.ensemble}{\loadmathjax Logical. If \code{TRUE}, the full trend
+filtering bootstrap ensemble is returned as an \mjseqn{n \times B} matrix,
+less any columns from post-hoc pruning (see \code{prune} below). Defaults to
 \code{return.full.ensemble = FALSE}.}
 
 \item{prune}{Logical. If \code{TRUE}, then the trend filtering bootstrap
@@ -60,8 +59,8 @@ bootstrap was used to obtain the variability bands.}
 variability bands.}
 \item{tf.bootstrap.ensemble}{If \code{return.full.ensemble = TRUE}, the
 full trend filtering bootstrap ensemble as an \mjseqn{n \times B} matrix,
-less any columns from post-hoc pruning (if \code{prune = TRUE}). If
-\code{return.full.ensemble = FALSE}, then this will return \code{NULL}.}
+less any columns from post-hoc pruning (if \code{prune = TRUE}). Else, this will
+return \code{NULL}.}
 \item{edf.boots}{An integer vector of the estimated number of effective
 degrees of freedom of each trend filtering bootstrap estimate. These should
 all be relatively close to \code{edf.min} (below).}
@@ -79,29 +78,19 @@ filtering estimate.}
 function documentation for details.}
 }
 \description{
-Obtain pointwise uncertainty bands by bootstrapping the optimized trend
-filtering estimator
+Construct pointwise variability bands via a bootstrap
 }
 \details{
-\loadmathjax Our recommendations for when to use
-\code{\link{cv.trendfilter}} vs. \code{SURE.trendfilter}, as well as each of the
-available settings for \code{bootstrap.algorithm} are shown in the table below.
-See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
+Our recommendations for when to use \code{\link{cv.trendfilter}} vs.
+\code{SURE.trendfilter}, as well as each of the available settings for
+\code{bootstrap.algorithm} are shown in the table below. See
+\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
 for more details.\tabular{lrr}{
    Scenario \tab Hyperparameter optimization \tab \code{bootstrap.algorithm} \cr
    \code{x} is irregularly sampled \tab \code{cv.trendfilter} \tab "nonparametric" \cr
    \code{x} is regularly sampled & reciprocal variances are not available \tab \code{cv.trendfilter} \tab "wild" \cr
    \code{x} is regularly sampled & reciprocal variances are available \tab \code{SURE.trendfilter} \tab "parametric" \cr
 }
-
-
-Given the full trend filtering bootstrap ensemble provided by the relevant
-bootstrap algorithm, for any \mjseqn{\alpha\in(0,1)}, a
-\mjseqn{(1-\alpha)\cdot100}\% pointwise variability band is
-given by
-\mjsdeqn{B_{1-\alpha}(x_i') = \left(\widehat{f}\emph{{\alpha/2}(x_i'),\;\widehat{f}}{1-\alpha/2}(x_i')\right), \quad\quad i = 1,\dots,m}
-where
-\mjsdeqn{\widehat{f}\emph{{\beta}(x_i') = \inf}{g}\left\{g : \frac{1}{B} \sum_{b=1}^{B} \mathbbm{1}\big\{\widehat{f}_{b}(x_i') \leq g\big\} \geq \beta \right\}, \quad\quad \beta\in(0,1).}
 }
 \examples{
 data(quasar_spectrum)
