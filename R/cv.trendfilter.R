@@ -330,7 +330,7 @@ cv.trendfilter <- function(x, y, weights,
     group_split(sample(rep_len(1:V, nrow(data.scaled))), .keep = FALSE)
 
   if (missing(lambdas)) {
-    lambdas <- seq(16, -10, length = nlambdas) %>% exp()
+    lambdas <- exp(seq(16, -10, length = nlambdas))
   } else {
     lambdas <- lambdas %>%
       as.double() %>%
@@ -372,8 +372,7 @@ cv.trendfilter <- function(x, y, weights,
 
   cv.out <- matrix(unlist(mclapply(1:(obj$V),
     FUN = trendfilter.validate,
-    data.folded = data.folded, obj = obj,
-    mc.cores = mc.cores
+    data.folded = data.folded, obj = obj, mc.cores = mc.cores
   )),
   ncol = obj$V
   )

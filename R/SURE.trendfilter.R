@@ -282,7 +282,7 @@ SURE.trendfilter <- function(x, y, weights,
   rm(x, y, weights)
 
   if (missing(lambdas)) {
-    lambdas <- seq(16, -10, length = nlambdas) %>% exp()
+    lambdas <- exp(seq(16, -10, length = nlambdas))
   } else {
     lambdas <- lambdas %>%
       as.double() %>%
@@ -319,7 +319,7 @@ SURE.trendfilter <- function(x, y, weights,
     as.double()
   optimisms <- 2 * out$df / nrow(data) * mean(1 / data.scaled$weights) %>% as.double()
   generalization.errors <- training.errors + optimisms
-  edfs <- out$df
+  edfs <- out$df %>% as.integer()
   n.iter <- out$iter %>% as.integer()
   i.min <- min(which.min(generalization.errors)) %>% as.integer()
   lambda.min <- lambdas[i.min]
