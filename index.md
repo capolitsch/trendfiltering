@@ -1,1 +1,1 @@
-# trendfiltering R package
+# trendfiltering
