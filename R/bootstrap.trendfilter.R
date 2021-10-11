@@ -135,30 +135,27 @@
 #'
 #' opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
 #' boot.out <- bootstrap.trendfilter(SURE.out, bootstrap.algorithm = "parametric")
-
-
 #' @importFrom glmgen trendfilter
 #' @importFrom dplyr %>% mutate case_when select n
 #' @importFrom tidyr tibble
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats quantile rnorm
 bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
-                                  bootstrap.algorithm = c("nonparametric","parametric","wild"),
+                                  bootstrap.algorithm = c("nonparametric", "parametric", "wild"),
                                   return.full.ensemble = FALSE, prune = TRUE,
-                                  mc.cores = detectCores()){
-
-  stopifnot( class(obj) %in% c("SURE.trendfilter","cv.trendfilter") )
+                                  mc.cores = detectCores()) {
+  stopifnot(class(obj) %in% c("SURE.trendfilter", "cv.trendfilter"))
   bootstrap.algorithm <- match.arg(bootstrap.algorithm)
-  stopifnot( is.numeric(level) & level > 0 & level < 1 )
-  stopifnot( B >= 10 )
+  stopifnot(is.double(level) & level > 0 & level < 1)
+  stopifnot(B >= 10)
 
-  if ( !prune ) warning("I hope you know what you are doing!")
+  if (!prune) warning("I hope you know what you are doing!")
 
-  if ( mc.cores < detectCores() ){
+  if (mc.cores < detectCores()) {
     warning(paste0("Your machine has ", detectCores(), " cores. Consider increasing mc.cores to speed up computation."))
   }
 
-  if ( mc.cores > detectCores() ) mc.cores <- detectCores()
+  if (mc.cores > detectCores()) mc.cores <- detectCores()
 
   sampler <- case_when(
     bootstrap.algorithm == "nonparametric" ~ list(nonparametric.resampler),
@@ -171,85 +168,92 @@ bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
 
   par.out <- mclapply(1:B, bootstrap.estimator, mc.cores = mc.cores)
   tf.boot.ensemble <- lapply(X = 1:B, FUN = function(X) par.out[[X]][["tf.estimate"]]) %>%
-    unlist %>%
+    unlist() %>%
     matrix(nrow = length(obj$x.eval))
 
   obj$edf.boots <- lapply(X = 1:B, FUN = function(X) par.out[[X]][["edf"]]) %>%
-    unlist %>%
-    as.integer
+    unlist() %>%
+    as.integer()
   obj$n.iter.boots <- lapply(X = 1:B, FUN = function(X) par.out[[X]][["n.iter"]]) %>%
-    unlist %>%
-    as.integer
+    unlist() %>%
+    as.integer()
 
-  obj$n.pruned <- (B - ncol(tf.boot.ensemble)) %>% as.integer
+  obj$n.pruned <- (B - ncol(tf.boot.ensemble)) %>% as.integer()
   obj$tf.standard.errors <- apply(tf.boot.ensemble, 1, sd)
   obj$bootstrap.lower.band <- apply(tf.boot.ensemble, 1, quantile, probs = (1 - level) / 2)
   obj$bootstrap.upper.band <- apply(tf.boot.ensemble, 1, quantile, probs = 1 - (1 - level) / 2)
 
   obj <- c(obj, list(bootstrap.algorithm = bootstrap.algorithm, level = level, B = B))
 
-  if ( return.full.ensemble ){
+  if (return.full.ensemble) {
     obj$tf.bootstrap.ensemble <- tf.boot.ensemble
-  }else{
+  } else {
     obj <- c(obj, list(tf.bootstrap.ensemble = NULL))
   }
 
-  obj <- obj[c("x.eval","tf.estimate","tf.standard.errors","bootstrap.lower.band",
-               "bootstrap.upper.band","bootstrap.algorithm","level","B",
-               "edf.boots","tf.bootstrap.ensemble","prune","n.pruned","x","y",
-               "weights","fitted.values","residuals","k","lambdas","lambda.min",
-               "edfs","edf.min","i.min","validation.method","errors",
-               "optimization.params","n.iter","n.iter.boots","x.scale","y.scale",
-               "data.scaled")]
+  obj <- obj[c(
+    "x.eval", "tf.estimate", "tf.standard.errors", "bootstrap.lower.band",
+    "bootstrap.upper.band", "bootstrap.algorithm", "level", "B",
+    "edf.boots", "tf.bootstrap.ensemble", "prune", "n.pruned", "x", "y",
+    "weights", "fitted.values", "residuals", "k", "lambdas", "lambda.min",
+    "edfs", "edf.min", "i.min", "validation.method", "errors",
+    "optimization.params", "n.iter", "n.iter.boots", "x.scale", "y.scale",
+    "data.scaled"
+  )]
   class(obj) <- "bootstrap.trendfilter"
   return(obj)
 }
 
 
-bootstrap.estimator <- function(b){
+bootstrap.estimator <- function(b) {
   tf.estimator(data = sampler(data.scaled), obj = obj, mode = "edf")
 }
 
 
-tf.estimator <- function(data, obj, mode = "lambda"){
+tf.estimator <- function(data, obj, mode = "lambda") {
+  if (mode == "edf") {
+    tf.fit <- trendfilter(
+      x = data$x,
+      y = data$y,
+      weights = data$weights,
+      k = obj$k,
+      lambda = obj$lambdas,
+      thinning = obj$thinning,
+      control = obj$optimization.params
+    )
 
-  if ( mode == "edf" ){
-    tf.fit <- trendfilter(x = data$x,
-                          y = data$y,
-                          weights = data$weights,
-                          k = obj$k,
-                          lambda = obj$lambdas,
-                          thinning = obj$thinning,
-                          control = obj$optimization.params)
-
-    i.min <- which.min( abs(tf.fit$df - obj$edf.min) )
+    i.min <- which.min(abs(tf.fit$df - obj$edf.min))
     lambda.min <- obj$lambdas[i.min]
     edf.min <- tf.fit$df[i.min]
     n.iter <- tf.fit$iter[i.min]
 
-    if ( obj$prune && edf.min <= 2 ){
+    if (obj$prune && edf.min <= 2) {
       return(list(tf.estimate = integer(0), df = NA, n.iter = NA))
     }
   }
 
-  if ( mode == "lambda" ){
-    tf.fit <- trendfilter(x = data$x,
-                          y = data$y,
-                          weights = data$weights,
-                          k = obj$k,
-                          lambda = obj$lambda.min,
-                          thinning = obj$thinning,
-                          control = obj$optimization.params)
+  if (mode == "lambda") {
+    tf.fit <- trendfilter(
+      x = data$x,
+      y = data$y,
+      weights = data$weights,
+      k = obj$k,
+      lambda = obj$lambda.min,
+      thinning = obj$thinning,
+      control = obj$optimization.params
+    )
 
     lambda.min <- obj$lambda.min
     edf.min <- tf.fit$df
     n.iter <- as.integer(tf.fit$iter)
   }
 
-  tf.estimate <- glmgen:::predict.trendfilter(object = tf.fit,
-                                              x.new = obj$x.eval / obj$x.scale,
-                                              lambda = lambda.min) %>%
-    as.numeric
+  tf.estimate <- glmgen:::predict.trendfilter(
+    object = tf.fit,
+    x.new = obj$x.eval / obj$x.scale,
+    lambda = lambda.min
+  ) %>%
+    as.double()
 
   return(list(tf.estimate = tf.estimate * obj$y.scale, edf = edf.min, n.iter = n.iter))
 }
@@ -268,31 +272,31 @@ tf.estimator <- function(data, obj, mode = "lambda"){
 #' @importFrom dplyr %>% mutate n
 #' @rdname samplers
 #' @export
-parametric.sampler <- function(data){
+parametric.sampler <- function(data) {
   data %>% mutate(y = fitted.values + rnorm(n = n(), sd = 1 / sqrt(weights)))
 }
 
 #' @importFrom dplyr %>% slice_sample n
 #' @rdname samplers
 #' @export
-nonparametric.resampler <- function(data){
+nonparametric.resampler <- function(data) {
   data %>% slice_sample(n = n(), replace = TRUE)
 }
 
 #' @importFrom dplyr %>% mutate n
 #' @rdname samplers
 #' @export
-wild.sampler <- function(data){
+wild.sampler <- function(data) {
   data %>% mutate(y = fitted.values + residuals *
-                    sample(x = c(
-                      (1 + sqrt(5)) / 2,
-                      (1 - sqrt(5)) / 2
-                    ),
-                    size = n(), replace = TRUE,
-                    prob = c(
-                      (1 + sqrt(5)) / (2 * sqrt(5)),
-                      (sqrt(5) - 1) / (2 * sqrt(5))
-                    )
-                    )
-  )
+    sample(
+      x = c(
+        (1 + sqrt(5)) / 2,
+        (1 - sqrt(5)) / 2
+      ),
+      size = n(), replace = TRUE,
+      prob = c(
+        (1 + sqrt(5)) / (2 * sqrt(5)),
+        (sqrt(5) - 1) / (2 * sqrt(5))
+      )
+    ))
 }

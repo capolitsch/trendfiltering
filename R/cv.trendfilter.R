@@ -8,34 +8,47 @@
 #' @param x Vector of observed values for the input variable.
 #' @param y Vector of observed values for the output variable.
 #' @param weights Weights for the observed outputs, defined as the reciprocal
-#' variance of the error distribution. `weights` can be passed as a scalar when
-#' all errors are believed to have equal variance. Otherwise, `weights` must
-#' have the same length as `x` and `y`.
+#' variance of the additive noise that contaminates the signal. `weights` can be
+#' passed as a scalar when the noise is expected to have equal variance for all
+#' observations. Otherwise, `weights` must have the same length as `x` and `y`.
 #' @param k Degree of the piecewise polynomials that make up the trend
 #' filtering estimate. Defaults to `k = 2` (i.e. a piecewise quadratic
 #' estimate). Must be one of `k = 0,1,2`. Higher order polynomials are
 #' disallowed since their smoothness is indistinguishable from `k = 2` and
 #' their use can lead to instability in the convex optimization.
 #' @param nlambdas The number of hyperparameter settings to test during
-#' validation. When `lambdas` is left blank (highly recommended for general use),
-#' the grid is automatically chosen by `cv.trendfilter`, with `nlambdas`
-#' controlling the granularity of the grid.
-#' @param lambdas Overrides `nlambdas` if passed. The vector of trend filtering
-#' hyperparameter values for the grid search. Use is discouraged unless you
-#' know what you are doing.
-#' @param x.eval A grid of inputs to evaluate the optimized trend filtering
-#' estimate on. May be ignored, in which case the grid is determined by
-#' `nx.eval`.
+#' validation. When nothing is passed to `lambdas` (highly recommended for
+#' general use), the grid is automatically constructed by `SURE.trendfilter`,
+#' with `nlambdas` controlling the granularity of the grid.
+#' @param lambdas (Optional) Overrides `nlambdas` if passed. The vector of trend
+#' filtering hyperparameter values for the grid search. Use of this argument is
+#' discouraged unless you know what you are doing.
+#' @param x.eval (Optional) A grid of inputs to evaluate the optimized trend
+#' filtering estimate on. May be ignored, in which case the grid is determined
+#' by `nx.eval`.
 #' @param nx.eval Integer. If nothing is passed to `x.eval`, then it is defined
 #' as `x.eval = seq(min(x), max(x), length = nx.eval)`.
-#' @param V The number of folds the data are split into for the V-fold cross
-#' validation. Defaults to `V = 10` (recommended).
-#' @param loss.metric Type of error to optimize during cross
-#' validation. One of `c("MAE","MSE","WMAE","WMSE")`, i.e. mean-absolute
-#' deviations error, mean-squared error, and their weighted counterparts.
-#' Defaults to `"WMAE"`.
+#' @param V Number of folds the data are partitioned into for the V-fold cross
+#' validation. Defaults to `V = 10`.
+#' @param validation.functional Loss functional to optimize during cross
+#' validation. Some common choices can be used by passing an appropriate string
+#' --- one of `c("MAE","MSE","WMAE","WMSE")`, i.e. mean-absolute deviations
+#' error, mean-squared error, and their weighted counterparts. Defaults to
+#' `validation.functional = "WMAE"`.
+#'
+#' Custom validation loss functionals can used by instead passing a function to
+#' `validation.functional`. The function should take three arguments --- `y`,
+#' `tf.estimate`, and `weights` --- and return a single scalar value for the
+#' validation loss. For example, `validation.functional = "WMAE"` is equivalent
+#' to passing the following function to `validation.functional`:
+#' ```{r, eval = F}
+#' function(y, tf.estimate, weights){
+#'   sum( abs(y - tf.estimate) * sqrt(weights) / sum(sqrt(weights)) )
+#' }
+#' ```
 #' @param lambda.choice One of `c("lambda.min","lambda.1se")`. The choice
 #' of hyperparameter that is used for optimized trend filtering estimate.
+#' Defaults to `lambda.min`.
 #' \itemize{
 #' \item{`lambda.min`}: The hyperparameter value that minimizes the cross
 #' validation error curve.
@@ -44,26 +57,34 @@
 #' error. This choice therefore favors simpler (i.e. smoother) trend filtering
 #' estimates. The motivation here is essentially Occam's razor: the two models
 #' yield results that are quantitatively very close, so we favor the simpler
-#' model.}
-#' @param optimization.params A named list of parameters that contains all
-#' parameter choices to be passed to the trend filtering ADMM algorithm
+#' model. See Section 7.10 of
+#' [Hastie, Tibshirani, and Friedman (2009)](https://web.stanford.edu/~hastie/Papers/ESLII.pdf)
+#' for more details on the ``one-standard-error rule''.}
+#' @param mc.cores Parallel computing: The number of cores to utilize. Defaults
+#' to the number of cores detected on the machine.
+#' @param optimization.params A named list of parameter choices to be passed to
+#' the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
 #' Tibshirani 2016}). See the [glmgen::trendfilter.control.list()]
-#' documentation for full details.
-#' No technical understanding of the ADMM algorithm is needed and the default
-#' parameter choices will almost always suffice. However, the following
-#' parameters may require some adjustments to ensure that your trend filtering
-#' estimate has sufficiently converged:
+#' documentation for full details. No technical understanding of the ADMM
+#' algorithm is needed and the default parameter choices will almost always
+#' suffice. However, the following parameters may require some adjustments to
+#' ensure that your trend filtering estimate has sufficiently converged:
 #' \enumerate{
-#' \item{`max_iter`}: Maximum iterations allowed for the trend filtering
-#' convex optimization. Defaults to `max_iter = 600L`. Increase this if
-#' the trend filtering estimate does not appear to have fully converged to a
-#' reasonable estimate of the signal.
+#' \item{`max_iter`}: Maximum iterations allowed for the trend filtering convex
+#' optimization. Defaults to `max_iter = 600L`. See the `n.iter` element
+#' of the function output for the actual number of iterations taken for every
+#' hyperparameter choice in `lambdas`. If any of the elements of `n.iter` are
+#' equal to `max_iter`, the objective function's tolerance has not been
+#' achieved and `max_iter` may need to be increased.
 #' \item{`obj_tol`}: The tolerance used in the convex optimization stopping
 #' criterion; when the relative change in the objective function is less than
-#' this value, the algorithm terminates. Decrease this if the trend filtering
-#' estimate does not appear to have fully converged to a reasonable estimate of
-#' the signal.
+#' this value, the algorithm terminates. Thus, decreasing this setting will
+#' increase the precision of the solution returned by the optimization. Defaults
+#' to `obj_tol = 1e-10`. If the returned trend filtering estimate does not
+#' appear to have fully converged to a reasonable estimate of the signal, this
+#' issue can be resolve by some combination of decreasing `obj_tol` and
+#' increasing `max_iter`.
 #' \item{`thinning`}: Logical. If `TRUE`, then the data are preprocessed so that
 #' a smaller, better conditioned data set is used for fitting. When left `NULL`
 #' (the default setting), the optimization will automatically detect whether
@@ -72,71 +93,20 @@
 #' controlled by the `x_tol` argument below.
 #' \item{`x_tol`}: Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
-#' elements of `x` that fall into the same bin, then we thin the data.
-#' }
-#' @param mc.cores Parallel computing: The number of cores to utilize. Defaults
-#' to the number of cores detected.
-#' @param ... Additional named arguments to be passed to
-#' [glmgen::trendfilter.control.list()].
+#' elements of `x` that fall into the same bin, then we thin the data.}
 #'
-#' @return An object of class 'cv.trendfilter'. This is a list with the
-#' following elements:
-#' \item{x.eval}{Input grid to evaluate the optimized trend filtering estimate
-#' on.}
-#' \item{tf.estimate}{Optimized trend filtering estimate, evaluated at `x.eval`.}
-#' \item{validation.method}{\code{paste0(V,"-fold CV")}}
-#' \item{V}{The number of folds the data are split into for the V-fold cross
-#' validation.}
-#' \item{loss.metric}{Type of error that validation was performed on.
-#' One of \code{c("WMAE","WMSE","MAE","MSE")}.}
-#' \item{lambdas}{Vector of hyperparameter values tested during validation. This
-#' vector will always be returned in descending order, regardless of the
-#' ordering provided by the user. The indices `i.min` and `i.1se` correspond to
-#' this descending ordering.}
-#' \item{errors}{Vector of cross validation errors for the given hyperparameter
-#' values.}
-#' \item{se.errors}{The standard errors of the cross validation errors.
-#' These are particularly useful for implementing the ``1-standard-error rule''.
-#' The 1-SE rule favors a smoother trend filtering estimate by, instead of
-#' using the hyperparameter that minimizes the CV error, instead uses the
-#' largest hyperparameter that has a CV error within 1 standard error of the
-#' smallest CV error.}
-#' \item{lambda.min}{Hyperparameter value that minimizes the SURE error curve.}
-#' \item{lambda.1se}{The largest hyperparameter value that is still within one
-#' standard error of the minimum hyperparameter's cross validation error.}
-#' \item{lambda.choice}{One of `c("lambda.min","lambda.1se")`. The choice
-#' of hyperparameter that is used for optimized trend filtering estimate.}
-#' \item{edfs}{Vector of effective degrees of freedom for trend filtering
-#' estimators fit during validation.}
-#' \item{edf.min}{The effective degrees of freedom of the optimally-tuned trend
-#' filtering estimator.}
-#' \item{edf.1se}{The effective degrees of freedom of the 1-stand-error rule
-#' trend filtering estimator.}
-#' \item{i.min}{The index of `lambdas` that minimizes the cross validation error.}
-#' \item{i.1se}{The index of `lambdas` that gives the largest hyperparameter
-#' value that has a cross validation error within 1 standard error of the
-#' minimum of the cross validation error curves.}
-#' \item{x}{Vector of observed inputs.}
-#' \item{y}{Vector of observed outputs.}
-#' \item{weights}{A vector of weights for the observed outputs. These are
-#' defined as `weights = 1 / sigmas^2`, where `sigmas` is a vector of
-#' standard errors of the uncertainty in the observed outputs.}
-#' \item{fitted.values}{The optimized trend filtering estimate of the signal,
-#' evaluated at the observed inputs `x`.}
-#' \item{residuals}{`residuals = y - fitted.values`}
-#' \item{k}{The degree of the trend filtering estimator.}
-#' \item{optimization.params}{A list of parameters that control the trend
-#' filtering convex optimization.}
-#' \item{n.iter}{Vector of the number of iterations needed for the ADMM
-#' algorithm to converge within the given tolerance, for each hyperparameter
-#' value. If many of these are exactly equal to `max_iter`, then their
-#' solutions have not converged with the tolerance specified by `obj_tol`.
-#' In which case, it is often prudent to increase `max_iter`.}
-#' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so
-#' that a smaller, better conditioned data set is used for fitting.}
-#' \item{x.scale, y.scale, data.scaled}{For internal use.}
+#' @details \loadmathjax Our recommendations for when to use
+#' \code{\link{cv.trendfilter}} vs. `SURE.trendfilter`, as well as each of the
+#' available settings for `bootstrap.algorithm` are shown in the table below.
+#' The corresponding settings that should be used when constructing bootstrap
+#' variability bands with `bootstrap.trendfilter` are also shown.
 #'
-#' @details \loadmathjax
+#' A regularly-sampled data set with some discarded pixels (either sporadically
+#' or in large consecutive chunks) is still considered regularly sampled. When
+#' the inputs are regularly sampled on a transformed scale, we recommend
+#' transforming to that scale and carrying out the full trend filtering analysis
+#' on that scale. See the example below for a case when the inputs are evenly
+#' sampled on the `log10(x)` scale.
 #'
 #' | Scenario                                                 | Hyperparameter optimization | `bootstrap.algorithm` |
 #' | :------------                                            |     ------------:           |         ------------: |
@@ -144,30 +114,77 @@
 #' | `x` is regularly sampled and `weights` are not available | Use `cv.trendfilter`        | "wild"                |
 #' | `x` is regularly sampled and `weights` are available     | Use `SURE.trendfilter`      | "parametric"          |
 #'
-#' Our recommendations for when to use \code{\link{`cv.trendfilter`}} vs.
-#' `SURE.trendfilter`, as well as each of the settings for `bootstrap.algorithm`
-#' are shown in the table above.
+#' The formal definitions of the common validation loss functionals available
+#' via the options `validation.functional = c("WMAE","WMSE","MAE","MSE")` are
+#' stated below.
 #'
-#' A regularly-sampled data set with some discarded pixels (either sporadically
-#' or in large consecutive chunks) is still considered regularly sampled. When
-#' the inputs are regularly sampled on a transformed scale, we recommend
-#' transforming to that scale and carrying out the full trend filtering analysis
-#' (using `SURE.trendfilter`) on that scale. See the example below for a case
-#' when the inputs are evenly sampled on the `log10(x)` scale.
-#'
-#'  Below we define the various types of validation error that
-#' can be used with `cv.trendfilter` by passing the appropriate string
-#' (one of `c("WMAE","WMSE","MAE","MSE")`) to the `loss.metric`
-#' argument. For the weighted validation errors, `weights` must be passed.
 #' \mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
 #' \mjsdeqn{WMSE(\lambda) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
 #' \mjsdeqn{MAE(\lambda) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|}
 #' \mjsdeqn{MSE(\lambda) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|^2}
 #' where \mjseqn{w_i} is the \mjseqn{i}th element of the `weights` vector.
 #'
-#' Concisely stated, weighting helps combat heteroskedasticity and
-#' absolute error decreases sensitivity to outliers. If `weights = NULL`, then
-#' the weighted and unweighted counterparts are equivalent. \cr
+#' If `weights = NULL`, then the weighted and unweighted counterparts are
+#' equivalent. \cr
+#'
+#' Briefly stated, weighting helps combat heteroskedasticity (varying levels
+#' of uncertainty in the output measurements) and absolute error is less
+#' sensitive to outliers than squared error.
+#'
+#' @return An object of class 'cv.trendfilter'. This is a list with the
+#' following elements:
+#' \item{x.eval}{Input grid used to evaluate the optimized trend filtering
+#' estimate on.}
+#' \item{tf.estimate}{Optimized trend filtering estimate, evaluated at `x.eval`.}
+#' \item{validation.method}{\code{paste0(V,"-fold CV")}}
+#' \item{V}{The number of folds the data are split into for the V-fold cross
+#' validation.}
+#' \item{validation.functional}{Type of error that validation was performed on.
+#' Either one of `c("WMAE","WMSE","MAE","MSE")` or a custom function passed by
+#' the user.}
+#' \item{lambdas}{Vector of hyperparameter values evaluated in the grid search
+#' (always returned in descending order).}
+#' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
+#' estimators fit during validation.}
+#' \item{generalization.errors}{Vector of cross validation estimates of the
+#' trend filtering generalization error, for each hyperparameter value
+#' (ordered corresponding to the descending-ordered `lambdas` vector).}
+#' \item{se.errors}{The standard errors of the cross validation errors.
+#' These are particularly useful for implementing the ``1-standard-error rule''.}
+#' \item{lambda.min}{Hyperparameter value that minimizes the cross validation
+#' generalization error curve.}
+#' \item{lambda.1se}{Largest hyperparameter value that is within one standard
+#' error of the minimum hyperparameter's cross validation error.}
+#' \item{lambda.choice}{One of `c("lambda.min","lambda.1se")`. The choice
+#' of hyperparameter that is used for the returned trend filtering estimate
+#' evaluation `tf.estimate`.}
+#' \item{i.min}{Index of `lambdas` that minimizes the cross validation error.}
+#' \item{i.1se}{Index of `lambdas` that gives the largest hyperparameter
+#' value that has a cross validation error within 1 standard error of the
+#' minimum of the cross validation error curves.}
+#' \item{edf.min}{Effective degrees of freedom of the optimized trend
+#' filtering estimator.}
+#' \item{edf.1se}{Effective degrees of freedom of the 1-stand-error rule
+#' trend filtering estimator.}
+#' \item{n.iter}{The number of iterations needed for the ADMM algorithm to
+#' converge within the given tolerance, for each hyperparameter value. If many
+#' of these are exactly equal to `max_iter`, then their solutions have not
+#' converged with the tolerance specified by `obj_tol`. In which case, it is
+#' often prudent to increase `max_iter`.}
+#' \item{x}{Vector of observed inputs.}
+#' \item{y}{Vector of observed outputs.}
+#' \item{weights}{Weights for the observed outputs, defined as the reciprocal
+#' variance of the additive noise that contaminates the signal.}
+#' \item{fitted.values}{Optimized trend filtering estimate, evaluated at the
+#' observed inputs `x`.}
+#' \item{residuals}{`residuals = y - fitted.values`}
+#' \item{k}{Degree of the trend filtering estimator.}
+#' \item{ADMM.params}{List of parameter settings for the trend filtering ADMM
+#' algorithm, constructed by passing the `optimization.params` list to
+#' [glmgen::trendfilter.control.list()].}
+#' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so that a
+#' smaller, better conditioned data set is used for fitting.}
+#' \item{x.scale, y.scale, data.scaled}{For internal use.}
 #'
 #' @export cv.trendfilter
 #'
@@ -198,8 +215,7 @@
 #' and 7.12)} \cr
 #' \item{James, Witten, Hastie, and Tibshirani (2013).
 #' \href{https://www.statlearning.com/}{An Introduction to Statistical Learning:
-#' with Applications in R}. Springer. (See Section 5.1; Less technical than
-#' ESL)} \cr
+#' with Applications in R}. Springer. (See Section 5.1)} \cr
 #' \item{Tibshirani (2013).
 #' \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
 #' Model selection and validation 2: Model assessment, more cross-validation}.
@@ -210,11 +226,10 @@
 #' @examples
 #' data(eclipsing_binary)
 #'
-#' opt <- cv.trendfilter(EB$phase, EB$flux, 1 / EB$std.err ^ 2,
-#'                       loss.metric = "MAE",
-#'                       optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T))
-
-
+#' opt <- cv.trendfilter(EB$phase, EB$flux, 1 / EB$std.err^2,
+#'   validation.functional = "MAE",
+#'   optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T)
+#' )
 #' @importFrom dplyr mutate arrange case_when group_split bind_rows
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom parallel mclapply detectCores
@@ -223,244 +238,272 @@
 #' @importFrom tidyr tibble drop_na
 cv.trendfilter <- function(x, y, weights,
                            k = 2L, nlambdas = 250L, lambdas,
-                           V = 10L, lambda.choice = c("lambda.min","lambda.1se"),
-                           loss.metric = c("WMAE","WMSE","MAE","MSE"),
+                           V = 10L, lambda.choice = c("lambda.min", "lambda.1se"),
+                           validation.functional = "WMAE",
                            x.eval, nx.eval = 1500L,
-                           optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
                            mc.cores = detectCores(),
-                           ...){
+                           optimization.params = list(max_iter = 600L, obj_tol = 1e-10)) {
+  if (missing(x) || is.null(x)) stop("x must be passed.")
+  if (missing(y) || is.null(y)) stop("y must be passed.")
+  if (length(x) != length(y)) stop("x and y must have equal length.")
+  if (length(y) < k + 2) stop("Must have >= k + 2 observations.")
+  if (k < 0 || k != round(k)) stop("k must be a nonnegative integer.")
+  if (k > 2) stop("k > 2 are algorithmically unstable and do not improve upon k = 2.")
+  if (V < 2 || V != round(V)) stop("V must be an integer between 2 and length(x).")
 
-  if ( missing(x) || is.null(x) ) stop("x must be passed.")
-  if ( missing(y) || is.null(y) ) stop("y must be passed.")
-  if ( length(x) != length(y) ) stop("x and y must have the same length.")
-
-  if ( !is.null(weights) ){
-    if ( !(length(weights) %in% c(1,length(y))) ){
-      stop("weights must either be have length 1 or length(y), or be NULL.")
+  if (!missing(weights)) {
+    if (!(length(weights) %in% c(1, length(y))) || !(class(weights) %in% c("numeric", "integer"))) {
+      stop("If passed, weights must be numerically-valued with length(weights) = 1 or the same length as x and y.")
     }
   }
 
-  if ( length(y) < k + 2 ){
-    stop("y must have length >= k + 2 for kth order trend filtering.")
-  }
-
-  if ( k < 0 || k != round(k) ){
-    stop("k must be a nonnegative integer.")
-  }
-
-  if ( k > 3 ){
-    stop(paste0("Large k leads to generally worse conditioning.\n",
-                "k = 0,1,2 are the most stable choices."))
-  }
-
-  if ( k == 3 ){
-    warning(paste0("k = 3 can have poor conditioning...\n",
-                   "k = 2 is more stable and visually indistinguishable."))
-  }
-
-  if ( !missing(lambdas) ){
-    if ( min(lambdas) < 0L ){
-      stop("All specified lambda values must be positive.")
+  if (missing(lambdas)) {
+    if (nlambdas < 0 || nlambdas != round(nlambdas)) {
+      stop("nlambdas must be a positive integer")
+      nlambdas <- nlambdas %>% as.integer()
     }
-    if ( length(lambdas) < 25L ) stop("lambdas must have length >= 25.")
+  } else {
+    if (min(lambdas) <= 0L) stop("All specified lambda values must be positive.")
+    if (length(lambdas) < 25L) warning("Recommended to provide more candidate hyperparameter values.")
+    if (!all(lambdas == sort(lambdas, decreasing = T))) warning("Sorting lambdas to descending order.")
   }
 
-  if ( !missing(nx.eval) ){
-    if ( nx.eval != round(nx.eval) ) stop("nx.eval must be a positive integer.")
-  }else{
-    if ( any(x.eval < min(x) || x.eval > max(x)) ){
-      stop("x.eval should all be in range(x).")
-    }
+  if (missing(x.eval)) {
+    if (!(class(nx.eval) %in% c("numeric", "integer")) || nx.eval < 1 || nx.eval != round(nx.eval)) stop("nx.eval must be a positive integer.")
+  } else {
+    if (any(x.eval < min(x) || x.eval > max(x))) stop("x.eval should all be in range(x).")
   }
 
-  if ( mc.cores < detectCores() ){
+  if (mc.cores < detectCores()) {
     warning(paste0("Your machine has ", detectCores(), " cores. Consider increasing mc.cores to speed up computation."))
   }
 
-  if ( mc.cores > detectCores() ) mc.cores <- detectCores()
-  if ( length(weights) == 1 ) weights <- rep(weights, length(y))
-  if ( length(weights) == 0 ) weights <- rep(1, length(y))
+  if (!(class(validation.functional) %in% c("character", "function"))) {
+    stop("validation.functional must either be one of c('WMAE','WMSE','MAE','MSE') or a function.")
+  }
 
-  mc.cores <- min(mc.cores, V)
+  if (class(validation.functional) == "character") {
+    if (!(validation.functional %in% c("MAE", "MSE", "WMAE", "WMSE"))) {
+      stop("character options for validation.functional are c('MAE','MSE','WMAE','WMSE')")
+    }
+  }
+  if (class(validation.functional) == "function") {
+    if (!all(c("y", "tf.estimate", "weights") %in% names(formals(validation.functional)))) {
+      stop("Incorrect input argument structure for function passed to validation.functional.")
+    }
+  }
+
+  if (mc.cores > detectCores()) mc.cores <- detectCores()
+  mc.cores <- min(floor(mc.cores), V)
+  if (missing(weights)) weights <- rep(1, length(y))
+  if (length(weights) == 1) weights <- rep(weights, length(y))
   lambda.choice <- match.arg(lambda.choice)
-  loss.metric <- match.arg(loss.metric)
+
+  x <- x %>% as.double()
+  y <- y %>% as.double()
+  weights <- weights %>% as.double()
+  k <- k %>% as.integer()
+  V <- V %>% as.integer()
 
   data <- tibble(x, y, weights) %>%
     arrange(x) %>%
-    filter( weights != 0 ) %>%
-    drop_na
-  rm(x,y,weights)
+    filter(weights != 0) %>%
+    drop_na()
+  rm(x, y, weights)
 
   thinning <- optimization.params$thinning
-  optimization.params <- trendfilter.control.list(max_iter = optimization.params$max_iter,
-                                                  obj_tol = optimization.params$obj_tol,
-                                                  ...)
+  optimization.params$thinning <- NULL
+  ADMM.params <- trendfilter.control.list(optimization.params)
   x.scale <- median(diff(data$x))
   y.scale <- median(abs(data$y)) / 10
-  optimization.params$x_tol <- optimization.params$x_tol / x.scale
+  ADMM.params$x_tol <- ADMM.params$x_tol / x.scale
 
   data.scaled <- data %>%
-    mutate(x = x / x.scale,
-           y = y / y.scale,
-           weights = weights * y.scale ^ 2)
+    mutate(
+      x = x / x.scale,
+      y = y / y.scale,
+      weights = weights * y.scale^2
+    ) %>%
+    select(x, y, weights)
 
   data.folded <- data.scaled %>%
-    group_split( sample( rep_len(1:V, nrow(data.scaled)) ), .keep = FALSE )
+    group_split(sample(rep_len(1:V, nrow(data.scaled))), .keep = FALSE)
 
-  if ( missing(lambdas) ){
-    lambdas <- exp(seq(16, -10, length = nlambdas))
-  }else{
-    lambdas <- sort(lambdas, decreasing = T)
+  if (missing(lambdas)) {
+    lambdas <- seq(16, -10, length = nlambdas) %>% exp()
+  } else {
+    lambdas <- lambdas %>%
+      as.double() %>%
+      sort(decreasing = T)
   }
 
-  if ( !missing(x.eval) ){
+  if (missing(x.eval)) {
     x.eval <- seq(min(data$x), max(data$x), length = nx.eval)
-  }else{
-    x.eval <- sort(x.eval)
+  } else {
+    x.eval <- x.eval %>%
+      as.double() %>%
+      sort()
   }
 
-  obj <- structure(list(x.eval = x.eval,
-                        validation.method = paste0(V,"-fold CV"),
-                        V = V,
-                        loss.metric = loss.metric,
-                        lambdas = lambdas,
-                        lambda.choice = lambda.choice,
-                        x = data$x,
-                        y = data$y,
-                        weights = data$weights,
-                        k = k,
-                        thinning = thinning,
-                        optimization.params = optimization.params,
-                        data.scaled = data.scaled,
-                        x.scale = x.scale,
-                        y.scale = y.scale),
-                   class = "cv.trendfilter"
-                   )
+  obj <- structure(list(
+    x.eval = x.eval,
+    validation.method = paste0(V, "-fold CV"),
+    V = V,
+    validation.functional = validation.functional,
+    lambdas = lambdas,
+    lambda.choice = lambda.choice,
+    x = data$x,
+    y = data$y,
+    weights = data$weights,
+    k = k,
+    thinning = thinning,
+    ADMM.params = ADMM.params,
+    data.scaled = data.scaled,
+    x.scale = x.scale,
+    y.scale = y.scale
+  ),
+  class = "cv.trendfilter"
+  )
 
-  rm(V,loss.metric,lambdas,nlambdas,lambda.choice,k,thinning,data,nx.eval,
-     optimization.params,data.scaled,x.eval,x.scale,y.scale)
+  rm(
+    V, validation.functional, lambdas, nlambdas, lambda.choice, k, thinning, data,
+    nx.eval, optimization.params, data.scaled, x.eval, x.scale, y.scale
+  )
 
-  cv.out <- matrix(unlist(mclapply(1:(obj$V), FUN = trendfilter.validate,
-                                   data.folded = data.folded,
-                                   obj = obj,
-                                   mc.cores = mc.cores)
-                          ),
-                   ncol = obj$V)
+  cv.out <- matrix(unlist(mclapply(1:(obj$V),
+    FUN = trendfilter.validate,
+    data.folded = data.folded, obj = obj,
+    mc.cores = mc.cores
+  )),
+  ncol = obj$V
+  )
 
-  errors <- rowMeans(cv.out) %>% as.double
-  se.errors <- rowSds(cv.out) / sqrt(obj$V) %>% as.double
-  obj$i.min <- which.min(errors) %>% min
-  obj$i.1se <- which(errors <= errors[obj$i.min] + se.errors[obj$i.min]) %>% min
+  errors <- cv.out %>%
+    rowMeans() %>%
+    as.double()
+  obj$i.min <- errors %>%
+    which.min() %>%
+    min()
   obj$lambda.min <- obj$lambdas[obj$i.min]
+
+  se.errors <- rowSds(cv.out) / sqrt(obj$V) %>% as.double()
+  obj$i.1se <- which(errors <= errors[obj$i.min] + se.errors[obj$i.min]) %>% min()
   obj$lambda.1se <- obj$lambdas[obj$i.1se]
 
-  if ( obj$loss.metric %in% c("MSE","WMSE") ){
-    obj$errors <- errors * obj$y.scale ^ 2
-    obj$se.errors <- se.errors * obj$y.scale ^ 2
+  if (obj$validation.functional %in% c("MSE", "WMSE")) {
+    obj$errors <- errors * obj$y.scale^2
+    obj$se.errors <- se.errors * obj$y.scale^2
   }
-  if ( obj$loss.metric %in% c("MAE","WMAE") ){
+  if (obj$validation.functional %in% c("MAE", "WMAE")) {
     obj$errors <- errors * obj$y.scale
     obj$se.errors <- se.errors * obj$y.scale
   }
+  if (class(obj$validation.functional) == "function") {
+    obj$errors <- errors
+    obj$se.errors <- se.errors
+  }
 
-  out <- obj %$% trendfilter(x = data.scaled$x,
-                             y = data.scaled$y,
-                             weights = data.scaled$weights,
-                             lambda = lambdas,
-                             k = k,
-                             thinning = thinning,
-                             control = optimization.params)
+  out <- obj %$% trendfilter(
+    x = data.scaled$x,
+    y = data.scaled$y,
+    weights = data.scaled$weights,
+    lambda = lambdas,
+    k = k,
+    thinning = thinning,
+    control = optimization.params
+  )
 
   lambda.pred <- case_when(
     obj$lambda.choice == "lambda.min" ~ obj$lambda.min,
     obj$lambda.choice == "lambda.1se" ~ obj$lambda.1se
   )
 
-  obj$n.iter <- out$iter
-  obj$edfs <- out$df
-  obj$edf.min <- out$df[obj$i.min]
-  obj$edf.1se <- out$df[obj$i.1se]
+  obj$n.iter <- out$iter %>% as.integer()
+  obj$edfs <- out$df %>% as.integer()
+  obj$edf.min <- out$df[obj$i.min] %>% as.integer()
+  obj$edf.1se <- out$df[obj$i.1se] %>% as.integer()
 
   # Increase the TF solution's algorithmic precision for the optimized estimate
   obj$optimization.params$obj_tol <- obj$optimization.params$obj_tol * 1e-2
 
-  out <- obj %$% trendfilter(x = data.scaled$x,
-                             y = data.scaled$y,
-                             weights = data.scaled$weights,
-                             lambda = lambdas,
-                             k = k,
-                             thinning = thinning,
-                             control = optimization.params)
+  out <- obj %$% trendfilter(
+    x = data.scaled$x,
+    y = data.scaled$y,
+    weights = data.scaled$weights,
+    lambda = lambdas,
+    k = k,
+    thinning = thinning,
+    control = optimization.params
+  )
 
   obj$optimization.params$obj_tol <- obj$optimization.params$obj_tol * 1e2
 
-  obj$data.scaled$fitted.values <- glmgen:::predict.trendfilter(out, lambda = lambda.pred,
-                                                                x.new = obj$data.scaled$x) %>%
-    as.double
+  obj$data.scaled$fitted.values <- glmgen:::predict.trendfilter(out,
+    lambda = lambda.pred,
+    x.new = obj$data.scaled$x
+  ) %>%
+    as.double()
   obj$data.scaled$residuals <- obj$data.scaled$y - obj$data.scaled$fitted.values
-  obj$tf.estimate <- glmgen:::predict.trendfilter(out, lambda = lambda.pred,
-                                                  x.new = obj$x.eval / obj$x.scale) * obj$y.scale %>%
-    as.double
+  obj$tf.estimate <- glmgen:::predict.trendfilter(out,
+    lambda = lambda.pred,
+    x.new = obj$x.eval / obj$x.scale
+  ) * obj$y.scale %>%
+    as.double()
   obj$fitted.values <- obj$data.scaled$fitted.values * obj$y.scale
   obj$residuals <- obj$y - obj$fitted.values
 
-  obj <- obj[c("x.eval","tf.estimate","validation.method","V",
-               "loss.metric","lambdas","lambda.min","lambda.1se",
-               "lambda.choice","errors","se.errors","edfs","edf.min","edf.1se",
-               "i.min","i.1se","x","y","weights","fitted.values", "residuals",
-               "k","thinning","optimization.params","n.iter","x.scale","y.scale",
-               "data.scaled")]
+  obj <- obj[c(
+    "x.eval", "tf.estimate", "validation.method", "V",
+    "validation.functional", "lambdas", "edfs", "generalization.errors",
+    "se.errors", "lambda.min", "lambda.1se", "lambda.choice", "i.min",
+    "i.1se", "edf.min", "edf.1se", "n.iter", "x", "y", "weights",
+    "fitted.values", "residuals", "k", "thinning", "ADMM.params",
+    "x.scale", "y.scale", "data.scaled"
+  )]
   return(obj)
 }
 
-
-trendfilter.validate <- function(validation.index, data.folded, obj){
-
-  data.train <- data.folded[-validation.index] %>% bind_rows
+trendfilter.validate <- function(validation.index, data.folded, obj) {
+  data.train <- data.folded[-validation.index] %>% bind_rows()
   data.validate <- data.folded[[validation.index]]
 
-  out <- trendfilter(x = data.train$x,
-                     y = data.train$y,
-                     weights = data.train$weights,
-                     k = obj$k,
-                     lambda = obj$lambdas,
-                     thinning = obj$thinning,
-                     control = obj$optimization.params)
+  out <- trendfilter(
+    x = data.train$x,
+    y = data.train$y,
+    weights = data.train$weights,
+    k = obj$k,
+    lambda = obj$lambdas,
+    thinning = obj$thinning,
+    control = obj$optimization.params
+  )
 
   tf.validate.preds <- glmgen:::predict.trendfilter(out, lambda = obj$lambdas, x.new = data.validate$x) %>%
-    suppressWarnings
+    suppressWarnings()
 
-  if ( obj$loss.metric == "MSE" ){
-    validation.error.mat <- mean( (tf.validate.preds - data.validate$y) ^ 2)
-  }
-  if ( obj$loss.metric == "MAE" ){
-    validation.error.mat <- abs(tf.validate.preds - data.validate$y)
-  }
-  if ( obj$loss.metric == "WMSE" ){
-    validation.error.mat <- (tf.validate.preds - data.validate$y) ^ 2 *
-      data.validate$weights / sum(data.validate$weights)
-  }
-  if ( obj$loss.metric == "WMAE" ){
-    validation.error.mat <- abs(tf.validate.preds - data.validate$y) *
-      sqrt(data.validate$weights) / sum(sqrt(data.validate$weights))
-  }
+  loss.func <- case_when(
+    obj$validation.functional == "MSE" ~ list(MSE),
+    obj$validation.functional == "MAE" ~ list(MAE),
+    obj$validation.functional == "WMSE" ~ list(WMSE),
+    obj$validation.functional == "WMAE" ~ list(WMAE)
+  )[[1]]
 
-  colMeans(validation.error.mat) %>% as.double
+  validation.error.mat <- loss.func(data.validate$y, tf.validate.preds, data.validate$weights) %>%
+    colSums() %>%
+    as.double()
 }
 
-
-MSE <- function(residuals, weights){
-  mean( residuals ^ 2 )
+MSE <- function(y, tf.estimate, weights) {
+  (tf.estimate - y)^2
 }
 
-MAE <- function(residuals, weights){
-  mean( abs(residuals) )
+MAE <- function(y, tf.estimate, weights) {
+  abs(tf.estimate - y)
 }
 
-WMSE <- function(residuals, weights){
-
+WMSE <- function(y, tf.estimate, weights) {
+  (tf.estimate - y)^2 * weights / sum(weights)
 }
 
-WMAE <- function(residuals, weights){
-
+WMAE <- function(y, tf.estimate, weights) {
+  abs(tf.estimate - y) * sqrt(weights) / sum(sqrt(weights))
 }

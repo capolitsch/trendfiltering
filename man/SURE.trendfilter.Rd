@@ -82,9 +82,6 @@ controlled by the \code{x_tol} argument below.
 \item{\code{x_tol}}: Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size \code{x_tol} and find at least two
 elements of \code{x} that fall into the same bin, then we thin the data.}}
-
-\item{...}{Additional named arguments to be passed to
-\code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}.}
 }
 \value{
 An object of class 'SURE.trendfilter'. This is a list with the
@@ -95,23 +92,23 @@ estimate on.}
 \item{validation.method}{"SURE"}
 \item{lambdas}{Vector of hyperparameter values evaluated in the grid search
 (always returned in descending order).}
+\item{edfs}{Vector of effective degrees of freedom for all trend filtering
+estimators fit during validation.}
 \item{generalization.errors}{Vector of SURE generalization error estimates,
 corresponding to the descending-ordered \code{lambdas} vector.}
 \item{lambda.min}{Hyperparameter value that minimizes the SURE generalization
 error curve.}
-\item{edfs}{Vector of effective degrees of freedom for all trend filtering
-estimators fit during validation.}
+\item{i.min}{Index of \code{lambdas} that minimizes the SURE error curve.}
 \item{edf.min}{Effective degrees of freedom of the optimized trend
 filtering estimator.}
-\item{i.min}{Index of \code{lambdas} that minimizes the SURE error curve.}
 \item{n.iter}{The number of iterations needed for the ADMM algorithm to
 converge within the given tolerance, for each hyperparameter value. If many
 of these are exactly equal to \code{max_iter}, then their solutions have not
 converged with the tolerance specified by \code{obj_tol}. In which case, it is
 often prudent to increase \code{max_iter}.}
-\item{training.errors}{Vector of MSEs between the observed outputs \code{y} and the
-trend filtering estimate, for every hyperparameter choice.}
-\item{optimisms}{The SURE-estimated optimisms, i.e.
+\item{training.errors}{Mean-squared error between the observed outputs \code{y}
+and the trend filtering estimate, for every hyperparameter choice.}
+\item{optimisms}{SURE-estimated optimisms, i.e.
 \code{optimisms = generalization.errors - training.errors}.}
 \item{x}{Vector of observed inputs.}
 \item{y}{Vector of observed outputs.}
@@ -122,7 +119,7 @@ observed inputs \code{x}.}
 \item{residuals}{\code{residuals = y - fitted.values}}
 \item{k}{Degree of the trend filtering estimator.}
 \item{ADMM.params}{List of parameter settings for the trend filtering ADMM
-algorithm, constructed by passing \code{optimization.params} list to
+algorithm, constructed by passing the \code{optimization.params} list to
 \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}.}
 \item{thinning}{Logical. If \code{TRUE}, then the data are preprocessed so that a
 smaller, better conditioned data set is used for fitting.}

@@ -62,8 +62,6 @@
 #' \item{`x_tol`}: Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
 #' elements of `x` that fall into the same bin, then we thin the data.}
-#' @param ... Additional named arguments to be passed to
-#' [glmgen::trendfilter.control.list()].
 #'
 #' @details \loadmathjax Our recommendations for when to use
 #' \code{\link{cv.trendfilter}} vs. `SURE.trendfilter`, as well as each of the
@@ -136,23 +134,23 @@
 #' \item{validation.method}{"SURE"}
 #' \item{lambdas}{Vector of hyperparameter values evaluated in the grid search
 #' (always returned in descending order).}
+#' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
+#' estimators fit during validation.}
 #' \item{generalization.errors}{Vector of SURE generalization error estimates,
 #' corresponding to the descending-ordered `lambdas` vector.}
 #' \item{lambda.min}{Hyperparameter value that minimizes the SURE generalization
 #' error curve.}
-#' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
-#' estimators fit during validation.}
+#' \item{i.min}{Index of `lambdas` that minimizes the SURE error curve.}
 #' \item{edf.min}{Effective degrees of freedom of the optimized trend
 #' filtering estimator.}
-#' \item{i.min}{Index of `lambdas` that minimizes the SURE error curve.}
 #' \item{n.iter}{The number of iterations needed for the ADMM algorithm to
 #' converge within the given tolerance, for each hyperparameter value. If many
 #' of these are exactly equal to `max_iter`, then their solutions have not
 #' converged with the tolerance specified by `obj_tol`. In which case, it is
 #' often prudent to increase `max_iter`.}
-#' \item{training.errors}{Vector of MSEs between the observed outputs `y` and the
-#' trend filtering estimate, for every hyperparameter choice.}
-#' \item{optimisms}{The SURE-estimated optimisms, i.e.
+#' \item{training.errors}{Mean-squared error between the observed outputs `y`
+#' and the trend filtering estimate, for every hyperparameter choice.}
+#' \item{optimisms}{SURE-estimated optimisms, i.e.
 #' `optimisms = generalization.errors - training.errors`.}
 #' \item{x}{Vector of observed inputs.}
 #' \item{y}{Vector of observed outputs.}
@@ -163,7 +161,7 @@
 #' \item{residuals}{`residuals = y - fitted.values`}
 #' \item{k}{Degree of the trend filtering estimator.}
 #' \item{ADMM.params}{List of parameter settings for the trend filtering ADMM
-#' algorithm, constructed by passing `optimization.params` list to
+#' algorithm, constructed by passing the `optimization.params` list to
 #' [glmgen::trendfilter.control.list()].}
 #' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so that a
 #' smaller, better conditioned data set is used for fitting.}
@@ -228,8 +226,6 @@
 #' data(quasar_spec)
 #'
 #' opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
-
-
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom tidyr drop_na tibble
 #' @importFrom dplyr %>% arrange filter select
@@ -238,127 +234,153 @@ SURE.trendfilter <- function(x, y, weights,
                              k = 2L, nlambdas = 250L, lambdas,
                              x.eval, nx.eval = 1500L,
                              optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
-                             ...){
+                             ...) {
+  if (missing(x) || is.null(x)) stop("x must be passed.")
+  if (missing(y) || is.null(y)) stop("y must be passed.")
+  if (length(x) != length(y)) stop("x and y must have equal length.")
+  if (length(y) < k + 2) stop("Must have >= k + 2 observations.")
+  if (k < 0 || k != round(k)) stop("k must be a nonnegative integer.")
+  if (k > 2) stop("k > 2 are algorithmically unstable and do not improve upon k = 2.")
 
-  if ( missing(x) || is.null(x) ) stop("x must be passed.")
-  if ( missing(y) || is.null(y) ) stop("y must be passed.")
-  if ( length(x) != length(y) ) stop("x and y must have equal length.")
-  if ( length(y) < k + 2 ) stop("Must have >= k + 2 observations.")
-  if ( k < 0 || k != round(k) ) stop("k must be a nonnegative integer.")
-  if ( k > 2 ) stop("k > 2 are algorithmically unstable and do not improve upon k = 2.")
-
-  if ( !missing(lambdas) ){
-    if ( min(lambdas) <= 0L ) stop("All specified lambda values must be positive.")
-    if ( length(lambdas) < 25L ) warning("Recommended to provide more candidate hyperparameter values.")
-    if ( !all( lambdas == sort(lambdas, decreasing = T) ) ) warning("Sorting lambdas to descending order.")
+  if (missing(lambdas)) {
+    if (nlambdas < 0 || nlambdas != round(nlambdas)) {
+      stop("nlambdas must be a positive integer")
+      nlambdas <- nlambdas %>% as.integer()
+    }
+  } else {
+    if (min(lambdas) <= 0L) stop("All specified lambda values must be positive.")
+    if (length(lambdas) < 25L) warning("Recommended to provide more candidate hyperparameter values.")
+    if (!all(lambdas == sort(lambdas, decreasing = T))) warning("Sorting lambdas to descending order.")
   }
 
-  if ( missing(x.eval) ){
-    if ( nx.eval != round(nx.eval) ) stop("nx.eval must be a positive integer.")
-  }else{
-    if ( any(x.eval < min(x) || x.eval > max(x)) ) stop("x.eval should all be in range(x).")
+  if (missing(x.eval)) {
+    if (!(class(nx.eval) %in% c("numeric", "integer")) || nx.eval < 1 || nx.eval != round(nx.eval)) stop("nx.eval must be a positive integer.")
+  } else {
+    if (any(x.eval < min(x) || x.eval > max(x))) stop("x.eval should all be in range(x).")
   }
 
-  if ( missing(weights) || !( class(weights) %in% c("numeric","integer") ) ){
+  if (missing(weights) || !(class(weights) %in% c("numeric", "integer"))) {
     stop("weights must be passed to use SURE.trendfilter.")
   }
 
-  if ( !( length(weights) %in% c(1,length(y)) ) ){
+  if (!(length(weights) %in% c(1, length(y)))) {
     stop("weights must either have length 1 or length(y) to use SURE.trendfilter.")
   }
 
-  if ( length(weights) == 1 ) weights <- rep(weights, length(x))
+  if (length(weights) == 1) weights <- rep(weights, length(x))
+
+  x <- x %>% as.double()
+  y <- y %>% as.double()
+  weights <- weights %>% as.double()
+  k <- k %>% as.integer()
+  V <- V %>% as.integer()
 
   data <- tibble(x, y, weights) %>%
     arrange(x) %>%
-    filter( weights > 0 ) %>%
-    drop_na
-  rm(x,y,weights)
+    filter(weights > 0) %>%
+    drop_na()
+  rm(x, y, weights)
+
+  if (missing(lambdas)) {
+    lambdas <- seq(16, -10, length = nlambdas) %>% exp()
+  } else {
+    lambdas <- lambdas %>%
+      as.double() %>%
+      sort(decreasing = T)
+  }
 
   thinning <- optimization.params$thinning
-  ADMM.params <- trendfilter.control.list(max_iter = optimization.params$max_iter,
-                                          obj_tol = optimization.params$obj_tol,
-                                          ...)
+  optimization.params$thinning <- NULL
+  ADMM.params <- trendfilter.control.list(optimization.params)
   x.scale <- median(diff(data$x))
   y.scale <- median(abs(data$y)) / 10
   ADMM.params$x_tol <- ADMM.params$x_tol / x.scale
 
   data.scaled <- data %>%
-    mutate(x = x / x.scale,
-           y = y / y.scale,
-           weights = weights * y.scale ^ 2) %>%
+    mutate(
+      x = x / x.scale,
+      y = y / y.scale,
+      weights = weights * y.scale^2
+    ) %>%
     select(x, y, weights)
 
-  if ( !missing(lambdas) ){
-    lambdas <- lambdas %>% as.double %>% sort(decreasing = T)
-  }else{
-    lambdas <- seq(16, -10, length = nlambdas) %>% exp
-  }
+  out <- trendfilter(
+    x = data.scaled$x,
+    y = data.scaled$y,
+    weights = data.scaled$weights,
+    lambda = lambdas,
+    k = k,
+    thinning = thinning,
+    control = ADMM.params
+  )
 
-  out <- trendfilter(x = data.scaled$x,
-                     y = data.scaled$y,
-                     weights = data.scaled$weights,
-                     lambda = lambdas,
-                     k = k,
-                     thinning = thinning,
-                     control = ADMM.params)
-
-  training.errors <- (out$beta - data.scaled$y) ^ 2 %>% colMeans %>% as.double
-  optimisms <- 2 * out$df / nrow(data) * mean(1 / data.scaled$weights) %>% as.double
+  training.errors <- (out$beta - data.scaled$y)^2 %>%
+    colMeans() %>%
+    as.double()
+  optimisms <- 2 * out$df / nrow(data) * mean(1 / data.scaled$weights) %>% as.double()
   generalization.errors <- training.errors + optimisms
   edfs <- out$df
-  n.iter <- out$iter %>% as.integer
-  i.min <- min(which.min(generalization.errors)) %>% as.integer
+  n.iter <- out$iter %>% as.integer()
+  i.min <- min(which.min(generalization.errors)) %>% as.integer()
   lambda.min <- lambdas[i.min]
 
-  if ( !missing(x.eval) ){
-    x.eval <- x.eval %>% as.double %>% sort
-  }else{
+  if (missing(x.eval)) {
     x.eval <- seq(min(data$x), max(data$x), length = nx.eval)
+  } else {
+    x.eval <- x.eval %>%
+      as.double() %>%
+      sort()
   }
 
   # Increase the TF solution's algorithmic precision for the optimized estimate
   ADMM.params$obj_tol <- ADMM.params$obj_tol * 1e-2
 
   out <- trendfilter(data.scaled$x, data.scaled$y, data.scaled$weights,
-                     lambda = lambda.min, k = k,
-                     thinning = thinning, control = ADMM.params)
+    lambda = lambda.min, k = k,
+    thinning = thinning, control = ADMM.params
+  )
 
   ADMM.params$obj_tol <- ADMM.params$obj_tol * 1e2
 
-  tf.estimate <- glmgen:::predict.trendfilter(out, lambda = lambda.min,
-                                              x.new = x.eval / x.scale) %>%
-    as.double
+  tf.estimate <- glmgen:::predict.trendfilter(out,
+    lambda = lambda.min,
+    x.new = x.eval / x.scale
+  ) %>%
+    as.double()
 
-  data.scaled$fitted.values <- glmgen:::predict.trendfilter(out, lambda = lambda.min,
-                                                            x.new = data.scaled$x) %>%
-    as.double
+  data.scaled$fitted.values <- glmgen:::predict.trendfilter(out,
+    lambda = lambda.min,
+    x.new = data.scaled$x
+  ) %>%
+    as.double()
 
   data.scaled <- data.scaled %>% mutate(residuals = y - fitted.values)
 
-  structure(list(x.eval = x.eval,
-                 tf.estimate = tf.estimate * y.scale,
-                 validation.method = "SURE",
-                 lambdas = lambdas,
-                 generalization.errors = generalization.errors * y.scale ^ 2,
-                 lambda.min = lambda.min,
-                 edfs = edfs,
-                 edf.min = out$df,
-                 i.min = i.min,
-                 training.errors = training.errors * y.scale ^ 2,
-                 optimisms = optimisms * y.scale ^ 2,
-                 x = data$x,
-                 y = data$y,
-                 weights = data$weights,
-                 fitted.values = data.scaled$fitted.values * y.scale,
-                 residuals = data.scaled$residuals * y.scale,
-                 k = k,
-                 ADMM.params = ADMM.params,
-                 thinning = thinning,
-                 n.iter = n.iter,
-                 x.scale = x.scale,
-                 y.scale = y.scale,
-                 data.scaled = data.scaled),
-            class = "SURE.trendfilter"
-            )
+  structure(list(
+    x.eval = x.eval,
+    tf.estimate = tf.estimate * y.scale,
+    validation.method = "SURE",
+    lambdas = lambdas,
+    generalization.errors = generalization.errors * y.scale^2,
+    lambda.min = lambda.min,
+    edfs = edfs,
+    edf.min = out$df,
+    i.min = i.min,
+    n.iter = n.iter,
+    training.errors = training.errors * y.scale^2,
+    optimisms = optimisms * y.scale^2,
+    x = data$x,
+    y = data$y,
+    weights = data$weights,
+    fitted.values = data.scaled$fitted.values * y.scale,
+    residuals = data.scaled$residuals * y.scale,
+    k = k,
+    ADMM.params = ADMM.params,
+    thinning = thinning,
+    x.scale = x.scale,
+    y.scale = y.scale,
+    data.scaled = data.scaled
+  ),
+  class = "SURE.trendfilter"
+  )
 }
