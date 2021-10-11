@@ -1,0 +1,11 @@
+bookdown::bs4_book:
+  includes:
+    in_header: [ga_script.html]
+  repo: https://github.com/capolitsch/trendfiltering
+
+bookdown::pdf_book:
+  latex_engine: xelatex
+  citation_package: natbib
+  keep_tex: yes
+
+bookdown::epub_book: default
