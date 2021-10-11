@@ -69,12 +69,12 @@ validation. Some common choices can be used by passing an appropriate string
 error, mean-squared error, and their weighted counterparts. Defaults to
 \code{validation.functional = "WMAE"}.
 
-Custom validation loss functionals can used by instead passing a function to
-\code{validation.functional}. The function should take three arguments --- \code{y},
-\code{tf.estimate}, and \code{weights} --- and return a single scalar value for the
-validation loss. For example, \code{validation.functional = "WMAE"} is equivalent
-to passing the following function to \code{validation.functional}:\if{html}{\out{<div class="sourceCode r">}}\preformatted{function(y, tf.estimate, weights)\{
-  sum( abs(y - tf.estimate) * sqrt(weights) / sum(sqrt(weights)) )
+Custom validation loss functionals can be used by instead passing a function
+to \code{validation.functional}. The function should take three vector arguments
+--- \code{y}, \code{tf.estimate}, and \code{weights} --- and return a single scalar value
+for the validation loss. For example, \code{validation.functional = "WMAE"} is
+equivalent to passing the following function:\if{html}{\out{<div class="sourceCode r">}}\preformatted{function(tf.estimate, y, weights)\{
+  sum(abs(tf.estimate - y) * sqrt(weights) / sum(sqrt(weights)))
 \}
 }\if{html}{\out{</div>}}}
 
@@ -222,7 +222,7 @@ sensitive to outliers than squared error.
 }
 \examples{
 data(eclipsing_binary)
-
+head(EB)
 # |      phase|      flux|  std.err|
 # |----------:|---------:|--------:|
 # | -0.4986308| 0.9384845| 0.010160|

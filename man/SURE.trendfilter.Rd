@@ -14,8 +14,7 @@ SURE.trendfilter(
   lambdas,
   x.eval,
   nx.eval = 1500L,
-  optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
-  ...
+  optimization.params = list(max_iter = 600L, obj_tol = 1e-10)
 )
 }
 \arguments{

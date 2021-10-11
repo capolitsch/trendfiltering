@@ -233,8 +233,7 @@
 SURE.trendfilter <- function(x, y, weights,
                              k = 2L, nlambdas = 250L, lambdas,
                              x.eval, nx.eval = 1500L,
-                             optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
-                             ...) {
+                             optimization.params = list(max_iter = 600L, obj_tol = 1e-10)) {
   if (missing(x) || is.null(x)) stop("x must be passed.")
   if (missing(y) || is.null(y)) stop("y must be passed.")
   if (length(x) != length(y)) stop("x and y must have equal length.")

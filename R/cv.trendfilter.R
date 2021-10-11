@@ -36,14 +36,14 @@
 #' error, mean-squared error, and their weighted counterparts. Defaults to
 #' `validation.functional = "WMAE"`.
 #'
-#' Custom validation loss functionals can used by instead passing a function to
-#' `validation.functional`. The function should take three arguments --- `y`,
-#' `tf.estimate`, and `weights` --- and return a single scalar value for the
-#' validation loss. For example, `validation.functional = "WMAE"` is equivalent
-#' to passing the following function to `validation.functional`:
+#' Custom validation loss functionals can be used by instead passing a function
+#' to `validation.functional`. The function should take three vector arguments
+#' --- `y`, `tf.estimate`, and `weights` --- and return a single scalar value
+#' for the validation loss. For example, `validation.functional = "WMAE"` is
+#' equivalent to passing the following function:
 #' ```{r, eval = F}
-#' function(y, tf.estimate, weights){
-#'   sum( abs(y - tf.estimate) * sqrt(weights) / sum(sqrt(weights)) )
+#' function(tf.estimate, y, weights){
+#'   sum(abs(tf.estimate - y) * sqrt(weights) / sum(sqrt(weights)))
 #' }
 #' ```
 #' @param lambda.choice One of `c("lambda.min","lambda.1se")`. The choice
@@ -225,7 +225,7 @@
 #'
 #' @examples
 #' data(eclipsing_binary)
-#'
+#' head(EB)
 #' # |      phase|      flux|  std.err|
 #' # |----------:|---------:|--------:|
 #' # | -0.4986308| 0.9384845| 0.010160|
@@ -373,7 +373,7 @@ cv.trendfilter <- function(x, y, weights,
 
   rm(
     V, validation.functional, lambdas, nlambdas, lambda.choice, k, thinning, data,
-    nx.eval, optimization.params, data.scaled, x.eval, x.scale, y.scale
+    nx.eval, ADMM.params, data.scaled, x.eval, x.scale, y.scale
   )
 
   cv.out <- matrix(unlist(mclapply(1:(obj$V),
@@ -415,7 +415,7 @@ cv.trendfilter <- function(x, y, weights,
     lambda = lambdas,
     k = k,
     thinning = thinning,
-    control = optimization.params
+    control = ADMM.params
   )
 
   lambda.pred <- case_when(
@@ -429,7 +429,7 @@ cv.trendfilter <- function(x, y, weights,
   obj$edf.1se <- out$df[obj$i.1se] %>% as.integer()
 
   # Increase the TF solution's algorithmic precision for the optimized estimate
-  obj$optimization.params$obj_tol <- obj$optimization.params$obj_tol * 1e-2
+  obj$ADMM.params$obj_tol <- obj$ADMM.params$obj_tol * 1e-2
 
   out <- obj %$% trendfilter(
     x = data.scaled$x,
@@ -438,11 +438,11 @@ cv.trendfilter <- function(x, y, weights,
     lambda = lambdas,
     k = k,
     thinning = thinning,
-    control = optimization.params
+    control = ADMM.params
   )
 
   # Return the objective tolerance to its previous setting
-  obj$optimization.params$obj_tol <- obj$optimization.params$obj_tol * 1e2
+  obj$ADMM.params$obj_tol <- obj$ADMM.params$obj_tol * 1e2
 
   obj$data.scaled$fitted.values <- glmgen:::predict.trendfilter(out,
     lambda = lambda.pred,
@@ -480,37 +480,48 @@ trendfilter.validate <- function(validation.index, data.folded, obj) {
     k = obj$k,
     lambda = obj$lambdas,
     thinning = obj$thinning,
-    control = obj$optimization.params
+    control = obj$ADMM.params
   )
 
   tf.validate.preds <- glmgen:::predict.trendfilter(out, lambda = obj$lambdas, x.new = data.validate$x) %>%
     suppressWarnings()
 
-  loss.func <- case_when(
-    obj$validation.functional == "MSE" ~ list(MSE),
-    obj$validation.functional == "MAE" ~ list(MAE),
-    obj$validation.functional == "WMSE" ~ list(WMSE),
-    obj$validation.functional == "WMAE" ~ list(WMAE)
-  )[[1]]
+  if (is.character(obj$validation.functional)) {
+    loss.func <- case_when(
+      obj$validation.functional == "MSE" ~ list(MSE),
+      obj$validation.functional == "MAE" ~ list(MAE),
+      obj$validation.functional == "WMSE" ~ list(WMSE),
+      obj$validation.functional == "WMAE" ~ list(WMAE)
+    )[[1]]
 
-  validation.errors <- loss.func(data.validate$y, tf.validate.preds, data.validate$weights) %>%
-    as.double()
+    validation.errors <- apply(tf.validate.preds, 2, loss.func,
+      y = data.validate$y,
+      weights = data.validate$weights
+    ) %>%
+      as.double()
+  } else {
+    loss.func <- obj$validation.functional
 
-  validation.errors <- apply(validation.error.mat, 2, mean)
+    validation.errors <- apply(tf.validate.preds * obj$y.scale, 2, loss.func,
+      y = data.validate$y * obj$y.scale,
+      weights = data.validate$weights / obj$y.scale^2
+    ) %>%
+      as.double()
+  }
 }
 
-MSE <- function(y, tf.estimate, weights) {
-  colMeans( (tf.estimate - y)^2 )
+MSE <- function(tf.estimate, y, weights) {
+  mean((tf.estimate - y)^2)
 }
 
-MAE <- function(y, tf.estimate, weights) {
-  colMeans( abs(tf.estimate - y) )
+MAE <- function(tf.estimate, y, weights) {
+  mean(abs(tf.estimate - y))
 }
 
-WMSE <- function(y, tf.estimate, weights) {
-  colSums( (tf.estimate - y)^2 * weights / sum(weights) )
+WMSE <- function(tf.estimate, y, weights) {
+  sum((tf.estimate - y)^2 * weights / sum(weights))
 }
 
-WMAE <- function(y, tf.estimate, weights) {
-  colSums( abs(tf.estimate - y) * sqrt(weights) / sum(sqrt(weights)) )
+WMAE <- function(tf.estimate, y, weights) {
+  sum(abs(tf.estimate - y) * sqrt(weights) / sum(sqrt(weights)))
 }
