@@ -3,11 +3,7 @@
 \docType{package}
 \name{trendfiltering-package}
 \alias{trendfiltering-package}
-\title{Optimal one-dimensional data analysis with trend filtering}
-\description{
-State-of-the-art one-dimensional data analysis with trend filtering
-(Tibshirani 2014).
-}
+\title{Denoising 1D signals, the state of the art}
 \references{
 \cr
 \bold{Companion references}

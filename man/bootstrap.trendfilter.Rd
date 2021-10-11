@@ -3,7 +3,7 @@
 \name{bootstrap.trendfilter}
 \alias{bootstrap.trendfilter}
 \title{Obtain pointwise uncertainty bands by bootstrapping the optimized trend
-filtering estimator.}
+filtering estimator}
 \usage{
 bootstrap.trendfilter(
   obj,
@@ -80,7 +80,7 @@ function documentation for details.}
 }
 \description{
 Obtain pointwise uncertainty bands by bootstrapping the optimized trend
-filtering estimator.
+filtering estimator
 }
 \details{
 \loadmathjax Our recommendations for when to use
@@ -104,7 +104,7 @@ where
 \mjsdeqn{\widehat{f}\emph{{\beta}(x_i') = \inf}{g}\left\{g : \frac{1}{B} \sum_{b=1}^{B} \mathbbm{1}\big\{\widehat{f}_{b}(x_i') \leq g\big\} \geq \beta \right\}, \quad\quad \beta\in(0,1).}
 }
 \examples{
-data(quasar_spec)
+data(quasar_spectrum)
 head(spec)
 
 # | log10.wavelength|       flux|   weights|

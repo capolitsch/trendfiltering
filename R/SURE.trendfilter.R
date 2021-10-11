@@ -223,7 +223,7 @@
 #' @seealso \code{\link{cv.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 #'
 #' @examples
-#' data(quasar_spec)
+#' data(quasar_spectrum)
 #' head(spec)
 #'
 #' # | log10.wavelength|       flux|   weights|

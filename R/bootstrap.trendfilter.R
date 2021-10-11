@@ -1,5 +1,5 @@
 #' Obtain pointwise uncertainty bands by bootstrapping the optimized trend
-#' filtering estimator.
+#' filtering estimator
 #'
 #' @param obj An object of class '\link{SURE.trendfilter}' or
 #' '\link{cv.trendfilter}'.
@@ -115,7 +115,7 @@
 #' @seealso \code{\link{SURE.trendfilter}}, \code{\link{cv.trendfilter}}
 #'
 #' @examples
-#' data(quasar_spec)
+#' data(quasar_spectrum)
 #' head(spec)
 #'
 #' # | log10.wavelength|       flux|   weights|
