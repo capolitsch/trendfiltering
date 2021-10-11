@@ -290,7 +290,7 @@ SURE.trendfilter <- function(x, y, weights,
 
   thinning <- optimization.params$thinning
   optimization.params$thinning <- NULL
-  ADMM.params <- trendfilter.control.list(optimization.params)
+  ADMM.params <- do.call(trendfilter.control.list, optimization.params)
   x.scale <- median(diff(data$x))
   y.scale <- median(abs(data$y)) / 10
   ADMM.params$x_tol <- ADMM.params$x_tol / x.scale
