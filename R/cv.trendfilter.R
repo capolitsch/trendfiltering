@@ -124,8 +124,8 @@
 #' \mjsdeqn{MSE(\lambda) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|^2}
 #' where \mjseqn{w_i} is the \mjseqn{i}th element of the `weights` vector.
 #'
-#' If `weights = NULL`, then the weighted and unweighted counterparts are
-#' equivalent. \cr
+#' If constant weights are passed, or if nothing is passed, then the weighted
+#' and unweighted counterparts are equivalent. \cr
 #'
 #' Briefly stated, weighting helps combat heteroskedasticity (varying levels
 #' of uncertainty in the output measurements) and absolute error is less
@@ -396,15 +396,15 @@ cv.trendfilter <- function(x, y, weights,
   obj$lambda.1se <- obj$lambdas[obj$i.1se]
 
   if (obj$validation.functional %in% c("MSE", "WMSE")) {
-    obj$errors <- errors * obj$y.scale^2
+    obj$generalization.errors <- errors * obj$y.scale^2
     obj$se.errors <- se.errors * obj$y.scale^2
   }
   if (obj$validation.functional %in% c("MAE", "WMAE")) {
-    obj$errors <- errors * obj$y.scale
+    obj$generalization.errors <- errors * obj$y.scale
     obj$se.errors <- se.errors * obj$y.scale
   }
   if (class(obj$validation.functional) == "function") {
-    obj$errors <- errors
+    obj$generalization.errors <- errors
     obj$se.errors <- se.errors
   }
 

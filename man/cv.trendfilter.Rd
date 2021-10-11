@@ -213,8 +213,8 @@ stated below.
 \mjsdeqn{MSE(\lambda) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|^2}
 where \mjseqn{w_i} is the \mjseqn{i}th element of the \code{weights} vector.
 
-If \code{weights = NULL}, then the weighted and unweighted counterparts are
-equivalent. \cr
+If constant weights are passed, or if nothing is passed, then the weighted
+and unweighted counterparts are equivalent. \cr
 
 Briefly stated, weighting helps combat heteroskedasticity (varying levels
 of uncertainty in the output measurements) and absolute error is less
