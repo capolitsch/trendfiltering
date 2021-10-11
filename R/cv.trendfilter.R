@@ -238,8 +238,6 @@
 #' )
 #'
 #' plot(log(opt$lambdas), opt$generalization.errors, type = "l", lwd = 1.5)
-
-
 #' @importFrom dplyr mutate arrange case_when group_split bind_rows
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom parallel mclapply detectCores
