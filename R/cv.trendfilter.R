@@ -226,6 +226,7 @@
 #' @examples
 #' data(eclipsing_binary)
 #' head(EB)
+#'
 #' # |      phase|      flux|  std.err|
 #' # |----------:|---------:|--------:|
 #' # | -0.4986308| 0.9384845| 0.010160|

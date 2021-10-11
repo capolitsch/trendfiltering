@@ -197,6 +197,7 @@ or
 \examples{
 data(quasar_spec)
 head(spec)
+
 # | log10.wavelength|       flux|   weights|
 # |----------------:|----------:|---------:|
 # |           3.5529|  0.4235348| 0.0417015|

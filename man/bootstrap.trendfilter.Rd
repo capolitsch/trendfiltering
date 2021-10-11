@@ -59,9 +59,9 @@ bootstrap was used to obtain the variability bands.}
 \item{B}{The number of bootstrap samples used to estimate the pointwise
 variability bands.}
 \item{tf.bootstrap.ensemble}{If \code{return.full.ensemble = TRUE}, the
-full trend filtering bootstrap ensemble as an \mjseqn{n \times B}
-matrix, less any columns from post-hoc pruning (if \code{prune = TRUE}).
-If \code{return.full.ensemble = FALSE}, then this will return \code{NULL}.}
+full trend filtering bootstrap ensemble as an \mjseqn{n \times B} matrix,
+less any columns from post-hoc pruning (if \code{prune = TRUE}). If
+\code{return.full.ensemble = FALSE}, then this will return \code{NULL}.}
 \item{edf.boots}{An integer vector of the estimated number of effective
 degrees of freedom of each trend filtering bootstrap estimate. These should
 all be relatively close to \code{edf.min} (below).}
@@ -74,39 +74,26 @@ estimates pruned from the ensemble.}
 \item{n.iter.boots}{Vector of the number of iterations needed for the ADMM
 algorithm to converge within the given tolerance, for each bootstrap trend
 filtering estimate.}
-\item{...}{All elements of \code{obj} --- an object either of class
-\link{SURE.trendfilter}' or '\link{cv.trendfilter}' --- that was passed to
-\code{bootstrap.trendfilter}. See the relevant function documentation for details.}
+\item{...}{Named elements inherited from \code{obj} --- an object either of class
+'\link{SURE.trendfilter}' or '\link{cv.trendfilter}'. See the relevant
+function documentation for details.}
 }
 \description{
-\loadmathjax \code{bootstrap.trendfilter} implements
+Obtain pointwise uncertainty bands by bootstrapping the optimized trend
+filtering estimator.
 }
 \details{
 \loadmathjax Our recommendations for when to use
 \code{\link{cv.trendfilter}} vs. \code{SURE.trendfilter}, as well as each of the
 available settings for \code{bootstrap.algorithm} are shown in the table below.
-See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-Politsch et al. (2020a)} for more details.\tabular{lrr}{
+See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
+for more details.\tabular{lrr}{
    Scenario \tab Hyperparameter optimization \tab \code{bootstrap.algorithm} \cr
    \code{x} is irregularly sampled \tab \code{cv.trendfilter} \tab "nonparametric" \cr
    \code{x} is regularly sampled & reciprocal variances are not available \tab \code{cv.trendfilter} \tab "wild" \cr
    \code{x} is regularly sampled & reciprocal variances are available \tab \code{SURE.trendfilter} \tab "parametric" \cr
 }
 
-
-Parametric bootstrap for fixed-input uncertainty quantification (when noise
-distribution \mjseqn{\epsilon_i\sim Q_i} is known a priori)
-Require: Training Data \mjseqn{(x_1, y_1),\dots,(x_n, y_n)}, hyperparameters
-\mjseqn{\lambda} and \mjseqn{k}, assumed noise distribution
-\mjseqn{\epsilon_i \sim Q_i}, prediction input grid \mjseqn{x_1',\dots,x_m'}
-Compute the trend filtering point estimate at the observed inputs:
-\mjseqn{(x_1, y_1),\dots, (x_n, y_n)}
-For \mjseqn{b in 1:B}
-Define a bootstrap sample by sampling from the assumed noise distribution:
-\mjsdeqn{y_i = \widehat{f}(x_i) + \epsilon_i \quad \quad \text{where }\epsilon_i \sim Q_i, \quad i=1,\dots,n}
-Let \mjseqn{\widehat{f}(x_1'), \dots, \widehat{f}(x_m')} denote the trend
-filtering estimate fit on the bootstrap sample and evaluated on the
-prediction grid \mjseqn{x_1',\dots,x_m'}
 
 Given the full trend filtering bootstrap ensemble provided by the relevant
 bootstrap algorithm, for any \mjseqn{\alpha\in(0,1)}, a
@@ -118,9 +105,16 @@ where
 }
 \examples{
 data(quasar_spec)
+head(spec)
 
-opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
-boot.out <- bootstrap.trendfilter(SURE.out, bootstrap.algorithm = "parametric")
+# | log10.wavelength|       flux|   weights|
+# |----------------:|----------:|---------:|
+# |           3.5529|  0.4235348| 0.0417015|
+# |           3.5530| -2.1143005| 0.1247811|
+# |           3.5531| -3.7832341| 0.1284383|
+
+SURE.obj <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
+opt <- bootstrap.trendfilter(SURE.obj, bootstrap.algorithm = "parametric")
 }
 \references{
 \bold{Companion references}
@@ -151,7 +145,7 @@ Bootstrap Methods: Another Look at the Jackknife}.
 \emph{The Annals of Statistics}, 7(1), p. 1-26.}}
 }
 \seealso{
-{\link{SURE.trendfilter}}, \code{\link{cv.trendfilter}}
+\code{\link{SURE.trendfilter}}, \code{\link{cv.trendfilter}}
 }
 \author{
 \emph{\bold{Collin A. Politsch, Ph.D.}} \cr

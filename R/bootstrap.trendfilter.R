@@ -1,8 +1,6 @@
 #' Obtain pointwise uncertainty bands by bootstrapping the optimized trend
 #' filtering estimator.
 #'
-#' \loadmathjax `bootstrap.trendfilter` implements
-#'
 #' @param obj An object of class '\link{SURE.trendfilter}' or
 #' '\link{cv.trendfilter}'.
 #' @param level The level of the pointwise variability bands. Defaults to
@@ -24,6 +22,26 @@
 #' @param mc.cores Parallel computing: The number of cores to utilize. Defaults
 #' to the number of cores detected.
 #'
+#' @details \loadmathjax Our recommendations for when to use
+#' \code{\link{cv.trendfilter}} vs. `SURE.trendfilter`, as well as each of the
+#' available settings for `bootstrap.algorithm` are shown in the table below.
+#' See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
+#' for more details.
+#'
+#' | Scenario                                                          | Hyperparameter optimization | `bootstrap.algorithm` |
+#' | :------------                                                     |     ------------:           |         ------------: |
+#' | `x` is irregularly sampled                                        | `cv.trendfilter`            | "nonparametric"       |
+#' | `x` is regularly sampled & reciprocal variances are not available | `cv.trendfilter`            | "wild"                |
+#' | `x` is regularly sampled & reciprocal variances are available     | `SURE.trendfilter`          | "parametric"          |
+#'
+#' Given the full trend filtering bootstrap ensemble provided by the relevant
+#' bootstrap algorithm, for any \mjseqn{\alpha\in(0,1)}, a
+#' \mjseqn{(1-\alpha)\cdot100}% pointwise variability band is
+#' given by
+#' \mjsdeqn{B_{1-\alpha}(x_i') = \left(\widehat{f}_{\alpha/2}(x_i'),\;\widehat{f}_{1-\alpha/2}(x_i')\right), \quad\quad i = 1,\dots,m}
+#' where
+#' \mjsdeqn{\widehat{f}_{\beta}(x_i') = \inf_{g}\left\{g : \frac{1}{B} \sum_{b=1}^{B} \mathbbm{1}\big\{\widehat{f}_{b}(x_i') \leq g\big\} \geq \beta \right\}, \quad\quad \beta\in(0,1).}
+#'
 #' @return An object of class 'bootstrap.trendfilter'. This is a comprehensive
 #' list containing all of the analysis important information, data, and
 #' results:
@@ -39,9 +57,9 @@
 #' \item{B}{The number of bootstrap samples used to estimate the pointwise
 #' variability bands.}
 #' \item{tf.bootstrap.ensemble}{If `return.full.ensemble = TRUE`, the
-#' full trend filtering bootstrap ensemble as an \mjseqn{n \times B}
-#' matrix, less any columns from post-hoc pruning (if `prune = TRUE`).
-#' If `return.full.ensemble = FALSE`, then this will return `NULL`.}
+#' full trend filtering bootstrap ensemble as an \mjseqn{n \times B} matrix,
+#' less any columns from post-hoc pruning (if `prune = TRUE`). If
+#' `return.full.ensemble = FALSE`, then this will return `NULL`.}
 #' \item{edf.boots}{An integer vector of the estimated number of effective
 #' degrees of freedom of each trend filtering bootstrap estimate. These should
 #' all be relatively close to `edf.min` (below).}
@@ -54,43 +72,9 @@
 #' \item{n.iter.boots}{Vector of the number of iterations needed for the ADMM
 #' algorithm to converge within the given tolerance, for each bootstrap trend
 #' filtering estimate.}
-#' \item{...}{All elements of `obj` --- an object either of class
-#' \link{SURE.trendfilter}' or '\link{cv.trendfilter}' --- that was passed to
-#' `bootstrap.trendfilter`. See the relevant function documentation for details.}
-#'
-#' @details \loadmathjax Our recommendations for when to use
-#' \code{\link{cv.trendfilter}} vs. `SURE.trendfilter`, as well as each of the
-#' available settings for `bootstrap.algorithm` are shown in the table below.
-#' See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-#' Politsch et al. (2020a)} for more details.
-#'
-#' | Scenario                                                          | Hyperparameter optimization | `bootstrap.algorithm` |
-#' | :------------                                                     |     ------------:           |         ------------: |
-#' | `x` is irregularly sampled                                        | `cv.trendfilter`            | "nonparametric"       |
-#' | `x` is regularly sampled & reciprocal variances are not available | `cv.trendfilter`            | "wild"                |
-#' | `x` is regularly sampled & reciprocal variances are available     | `SURE.trendfilter`          | "parametric"          |
-#'
-#' Parametric bootstrap for fixed-input uncertainty quantification (when noise
-#' distribution \mjseqn{\epsilon_i\sim Q_i} is known a priori)
-#' Require: Training Data \mjseqn{(x_1, y_1),\dots,(x_n, y_n)}, hyperparameters
-#' \mjseqn{\lambda} and \mjseqn{k}, assumed noise distribution
-#' \mjseqn{\epsilon_i \sim Q_i}, prediction input grid \mjseqn{x_1',\dots,x_m'}
-#' Compute the trend filtering point estimate at the observed inputs:
-#' \mjseqn{(x_1, y_1),\dots, (x_n, y_n)}
-#' For \mjseqn{b in 1:B}
-#' Define a bootstrap sample by sampling from the assumed noise distribution:
-#' \mjsdeqn{y_i = \widehat{f}(x_i) + \epsilon_i \quad \quad \text{where }\epsilon_i \sim Q_i, \quad i=1,\dots,n}
-#' Let \mjseqn{\widehat{f}(x_1'), \dots, \widehat{f}(x_m')} denote the trend
-#' filtering estimate fit on the bootstrap sample and evaluated on the
-#' prediction grid \mjseqn{x_1',\dots,x_m'}
-#'
-#' Given the full trend filtering bootstrap ensemble provided by the relevant
-#' bootstrap algorithm, for any \mjseqn{\alpha\in(0,1)}, a
-#' \mjseqn{(1-\alpha)\cdot100}% pointwise variability band is
-#' given by
-#' \mjsdeqn{B_{1-\alpha}(x_i') = \left(\widehat{f}_{\alpha/2}(x_i'),\;\widehat{f}_{1-\alpha/2}(x_i')\right), \quad\quad i = 1,\dots,m}
-#' where
-#' \mjsdeqn{\widehat{f}_{\beta}(x_i') = \inf_{g}\left\{g : \frac{1}{B} \sum_{b=1}^{B} \mathbbm{1}\big\{\widehat{f}_{b}(x_i') \leq g\big\} \geq \beta \right\}, \quad\quad \beta\in(0,1).}
+#' \item{...}{Named elements inherited from `obj` --- an object either of class
+#' '\link{SURE.trendfilter}' or '\link{cv.trendfilter}'. See the relevant
+#' function documentation for details.}
 #'
 #' @export bootstrap.trendfilter
 #'
@@ -128,13 +112,20 @@
 #' Bootstrap Methods: Another Look at the Jackknife}.
 #' \emph{The Annals of Statistics}, 7(1), p. 1-26.}}
 #'
-#' @seealso {\link{SURE.trendfilter}}, \code{\link{cv.trendfilter}}
+#' @seealso \code{\link{SURE.trendfilter}}, \code{\link{cv.trendfilter}}
 #'
 #' @examples
 #' data(quasar_spec)
+#' head(spec)
 #'
-#' opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
-#' boot.out <- bootstrap.trendfilter(SURE.out, bootstrap.algorithm = "parametric")
+#' # | log10.wavelength|       flux|   weights|
+#' # |----------------:|----------:|---------:|
+#' # |           3.5529|  0.4235348| 0.0417015|
+#' # |           3.5530| -2.1143005| 0.1247811|
+#' # |           3.5531| -3.7832341| 0.1284383|
+#'
+#' SURE.obj <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
+#' opt <- bootstrap.trendfilter(SURE.obj, bootstrap.algorithm = "parametric")
 #' @importFrom glmgen trendfilter
 #' @importFrom dplyr %>% mutate case_when select n
 #' @importFrom tidyr tibble
@@ -183,7 +174,6 @@ bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
   obj$tf.standard.errors <- apply(tf.boot.ensemble, 1, sd)
   obj$bootstrap.lower.band <- apply(tf.boot.ensemble, 1, quantile, probs = (1 - level) / 2)
   obj$bootstrap.upper.band <- apply(tf.boot.ensemble, 1, quantile, probs = 1 - (1 - level) / 2)
-
   obj <- c(obj, list(bootstrap.algorithm = bootstrap.algorithm, level = level, B = B))
 
   if (return.full.ensemble) {
@@ -205,11 +195,9 @@ bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
   return(obj)
 }
 
-
 bootstrap.estimator <- function(b) {
   tf.estimator(data = sampler(data.scaled), obj = obj, mode = "edf")
 }
-
 
 tf.estimator <- function(data, obj, mode = "lambda") {
   if (mode == "edf") {
@@ -220,10 +208,10 @@ tf.estimator <- function(data, obj, mode = "lambda") {
       k = obj$k,
       lambda = obj$lambdas,
       thinning = obj$thinning,
-      control = obj$optimization.params
+      control = obj$ADMM.params
     )
 
-    i.min <- min(which.min(abs(tf.fit$df - obj$edf.min))) %>% as.integer()
+    i.min <- which.min(abs(tf.fit$df - obj$edf.min))
     lambda.min <- obj$lambdas[i.min]
     edf.min <- tf.fit$df[i.min]
     n.iter <- tf.fit$iter[i.min]
@@ -241,12 +229,12 @@ tf.estimator <- function(data, obj, mode = "lambda") {
       k = obj$k,
       lambda = obj$lambda.min,
       thinning = obj$thinning,
-      control = obj$optimization.params
+      control = obj$ADMM.params
     )
 
     lambda.min <- obj$lambda.min
     edf.min <- tf.fit$df
-    n.iter <- as.integer(tf.fit$iter)
+    n.iter <- tf.fit$iter
   }
 
   tf.estimate <- glmgen:::predict.trendfilter(
