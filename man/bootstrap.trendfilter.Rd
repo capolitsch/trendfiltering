@@ -9,7 +9,7 @@ bootstrap.trendfilter(
   level = 0.95,
   B = 100L,
   bootstrap.algorithm = c("nonparametric", "parametric", "wild"),
-  return.full.ensemble = FALSE,
+  return.ensemble = FALSE,
   prune = TRUE,
   mc.cores = detectCores()
 )
@@ -28,10 +28,10 @@ variability bands. Defaults to \code{B = 100}.}
 bootstrap to use. One of \code{c("nonparametric","parametric","wild")}. See
 details below for recommendations on when each option is appropriate.}
 
-\item{return.full.ensemble}{\loadmathjax Logical. If \code{TRUE}, the full trend
+\item{return.ensemble}{\loadmathjax Logical. If \code{TRUE}, the full trend
 filtering bootstrap ensemble is returned as an \mjseqn{n \times B} matrix,
 less any columns from post-hoc pruning (see \code{prune} below). Defaults to
-\code{return.full.ensemble = FALSE} to save memory.}
+\code{return.ensemble = FALSE} to save memory.}
 
 \item{prune}{Logical. If \code{TRUE}, then the trend filtering bootstrap
 ensemble is examined for rare instances in which the optimization has
@@ -57,7 +57,7 @@ bootstrap was used to obtain the variability bands.}
 \item{level}{The level of the pointwise variability bands.}
 \item{B}{The number of bootstrap samples used to estimate the pointwise
 variability bands.}
-\item{tf.bootstrap.ensemble}{If \code{return.full.ensemble = TRUE}, the
+\item{tf.bootstrap.ensemble}{If \code{return.ensemble = TRUE}, the
 full trend filtering bootstrap ensemble as an \mjseqn{n \times B} matrix,
 less any columns from post-hoc pruning (if \code{prune = TRUE}). Else, this will
 return \code{NULL}.}

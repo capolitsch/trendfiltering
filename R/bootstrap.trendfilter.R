@@ -9,10 +9,10 @@
 #' @param bootstrap.algorithm A string specifying which variation of the
 #' bootstrap to use. One of `c("nonparametric","parametric","wild")`. See
 #' details below for recommendations on when each option is appropriate.
-#' @param return.full.ensemble \loadmathjax Logical. If `TRUE`, the full trend
+#' @param return.ensemble \loadmathjax Logical. If `TRUE`, the full trend
 #' filtering bootstrap ensemble is returned as an \mjseqn{n \times B} matrix,
 #' less any columns from post-hoc pruning (see `prune` below). Defaults to
-#' `return.full.ensemble = FALSE` to save memory.
+#' `return.ensemble = FALSE` to save memory.
 #' @param prune Logical. If `TRUE`, then the trend filtering bootstrap
 #' ensemble is examined for rare instances in which the optimization has
 #' stopped at zero knots (likely erroneously), and removes them from the
@@ -47,7 +47,7 @@
 #' \item{level}{The level of the pointwise variability bands.}
 #' \item{B}{The number of bootstrap samples used to estimate the pointwise
 #' variability bands.}
-#' \item{tf.bootstrap.ensemble}{If `return.full.ensemble = TRUE`, the
+#' \item{tf.bootstrap.ensemble}{If `return.ensemble = TRUE`, the
 #' full trend filtering bootstrap ensemble as an \mjseqn{n \times B} matrix,
 #' less any columns from post-hoc pruning (if `prune = TRUE`). Else, this will
 #' return `NULL`.}
@@ -124,7 +124,7 @@
 #' @importFrom stats quantile rnorm
 bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
                                   bootstrap.algorithm = c("nonparametric", "parametric", "wild"),
-                                  return.full.ensemble = FALSE, prune = TRUE,
+                                  return.ensemble = FALSE, prune = TRUE,
                                   mc.cores = detectCores()) {
   stopifnot(class(obj) %in% c("SURE.trendfilter", "cv.trendfilter"))
   bootstrap.algorithm <- match.arg(bootstrap.algorithm)
@@ -167,7 +167,7 @@ bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
   obj$bootstrap.upper.band <- apply(tf.boot.ensemble, 1, quantile, probs = 1 - (1 - level) / 2)
   obj <- c(obj, list(bootstrap.algorithm = bootstrap.algorithm, level = level, B = B))
 
-  if (return.full.ensemble) {
+  if (return.ensemble) {
     obj$tf.bootstrap.ensemble <- tf.boot.ensemble
   } else {
     obj <- c(obj, list(tf.bootstrap.ensemble = NULL))
@@ -178,8 +178,8 @@ bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
     "bootstrap.upper.band", "bootstrap.algorithm", "level", "B",
     "edf.boots", "tf.bootstrap.ensemble", "prune", "n.pruned", "x", "y",
     "weights", "fitted.values", "residuals", "k", "lambdas", "lambda.min",
-    "edfs", "edf.min", "i.min", "validation.method", "errors",
-    "optimization.params", "n.iter", "n.iter.boots", "x.scale", "y.scale",
+    "edfs", "edf.min", "i.min", "validation.method", "generalization.errors",
+    "ADMM.params", "n.iter", "n.iter.boots", "x.scale", "y.scale",
     "data.scaled"
   )]
   class(obj) <- "bootstrap.trendfilter"
