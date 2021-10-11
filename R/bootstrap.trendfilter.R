@@ -186,6 +186,7 @@ bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
   return(obj)
 }
 
+#' @importFrom glmgen trendfilter
 bootstrap.estimator <- function(b) {
   tf.estimator(data = sampler(data.scaled), obj = obj, mode = "edf")
 }
