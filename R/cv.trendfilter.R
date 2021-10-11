@@ -137,11 +137,11 @@
 #' estimate on.}
 #' \item{tf.estimate}{Optimized trend filtering estimate, evaluated at `x.eval`.}
 #' \item{validation.method}{\code{paste0(V,"-fold CV")}}
-#' \item{V}{The number of folds the data are split into for the V-fold cross
-#' validation.}
 #' \item{validation.functional}{Type of error that validation was performed on.
 #' Either one of `c("WMAE","WMSE","MAE","MSE")` or a custom function passed by
 #' the user.}
+#' \item{V}{The number of folds the data are split into for the V-fold cross
+#' validation.}
 #' \item{lambdas}{Vector of hyperparameter values evaluated in the grid search
 #' (always returned in descending order).}
 #' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
@@ -462,8 +462,8 @@ cv.trendfilter <- function(x, y, weights,
   obj$residuals <- obj$y - obj$fitted.values
 
   obj <- obj[c(
-    "x.eval", "tf.estimate", "validation.method", "V",
-    "validation.functional", "lambdas", "edfs", "generalization.errors",
+    "x.eval", "tf.estimate", "validation.method", "validation.functional",
+    "V", "lambdas", "edfs", "generalization.errors",
     "se.errors", "lambda.min", "lambda.1se", "lambda.choice", "i.min",
     "i.1se", "edf.min", "edf.1se", "n.iter", "x", "y", "weights",
     "fitted.values", "residuals", "k", "thinning", "ADMM.params",
