@@ -1,7 +1,4 @@
-#' Optimal one-dimensional data analysis with trend filtering
-#'
-#' State-of-the-art one-dimensional data analysis with trend filtering
-#' (Tibshirani 2014).
+#' Denoising one-dimensional signals, the state of the art
 #'
 #' @docType package
 #' @name trendfiltering-package
