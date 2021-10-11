@@ -224,8 +224,18 @@
 #'
 #' @examples
 #' data(quasar_spec)
+#' head(spec)
+#' | log10.wavelength|       flux|   weights|
+#' |----------------:|----------:|---------:|
+#' |           3.5529|  0.4235348| 0.0417015|
+#' |           3.5530| -2.1143005| 0.1247811|
+#' |           3.5531| -3.7832341| 0.1284383|
 #'
 #' opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
+#'
+#' plot(log(opt$lambdas), opt$generalization.errors, type = "l", lwd = 1.5)
+
+
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom tidyr drop_na tibble
 #' @importFrom dplyr %>% arrange filter select

@@ -156,6 +156,7 @@ bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
   }
 
   if (mc.cores > detectCores()) mc.cores <- detectCores()
+  mc.cores <- min(floor(mc.cores), B)
 
   sampler <- case_when(
     bootstrap.algorithm == "nonparametric" ~ list(nonparametric.resampler),
@@ -222,7 +223,7 @@ tf.estimator <- function(data, obj, mode = "lambda") {
       control = obj$optimization.params
     )
 
-    i.min <- which.min(abs(tf.fit$df - obj$edf.min))
+    i.min <- min(which.min(abs(tf.fit$df - obj$edf.min))) %>% as.integer()
     lambda.min <- obj$lambdas[i.min]
     edf.min <- tf.fit$df[i.min]
     n.iter <- tf.fit$iter[i.min]
@@ -258,34 +259,20 @@ tf.estimator <- function(data, obj, mode = "lambda") {
   return(list(tf.estimate = tf.estimate * obj$y.scale, edf = edf.min, n.iter = n.iter))
 }
 
-########################################################
-
-#' Resampling functions for various bootstrap algorithms
-#'
-#' @param data Data frame / tibble with minimal column set: `x`, `y`, `weights`
-#' (for `parametric.sampler`), `fitted.values` (for `parametric.sampler`), and
-#' `residuals` (for `wild.sampler`)
-#'
-#' @return Bootstrap sample returned in the same format as the input data frame
-#' / tibble.
 
 #' @importFrom dplyr %>% mutate n
-#' @rdname samplers
-#' @export
 parametric.sampler <- function(data) {
   data %>% mutate(y = fitted.values + rnorm(n = n(), sd = 1 / sqrt(weights)))
 }
 
+
 #' @importFrom dplyr %>% slice_sample n
-#' @rdname samplers
-#' @export
 nonparametric.resampler <- function(data) {
   data %>% slice_sample(n = n(), replace = TRUE)
 }
 
+
 #' @importFrom dplyr %>% mutate n
-#' @rdname samplers
-#' @export
 wild.sampler <- function(data) {
   data %>% mutate(y = fitted.values + residuals *
     sample(
