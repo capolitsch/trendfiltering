@@ -122,10 +122,10 @@
 #' @importFrom tidyr tibble
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats quantile rnorm
-bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
-                                  bootstrap.algorithm = c("nonparametric", "parametric", "wild"),
+bootstrap.trendfilter <- function(obj,
+                                  bootstrap.algorithm, level = 0.95, B = 100L,
                                   return.ensemble = FALSE, prune = TRUE,
-                                  mc.cores = detectCores()) {
+                                  mc.cores = detectCores(), seed = 1) {
   stopifnot(class(obj) %in% c("SURE.trendfilter", "cv.trendfilter"))
   bootstrap.algorithm <- match.arg(bootstrap.algorithm)
   stopifnot(is.double(level) & level > 0 & level < 1)
@@ -135,6 +135,11 @@ bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
 
   if (mc.cores < detectCores()) {
     warning(paste0("Your machine has ", detectCores(), " cores. Consider increasing mc.cores to speed up computation."))
+  }
+
+  if (!missing(seed)) {
+    RNGkind("L'Ecuyer-CMRG")
+    set.seed(seed)
   }
 
   if (mc.cores > detectCores()) mc.cores <- detectCores()
@@ -147,12 +152,14 @@ bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
   )[[1]]
 
   obj$prune <- prune
-  data.scaled <- obj$data.scaled
+  par.out <- mclapply(1:B, tf.estimator,
+    data = sampler(obj$data.scaled),
+    obj = obj, mode = "edf", mc.cores = mc.cores
+  )
 
-  par.out <- mclapply(1:B, bootstrap.estimator, mc.cores = mc.cores)
   tf.boot.ensemble <- lapply(X = 1:B, FUN = function(X) par.out[[X]][["tf.estimate"]]) %>%
     unlist() %>%
-    matrix(nrow = length(obj$x.eval))
+    matrix(nrow = length(obj$x.eval)) * obj$y.scale
 
   obj$edf.boots <- lapply(X = 1:B, FUN = function(X) par.out[[X]][["edf"]]) %>%
     unlist() %>%
@@ -187,12 +194,7 @@ bootstrap.trendfilter <- function(obj, level = 0.95, B = 100L,
 }
 
 #' @importFrom glmgen trendfilter
-bootstrap.estimator <- function(b) {
-  tf.estimator(data = sampler(data.scaled), obj = obj, mode = "edf")
-}
-
-#' @importFrom glmgen trendfilter
-tf.estimator <- function(data, obj, mode = "lambda") {
+tf.estimator <- function(b, data, obj, mode = "lambda") {
   if (mode == "edf") {
     tf.fit <- trendfilter(
       x = data$x,

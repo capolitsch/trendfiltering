@@ -94,6 +94,7 @@
 #' \item{`x_tol`}: Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
 #' elements of `x` that fall into the same bin, then we thin the data.}
+#' @param seed Random number seed (for reproducible results).
 #'
 #' @details \loadmathjax Our recommendations for when to use
 #' \code{\link{cv.trendfilter}} vs. `SURE.trendfilter`, as well as each of the
@@ -251,7 +252,8 @@ cv.trendfilter <- function(x, y, weights,
                            validation.functional = "WMAE",
                            x.eval, nx.eval = 1500L,
                            mc.cores = detectCores(),
-                           optimization.params = list(max_iter = 600L, obj_tol = 1e-10)) {
+                           optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
+                           seed = 1) {
   if (missing(x) || is.null(x)) stop("x must be passed.")
   if (missing(y) || is.null(y)) stop("y must be passed.")
   if (length(x) != length(y)) stop("x and y must have equal length.")
@@ -313,6 +315,11 @@ cv.trendfilter <- function(x, y, weights,
   weights <- weights %>% as.double()
   k <- k %>% as.integer()
   V <- V %>% as.integer()
+
+  if (!missing(seed)) {
+    RNGkind("L'Ecuyer-CMRG")
+    set.seed(seed)
+  }
 
   data <- tibble(x, y, weights) %>%
     arrange(x) %>%

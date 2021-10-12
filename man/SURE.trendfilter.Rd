@@ -14,7 +14,8 @@ SURE.trendfilter(
   lambdas,
   x.eval,
   nx.eval = 1500L,
-  optimization.params = list(max_iter = 600L, obj_tol = 1e-10)
+  optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
+  seed = 1
 )
 }
 \arguments{
@@ -81,6 +82,8 @@ controlled by the \code{x_tol} argument below.
 \item{\code{x_tol}}: Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size \code{x_tol} and find at least two
 elements of \code{x} that fall into the same bin, then we thin the data.}}
+
+\item{seed}{Random number seed (for reproducible results).}
 }
 \value{
 An object of class 'SURE.trendfilter'. This is a list with the

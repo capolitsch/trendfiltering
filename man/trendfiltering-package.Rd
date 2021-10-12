@@ -3,7 +3,7 @@
 \docType{package}
 \name{trendfiltering-package}
 \alias{trendfiltering-package}
-\title{Denoising one-dimensional signals, the state of the art}
+\title{The state of the art for denoising 1D signals}
 \references{
 \cr
 \bold{Companion references}

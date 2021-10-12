@@ -6,27 +6,28 @@
 \usage{
 bootstrap.trendfilter(
   obj,
+  bootstrap.algorithm,
   level = 0.95,
   B = 100L,
-  bootstrap.algorithm = c("nonparametric", "parametric", "wild"),
   return.ensemble = FALSE,
   prune = TRUE,
-  mc.cores = detectCores()
+  mc.cores = detectCores(),
+  seed = 1
 )
 }
 \arguments{
 \item{obj}{An object of class '\link{SURE.trendfilter}' or
 '\link{cv.trendfilter}'.}
 
+\item{bootstrap.algorithm}{A string specifying which variation of the
+bootstrap to use. One of \code{c("nonparametric","parametric","wild")}. See
+details below for recommendations on when each option is appropriate.}
+
 \item{level}{The level of the pointwise variability bands. Defaults to
 \code{level = 0.95}.}
 
 \item{B}{The number of bootstrap samples used to estimate the pointwise
 variability bands. Defaults to \code{B = 100}.}
-
-\item{bootstrap.algorithm}{A string specifying which variation of the
-bootstrap to use. One of \code{c("nonparametric","parametric","wild")}. See
-details below for recommendations on when each option is appropriate.}
 
 \item{return.ensemble}{\loadmathjax Logical. If \code{TRUE}, the full trend
 filtering bootstrap ensemble is returned as an \mjseqn{n \times B} matrix,
