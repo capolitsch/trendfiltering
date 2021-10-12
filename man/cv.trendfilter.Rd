@@ -210,10 +210,10 @@ The formal definitions of the common validation loss functionals available
 via the options \code{validation.functional = c("WMAE","WMSE","MAE","MSE")} are
 stated below.
 
-\mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-\mjsdeqn{WMSE(\lambda) = \sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
-\mjsdeqn{MAE(\lambda) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|}
-\mjsdeqn{MSE(\lambda) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \widehat{f}(x_i; \lambda)|^2}
+\mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
+\mjsdeqn{WMSE(\lambda) = \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
+\mjsdeqn{MAE(\lambda) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|}
+\mjsdeqn{MSE(\lambda) = \frac{1}{n}\sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2}
 where \mjseqn{w_i} is the \mjseqn{i}th element of the \code{weights} vector.
 
 If constant weights are passed, or if nothing is passed, then the weighted

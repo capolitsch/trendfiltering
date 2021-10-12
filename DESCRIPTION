@@ -2,18 +2,13 @@ Type: Package
 Package: trendfiltering
 Title: The state of the art method for denoising 1D signals
 Version: 0.1.0
-Authors@R:
-    c(person(given = "Collin A.",
+Author@R: c(person(given = "Collin A.",
              family = "Politsch",
              role = c("aut","cre"),
              email = "collinpolitsch@gmail.com",
              comment = c(ORCID = "0000-0003-3727-9167")))
-Description: 
+Description: The state of the art method for denoising 1D signals
 License: MIT
-URL: 
-    https://github.com/capolitsch/trendfiltering
-    https://academic.oup.com/mnras/article/492/3/4005/5704413
-    https://academic.oup.com/mnras/article/492/3/4019/5704414
 BugReports: https://github.com/capolitsch/trendfiltering/issues
 LazyData: true
 Remotes:

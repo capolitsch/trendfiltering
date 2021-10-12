@@ -164,28 +164,28 @@ process
 where \mjseqn{y_i} is a noisy observation of a signal \mjseqn{f(x_i)} and the
 \mjseqn{\epsilon_i} have mean zero with variance
 \mjseqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}. Let
-\mjseqn{\widehat{f}(\cdot\;; \lambda)} denote the trend filtering estimator of
+\mjseqn{\hat{f}(\cdot\;; \lambda)} denote the trend filtering estimator of
 order \mjseqn{k} with tunable hyperparameter \mjseqn{\lambda}. The fixed-input
-mean-squared prediction error (MSPE) of the estimator \mjseqn{\widehat{f}}
+mean-squared prediction error (MSPE) of the estimator \mjseqn{\hat{f}}
 is defined as
-\mjsdeqn{R(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(y_i - \widehat{f}(x_{i};\lambda)\right)^2\;|\;x_{1},\dots,x_{n}\right]}
-\mjsdeqn{= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left[\left(f(x_i) - \widehat{f}(x_i;\lambda)\right)^2\;|\;x_1,\dots,x_n\right] + \sigma_i^2\right).}
+\mjsdeqn{R(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(y_i - \hat{f}(x_{i};\lambda)\right)^2\;|\;x_{1},\dots,x_{n}\right]}
+\mjsdeqn{= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left[\left(f(x_i) - \hat{f}(x_i;\lambda)\right)^2\;|\;x_1,\dots,x_n\right] + \sigma_i^2\right).}
 Stein's unbiased risk estimate (SURE) provides an unbiased estimate of the
 fixed-input MSPE via the following formula:
-\mjsdeqn{\widehat{R}(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \lambda)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f})}{n},}
+\mjsdeqn{\hat{R}(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \hat{f}(x_i; \lambda)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\hat{f})}{n},}
 where \mjseqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}
-and \mjseqn{\text{df}(\widehat{f})} is the effective degrees of
+and \mjseqn{\text{df}(\hat{f})} is the effective degrees of
 freedom of the trend filtering estimator (with a fixed choice of
 hyperparameter). The generalized lasso results of
 \href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{Tibshirani and Taylor (2012)}
 provide the following formula for the effective degrees of freedom of a trend
 filtering estimator (with a fixed hyperparameter choice):
-\mjsdeqn{\text{df}(\widehat{f}) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}\right] + k + 1.}
+\mjsdeqn{\text{df}(\hat{f}) = \mathbb{E}\left[\text{number of knots in}\;\hat{f}\right] + k + 1.}
 The optimal hyperparameter value is then defined as
-\mjsdeqn{\widehat{\lambda} = \arg\min_{\lambda} \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \lambda)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f})}{n},}
-where \mjseqn{\widehat{\text{df}}} is the estimate for the effective
+\mjsdeqn{\hat{\lambda} = \arg\min_{\lambda} \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \hat{f}(x_i; \lambda)\big)^2 + \frac{2\hat{\overline{\sigma}}^{2}\hat{\text{df}}(\hat{f})}{n},}
+where \mjseqn{\hat{\text{df}}} is the estimate for the effective
 degrees of freedom that is obtained by replacing the expectation with the
-observed number of knots, and \mjseqn{\widehat{\overline{\sigma}}^2}
+observed number of knots, and \mjseqn{\hat{\overline{\sigma}}^2}
 is an estimate of \mjseqn{\overline{\sigma}^2}. We define
 \mjseqn{\overline{\sigma}^2} as \code{mean(1 / weights)}, so \code{weights} must be
 passed in order to use \code{SURE.trendfilter}. If a reliable estimate of
