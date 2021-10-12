@@ -128,7 +128,6 @@ bootstrap.trendfilter <- function(obj,
                                   return.ensemble = FALSE, prune = TRUE,
                                   mc.cores = detectCores(), seed = 1) {
   stopifnot(class(obj) %in% c("SURE.trendfilter", "cv.trendfilter"))
-  bootstrap.algorithm <- match.arg(bootstrap.algorithm)
   stopifnot(is.double(level) & level > 0 & level < 1)
   stopifnot(B >= 10)
 
