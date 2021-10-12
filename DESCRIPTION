@@ -1,6 +1,6 @@
 Type: Package
 Package: trendfiltering
-Title: The state of the art for denoising 1D signals
+Title: The state of the art method for denoising 1D signals
 Version: 0.1.0
 Authors@R:
     c(person(given = "Collin A.",

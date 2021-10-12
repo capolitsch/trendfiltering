@@ -1,4 +1,4 @@
-#' The state of the art for denoising 1D signals
+#' The state of the art method for denoising 1D signals
 #'
 #' @docType package
 #' @name trendfiltering-package
