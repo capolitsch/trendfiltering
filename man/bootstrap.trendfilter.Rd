@@ -42,6 +42,8 @@ Do not change this unless you know what you are doing!}
 
 \item{mc.cores}{Parallel computing: The number of cores to utilize. Defaults
 to the number of cores detected.}
+
+\item{seed}{Random number seed (for reproducible results).}
 }
 \value{
 An object of class 'bootstrap.trendfilter'. This is a comprehensive

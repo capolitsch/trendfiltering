@@ -284,7 +284,7 @@ SURE.trendfilter <- function(x, y, weights,
   weights <- weights %>% as.double()
   k <- k %>% as.integer()
 
-  if (!is.missing(seed)) set.seed(seed)
+  if (!missing(seed)) set.seed(seed)
 
   data <- tibble(x, y, weights) %>%
     arrange(x) %>%

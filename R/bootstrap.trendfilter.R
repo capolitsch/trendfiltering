@@ -20,6 +20,7 @@
 #' Do not change this unless you know what you are doing!
 #' @param mc.cores Parallel computing: The number of cores to utilize. Defaults
 #' to the number of cores detected.
+#' @param seed Random number seed (for reproducible results).
 #'
 #' @details Our recommendations for when to use \code{\link{cv.trendfilter}} vs.
 #' `SURE.trendfilter`, as well as each of the available settings for
