@@ -185,6 +185,7 @@
 #' astronomical spectroscopy}. \emph{MNRAS}, 492(3), p. 4005-4018.} \cr
 #' \item{Politsch et al. (2020b).
 #' \href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
+<<<<<<< HEAD
 #' Trend Filtering – II. Denoising astronomical signals with varying degrees of
 #' smoothness}. \emph{MNRAS}, 492(3), p. 4019-4032.}}
 #'

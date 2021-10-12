@@ -1,9 +1,20 @@
 #' Construct pointwise variability bands via a bootstrap
 #'
+<<<<<<< HEAD
 #' @param obj An object of class '\link{SURE.trendfilter}' or
 #' '\link{cv.trendfilter}'.
 #' @param level The level of the pointwise variability bands. Defaults to
 #' `level = 0.95`.
+=======
+#' @description \loadmathjax{} \code{bootstrap.trendfilter} implements a
+#' parametric bootstrap algorithm to obtain one or both of the following: 
+#' 1. Standard errors of the optimized trend filtering point estimator
+#' 2. Percentile-based \code{1-alpha} variability bands of the optimized 
+#' trend filtering point estimator.
+#' @param obj An object of class '\link{SURE.trendfilter}'.
+#' @param alpha Specifies the width of the \code{1-alpha} pointwise variability 
+#' bands. Defaults to \code{alpha = 0.05}.
+>>>>>>> main
 #' @param B The number of bootstrap samples used to estimate the pointwise
 #' variability bands. Defaults to `B = 100`.
 #' @param bootstrap.algorithm A string specifying which variation of the
@@ -62,12 +73,19 @@
 #' \item{n.pruned}{The number of poorly-converged bootstrap trend filtering
 #' estimates pruned from the ensemble.}
 #' \item{n.iter.boots}{Vector of the number of iterations needed for the ADMM
+<<<<<<< HEAD
 #' algorithm to converge within the given tolerance, for each bootstrap trend
 #' filtering estimate.}
 #' \item{...}{Named elements inherited from `obj` --- an object either of class
 #' '\link{SURE.trendfilter}' or '\link{cv.trendfilter}'. See the relevant
 #' function documentation for details.}
 #'
+=======
+#' algorithm to converge within the given tolerance, for each bootstrap
+#' trend filtering estimate.}
+#' \item{x.scale, y.scale, data.scaled}{for internal use.}
+#' @details Further details...
+>>>>>>> main
 #' @export bootstrap.trendfilter
 #'
 #' @author

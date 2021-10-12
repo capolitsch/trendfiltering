@@ -2,6 +2,7 @@ citHeader("To cite the trendfiltering package in publications use:")
 
 note <- sprintf("R package version %s", meta$Version)
 
+<<<<<<< HEAD
 citEntry(entry = "Misc",
          author = "Collin A. Politsch",
          title = "trendfiltering: The state of the art method for denoising 1D signals",
