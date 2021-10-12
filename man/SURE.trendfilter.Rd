@@ -2,161 +2,266 @@
 % Please edit documentation in R/SURE.trendfilter.R
 \name{SURE.trendfilter}
 \alias{SURE.trendfilter}
-\title{Optimize the trend filtering hyperparameter (with respect to Stein's
-unbiased risk estimate)}
+\title{Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
+risk estimate}
 \usage{
 SURE.trendfilter(
   x,
   y,
   weights,
-  x.eval = x,
-  ngammas = 250L,
-  nx.eval,
-  gammas,
   k = 2L,
-  thinning = NULL,
-  optimization.params = list(max_iter = 600L, obj_tol = 1e-10)
+  nlambdas = 250L,
+  lambdas,
+  x.eval,
+  nx.eval = 1500L,
+  optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
+  seed = 1
 )
 }
 \arguments{
-\item{x}{The vector of observed values of the input variable (a.k.a. the
-predictor, covariate, explanatory variable, regressor, independent variable,
-control variable, etc.)}
+\item{x}{Vector of observed values for the input variable.}
 
-\item{y}{The vector of observed values of the output variable (a.k.a. the
-response, target, outcome, regressand, dependent variable, etc.).}
+\item{y}{Vector of observed values for the output variable.}
 
-\item{weights}{\emph{\strong{Must be passed.}} A vector of weights for the
-observed outputs. These are defined as \code{weights = 1 / sigma^2}, where
-\code{sigma} is a vector of standard errors of the uncertainty in the
-observed outputs. \code{weights} should either have length equal to 1
-(corresponding to observations with a constant (scalar) variance of
-\code{sigma = 1/sqrt(weights)}) or length equal to
-\code{length(y)} (i.e. general heteroskedastic noise).}
+\item{weights}{Weights for the observed outputs, defined as the reciprocal
+variance of the additive noise that contaminates the signal. \code{weights} can be
+passed as a scalar when the noise is expected to have equal variance for all
+observations. Otherwise, \code{weights} must have the same length as \code{x} and \code{y}.}
 
-\item{x.eval}{A user-supplied grid of inputs to evaluate the optimized trend
-filtering estimate on. Defaults to the observed inputs.}
+\item{k}{Degree of the piecewise polynomials that make up the trend
+filtering estimate. Defaults to \code{k = 2} (i.e. a piecewise quadratic
+estimate). Must be one of \verb{k = 0,1,2}. Higher order polynomials are
+disallowed since their smoothness is indistinguishable from \code{k = 2} and
+their use can lead to instability in the convex optimization.}
 
-\item{ngammas}{Integer. The number of trend filtering hyperparameter values
-to run the grid search over.}
+\item{nlambdas}{The number of hyperparameter settings to test during
+validation. When nothing is passed to \code{lambdas} (highly recommended for
+general use), the grid is automatically constructed by \code{SURE.trendfilter},
+with \code{nlambdas} controlling the granularity of the grid.}
 
-\item{nx.eval}{Overrides \code{x.eval} if passed. A length for an
-equally-spaced \code{x} grid between the minimum and maximum observed inputs
-to evaluate the optimized trend filtering estimate on.}
+\item{lambdas}{(Optional) Overrides \code{nlambdas} if passed. The vector of trend
+filtering hyperparameter values for the grid search. Use of this argument is
+discouraged unless you know what you are doing.}
 
-\item{gammas}{Overrides \code{ngammas} if passed. A user-supplied vector of
-trend filtering hyperparameter values to run the grid search over. It is
-advisable to let the vector be equally-spaced in log-space and provided in
-descending order. The function output will contain the sorted hyperparameter
-vector regardless of the input ordering, and all related output objects
-(e.g. the \code{errors} vector) will correspond to the sorted ordering.
-Unless you know what you are doing, it is best to leave this alone.}
+\item{x.eval}{(Optional) A grid of inputs to evaluate the optimized trend
+filtering estimate on. May be ignored, in which case the grid is determined
+by \code{nx.eval}.}
 
-\item{k}{The degree of the trend filtering estimator. Defaults to
-\code{k = 2} (quadratic trend filtering). Must be one of \code{k = 0,1,2,3},
-although \code{k = 3} is discouraged due to algorithmic instability (and is
-visually indistinguishable from \code{k = 2} anyway).}
+\item{nx.eval}{Integer. If nothing is passed to \code{x.eval}, then it is defined
+as \code{x.eval = seq(min(x), max(x), length = nx.eval)}.}
 
-\item{optimization.params}{a named list of parameters that
-contains all parameter choices (user-supplied or defaults) to be passed to
+\item{optimization.params}{A named list of parameter choices to be passed to
 the trend filtering ADMM algorithm
 (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
-Tibshirani 2016}). See the documentation for the
-\pkg{glmgen} function \code{\link[glmgen]{trendfilter.control.list}} for
-full details.
-No technical understanding of the ADMM algorithm is needed and the default
-parameter choices will almost always suffice. However, the following
-parameters may require some adjustments to ensure that your trend filtering
-estimate has sufficiently converged:
+Tibshirani 2016}). See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}
+documentation for full details. No technical understanding of the ADMM
+algorithm is needed and the default parameter choices will almost always
+suffice. However, the following parameters may require some adjustments to
+ensure that your trend filtering estimate has sufficiently converged:
 \enumerate{
-\item{\code{max_iter}}: Maximum iterations allowed for the trend filtering
-convex optimization. Defaults to \code{max_iter = 600L}. Increase this if
-the trend filtering estimate does not appear to have fully converged to a
-reasonable estimate of the signal.
+\item{\code{max_iter}}: Maximum iterations allowed for the trend filtering convex
+optimization. Defaults to \code{max_iter = 600L}. See the \code{n.iter} element
+of the function output for the actual number of iterations taken for every
+hyperparameter choice in \code{lambdas}. If any of the elements of \code{n.iter} are
+equal to \code{max_iter}, the objective function's tolerance has not been
+achieved and \code{max_iter} may need to be increased.
 \item{\code{obj_tol}}: The tolerance used in the convex optimization stopping
 criterion; when the relative change in the objective function is less than
-this value, the algorithm terminates. Decrease this if the trend filtering
-estimate does not appear to have fully converged to a reasonable estimate of
-the signal.
-\item{\code{thinning}}: logical. If \code{TRUE}, then the data are
-preprocessed so that a smaller, better conditioned data set is used for
-fitting. When left \code{NULL}, the default, the optimization will
-automatically detect whether thinning should be applied (i.e., cases in
-which the numerical fitting algorithm will struggle to converge). This
-preprocessing procedure is controlled by the \code{x_tol} argument of
-\code{\link[glmgen]{trendfilter.control.list}}.
-\item{x_tol}: Controls the automatic detection of when thinning should be
-applied to the data. If we make bins
-of size \code{x_tol} and find at least two \code{x}'s which fall into the
-same bin, then we thin the data.
-}}
+this value, the algorithm terminates. Thus, decreasing this setting will
+increase the precision of the solution returned by the optimization. Defaults
+to \code{obj_tol = 1e-10}. If the returned trend filtering estimate does not
+appear to have fully converged to a reasonable estimate of the signal, this
+issue can be resolve by some combination of decreasing \code{obj_tol} and
+increasing \code{max_iter}.
+\item{\code{thinning}}: Logical. If \code{TRUE}, then the data are preprocessed so that
+a smaller, better conditioned data set is used for fitting. When left \code{NULL}
+(the default setting), the optimization will automatically detect whether
+thinning should be applied (i.e. cases in which the numerical fitting
+algorithm will struggle to converge). This preprocessing procedure is
+controlled by the \code{x_tol} argument below.
+\item{\code{x_tol}}: Controls the automatic detection of when thinning should be
+applied to the data. If we make bins of size \code{x_tol} and find at least two
+elements of \code{x} that fall into the same bin, then we thin the data.}}
+
+\item{seed}{Random number seed (for reproducible results).}
 }
 \value{
 An object of class 'SURE.trendfilter'. This is a list with the
 following elements:
-\item{x.eval}{The grid of inputs the optimized trend filtering estimate was
-evaluated on.}
-\item{tf.estimate}{The optimized trend filtering estimate of the signal,
-evaluated on \code{x.eval}.}
+\item{x.eval}{Input grid used to evaluate the optimized trend filtering
+estimate on.}
+\item{tf.estimate}{Optimized trend filtering estimate, evaluated at \code{x.eval}.}
 \item{validation.method}{"SURE"}
-\item{gammas}{Vector of hyperparameter values tested during validation
+\item{lambdas}{Vector of hyperparameter values evaluated in the grid search
 (always returned in descending order).}
-\item{errors}{Vector of SURE error estimates corresponding to the
-\emph{descending} set of gamma values tested during validation.}
-\item{gamma.min}{Hyperparameter value that minimizes the SURE error curve.}
 \item{edfs}{Vector of effective degrees of freedom for all trend filtering
 estimators fit during validation.}
-\item{edf.min}{The effective degrees of freedom of the optimally-tuned trend
+\item{generalization.errors}{Vector of SURE generalization error estimates,
+corresponding to the descending-ordered \code{lambdas} vector.}
+\item{lambda.min}{Hyperparameter value that minimizes the SURE generalization
+error curve.}
+\item{i.min}{Index of \code{lambdas} that minimizes the SURE error curve.}
+\item{edf.min}{Effective degrees of freedom of the optimized trend
 filtering estimator.}
-\item{i.min}{The index of \code{gammas} (descending order) that minimizes
-the SURE error curve.}
-\item{x}{The vector of the observed inputs.}
-\item{y}{The vector of the observed outputs.}
-\item{weights}{A vector of weights for the observed outputs. These are
-defined as \code{weights = 1 / sigma^2}, where \code{sigma} is a vector of
-standard errors of the uncertainty in the observed outputs.}
-\item{fitted.values}{The optimized trend filtering estimate of the signal,
-evaluated at the observed inputs \code{x}.}
-\item{residuals}{\code{residuals = y - fitted.values}.}
-\item{k}{The degree of the trend filtering estimator.}
-\item{optimization.params}{a list of parameters that control the trend
-filtering convex optimization.}
-\item{n.iter}{Vector of the number of iterations needed for the ADMM
-algorithm to converge within the given tolerance, for each hyperparameter
-value. If many of these are exactly equal to \code{max_iter}, then their
-solutions have not converged with the tolerance specified by \code{obj_tol}.
-In which case, it is often prudent to increase \code{max_iter}.}
-\item{thinning}{logical. If \code{TRUE}, then the data are preprocessed so
-that a smaller, better conditioned data set is used for fitting.}
-\item{x.scale, y.scale, data.scaled}{for internal use.}
+\item{n.iter}{The number of iterations needed for the ADMM algorithm to
+converge within the given tolerance, for each hyperparameter value. If many
+of these are exactly equal to \code{max_iter}, then their solutions have not
+converged with the tolerance specified by \code{obj_tol}. In which case, it is
+often prudent to increase \code{max_iter}.}
+\item{training.errors}{Mean-squared error between the observed outputs \code{y}
+and the trend filtering estimate, for every hyperparameter choice.}
+\item{optimisms}{SURE-estimated optimisms, i.e.
+\code{optimisms = generalization.errors - training.errors}.}
+\item{x}{Vector of observed inputs.}
+\item{y}{Vector of observed outputs.}
+\item{weights}{Weights for the observed outputs, defined as the reciprocal
+variance of the additive noise that contaminates the signal.}
+\item{fitted.values}{Optimized trend filtering estimate, evaluated at the
+observed inputs \code{x}.}
+\item{residuals}{\code{residuals = y - fitted.values}}
+\item{k}{Degree of the trend filtering estimator.}
+\item{ADMM.params}{List of parameter settings for the trend filtering ADMM
+algorithm, constructed by passing the \code{optimization.params} list to
+\code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}.}
+\item{thinning}{Logical. If \code{TRUE}, then the data are preprocessed so that a
+smaller, better conditioned data set is used for fitting.}
+\item{x.scale, y.scale, data.scaled}{For internal use.}
 }
 \description{
-\loadmathjax{} \code{SURE.trendfilter} estimates the fixed-input
-mean-squared error of a trend filtering estimator (via Stein's unbiased risk
-estimate) on a grid of values for the hyperparameter \code{gamma}, and
-returns the full error curve and the optimized trend filtering estimate
-within a larger list with useful ancillary information.
+\code{SURE.trendfilter} optimizes the trend filtering hyperparameter via a grid
+search over a vector of candidate hyperparameter settings and selects the
+value that minimizes an unbiased estimate of the model's generalization
+error. See details for when to use \code{SURE.trendfilter} vs.
+\code{\link{cv.trendfilter}}.
 }
 \details{
-Further details...
+\loadmathjax Our recommendations for when to use
+\code{\link{cv.trendfilter}} vs. \code{SURE.trendfilter}, as well as each of the
+available settings for \code{bootstrap.algorithm} are shown in the table below.
+
+A regularly-sampled data set with some discarded pixels (either sporadically
+or in large consecutive chunks) is still considered regularly sampled. When
+the inputs are regularly sampled on a transformed scale, we recommend
+transforming to that scale and carrying out the full trend filtering analysis
+on that scale. See the example below for a case when the inputs are evenly
+sampled on the \code{log10(x)} scale.\tabular{lrr}{
+   Scenario \tab Hyperparameter optimization \tab \code{bootstrap.algorithm} \cr
+   \code{x} is irregularly sampled \tab \code{cv.trendfilter} \tab "nonparametric" \cr
+   \code{x} is regularly sampled & reciprocal variances are not available \tab \code{cv.trendfilter} \tab "wild" \cr
+   \code{x} is regularly sampled & reciprocal variances are available \tab \code{SURE.trendfilter} \tab "parametric" \cr
+}
+}
+\section{Trend filtering with Stein's unbiased risk estimate}{
+Here we describe the general motivation for optimizing a trend filtering
+estimator with respect to Stein's unbiased risk estimate. See
+\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)}
+for more details. \cr
+
+Suppose we observe noisy measurements of an output variable of interest
+(e.g., flux, magnitude, photon counts) according to the data generating
+process
+\mjsdeqn{y_i = f(x_i) + \epsilon_i, \quad\quad x_1,\dots,x_n\in(a,b),}
+where \mjseqn{y_i} is a noisy observation of a signal \mjseqn{f(x_i)} and the
+\mjseqn{\epsilon_i} have mean zero with variance
+\mjseqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}. Let
+\mjseqn{\widehat{f}(\cdot\;; \lambda)} denote the trend filtering estimator of
+order \mjseqn{k} with tunable hyperparameter \mjseqn{\lambda}. The fixed-input
+mean-squared prediction error (MSPE) of the estimator \mjseqn{\widehat{f}}
+is defined as
+\mjsdeqn{R(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(y_i - \widehat{f}(x_{i};\lambda)\right)^2\;|\;x_{1},\dots,x_{n}\right]}
+\mjsdeqn{= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left[\left(f(x_i) - \widehat{f}(x_i;\lambda)\right)^2\;|\;x_1,\dots,x_n\right] + \sigma_i^2\right).}
+Stein's unbiased risk estimate (SURE) provides an unbiased estimate of the
+fixed-input MSPE via the following formula:
+\mjsdeqn{\widehat{R}(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \lambda)\big)^2 + \frac{2\overline{\sigma}^{2}\text{df}(\widehat{f})}{n},}
+where \mjseqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}
+and \mjseqn{\text{df}(\widehat{f})} is the effective degrees of
+freedom of the trend filtering estimator (with a fixed choice of
+hyperparameter). The generalized lasso results of
+\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{Tibshirani and Taylor (2012)}
+provide the following formula for the effective degrees of freedom of a trend
+filtering estimator (with a fixed hyperparameter choice):
+\mjsdeqn{\text{df}(\widehat{f}) = \mathbb{E}\left[\text{number of knots in}\;\widehat{f}\right] + k + 1.}
+The optimal hyperparameter value is then defined as
+\mjsdeqn{\widehat{\lambda} = \arg\min_{\lambda} \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \widehat{f}(x_i; \lambda)\big)^2 + \frac{2\widehat{\overline{\sigma}}^{2}\widehat{\text{df}}(\widehat{f})}{n},}
+where \mjseqn{\widehat{\text{df}}} is the estimate for the effective
+degrees of freedom that is obtained by replacing the expectation with the
+observed number of knots, and \mjseqn{\widehat{\overline{\sigma}}^2}
+is an estimate of \mjseqn{\overline{\sigma}^2}. We define
+\mjseqn{\overline{\sigma}^2} as \code{mean(1 / weights)}, so \code{weights} must be
+passed in order to use \code{SURE.trendfilter}. If a reliable estimate of
+\mjseqn{\overline{\sigma}^2} is not available a priori, a data-driven
+estimate can be constructed, e.g. see
+\href{https://link.springer.com/book/10.1007/978-0-387-21736-9}{Wasserman (2004)}
+or
+\href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{Hastie, Tibshirani, and Friedman (2009)}.
+\cr \cr
+}
+
+\examples{
+data(quasar_spectrum)
+head(spec)
+
+# | log10.wavelength|       flux|   weights|
+# |----------------:|----------:|---------:|
+# |           3.5529|  0.4235348| 0.0417015|
+# |           3.5530| -2.1143005| 0.1247811|
+# |           3.5531| -3.7832341| 0.1284383|
+
+opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
+
+plot(log(opt$lambdas), opt$generalization.errors, type = "l", lwd = 1.5)
 }
 \references{
+\bold{Companion references}
 \enumerate{
-\item{Politsch et al. (2020a). Trend filtering – I. A modern
-statistical tool for time-domain astronomy and astronomical spectroscopy.
-\emph{Monthly Notices of the Royal Astronomical Society}, 492(3),
-p. 4005-4018.
-\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{\strong{\link{Link}}}}
-\item{Politsch et al. (2020b). Trend Filtering – II. Denoising
-astronomical signals with varying degrees of smoothness. \emph{Monthly
-Notices of the Royal Astronomical Society}, 492(3), p. 4019-4032.
+\item{Politsch et al. (2020a).
+\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
+Trend filtering – I. A modern statistical tool for time-domain astronomy and
+astronomical spectroscopy}. \emph{MNRAS}, 492(3), p. 4005-4018.} \cr
+\item{Politsch et al. (2020b).
 \href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
-\strong{\link{Link}}}}
-}
+Trend Filtering – II. Denoising astronomical signals with varying degrees of
+smoothness}. \emph{MNRAS}, 492(3), p. 4019-4032.}}
+
+\bold{Trend filtering theory}
+\enumerate{
+\item{Tibshirani (2014).
+\href{https://projecteuclid.org/euclid.aos/1395234979}{Adaptive piecewise
+polynomial estimation via trend filtering}. \emph{The Annals of Statistics}.
+42(1), p. 285-323.} \cr
+\item{Tibshirani (2020). \href{https://arxiv.org/abs/2003.03886}{Divided
+Differences, Falling Factorials, and Discrete Splines: Another Look at Trend
+Filtering and Related Problems}. arXiv: 2003.03886.}}
+
+\bold{Stein's unbiased risk estimate}
+\enumerate{
+\item{Tibshirani and Wasserman (2015).
+\href{http://www.stat.cmu.edu/~larry/=sml/stein.pdf}{Stein’s Unbiased Risk
+Estimate}. \emph{36-702: Statistical Machine Learning course notes}
+(Carnegie Mellon University).} \cr
+\item{Efron (2014).
+\href{https://www.tandfonline.com/doi/abs/10.1198/016214504000000692}{
+The Estimation of Prediction Error: Covariance Penalties
+and Cross-Validation}. \emph{Journal of the American Statistical
+Association}. 99(467), p. 619-632.} \cr
+\item{Stein (1981).
+\href{https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full}{
+Estimation of the Mean of a Multivariate Normal Distribution}.
+\emph{The Annals of Statistics}. 9(6), p. 1135-1151.}}
+
+\bold{Effective degrees of freedom for trend filtering}
+\enumerate{
+\item{Tibshirani and Taylor (2012)}.
+\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{
+Degrees of freedom in lasso problems}. \emph{The Annals of Statistics},
+40(2), p. 1198-1232.}
 }
 \seealso{
-\code{\link{bootstrap.trendfilter}}
+\code{\link{cv.trendfilter}}, \code{\link{bootstrap.trendfilter}}
 }
 \author{
-Collin A. Politsch, \email{collinpolitsch@gmail.com}
+\emph{\bold{Collin A. Politsch, Ph.D.}} \cr
+Email: collinpolitsch@gmail.com \cr
+Website: \href{https://collinpolitsch.com/}{collinpolitsch.com} \cr
+GitHub: \href{https://github.com/capolitsch/}{github.com/capolitsch} \cr \cr
 }
