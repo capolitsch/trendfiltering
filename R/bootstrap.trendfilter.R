@@ -159,7 +159,7 @@ bootstrap.trendfilter <- function(obj,
 
   tf.boot.ensemble <- lapply(X = 1:B, FUN = function(X) par.out[[X]][["tf.estimate"]]) %>%
     unlist() %>%
-    matrix(nrow = length(obj$x.eval)) * obj$y.scale
+    matrix(nrow = length(obj$x.eval))
 
   obj$edf.boots <- lapply(X = 1:B, FUN = function(X) par.out[[X]][["edf"]]) %>%
     unlist() %>%
