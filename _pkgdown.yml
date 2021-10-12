@@ -1,0 +1,46 @@
+# Deploy to central docs directory that's on GitHub Pages
+destination: docs/
+
+template:
+  code_folding: show
+  bootstrap: 4
+  params:
+    bootswatch: "cosmo"
+  bslib:
+    base_font:
+      google: "Sans Serif"
+    heading_font:
+      google: "Sans Serif"
+    code_font:
+      google: "JetBrains Mono"
+    
+authors:
+  Collin A. Politsch:
+    href: "https://collinpolitsch.com/"
+      
+figures:
+  dev: ragg::agg_png
+  dpi: 96
+  dev.args: []
+  fig.ext: png
+  fig.width: 8
+  fig.height: ~
+  fig.asp: 2
+  fig.retina: 2
+  fig.align: "center"
+  bg: NA
+
+reference:
+  - title: "Functions"
+  - contents:
+      - SURE.trendfilter
+      - cv.trendfilter
+      - bootstrap.trendfilter
+      
+repo:
+  branch: modeltools
+  url:
+    home: "https://github.com/capolitsch/trendfiltering"
+    source: "https://github.com/capolitsch/trendfiltering"
+    issue: "https://github.com/capolitsch/trendfiltering/issues"
+    user: "https://github.com/capolitsch"
