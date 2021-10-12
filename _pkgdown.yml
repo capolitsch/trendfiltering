@@ -14,21 +14,30 @@ template:
     code_font:
       google: "JetBrains Mono"
     
-authors:
+author:
   Collin A. Politsch:
     href: "https://collinpolitsch.com/"
-      
-figures:
-  dev: ragg::agg_png
-  dpi: 96
-  dev.args: []
-  fig.ext: png
-  fig.width: 8
-  fig.height: ~
-  fig.asp: 2
-  fig.retina: 2
-  fig.align: "center"
-  bg: NA
+    
+navbar:
+  structure:
+    left:
+    - home
+    - documentation
+    - references
+    right: github
+  components:
+    home:
+      icon: fas fa-home fa-lg
+      href: index.html
+    documentation:
+      text: Documentation
+      href: reference/index.html
+    references:
+      text: References
+      href: trendfiltering-package.html
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/capolitsch/trendfiltering
 
 reference:
   - title: "Functions"
@@ -36,9 +45,11 @@ reference:
       - SURE.trendfilter
       - cv.trendfilter
       - bootstrap.trendfilter
+  - title: "References"
+    contents:
+      - trendfiltering-package
       
 repo:
-  branch: modeltools
   url:
     home: "https://github.com/capolitsch/trendfiltering"
     source: "https://github.com/capolitsch/trendfiltering"
