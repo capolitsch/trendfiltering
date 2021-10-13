@@ -2,6 +2,9 @@
 .Rhistory
 .Rapp.history
 
+# Package-specific R profile
+.Rprofile
+
 # Session Data files
 .RData
 

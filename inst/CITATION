@@ -4,9 +4,9 @@ note <- sprintf("R package version %s", meta$Version)
 
 citEntry(entry = "Misc",
          author = "Collin A. Politsch",
-         title = "trendfiltering: The state of the art method for denoising 1D signals",
+         title = "trendfiltering: The state-of-the-art method for denoising 1D signals",
          year = "2021",
-         url = "https://github.com/capolitsch/trendfiltering",
-         textVersion = "C. A. Politsch (2021). trendfiltering: The state of the art method for denoising 1D signals. R package version 0.1.0.",
+         url = "https://capolitsch.github.io/trendfiltering/",
+         textVersion = "C. A. Politsch (2021). trendfiltering: The state-of-the-art method for denoising 1D signals. R package version 0.1.0.",
          note = note,
          key = "trendfiltering")

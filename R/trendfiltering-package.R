@@ -1,8 +1,5 @@
-#' The state-of-the-art method for denoising 1D signals
-#'
 #' @docType package
 #' @name trendfiltering-package
-#' @keywords package
 #'
 #' @author \cr
 #' \bold{Collin A. Politsch, Ph.D.}

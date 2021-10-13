@@ -88,10 +88,13 @@ to use SURE.trendfilter vs. cv.trendfilter." />
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Documentation</a>
+  <a href="../reference/index.html">Contents</a>
 </li>
 <li>
-  <a href="../trendfiltering-package.html">References</a>
+  <a href="../reference/trendfiltering-references.html">Papers</a>
+</li>
+<li>
+  <a href="../reference/index.html">Reference</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -402,7 +405,7 @@ Model selection and validation 2: Model assessment, more cross-validation</a>.
     <div class='dont-index'><p><code><a href='SURE.trendfilter.html'>SURE.trendfilter</a></code>, <code><a href='bootstrap.trendfilter.html'>bootstrap.trendfilter</a></code></p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
-    <p><em><b>Collin A. Politsch, Ph.D.</b></em> <br />
+    <p><b>Collin A. Politsch, Ph.D.</b> <br />
 Email: collinpolitsch@gmail.com <br />
 Website: <a href='https://collinpolitsch.com/'>collinpolitsch.com</a> <br />
 GitHub: <a href='https://github.com/capolitsch/'>github.com/capolitsch</a> <br /> <br /></p>
@@ -423,9 +426,7 @@ GitHub: <a href='https://github.com/capolitsch/'>github.com/capolitsch</a> <br /
   validation.functional <span class='op'>=</span> <span class='st'>"MAE"</span>, lambdas <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>7</span>, <span class='fl'>20</span>, length <span class='op'>=</span> <span class='fl'>250</span><span class='op'>)</span><span class='op'>)</span>,
   optimization.params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>max_iter <span class='op'>=</span> <span class='fl'>5e3</span>, obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span>, thinning <span class='op'>=</span> <span class='cn'>T</span><span class='op'>)</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Sorting lambdas to descending order.</span></div><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>opt</span><span class='op'>$</span><span class='va'>lambdas</span><span class='op'>)</span>, <span class='va'>opt</span><span class='op'>$</span><span class='va'>generalization.errors</span>, type <span class='op'>=</span> <span class='st'>"l"</span>, lwd <span class='op'>=</span> <span class='fl'>1.5</span><span class='op'>)</span>
-</div><div class='img'><img src='cv.trendfilter-1.png' alt='' width='700' height='433' /></div></pre>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: Sorting lambdas to descending order.</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
