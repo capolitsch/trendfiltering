@@ -14,7 +14,7 @@ SURE.trendfilter(
   lambdas,
   x.eval,
   nx.eval = 1500L,
-  optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
+  optimization.params,
   seed = 1
 )
 }
@@ -50,8 +50,8 @@ by \code{nx.eval}.}
 \item{nx.eval}{Integer. If nothing is passed to \code{x.eval}, then it is defined
 as \code{x.eval = seq(min(x), max(x), length = nx.eval)}.}
 
-\item{optimization.params}{A named list of parameter choices to be passed to
-the trend filtering ADMM algorithm
+\item{optimization.params}{(Optional) A named list of parameter choices to be
+passed to the trend filtering ADMM algorithm
 (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
 Tibshirani 2016}). See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}
 documentation for full details. No technical understanding of the ADMM

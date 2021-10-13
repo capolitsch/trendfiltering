@@ -30,8 +30,8 @@
 #' by `nx.eval`.
 #' @param nx.eval Integer. If nothing is passed to `x.eval`, then it is defined
 #' as `x.eval = seq(min(x), max(x), length = nx.eval)`.
-#' @param optimization.params A named list of parameter choices to be passed to
-#' the trend filtering ADMM algorithm
+#' @param optimization.params (Optional) A named list of parameter choices to be
+#' passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
 #' Tibshirani 2016}). See the [glmgen::trendfilter.control.list()]
 #' documentation for full details. No technical understanding of the ADMM
@@ -235,7 +235,7 @@
 SURE.trendfilter <- function(x, y, weights,
                              k = 2L, nlambdas = 250L, lambdas,
                              x.eval, nx.eval = 1500L,
-                             optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
+                             optimization.params,
                              seed = 1) {
   if (missing(x) || is.null(x)) stop("x must be passed.")
   if (missing(y) || is.null(y)) stop("y must be passed.")
@@ -292,6 +292,9 @@ SURE.trendfilter <- function(x, y, weights,
       sort(decreasing = T)
   }
 
+  if (missing(optimization.params)) {
+    optimization.params <- list(max_iter = 600L, obj_tol = 1e-10)
+  }
   thinning <- optimization.params$thinning
   optimization.params$thinning <- NULL
   ADMM.params <- do.call(trendfilter.control.list, optimization.params)

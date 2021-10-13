@@ -62,8 +62,8 @@
 #' for more details on the ``one-standard-error rule''.}
 #' @param mc.cores Parallel computing: The number of cores to utilize. Defaults
 #' to the number of cores detected on the machine.
-#' @param optimization.params A named list of parameter choices to be passed to
-#' the trend filtering ADMM algorithm
+#' @param optimization.params (Optional) A named list of parameter choices to be
+#' passed to the trend filtering ADMM algorithm
 #' (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
 #' Tibshirani 2016}). See the [glmgen::trendfilter.control.list()]
 #' documentation for full details. No technical understanding of the ADMM
@@ -244,7 +244,7 @@ cv.trendfilter <- function(x, y, weights,
                            validation.functional = "WMAE",
                            x.eval, nx.eval = 1500L,
                            mc.cores = detectCores(),
-                           optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
+                           optimization.params,
                            seed = 1) {
   if (missing(x) || is.null(x)) stop("x must be passed.")
   if (missing(y) || is.null(y)) stop("y must be passed.")
@@ -319,6 +319,9 @@ cv.trendfilter <- function(x, y, weights,
     drop_na()
   rm(x, y, weights)
 
+  if (missing(optimization.params)) {
+    optimization.params <- list(max_iter = 600L, obj_tol = 1e-10)
+  }
   thinning <- optimization.params$thinning
   optimization.params$thinning <- NULL
   ADMM.params <- do.call(trendfilter.control.list, optimization.params)

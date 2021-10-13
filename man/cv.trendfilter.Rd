@@ -17,7 +17,7 @@ cv.trendfilter(
   x.eval,
   nx.eval = 1500L,
   mc.cores = detectCores(),
-  optimization.params = list(max_iter = 600L, obj_tol = 1e-10),
+  optimization.params,
   seed = 1
 )
 }
@@ -89,8 +89,8 @@ as \code{x.eval = seq(min(x), max(x), length = nx.eval)}.}
 \item{mc.cores}{Parallel computing: The number of cores to utilize. Defaults
 to the number of cores detected on the machine.}
 
-\item{optimization.params}{A named list of parameter choices to be passed to
-the trend filtering ADMM algorithm
+\item{optimization.params}{(Optional) A named list of parameter choices to be
+passed to the trend filtering ADMM algorithm
 (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and
 Tibshirani 2016}). See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}
 documentation for full details. No technical understanding of the ADMM
