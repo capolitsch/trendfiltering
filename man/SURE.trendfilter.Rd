@@ -202,8 +202,6 @@ data(quasar_spectrum)
 head(spec)
 
 opt <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
-
-plot(log(opt$lambdas), opt$generalization.errors, type = "l", lwd = 1.5)
 }
 \references{
 \bold{Companion references}

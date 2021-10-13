@@ -231,8 +231,6 @@ opt <- cv.trendfilter(EB$phase, EB$flux, 1 / EB$std.err^2,
   validation.functional = "MAE", lambdas = exp(seq(7, 20, length = 250)),
   optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T)
 )
-
-plot(log(opt$lambdas), opt$generalization.errors, type = "l", lwd = 1.5)
 }
 \references{
 \bold{Companion references}

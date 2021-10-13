@@ -232,8 +232,6 @@
 #'   validation.functional = "MAE", lambdas = exp(seq(7, 20, length = 250)),
 #'   optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T)
 #' )
-#'
-#' plot(log(opt$lambdas), opt$generalization.errors, type = "l", lwd = 1.5)
 #' @importFrom dplyr mutate arrange case_when group_split bind_rows
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom parallel mclapply detectCores
