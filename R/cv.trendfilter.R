@@ -190,7 +190,7 @@
 #' @export cv.trendfilter
 #'
 #' @author
-#' \emph{\bold{Collin A. Politsch, Ph.D.}} \cr
+#' \bold{Collin A. Politsch, Ph.D.} \cr
 #' Email: collinpolitsch@@gmail.com \cr
 #' Website: [collinpolitsch.com](https://collinpolitsch.com/) \cr
 #' GitHub: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
@@ -228,14 +228,8 @@
 #' data(eclipsing_binary)
 #' head(EB)
 #'
-#' # |      phase|      flux|  std.err|
-#' # |----------:|---------:|--------:|
-#' # | -0.4986308| 0.9384845| 0.010160|
-#' # | -0.4978067| 0.9295757| 0.010162|
-#' # | -0.4957892| 0.9438493| 0.010162|
-#'
 #' opt <- cv.trendfilter(EB$phase, EB$flux, 1 / EB$std.err^2,
-#'   validation.functional = "MAE",
+#'   validation.functional = "MAE", lambdas = exp(seq(7, 20, length = 250)),
 #'   optimization.params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T)
 #' )
 #'

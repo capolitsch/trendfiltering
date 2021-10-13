@@ -13,42 +13,57 @@ template:
       google: "Sans Serif"
     code_font:
       google: "JetBrains Mono"
-    
+
+year: '2021'
+package:
+  name: trendfiltering
+  version: 0.1.0
+  authors: Collin A. Politsch
+development:
+  destination: dev
+  mode: release
+  version_label: default
+  version_tooltip: Released version
+  in_dev: no
+site:
+  root: ''
+  title: trendfiltering
+dev: ~
+extra: []
+
 author:
   Collin A. Politsch:
     href: "https://collinpolitsch.com/"
-    
+
+
 navbar:
   structure:
     left:
     - home
-    - documentation
-    - references
+    - contents
+    - papers
     right: github
   components:
     home:
       icon: fas fa-home fa-lg
       href: index.html
-    documentation:
-      text: Documentation
+    contents:
+      text: Contents
       href: reference/index.html
-    references:
-      text: References
-      href: trendfiltering-package.html
+    papers:
+      text: Papers
+      href: reference/trendfiltering-references.html
     github:
       icon: fab fa-github fa-lg
       href: https://github.com/capolitsch/trendfiltering
 
-reference:
+contents:
   - title: "Functions"
   - contents:
       - SURE.trendfilter
       - cv.trendfilter
       - bootstrap.trendfilter
-  - title: "References"
-    contents:
-      - trendfiltering-package
-      
+
 repo:
   url:
     home: "https://github.com/capolitsch/trendfiltering"

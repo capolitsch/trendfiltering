@@ -99,12 +99,6 @@ for more details.\tabular{lrr}{
 data(quasar_spectrum)
 head(spec)
 
-# | log10.wavelength|       flux|   weights|
-# |----------------:|----------:|---------:|
-# |           3.5529|  0.4235348| 0.0417015|
-# |           3.5530| -2.1143005| 0.1247811|
-# |           3.5531| -3.7832341| 0.1284383|
-
 SURE.obj <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
 opt <- bootstrap.trendfilter(SURE.obj, bootstrap.algorithm = "parametric")
 }

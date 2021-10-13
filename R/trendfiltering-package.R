@@ -1,4 +1,4 @@
-#' The state of the art method for denoising 1D signals
+#' The state-of-the-art method for denoising 1D signals
 #'
 #' @docType package
 #' @name trendfiltering-package
@@ -97,4 +97,3 @@
 #' \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
 #' Model selection and validation 2: Model assessment, more cross-validation}.
 #' \emph{36-462: Data Mining course notes} (Carnegie Mellon University).}}
-NULL
