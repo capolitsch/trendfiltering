@@ -91,13 +91,10 @@ cv.trendfilter." />
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Contents</a>
-</li>
-<li>
-  <a href="../reference/trendfiltering-references.html">Papers</a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li>
+  <a href="../trendfiltering-references.html">Papers</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -143,7 +140,7 @@ error. See details for when to use <code>SURE.trendfilter</code> vs.
   <span class='va'>lambdas</span>,
   <span class='va'>x.eval</span>,
   nx.eval <span class='op'>=</span> <span class='fl'>1500L</span>,
-  optimization.params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>max_iter <span class='op'>=</span> <span class='fl'>600L</span>, obj_tol <span class='op'>=</span> <span class='fl'>1e-10</span><span class='op'>)</span>,
+  <span class='va'>optimization.params</span>,
   seed <span class='op'>=</span> <span class='fl'>1</span>
 <span class='op'>)</span></pre>
 
@@ -199,8 +196,8 @@ as <code>x.eval = seq(min(x), max(x), length = nx.eval)</code>.</p></td>
     </tr>
     <tr>
       <th>optimization.params</th>
-      <td><p>A named list of parameter choices to be passed to
-the trend filtering ADMM algorithm
+      <td><p>(Optional) A named list of parameter choices to be
+passed to the trend filtering ADMM algorithm
 (<a href='http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf'>Ramdas and
 Tibshirani 2016</a>). See the <code><a href='https://rdrr.io/pkg/glmgen/man/trendfilter.control.list.html'>glmgen::trendfilter.control.list()</a></code>
 documentation for full details. No technical understanding of the ADMM

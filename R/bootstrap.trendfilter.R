@@ -107,11 +107,13 @@
 #' @seealso \code{\link{SURE.trendfilter}}, \code{\link{cv.trendfilter}}
 #'
 #' @examples
+#' \dontrun{
 #' data(quasar_spectrum)
 #' head(spec)
 #'
 #' SURE.obj <- SURE.trendfilter(spec$log10.wavelength, spec$flux, spec$weights)
 #' opt <- bootstrap.trendfilter(SURE.obj, bootstrap.algorithm = "parametric")
+#' }
 #' @importFrom glmgen trendfilter
 #' @importFrom dplyr %>% mutate case_when select n
 #' @importFrom tidyr tibble

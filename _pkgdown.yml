@@ -24,9 +24,9 @@ development:
   mode: release
   version_label: default
   version_tooltip: Released version
-  in_dev: no
+  in_dev: yes
 site:
-  root: ''
+  root: 'https://capolitsch.github.io/'
   title: trendfiltering
 dev: ~
 extra: []
@@ -40,28 +40,28 @@ navbar:
   structure:
     left:
     - home
-    - contents
+    - reference
     - papers
     right: github
   components:
     home:
       icon: fas fa-home fa-lg
       href: index.html
-    contents:
-      text: Contents
+    reference:
+      text: Reference
       href: reference/index.html
     papers:
       text: Papers
-      href: reference/trendfiltering-references.html
+      href: trendfiltering-references.html
     github:
       icon: fab fa-github fa-lg
-      href: https://github.com/capolitsch/trendfiltering
+      href: "https://github.com/capolitsch/trendfiltering"
 
-contents:
+reference:
   - title: "Functions"
   - contents:
-      - SURE.trendfilter
       - cv.trendfilter
+      - SURE.trendfilter
       - bootstrap.trendfilter
 
 repo:
