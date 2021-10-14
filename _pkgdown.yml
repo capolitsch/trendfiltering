@@ -43,7 +43,7 @@ reference:
   - title: "Functions"
   - contents:
       - '`cv_trendfilter`'
-      - '`SURE_trendfilter`'
+      - '`sure_trendfilter`'
       - '`bootstrap_trendfilter`'
 
 repo:

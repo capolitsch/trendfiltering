@@ -85,7 +85,7 @@ elements of \code{x} that fall into the same bin, then we thin the data.}}
 \item{seed}{Random number seed (for reproducible results).}
 }
 \value{
-An object of class \link{sure_tf}. This is a list with the following
+An object of class \code{sure_tf}. This is a list with the following
 elements:
 \item{x_eval}{Input grid used to evaluate the optimized trend filtering
 estimate on.}
@@ -167,7 +167,7 @@ where \mjseqn{y_i} is a noisy observation of a signal \mjseqn{f(x_i)} and the
 \mjseqn{\epsilon_i} have mean zero with variance
 \mjseqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}. Let
 \mjseqn{\hat{f}(\cdot\;; \lambda)} denote the trend filtering estimator of
-order \mjseqn{k} with tunable hyperparameter \mjseqn{\lambda}. The
+order \mjseqn{k} with tuneable hyperparameter \mjseqn{\lambda}. The
 fixed-input mean-squared prediction error (MSPE) of the estimator
 \mjseqn{\hat{f}} is defined as
 \mjsdeqn{R(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(y_i -

@@ -96,7 +96,7 @@
 #' \mjseqn{\epsilon_i} have mean zero with variance
 #' \mjseqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}. Let
 #' \mjseqn{\hat{f}(\cdot\;; \lambda)} denote the trend filtering estimator of
-#' order \mjseqn{k} with tunable hyperparameter \mjseqn{\lambda}. The
+#' order \mjseqn{k} with tuneable hyperparameter \mjseqn{\lambda}. The
 #' fixed-input mean-squared prediction error (MSPE) of the estimator
 #' \mjseqn{\hat{f}} is defined as
 #' \mjsdeqn{R(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left\[\left(y_i -
@@ -136,7 +136,7 @@
 #' https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf).
 #' \cr \cr
 #'
-#' @return An object of class [sure_tf]. This is a list with the following
+#' @return An object of class `sure_tf`. This is a list with the following
 #' elements:
 #' \item{x_eval}{Input grid used to evaluate the optimized trend filtering
 #' estimate on.}
@@ -422,59 +422,3 @@ sure_trendfilter <- function(x, y, weights,
   class = "sure_tf"
   )
 }
-
-
-#' @importFrom methods setOldClass
-#' @exportClass sure_tf
-setOldClass(c("sure_tf"))
-
-#' `sure_tf` class
-#'
-#' A list object returned by [sure_trendfilter()], with the following elements:
-#' \itemize{
-#' \item{`x_eval`:} Input grid used to evaluate the optimized trend filtering
-#' estimate on.
-#' \item{`tf_estimate`:} Optimized trend filtering estimate, evaluated at
-#' `x_eval`.
-#' \item{`validation_method`:} "SURE"
-#' \item{`lambdas`:} Vector of hyperparameter values evaluated in the grid search
-#' (always returned in descending order).
-#' \item{`edfs`:} Vector of effective degrees of freedom for all trend filtering
-#' estimators fit during validation.
-#' \item{`generalization_errors`:} Vector of SURE generalization error estimates,
-#' corresponding to the descending-ordered `lambdas` vector.
-#' \item{`lambda_min`:} Hyperparameter value that minimizes the SURE
-#' generalization error curve.
-#' \item{`i_min`:} Index of `lambdas` that minimizes the SURE error curve.
-#' \item{`edf_min`:} Effective degrees of freedom of the optimized trend
-#' filtering estimator.
-#' \item{`n_iter`:} The number of iterations needed for the ADMM algorithm to
-#' converge within the given tolerance, for each hyperparameter value. If many
-#' of these are exactly equal to `max_iter`, then their solutions have not
-#' converged with the tolerance specified by `obj_tol`. In which case, it is
-#' often prudent to increase `max_iter`.
-#' \item{`training_errors`:} Mean-squared error between the observed outputs `y`
-#' and the trend filtering estimate, for every hyperparameter choice.
-#' \item{`optimisms`:} SURE-estimated optimisms, i.e.
-#' `optimisms = generalization_errors - training_errors`.
-#' \item{`x`:} Vector of observed inputs.
-#' \item{`y`:} Vector of observed outputs.
-#' \item{`weights`:} Weights for the observed outputs, defined as the reciprocal
-#' variance of the additive noise that contaminates the signal.
-#' \item{`fitted_values`:} Optimized trend filtering estimate, evaluated at the
-#' observed inputs `x`.
-#' \item{`residuals`:} `residuals = y - fitted_values`
-#' \item{`k`:} Degree of the trend filtering estimator.
-#' \item{`admm_params`:} List of parameter settings for the trend filtering ADMM
-#' algorithm, constructed by passing the `optimization_params` list to
-#' [glmgen::trendfilter.control.list()].
-#' \item{`thinning`:} Logical. If `TRUE`, then the data are preprocessed so that a
-#' smaller, better conditioned data set is used for fitting.
-#' \item{`seed`:} Random number seed (for reproducible results).
-#' \item{`x_scale`, `y_scale`, `data_scaled`:} For internal use.
-#' }
-#'
-#' @seealso [sure_trendfilter()]
-#' @name sure_tf-class
-#' @aliases sure_tf sure_tf-class
-NULL

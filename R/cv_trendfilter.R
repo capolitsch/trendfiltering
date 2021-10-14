@@ -235,7 +235,7 @@
 #' head(EB)
 #'
 #' opt <- cv_trendfilter(EB$phase, EB$flux, 1 / EB$std_err^2,
-#'   validation_functional = "MAE", lambdas = exp(seq(7, 20, length = 250)),
+#'   validation_functional = "MAE", lambdas = exp(seq(20, 7, length = 250)),
 #'   optimization_params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T)
 #' )
 #' @importFrom dplyr mutate arrange case_when group_split bind_rows
@@ -587,74 +587,3 @@ WMSE <- function(tf_estimate, y, weights) {
 WMAE <- function(tf_estimate, y, weights) {
   sum(abs(tf_estimate - y) * sqrt(weights) / sum(sqrt(weights)))
 }
-
-
-#' @importFrom methods setOldClass
-#' @exportClass cv_tf
-setOldClass(c("cv_tf"))
-
-#' `cv_tf` class
-#'
-#' A list object returned by [cv_trendfilter()], with the following elements:
-#' \itemize{
-#' \item{`x_eval`:} Input grid used to evaluate the optimized trend filtering
-#' estimate on.
-#' \item{`tf_estimate`:} Optimized trend filtering estimate, evaluated at
-#' `x_eval`.
-#' \item{`validation_method`:} `paste0(V,"-fold CV")`
-#' \item{`validation_functional`:} Type of error that validation was performed
-#' on. Either one of `c("WMAE","WMSE","MAE","MSE")` or a custom function passed
-#' by the user.
-#' \item{`V`:} The number of folds the data are split into for the V-fold cross
-#' validation.
-#' \item{`lambdas`:} Vector of hyperparameter values evaluated in the grid
-#' search (always returned in descending order).
-#' \item{`edfs`:} Vector of effective degrees of freedom for all trend filtering
-#' estimators fit during validation.
-#' \item{`generalization_errors`:} Vector of cross validation estimates of the
-#' trend filtering generalization error, for each hyperparameter value
-#' (ordered corresponding to the descending-ordered `lambdas` vector).
-#' \item{`se_errors`:} The standard errors of the cross validation errors.
-#' These are particularly useful for implementing the
-#' ``1-standard-error rule''.
-#' \item{`lambda_min`:} Hyperparameter value that minimizes the cross validation
-#' generalization error curve.
-#' \item{`lambda_1se`:} Largest hyperparameter value that is within one standard
-#' error of the minimum hyperparameter's cross validation error.
-#' \item{`lambda_choice`:} One of `c("lambda_min", "lambda_1se")`. The choice
-#' of hyperparameter that is used for the returned trend filtering estimate
-#' evaluation `tf_estimate`.
-#' \item{`i_min`:} Index of `lambdas` that minimizes the cross validation
-#' error.
-#' \item{`i_1se`:} Index of `lambdas` that gives the largest hyperparameter
-#' value that has a cross validation error within 1 standard error of the
-#' minimum of the cross validation error curves.
-#' \item{`edf_min`:} Effective degrees of freedom of the optimized trend
-#' filtering estimator.
-#' \item{`edf_1se`:} Effective degrees of freedom of the 1-stand-error rule
-#' trend filtering estimator.
-#' \item{`n_iter`:} The number of iterations needed for the ADMM algorithm to
-#' converge within the given tolerance, for each hyperparameter value. If many
-#' of these are exactly equal to `max_iter`, then their solutions have not
-#' converged with the tolerance specified by `obj_tol`. In which case, it is
-#' often prudent to increase `max_iter`.
-#' \item{`x`:} Vector of observed inputs.
-#' \item{`y:`} Vector of observed outputs.
-#' \item{`weights`:} Weights for the observed outputs, defined as the reciprocal
-#' variance of the additive noise that contaminates the signal.
-#' \item{`fitted_values`:} Optimized trend filtering estimate, evaluated at the
-#' observed inputs `x`.
-#' \item{`residuals`:} `residuals = y - fitted_values`
-#' \item{`k`:} Degree of the trend filtering estimator.
-#' \item{`admm_params`:} List of parameter settings for the trend filtering ADMM
-#' algorithm, constructed by passing the `optimization_params` list to
-#' [glmgen::trendfilter.control.list()].
-#' \item{`thinning`:} Logical. If `TRUE`, then the data are preprocessed so that
-#' a smaller, better conditioned data set is used for fitting.
-#' \item{`x_scale`, `y_scale`, `data_scaled`:} For internal use.
-#' }
-#'
-#' @seealso [cv_trendfilter()]
-#' @name cv_tf-class
-#' @aliases cv_tf cv_tf-class
-NULL

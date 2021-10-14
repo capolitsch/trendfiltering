@@ -34,7 +34,7 @@
 #' | `x` is regularly sampled                     | `bootstrap_algorithm = "parametric"`   |
 #' | `    `reciprocal variances are available     |                                        |
 #'
-#' @return An object of class 'bootstrap_tf'. This is a comprehensive
+#' @return An object of class `bootstrap_tf`. This is a comprehensive
 #' list containing all of the analysis important information, data, and
 #' results:
 #' \item{tf_standard_errors}{The standard errors of the optimized trend
@@ -65,7 +65,8 @@
 #' algorithm to converge within the given tolerance, for each bootstrap trend
 #' filtering estimate.}
 #' \item{...}{Named elements inherited from `obj` --- an object either of class
-#' `sure_tf` or `cv_tf`. See the relevant function documentation for details.}
+#' `sure_tf` or `cv_tf`. See the relevant function documentation for
+#' details.}
 #'
 #' @export bootstrap_trendfilter
 #'

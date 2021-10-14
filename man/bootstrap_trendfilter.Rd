@@ -45,7 +45,7 @@ ensemble that is used to compute the variability bands. Defaults to
 to the number of cores detected.}
 }
 \value{
-An object of class 'bootstrap_tf'. This is a comprehensive
+An object of class \code{bootstrap_tf}. This is a comprehensive
 list containing all of the analysis important information, data, and
 results:
 \item{tf_standard_errors}{The standard errors of the optimized trend
@@ -76,7 +76,8 @@ estimates pruned from the ensemble.}
 algorithm to converge within the given tolerance, for each bootstrap trend
 filtering estimate.}
 \item{...}{Named elements inherited from \code{obj} --- an object either of class
-\code{sure_tf} or \code{cv_tf}. See the relevant function documentation for details.}
+\code{sure_tf} or \code{cv_tf}. See the relevant function documentation for
+details.}
 }
 \description{
 Construct pointwise variability bands via a bootstrap

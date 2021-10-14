@@ -232,7 +232,7 @@ data(eclipsing_binary)
 head(EB)
 
 opt <- cv_trendfilter(EB$phase, EB$flux, 1 / EB$std_err^2,
-  validation_functional = "MAE", lambdas = exp(seq(7, 20, length = 250)),
+  validation_functional = "MAE", lambdas = exp(seq(20, 7, length = 250)),
   optimization_params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T)
 )
 }
