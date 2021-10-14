@@ -34,7 +34,7 @@ navbar:
       href: reference/index.html
     papers:
       text: Papers
-      href: trendfiltering-references.html
+      href: papers.html
     github:
       icon: fab fa-github fa-lg
       href: "https://github.com/capolitsch/trendfiltering"
