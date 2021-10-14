@@ -1,6 +1,7 @@
 #' Construct pointwise variability bands via a bootstrap
 #'
-#' @param obj An object of class `sure_tf` or `cv_tf`.
+#' @param obj An object of class [`sure_tf`][sure_trendfilter()] or
+#' [`cv_tf`][cv_trendfilter].
 #' @param level The level of the pointwise variability bands. Defaults to
 #' `level = 0.95`.
 #' @param B The number of bootstrap samples used to estimate the pointwise
@@ -65,8 +66,8 @@
 #' algorithm to converge within the given tolerance, for each bootstrap trend
 #' filtering estimate.}
 #' \item{...}{Named elements inherited from `obj` --- an object either of class
-#' `sure_tf` or `cv_tf`. See the relevant function documentation for
-#' details.}
+#' [`sure_tf`][sure_trendfilter] or [`cv_tf`][cv_trendfilter]. See the relevant
+#' function documentation for details.}
 #'
 #' @export bootstrap_trendfilter
 #'
@@ -110,8 +111,8 @@
 #' data(quasar_spectrum)
 #' head(spec)
 #' \dontrun{
-#' sure_obj <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
-#' opt <- bootstrap_trendfilter(sure_obj, bootstrap_algorithm = "parametric")
+#' sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+#' opt_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")
 #' }
 #' @importFrom glmgen trendfilter
 #' @importFrom dplyr %>% mutate case_when select n
@@ -121,7 +122,7 @@
 bootstrap_trendfilter <- function(obj,
                                   bootstrap_algorithm, level = 0.95, B = 100L,
                                   return_ensemble = FALSE, prune = TRUE,
-                                  mc.cores = parallel::detectCores(),
+                                  mc_cores = parallel::detectCores(),
                                   seed = 1) {
   stopifnot(class(obj) %in% c("sure_tf", "cv_tf"))
   stopifnot(is.double(level) & level > 0 & level < 1)

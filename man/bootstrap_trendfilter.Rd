@@ -11,12 +11,13 @@ bootstrap_trendfilter(
   B = 100L,
   return_ensemble = FALSE,
   prune = TRUE,
-  mc.cores = parallel::detectCores(),
+  mc_cores = parallel::detectCores(),
   seed = 1
 )
 }
 \arguments{
-\item{obj}{An object of class \code{sure_tf} or \code{cv_tf}.}
+\item{obj}{An object of class \code{\link[=sure_trendfilter]{sure_tf}} or
+\code{\link[=cv_trendfilter]{cv_tf}}.}
 
 \item{bootstrap_algorithm}{A string specifying which variation of the
 bootstrap to use. One of \code{c("nonparametric","parametric","wild")}. See
@@ -39,10 +40,10 @@ stopped at zero knots (likely erroneously), and removes them from the
 ensemble that is used to compute the variability bands. Defaults to
 \code{prune = TRUE}. Do not change this unless you know what you are doing!}
 
-\item{seed}{Random number seed (for reproducible results).}
-
 \item{mc_cores}{Parallel computing: The number of cores to utilize. Defaults
 to the number of cores detected.}
+
+\item{seed}{Random number seed (for reproducible results).}
 }
 \value{
 An object of class \code{bootstrap_tf}. This is a comprehensive
@@ -76,8 +77,8 @@ estimates pruned from the ensemble.}
 algorithm to converge within the given tolerance, for each bootstrap trend
 filtering estimate.}
 \item{...}{Named elements inherited from \code{obj} --- an object either of class
-\code{sure_tf} or \code{cv_tf}. See the relevant function documentation for
-details.}
+\code{\link[=sure_trendfilter]{sure_tf}} or \code{\link[=cv_trendfilter]{cv_tf}}. See the relevant
+function documentation for details.}
 }
 \description{
 Construct pointwise variability bands via a bootstrap
@@ -99,8 +100,8 @@ Politsch et al. (2020a)} for more details.\tabular{ll}{
 data(quasar_spectrum)
 head(spec)
 \dontrun{
-sure_obj <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
-opt <- bootstrap_trendfilter(sure_obj, bootstrap_algorithm = "parametric")
+sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+opt_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")
 }
 }
 \references{

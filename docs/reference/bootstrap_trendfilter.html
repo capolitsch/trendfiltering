@@ -127,7 +127,7 @@
   B <span class='op'>=</span> <span class='fl'>100L</span>,
   return_ensemble <span class='op'>=</span> <span class='cn'>FALSE</span>,
   prune <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  mc.cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span>,
+  mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span>,
   seed <span class='op'>=</span> <span class='fl'>1</span>
 <span class='op'>)</span></pre>
 
@@ -136,7 +136,8 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>obj</th>
-      <td><p>An object of class <code>sure_tf</code> or <code>cv_tf</code>.</p></td>
+      <td><p>An object of class <code><a href='sure_trendfilter.html'>sure_tf</a></code> or
+<code><a href='cv_trendfilter.html'>cv_tf</a></code>.</p></td>
     </tr>
     <tr>
       <th>bootstrap_algorithm</th>
@@ -171,13 +172,13 @@ ensemble that is used to compute the variability bands. Defaults to
 <code>prune = TRUE</code>. Do not change this unless you know what you are doing!</p></td>
     </tr>
     <tr>
-      <th>seed</th>
-      <td><p>Random number seed (for reproducible results).</p></td>
-    </tr>
-    <tr>
       <th>mc_cores</th>
       <td><p>Parallel computing: The number of cores to utilize. Defaults
 to the number of cores detected.</p></td>
+    </tr>
+    <tr>
+      <th>seed</th>
+      <td><p>Random number seed (for reproducible results).</p></td>
     </tr>
     </table>
 
@@ -214,8 +215,8 @@ estimates pruned from the ensemble.</p></dd>
 algorithm to converge within the given tolerance, for each bootstrap trend
 filtering estimate.</p></dd>
 <dt>...</dt><dd><p>Named elements inherited from <code>obj</code> --- an object either of class
-<code>sure_tf</code> or <code>cv_tf</code>. See the relevant function documentation for
-details.</p></dd>
+<code><a href='sure_trendfilter.html'>sure_tf</a></code> or <code><a href='cv_trendfilter.html'>cv_tf</a></code>. See the relevant
+function documentation for details.</p></dd>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -283,8 +284,8 @@ GitHub: <a href='https://github.com/capolitsch/'>github.com/capolitsch</a> <br /
 #&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121 
 #&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
 #&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='va'>sure_obj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sure_trendfilter.html'>sure_trendfilter</a></span><span class='op'>(</span><span class='va'>spec</span><span class='op'>$</span><span class='va'>log10_wavelength</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>flux</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>weights</span><span class='op'>)</span>
-<span class='va'>opt</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>sure_obj</span>, bootstrap_algorithm <span class='op'>=</span> <span class='st'>"parametric"</span><span class='op'>)</span>
+<span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sure_trendfilter.html'>sure_trendfilter</a></span><span class='op'>(</span><span class='va'>spec</span><span class='op'>$</span><span class='va'>log10_wavelength</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>flux</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>weights</span><span class='op'>)</span>
+<span class='va'>opt_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>sure_tf</span>, bootstrap_algorithm <span class='op'>=</span> <span class='st'>"parametric"</span><span class='op'>)</span>
 <span class='op'>}</span>
 </div></pre>
   </div>

@@ -210,7 +210,7 @@ or
 data(quasar_spectrum)
 head(spec)
 
-opt <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
 }
 \references{
 \bold{Companion references}
