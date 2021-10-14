@@ -42,9 +42,9 @@ navbar:
 reference:
   - title: "Functions"
   - contents:
-      - '`cv.trendfilter`'
-      - '`SURE.trendfilter`'
-      - '`bootstrap.trendfilter`'
+      - '`cv_trendfilter`'
+      - '`SURE_trendfilter`'
+      - '`bootstrap_trendfilter`'
 
 repo:
   url:

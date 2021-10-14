@@ -4,3 +4,4 @@
 ``` r
 devtools::install_github("capolitsch/trendfiltering")
 ```
+
