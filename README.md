@@ -1,4 +1,4 @@
-# trendfiltering
+# trendfiltering R package
 
 ## Installation
 ``` r

@@ -14,27 +14,9 @@ template:
     code_font:
       google: "JetBrains Mono"
 
-year: '2021'
-package:
-  name: trendfiltering
-  version: 0.1.0
-  authors: Collin A. Politsch
-development:
-  destination: dev
-  mode: release
-  version_label: default
-  version_tooltip: Released version
-  in_dev: yes
-site:
-  root: 'https://capolitsch.github.io/'
-  title: trendfiltering
-dev: ~
-extra: []
-
-author:
+authors:
   Collin A. Politsch:
     href: "https://collinpolitsch.com/"
-
 
 navbar:
   structure:
@@ -60,9 +42,9 @@ navbar:
 reference:
   - title: "Functions"
   - contents:
-      - cv.trendfilter
-      - SURE.trendfilter
-      - bootstrap.trendfilter
+      - '`cv.trendfilter`'
+      - '`SURE.trendfilter`'
+      - '`bootstrap.trendfilter`'
 
 repo:
   url:
