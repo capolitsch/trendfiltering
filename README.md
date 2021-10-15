@@ -2,6 +2,7 @@
 
 ## Installation
 ``` r
+install.packages("remotes")
 remotes::install_github("capolitsch/trendfiltering")
 ```
 ## Key references:
