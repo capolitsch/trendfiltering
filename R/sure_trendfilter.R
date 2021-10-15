@@ -223,7 +223,7 @@
 #' Degrees of freedom in lasso problems}. \emph{The Annals of Statistics},
 #' 40(2), p. 1198-1232.}
 #'
-#' @seealso [sure_trendfilter()], [bootstrap_trendfilter()]
+#' @seealso [cv_trendfilter()], [bootstrap_trendfilter()]
 #'
 #' @examples
 #' data(quasar_spectrum)

@@ -130,5 +130,5 @@ Bootstrap Methods: Another Look at the Jackknife}.
 \emph{The Annals of Statistics}, 7(1), p. 1-26.}}
 }
 \seealso{
-\code{\link[=sure.trendfilter]{sure.trendfilter()}}, \code{\link[=cv_trendfilter]{cv_trendfilter()}}
+\code{\link[=sure_trendfilter]{sure_trendfilter()}}, \code{\link[=cv_trendfilter]{cv_trendfilter()}}
 }

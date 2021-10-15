@@ -97,7 +97,7 @@
 #' Bootstrap Methods: Another Look at the Jackknife}.
 #' \emph{The Annals of Statistics}, 7(1), p. 1-26.}}
 #'
-#' @seealso [sure.trendfilter()], [cv_trendfilter()]
+#' @seealso [sure_trendfilter()], [cv_trendfilter()]
 #'
 #' @examples
 #' data(quasar_spectrum)

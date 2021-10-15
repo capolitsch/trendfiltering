@@ -255,5 +255,5 @@ Degrees of freedom in lasso problems}. \emph{The Annals of Statistics},
 40(2), p. 1198-1232.}
 }
 \seealso{
-\code{\link[=sure_trendfilter]{sure_trendfilter()}}, \code{\link[=bootstrap_trendfilter]{bootstrap_trendfilter()}}
+\code{\link[=cv_trendfilter]{cv_trendfilter()}}, \code{\link[=bootstrap_trendfilter]{bootstrap_trendfilter()}}
 }

@@ -5,6 +5,9 @@
 # Package-specific R profile
 .Rprofile
 
+# Unknown-origin Rplot files
+docs/reference/Rplot*
+
 # Session Data files
 .RData
 
