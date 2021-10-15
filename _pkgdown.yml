@@ -4,10 +4,15 @@ destination: docs/
 url: https://capolitsch.github.io/trendfiltering
 
 home:
-  title: State-of-the-art denoising
+  title: >
+    trendfiltering R package • The state-of-the-art method for denoising 1D
+    signals
   links:
   - text: See my other work at
     href: "https://collinpolitsch.com/"
+  citation:
+  - text: Citing the trendfiltering R package
+    href: authors.html
 
 authors:
   Collin A. Politsch:
