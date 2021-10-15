@@ -17,7 +17,7 @@ LazyData: true
 Remotes:
     statsmaths/glmgen/R_pkg/glmgen
 Depends: 
-    R (>= 4.1.0), 
+    R (>= 3.4.0),
     mathjaxr (>= 1.4)
 Imports: 
     glmgen (>= 0.0.3), 
