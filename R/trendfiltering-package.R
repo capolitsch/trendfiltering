@@ -1,15 +1,8 @@
 #' @docType package
 #' @name trendfiltering-package
 #'
-#' @author \cr
-#' \bold{Collin A. Politsch, Ph.D.}
-#' ---
-#' Email: collinpolitsch@@gmail.com \cr
-#' Website: [collinpolitsch.com](https://collinpolitsch.com/) \cr
-#' GitHub: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
-#'
 #' @references \cr
-#' \bold{Companion references}
+#' \bold{Closely related to this R package}
 #' \enumerate{
 #' \item{Politsch et al. (2020a).
 #' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
@@ -86,10 +79,6 @@
 #' The Elements of Statistical Learning: Data Mining, Inference, and
 #' Prediction}. 2nd edition. Springer Series in Statistics. (See Sections 7.10
 #' and 7.12)} \cr
-#' \item{James, Witten, Hastie, and Tibshirani (2013).
-#' \href{https://www.statlearning.com/}{An Introduction to Statistical Learning:
-#' with Applications in R}. Springer. (See Section 5.1; Less technical than
-#' ESL)} \cr
 #' \item{Tibshirani (2013).
 #' \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
 #' Model selection and validation 2: Model assessment, more cross-validation}.

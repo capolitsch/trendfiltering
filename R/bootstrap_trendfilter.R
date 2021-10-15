@@ -18,22 +18,20 @@
 #' stopped at zero knots (likely erroneously), and removes them from the
 #' ensemble that is used to compute the variability bands. Defaults to
 #' `prune = TRUE`. Do not change this unless you know what you are doing!
-#' @param mc_cores Parallel computing: The number of cores to utilize. Defaults
-#' to the number of cores detected.
-#' @param seed Random number seed (for reproducible results).
+#' @param mc_cores Multi-core computing using the
+#' [`parallel`][`parallel::parallel-package`] package: The number of cores to
+#' utilize. Defaults to the number of cores detected.
 #'
 #' @details Our recommendations for when to use each of the possible settings
 #' for the `bootstrap_algorithm` argument are shown in the table below. See
 #' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
 #' Politsch et al. (2020a)} for more details.
 #'
-#' | Scenario                                     |        Uncertainty quantification      |
-#' | :---                                         |                   :---                 |
-#' | `x` is irregularly sampled                   | `bootstrap_algorithm = "nonparametric"`|
-#' | `x` is regularly sampled and                 | `bootstrap_algorithm = "wild"`         |
-#' | `    `reciprocal variances are not available |                                        |
-#' | `x` is regularly sampled                     | `bootstrap_algorithm = "parametric"`   |
-#' | `    `reciprocal variances are available     |                                        |
+#' | Scenario                                                            |        Uncertainty quantification      |
+#' | :---                                                                |                   :---                 |
+#' | `x` is irregularly sampled                                          | `bootstrap_algorithm = "nonparametric"`|
+#' | `x` is regularly sampled and reciprocal variances are not available | `bootstrap_algorithm = "wild"`         |
+#' | `x` is regularly sampled and reciprocal variances are available     | `bootstrap_algorithm = "parametric"`   |
 #'
 #' @return An object of class `bootstrap_tf`. This is a comprehensive
 #' list containing all of the analysis important information, data, and
@@ -71,12 +69,6 @@
 #'
 #' @export bootstrap_trendfilter
 #'
-#' @author
-#' \bold{Collin A. Politsch, Ph.D.} \cr
-#' Email: collinpolitsch@@gmail.com \cr
-#' Website: [collinpolitsch.com](https://collinpolitsch.com/) \cr
-#' GitHub: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
-#'
 #' @references
 #' \bold{Companion references}
 #' \enumerate{
@@ -110,9 +102,10 @@
 #' @examples
 #' data(quasar_spectrum)
 #' head(spec)
+#'
 #' \dontrun{
-#' sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
-#' opt_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")
+#'   sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+#'   opt_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")
 #' }
 #' @importFrom glmgen trendfilter
 #' @importFrom dplyr %>% mutate case_when select n
@@ -122,8 +115,7 @@
 bootstrap_trendfilter <- function(obj,
                                   bootstrap_algorithm, level = 0.95, B = 100L,
                                   return_ensemble = FALSE, prune = TRUE,
-                                  mc_cores = parallel::detectCores(),
-                                  seed = 1) {
+                                  mc_cores = parallel::detectCores()) {
   stopifnot(class(obj) %in% c("sure_tf", "cv_tf"))
   stopifnot(is.double(level) & level > 0 & level < 1)
   stopifnot(B >= 10)
@@ -133,13 +125,8 @@ bootstrap_trendfilter <- function(obj,
   if (mc_cores < detectCores()) {
     warning(paste0(
       "Your machine has ", detectCores(),
-      " cores. Consider increasing mc.cores to speed up computation."
+      " cores. Consider increasing mc_cores to speed up computation."
     ))
-  }
-
-  if (!missing(seed)) {
-    RNGkind("L'Ecuyer-CMRG")
-    set.seed(seed)
   }
 
   if (mc_cores > detectCores()) mc_cores <- detectCores()
@@ -156,7 +143,9 @@ bootstrap_trendfilter <- function(obj,
     1:B,
     tf_estimator,
     data = sampler(obj$data_scaled),
-    obj = obj, mode = "edf", mc.cores = mc_cores
+    obj = obj,
+    mode = "edf",
+    mc.cores = mc_cores
   )
 
   tf_boot_ensemble <- lapply(

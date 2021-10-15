@@ -1,10 +1,10 @@
 #' Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
 #' risk estimate
 #'
-#' `sure_trendfilter()` optimizes the trend filtering hyperparameter via a grid
+#' [`sure_trendfilter()`] optimizes the trend filtering hyperparameter via a grid
 #' search over a vector of candidate hyperparameter settings and selects the
 #' value that minimizes an unbiased estimate of the model's generalization
-#' error. See details for when to use `sure_trendfilter()` vs.
+#' error. See details for when to use [`sure_trendfilter()`] vs.
 #' [cv_trendfilter()].
 #'
 #' @param x Vector of observed values for the input variable.
@@ -20,8 +20,9 @@
 #' their use can lead to instability in the convex optimization.
 #' @param nlambdas The number of hyperparameter settings to test during
 #' validation. When nothing is passed to `lambdas` (highly recommended for
-#' general use), the grid is automatically constructed by `sure_trendfilter()`,
-#' with `nlambdas` controlling the granularity of the grid.
+#' general use), the grid is automatically constructed by
+#' [`sure_trendfilter()`], with `nlambdas` controlling the granularity of the
+#' grid.
 #' @param lambdas (Optional) Overrides `nlambdas` if passed. The vector of trend
 #' filtering hyperparameter values for the grid search. Use of this argument is
 #' discouraged unless you know what you are doing.
@@ -62,7 +63,6 @@
 #' \item{`x_tol`}: Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
 #' elements of `x` that fall into the same bin, then we thin the data.}
-#' @param seed Random number seed (for reproducible results).
 #'
 #' @details \loadmathjax Our recommendations for when to use [cv_trendfilter()]
 #' vs. [sure_trendfilter()] are shown in the table below.
@@ -74,13 +74,11 @@
 #' on that scale. See the example below for a case when the inputs are evenly
 #' sampled on the `log10(x)` scale.
 #'
-#' | Scenario                                     | Hyperparameter optimization |
-#' | :---                                         |                       :---: |
-#' | `x` is irregularly sampled                   |      `cv_trendfilter()`     |
-#' | `x` is regularly sampled and                 |      `cv_trendfilter()`     |
-#' | `    `reciprocal variances are not available |                             |
-#' | `x` is regularly sampled                     |      `sure_trendfilter()`   |
-#' | `    `reciprocal variances are available     |                             |
+#' | Scenario                                                            |  Hyperparameter optimization  |
+#' | :---                                                                |                         :---: |
+#' | `x` is irregularly sampled                                          |      [`cv_trendfilter()`]     |
+#' | `x` is regularly sampled and reciprocal variances are not available |      [`cv_trendfilter()`]     |
+#' | `x` is regularly sampled and reciprocal variances are available     |      [`sure_trendfilter()`]   |
 #'
 #' # Trend filtering with Stein's unbiased risk estimate
 #' Here we describe the general motivation for optimizing a trend filtering
@@ -136,8 +134,8 @@
 #' https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf).
 #' \cr \cr
 #'
-#' @return An object of class `sure_tf`. This is a list with the following
-#' elements:
+#' @return An object of class [`sure_tf`][sure_trendfilter()]. This is a list
+#' with the following elements:
 #' \item{x_eval}{Input grid used to evaluate the optimized trend filtering
 #' estimate on.}
 #' \item{tf_estimate}{Optimized trend filtering estimate, evaluated at
@@ -176,16 +174,9 @@
 #' [glmgen::trendfilter.control.list()].}
 #' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so that a
 #' smaller, better conditioned data set is used for fitting.}
-#' \item{seed}{Random number seed (for reproducible results).}
 #' \item{x_scale, y_scale, data_scaled}{For internal use.}
 #'
 #' @export sure_trendfilter
-#'
-#' @author
-#' \bold{Collin A. Politsch, Ph.D.} \cr
-#' Email: collinpolitsch@@gmail.com \cr
-#' Website: [collinpolitsch.com](https://collinpolitsch.com/) \cr
-#' GitHub: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
 #'
 #' @references
 #' \bold{Companion references}
@@ -238,16 +229,17 @@
 #' data(quasar_spectrum)
 #' head(spec)
 #'
-#' sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+#' \dontrun{
+#'   sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+#' }
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom tidyr drop_na tibble
 #' @importFrom dplyr %>% arrange filter select
 #' @importFrom magrittr %$%
 sure_trendfilter <- function(x, y, weights,
                              k = 2L, nlambdas = 250L, lambdas,
-                             x_eval, nx_eval = 1500L,
-                             optimization_params,
-                             seed = 1) {
+                             nx_eval = 1500L, x_eval,
+                             optimization_params) {
   if (missing(x) || is.null(x)) stop("x must be passed.")
   if (missing(y) || is.null(y)) stop("y must be passed.")
   if (length(x) != length(y)) stop("x and y must have equal length.")
@@ -303,8 +295,6 @@ sure_trendfilter <- function(x, y, weights,
   y <- y %>% as.double()
   weights <- weights %>% as.double()
   k <- k %>% as.integer()
-
-  if (!missing(seed)) set.seed(seed)
 
   data <- tibble(x, y, weights) %>%
     arrange(x) %>%

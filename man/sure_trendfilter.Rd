@@ -12,10 +12,9 @@ sure_trendfilter(
   k = 2L,
   nlambdas = 250L,
   lambdas,
-  x_eval,
   nx_eval = 1500L,
-  optimization_params,
-  seed = 1
+  x_eval,
+  optimization_params
 )
 }
 \arguments{
@@ -36,19 +35,20 @@ their use can lead to instability in the convex optimization.}
 
 \item{nlambdas}{The number of hyperparameter settings to test during
 validation. When nothing is passed to \code{lambdas} (highly recommended for
-general use), the grid is automatically constructed by \code{sure_trendfilter()},
-with \code{nlambdas} controlling the granularity of the grid.}
+general use), the grid is automatically constructed by
+\code{\link[=sure_trendfilter]{sure_trendfilter()}}, with \code{nlambdas} controlling the granularity of the
+grid.}
 
 \item{lambdas}{(Optional) Overrides \code{nlambdas} if passed. The vector of trend
 filtering hyperparameter values for the grid search. Use of this argument is
 discouraged unless you know what you are doing.}
 
+\item{nx_eval}{Integer. If nothing is passed to \code{x_eval}, then it is defined
+as \code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
+
 \item{x_eval}{(Optional) A grid of inputs to evaluate the optimized trend
 filtering estimate on. May be ignored, in which case the grid is determined
 by \code{nx_eval}.}
-
-\item{nx_eval}{Integer. If nothing is passed to \code{x_eval}, then it is defined
-as \code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
 
 \item{optimization_params}{(Optional) A named list of parameter choices to be
 passed to the trend filtering ADMM algorithm (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and Tibshirani 2016}). See the
@@ -81,12 +81,10 @@ controlled by the \code{x_tol} argument below.
 \item{\code{x_tol}}: Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size \code{x_tol} and find at least two
 elements of \code{x} that fall into the same bin, then we thin the data.}}
-
-\item{seed}{Random number seed (for reproducible results).}
 }
 \value{
-An object of class \code{sure_tf}. This is a list with the following
-elements:
+An object of class \code{\link[=sure_trendfilter]{sure_tf}}. This is a list
+with the following elements:
 \item{x_eval}{Input grid used to evaluate the optimized trend filtering
 estimate on.}
 \item{tf_estimate}{Optimized trend filtering estimate, evaluated at
@@ -125,14 +123,13 @@ algorithm, constructed by passing the \code{optimization_params} list to
 \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}.}
 \item{thinning}{Logical. If \code{TRUE}, then the data are preprocessed so that a
 smaller, better conditioned data set is used for fitting.}
-\item{seed}{Random number seed (for reproducible results).}
 \item{x_scale, y_scale, data_scaled}{For internal use.}
 }
 \description{
-\code{sure_trendfilter()} optimizes the trend filtering hyperparameter via a grid
+\code{\link[=sure_trendfilter]{sure_trendfilter()}} optimizes the trend filtering hyperparameter via a grid
 search over a vector of candidate hyperparameter settings and selects the
 value that minimizes an unbiased estimate of the model's generalization
-error. See details for when to use \code{sure_trendfilter()} vs.
+error. See details for when to use \code{\link[=sure_trendfilter]{sure_trendfilter()}} vs.
 \code{\link[=cv_trendfilter]{cv_trendfilter()}}.
 }
 \details{
@@ -146,11 +143,9 @@ transforming to that scale and carrying out the full trend filtering analysis
 on that scale. See the example below for a case when the inputs are evenly
 sampled on the \code{log10(x)} scale.\tabular{lc}{
    Scenario \tab Hyperparameter optimization \cr
-   \code{x} is irregularly sampled \tab \code{cv_trendfilter()} \cr
-   \code{x} is regularly sampled and \tab \code{cv_trendfilter()} \cr
-   \verb{  }reciprocal variances are not available \tab  \cr
-   \code{x} is regularly sampled \tab \code{sure_trendfilter()} \cr
-   \verb{  }reciprocal variances are available \tab  \cr
+   \code{x} is irregularly sampled \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
+   \code{x} is regularly sampled and reciprocal variances are not available \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
+   \code{x} is regularly sampled and reciprocal variances are available \tab \code{\link[=sure_trendfilter]{sure_trendfilter()}} \cr
 }
 }
 \section{Trend filtering with Stein's unbiased risk estimate}{
@@ -210,7 +205,9 @@ or
 data(quasar_spectrum)
 head(spec)
 
-sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+\dontrun{
+  sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+}
 }
 \references{
 \bold{Companion references}
@@ -259,10 +256,4 @@ Degrees of freedom in lasso problems}. \emph{The Annals of Statistics},
 }
 \seealso{
 \code{\link[=sure_trendfilter]{sure_trendfilter()}}, \code{\link[=bootstrap_trendfilter]{bootstrap_trendfilter()}}
-}
-\author{
-\bold{Collin A. Politsch, Ph.D.} \cr
-Email: collinpolitsch@gmail.com \cr
-Website: \href{https://collinpolitsch.com/}{collinpolitsch.com} \cr
-GitHub: \href{https://github.com/capolitsch/}{github.com/capolitsch} \cr \cr
 }

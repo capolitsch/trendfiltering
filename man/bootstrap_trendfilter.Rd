@@ -11,8 +11,7 @@ bootstrap_trendfilter(
   B = 100L,
   return_ensemble = FALSE,
   prune = TRUE,
-  mc_cores = parallel::detectCores(),
-  seed = 1
+  mc_cores = parallel::detectCores()
 )
 }
 \arguments{
@@ -40,10 +39,9 @@ stopped at zero knots (likely erroneously), and removes them from the
 ensemble that is used to compute the variability bands. Defaults to
 \code{prune = TRUE}. Do not change this unless you know what you are doing!}
 
-\item{mc_cores}{Parallel computing: The number of cores to utilize. Defaults
-to the number of cores detected.}
-
-\item{seed}{Random number seed (for reproducible results).}
+\item{mc_cores}{Multi-core computing using the
+\code{\link[parallel:parallel-package]{parallel}} package: The number of cores to
+utilize. Defaults to the number of cores detected.}
 }
 \value{
 An object of class \code{bootstrap_tf}. This is a comprehensive
@@ -90,18 +88,17 @@ for the \code{bootstrap_algorithm} argument are shown in the table below. See
 Politsch et al. (2020a)} for more details.\tabular{ll}{
    Scenario \tab Uncertainty quantification \cr
    \code{x} is irregularly sampled \tab \code{bootstrap_algorithm = "nonparametric"} \cr
-   \code{x} is regularly sampled and \tab \code{bootstrap_algorithm = "wild"} \cr
-   \verb{  }reciprocal variances are not available \tab  \cr
-   \code{x} is regularly sampled \tab \code{bootstrap_algorithm = "parametric"} \cr
-   \verb{  }reciprocal variances are available \tab  \cr
+   \code{x} is regularly sampled and reciprocal variances are not available \tab \code{bootstrap_algorithm = "wild"} \cr
+   \code{x} is regularly sampled and reciprocal variances are available \tab \code{bootstrap_algorithm = "parametric"} \cr
 }
 }
 \examples{
 data(quasar_spectrum)
 head(spec)
+
 \dontrun{
-sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
-opt_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")
+  sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+  opt_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")
 }
 }
 \references{
@@ -134,10 +131,4 @@ Bootstrap Methods: Another Look at the Jackknife}.
 }
 \seealso{
 \code{\link[=sure.trendfilter]{sure.trendfilter()}}, \code{\link[=cv_trendfilter]{cv_trendfilter()}}
-}
-\author{
-\bold{Collin A. Politsch, Ph.D.} \cr
-Email: collinpolitsch@gmail.com \cr
-Website: \href{https://collinpolitsch.com/}{collinpolitsch.com} \cr
-GitHub: \href{https://github.com/capolitsch/}{github.com/capolitsch} \cr \cr
 }

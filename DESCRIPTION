@@ -11,7 +11,6 @@ Description: The state-of-the-art method for denoising 1D signals
 License: MIT
 URL:
     https://capolitsch.github.io/trendfiltering/
-    https://github.com/capolitsch/trendfiltering/
 BugReports: https://github.com/capolitsch/trendfiltering/issues
 LazyData: true
 Remotes:

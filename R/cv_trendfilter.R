@@ -1,16 +1,17 @@
 #' Optimize the trend filtering hyperparameter by V-fold cross validation
 #'
-#' `cv_trendfilter()` optimizes the trend filtering hyperparameter via V-fold
+#' [`cv_trendfilter()`] optimizes the trend filtering hyperparameter via V-fold
 #' cross validation on a grid of candidate hyperparameter settings and selects
 #' the value that minimizes a user-specified loss metric. See details for when
-#' to use [sure_trendfilter()] vs. `cv_trendfilter()`.
+#' to use [sure_trendfilter()] vs. [`cv_trendfilter()`].
 #'
 #' @param x Vector of observed values for the input variable.
 #' @param y Vector of observed values for the output variable.
-#' @param weights Weights for the observed outputs, defined as the reciprocal
-#' variance of the additive noise that contaminates the signal. `weights` can be
-#' passed as a scalar when the noise is expected to have equal variance for all
-#' observations. Otherwise, `weights` must have the same length as `x` and `y`.
+#' @param weights (Optional) Weights for the observed outputs, defined as the
+#' reciprocal variance of the additive noise that contaminates the signal.
+#' `weights` can be passed as a scalar when the noise is expected to have equal
+#' variance for all observations. Otherwise, `weights` must have the same length
+#' as `x` and `y`.
 #' @param k Degree of the piecewise polynomials that make up the trend
 #' filtering estimate. Defaults to `k = 2` (i.e. a piecewise quadratic
 #' estimate). Must be one of `k = 0,1,2`. Higher order polynomials are
@@ -18,7 +19,7 @@
 #' their use can lead to instability in the convex optimization.
 #' @param nlambdas The number of hyperparameter settings to test during
 #' validation. When nothing is passed to `lambdas` (highly recommended for
-#' general use), the grid is automatically constructed by `sure_trendfilter()`,
+#' general use), the grid is automatically constructed by [`cv_trendfilter()`],
 #' with `nlambdas` controlling the granularity of the grid.
 #' @param lambdas (Optional) Overrides `nlambdas` if passed. The vector of trend
 #' filtering hyperparameter values for the grid search. Use of this argument is
@@ -32,15 +33,16 @@
 #' validation. Defaults to `V = 10`.
 #' @param validation_functional Loss functional to optimize during cross
 #' validation. Some common choices can be used by passing an appropriate string
-#' --- one of `c("MAE","MSE","WMAE","WMSE")`, i.e. mean-absolute deviations
+#' --- one of `c("MSE","MAE","WMSE","WMAE")`, i.e. mean-absolute deviations
 #' error, mean-squared error, and their weighted counterparts. Defaults to
 #' `validation_functional = "WMAE"`.
 #'
-#' Custom validation loss functionals can be used by instead passing a function
-#' to `validation_functional`. The function should take three vector arguments
-#' --- `y`, `tf_estimate`, and `weights` --- and return a single scalar value
-#' for the validation loss. For example, `validation_functional = "WMAE"` is
-#' equivalent to passing the following function:
+#' Alternatively, custom validation loss functionals can be used by instead
+#' passing a function to `validation_functional`. The function should take three
+#' vector arguments --- `y`, `tf_estimate`, and `weights` --- and return a
+#' single scalar value for the validation loss. For example,
+#' `validation_functional = "WMAE"` is equivalent to passing the following
+#' function:
 #' ```{r, eval = F}
 #' function(tf_estimate, y, weights){
 #'   sum(abs(tf_estimate - y) * sqrt(weights) / sum(sqrt(weights)))
@@ -61,8 +63,9 @@
 #' [Hastie, Tibshirani, and Friedman (2009)](
 #' https://web.stanford.edu/~hastie/Papers/ESLII.pdf)
 #' for more details on the ``one-standard-error rule''.}
-#' @param mc_cores Parallel computing: The number of cores to utilize. Defaults
-#' to the number of cores detected on the machine.
+#' @param mc_cores Multi-core computing using the
+#' [`parallel`][`parallel::parallel-package`] package: The number of cores to
+#' utilize. Defaults to the number of cores detected.
 #' @param optimization_params (Optional) A named list of parameter choices to be
 #' passed to the trend filtering ADMM algorithm ([Ramdas and Tibshirani 2016](
 #' http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf)). See the
@@ -95,7 +98,6 @@
 #' \item{`x_tol`}: Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
 #' elements of `x` that fall into the same bin, then we thin the data.}
-#' @param seed Random number seed (for reproducible results).
 #'
 #' @details \loadmathjax Our recommendations for when to use [cv_trendfilter()]
 #' vs. [sure_trendfilter()] are shown in the table below.
@@ -107,26 +109,24 @@
 #' on that scale. See the example below for a case when the inputs are evenly
 #' sampled on the `log10(x)` scale.
 #'
-#' | Scenario                                     | Hyperparameter optimization |
-#' | :---                                         |                       :---: |
-#' | `x` is irregularly sampled                   |      `cv_trendfilter()`     |
-#' | `x` is regularly sampled and                 |      `cv_trendfilter()`     |
-#' | `    `reciprocal variances are not available |                             |
-#' | `x` is regularly sampled                     |      `sure_trendfilter()`   |
-#' | `    `reciprocal variances are available     |                             |
+#' | Scenario                                                            |  Hyperparameter optimization  |
+#' | :---                                                                |                         :---: |
+#' | `x` is irregularly sampled                                          |      [`cv_trendfilter()`]     |
+#' | `x` is regularly sampled and reciprocal variances are not available |      [`cv_trendfilter()`]     |
+#' | `x` is regularly sampled and reciprocal variances are available     |      [`sure_trendfilter()`]   |
 #'
 #' The formal definitions of the common validation loss functionals available
-#' via the options `validation_functional = c("WMAE","WMSE","MAE","MSE")` are
+#' via the options `validation_functional = c("MSE","MAE","WMSE","WMAE")` are
 #' stated below.
 #'
-#' \mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n}
-#' |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-#' \mjsdeqn{WMSE(\lambda) = \sum_{i=1}^{n}
-#' |Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
-#' \mjsdeqn{MAE(\lambda) = \frac{1}{n}
-#' \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|}
 #' \mjsdeqn{MSE(\lambda) = \frac{1}{n}
 #' \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2}
+#' \mjsdeqn{MAE(\lambda) = \frac{1}{n}
+#' \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|}
+#' \mjsdeqn{WMSE(\lambda) = \sum_{i=1}^{n}
+#' |Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
+#' \mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n}
+#' |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
 #' where \mjseqn{w_i} is the \mjseqn{i}th element of the `weights` vector.
 #'
 #' If constant weights are passed, or if nothing is passed, then the weighted
@@ -136,15 +136,15 @@
 #' of uncertainty in the output measurements) and absolute error is less
 #' sensitive to outliers than squared error.
 #'
-#' @return An object of class `cv_tf`. This is a list with the following
-#' elements:
+#' @return An object of class [`cv_tf`][cv_trendfilter]. This is a list with the
+#' following elements:
 #' \item{x_eval}{Input grid used to evaluate the optimized trend filtering
 #' estimate on.}
 #' \item{tf_estimate}{Optimized trend filtering estimate, evaluated at
 #' `x_eval`.}
 #' \item{validation_method}{`paste0(V,"-fold CV")`}
 #' \item{validation_functional}{Type of error that validation was performed on.
-#' Either one of `c("WMAE","WMSE","MAE","MSE")` or a custom function passed by
+#' Either one of `c("MSE","MAE","WMSE","WMAE")` or a custom function passed by
 #' the user.}
 #' \item{V}{The number of folds the data are split into for the V-fold cross
 #' validation.}
@@ -195,12 +195,6 @@
 #'
 #' @export cv_trendfilter
 #'
-#' @author
-#' \bold{Collin A. Politsch, Ph.D.} \cr
-#' Email: collinpolitsch@@gmail.com \cr
-#' Website: [collinpolitsch.com](https://collinpolitsch.com/) \cr
-#' GitHub: [github.com/capolitsch](https://github.com/capolitsch/) \cr \cr
-#'
 #' @references
 #' \bold{Companion references}
 #' \enumerate{
@@ -220,9 +214,6 @@
 #' The Elements of Statistical Learning: Data Mining, Inference, and
 #' Prediction}. 2nd edition. Springer Series in Statistics. (See Sections 7.10
 #' and 7.12)} \cr
-#' \item{James, Witten, Hastie, and Tibshirani (2013).
-#' \href{https://www.statlearning.com/}{An Introduction to Statistical Learning:
-#' with Applications in R}. Springer. (See Section 5.1)} \cr
 #' \item{Tibshirani (2013).
 #' \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
 #' Model selection and validation 2: Model assessment, more cross-validation}.
@@ -234,10 +225,20 @@
 #' data(eclipsing_binary)
 #' head(EB)
 #'
-#' cv_tf <- cv_trendfilter(EB$phase, EB$flux, 1 / EB$std_err^2,
-#'   validation_functional = "MAE", lambdas = exp(seq(20, 7, length = 250)),
-#'   optimization_params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T)
-#' )
+#' \dontrun{
+#'   cv_tf <- cv_trendfilter(
+#'     x = EB$phase,
+#'     y = EB$flux,
+#'     weights = 1 / EB$std_err^2,
+#'     validation_functional = "MAE",
+#'     lambdas = exp(seq(20, 7, length = 250)),
+#'     optimization_params = list(
+#'       max_iter = 5e3,
+#'       obj_tol = 1e-6,
+#'       thinning = T
+#'     )
+#'   )
+#' }
 #' @importFrom dplyr mutate arrange case_when group_split bind_rows
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom parallel mclapply detectCores
@@ -248,10 +249,9 @@ cv_trendfilter <- function(x, y, weights,
                            k = 2L, nlambdas = 250L, lambdas, V = 10L,
                            lambda_choice = c("lambda_min", "lambda_1se"),
                            validation_functional = "WMAE",
-                           x_eval, nx_eval = 1500L,
+                           nx_eval = 1500L, x_eval,
                            mc_cores = parallel::detectCores(),
-                           optimization_params,
-                           seed = 1) {
+                           optimization_params) {
   if (missing(x) || is.null(x)) stop("x must be passed.")
   if (missing(y) || is.null(y)) stop("y must be passed.")
   if (length(x) != length(y)) stop("x and y must have equal length.")
@@ -353,11 +353,6 @@ cv_trendfilter <- function(x, y, weights,
   k <- k %>% as.integer()
   V <- V %>% as.integer()
 
-  if (!missing(seed)) {
-    RNGkind("L'Ecuyer-CMRG")
-    set.seed(seed)
-  }
-
   data <- tibble(x, y, weights) %>%
     arrange(x) %>%
     filter(weights != 0) %>%
@@ -427,9 +422,12 @@ cv_trendfilter <- function(x, y, weights,
     data, nx_eval, admm_params, data_scaled, x_eval, x_scale, y_scale
   )
 
-  cv_out <- matrix(unlist(mclapply(1:(obj$V),
+  cv_out <- matrix(unlist(mclapply(
+    1:(obj$V),
     FUN = trendfilter_validate,
-    data_folded = data_folded, obj = obj, mc.cores = mc_cores
+    data_folded = data_folded,
+    obj = obj,
+    mc.cores = mc_cores
   )),
   ncol = obj$V
   )

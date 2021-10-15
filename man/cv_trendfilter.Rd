@@ -14,11 +14,10 @@ cv_trendfilter(
   V = 10L,
   lambda_choice = c("lambda_min", "lambda_1se"),
   validation_functional = "WMAE",
-  x_eval,
   nx_eval = 1500L,
-  mc_cores = detectCores(),
-  optimization_params,
-  seed = 1
+  x_eval,
+  mc_cores = parallel::detectCores(),
+  optimization_params
 )
 }
 \arguments{
@@ -26,10 +25,11 @@ cv_trendfilter(
 
 \item{y}{Vector of observed values for the output variable.}
 
-\item{weights}{Weights for the observed outputs, defined as the reciprocal
-variance of the additive noise that contaminates the signal. \code{weights} can be
-passed as a scalar when the noise is expected to have equal variance for all
-observations. Otherwise, \code{weights} must have the same length as \code{x} and \code{y}.}
+\item{weights}{(Optional) Weights for the observed outputs, defined as the
+reciprocal variance of the additive noise that contaminates the signal.
+\code{weights} can be passed as a scalar when the noise is expected to have equal
+variance for all observations. Otherwise, \code{weights} must have the same length
+as \code{x} and \code{y}.}
 
 \item{k}{Degree of the piecewise polynomials that make up the trend
 filtering estimate. Defaults to \code{k = 2} (i.e. a piecewise quadratic
@@ -39,7 +39,7 @@ their use can lead to instability in the convex optimization.}
 
 \item{nlambdas}{The number of hyperparameter settings to test during
 validation. When nothing is passed to \code{lambdas} (highly recommended for
-general use), the grid is automatically constructed by \code{sure_trendfilter()},
+general use), the grid is automatically constructed by \code{\link[=cv_trendfilter]{cv_trendfilter()}},
 with \code{nlambdas} controlling the granularity of the grid.}
 
 \item{lambdas}{(Optional) Overrides \code{nlambdas} if passed. The vector of trend
@@ -66,28 +66,30 @@ for more details on the ``one-standard-error rule''.}}
 
 \item{validation_functional}{Loss functional to optimize during cross
 validation. Some common choices can be used by passing an appropriate string
---- one of \code{c("MAE","MSE","WMAE","WMSE")}, i.e. mean-absolute deviations
+--- one of \code{c("MSE","MAE","WMSE","WMAE")}, i.e. mean-absolute deviations
 error, mean-squared error, and their weighted counterparts. Defaults to
 \code{validation_functional = "WMAE"}.
 
-Custom validation loss functionals can be used by instead passing a function
-to \code{validation_functional}. The function should take three vector arguments
---- \code{y}, \code{tf_estimate}, and \code{weights} --- and return a single scalar value
-for the validation loss. For example, \code{validation_functional = "WMAE"} is
-equivalent to passing the following function:\if{html}{\out{<div class="sourceCode r">}}\preformatted{function(tf_estimate, y, weights)\{
+Alternatively, custom validation loss functionals can be used by instead
+passing a function to \code{validation_functional}. The function should take three
+vector arguments --- \code{y}, \code{tf_estimate}, and \code{weights} --- and return a
+single scalar value for the validation loss. For example,
+\code{validation_functional = "WMAE"} is equivalent to passing the following
+function:\if{html}{\out{<div class="sourceCode r">}}\preformatted{function(tf_estimate, y, weights)\{
   sum(abs(tf_estimate - y) * sqrt(weights) / sum(sqrt(weights)))
 \}
 }\if{html}{\out{</div>}}}
+
+\item{nx_eval}{Integer. If nothing is passed to \code{x_eval}, then it is defined
+as \code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
 
 \item{x_eval}{(Optional) A grid of inputs to evaluate the optimized trend
 filtering estimate on. May be ignored, in which case the grid is determined
 by \code{nx_eval}.}
 
-\item{nx_eval}{Integer. If nothing is passed to \code{x_eval}, then it is defined
-as \code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
-
-\item{mc_cores}{Parallel computing: The number of cores to utilize. Defaults
-to the number of cores detected on the machine.}
+\item{mc_cores}{Multi-core computing using the
+\code{\link[parallel:parallel-package]{parallel}} package: The number of cores to
+utilize. Defaults to the number of cores detected.}
 
 \item{optimization_params}{(Optional) A named list of parameter choices to be
 passed to the trend filtering ADMM algorithm (\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and Tibshirani 2016}). See the
@@ -120,19 +122,17 @@ controlled by the \code{x_tol} argument below.
 \item{\code{x_tol}}: Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size \code{x_tol} and find at least two
 elements of \code{x} that fall into the same bin, then we thin the data.}}
-
-\item{seed}{Random number seed (for reproducible results).}
 }
 \value{
-An object of class \code{cv_tf}. This is a list with the following
-elements:
+An object of class \code{\link[=cv_trendfilter]{cv_tf}}. This is a list with the
+following elements:
 \item{x_eval}{Input grid used to evaluate the optimized trend filtering
 estimate on.}
 \item{tf_estimate}{Optimized trend filtering estimate, evaluated at
 \code{x_eval}.}
 \item{validation_method}{\code{paste0(V,"-fold CV")}}
 \item{validation_functional}{Type of error that validation was performed on.
-Either one of \code{c("WMAE","WMSE","MAE","MSE")} or a custom function passed by
+Either one of \code{c("MSE","MAE","WMSE","WMAE")} or a custom function passed by
 the user.}
 \item{V}{The number of folds the data are split into for the V-fold cross
 validation.}
@@ -182,10 +182,10 @@ smaller, better conditioned data set is used for fitting.}
 \item{x_scale, y_scale, data_scaled}{For internal use.}
 }
 \description{
-\code{cv_trendfilter()} optimizes the trend filtering hyperparameter via V-fold
+\code{\link[=cv_trendfilter]{cv_trendfilter()}} optimizes the trend filtering hyperparameter via V-fold
 cross validation on a grid of candidate hyperparameter settings and selects
 the value that minimizes a user-specified loss metric. See details for when
-to use \code{\link[=sure_trendfilter]{sure_trendfilter()}} vs. \code{cv_trendfilter()}.
+to use \code{\link[=sure_trendfilter]{sure_trendfilter()}} vs. \code{\link[=cv_trendfilter]{cv_trendfilter()}}.
 }
 \details{
 \loadmathjax Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}}
@@ -198,26 +198,24 @@ transforming to that scale and carrying out the full trend filtering analysis
 on that scale. See the example below for a case when the inputs are evenly
 sampled on the \code{log10(x)} scale.\tabular{lc}{
    Scenario \tab Hyperparameter optimization \cr
-   \code{x} is irregularly sampled \tab \code{cv_trendfilter()} \cr
-   \code{x} is regularly sampled and \tab \code{cv_trendfilter()} \cr
-   \verb{  }reciprocal variances are not available \tab  \cr
-   \code{x} is regularly sampled \tab \code{sure_trendfilter()} \cr
-   \verb{  }reciprocal variances are available \tab  \cr
+   \code{x} is irregularly sampled \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
+   \code{x} is regularly sampled and reciprocal variances are not available \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
+   \code{x} is regularly sampled and reciprocal variances are available \tab \code{\link[=sure_trendfilter]{sure_trendfilter()}} \cr
 }
 
 
 The formal definitions of the common validation loss functionals available
-via the options \code{validation_functional = c("WMAE","WMSE","MAE","MSE")} are
+via the options \code{validation_functional = c("MSE","MAE","WMSE","WMAE")} are
 stated below.
 
-\mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n}
-|Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-\mjsdeqn{WMSE(\lambda) = \sum_{i=1}^{n}
-|Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
-\mjsdeqn{MAE(\lambda) = \frac{1}{n}
-\sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|}
 \mjsdeqn{MSE(\lambda) = \frac{1}{n}
 \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2}
+\mjsdeqn{MAE(\lambda) = \frac{1}{n}
+\sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|}
+\mjsdeqn{WMSE(\lambda) = \sum_{i=1}^{n}
+|Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
+\mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n}
+|Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
 where \mjseqn{w_i} is the \mjseqn{i}th element of the \code{weights} vector.
 
 If constant weights are passed, or if nothing is passed, then the weighted
@@ -231,10 +229,20 @@ sensitive to outliers than squared error.
 data(eclipsing_binary)
 head(EB)
 
-cv_tf <- cv_trendfilter(EB$phase, EB$flux, 1 / EB$std_err^2,
-  validation_functional = "MAE", lambdas = exp(seq(20, 7, length = 250)),
-  optimization_params = list(max_iter = 5e3, obj_tol = 1e-6, thinning = T)
-)
+\dontrun{
+  cv_tf <- cv_trendfilter(
+    x = EB$phase,
+    y = EB$flux,
+    weights = 1 / EB$std_err^2,
+    validation_functional = "MAE",
+    lambdas = exp(seq(20, 7, length = 250)),
+    optimization_params = list(
+      max_iter = 5e3,
+      obj_tol = 1e-6,
+      thinning = T
+    )
+  )
+}
 }
 \references{
 \bold{Companion references}
@@ -255,9 +263,6 @@ smoothness}. \emph{MNRAS}, 492(3), p. 4019-4032.}}
 The Elements of Statistical Learning: Data Mining, Inference, and
 Prediction}. 2nd edition. Springer Series in Statistics. (See Sections 7.10
 and 7.12)} \cr
-\item{James, Witten, Hastie, and Tibshirani (2013).
-\href{https://www.statlearning.com/}{An Introduction to Statistical Learning:
-with Applications in R}. Springer. (See Section 5.1)} \cr
 \item{Tibshirani (2013).
 \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
 Model selection and validation 2: Model assessment, more cross-validation}.
@@ -265,10 +270,4 @@ Model selection and validation 2: Model assessment, more cross-validation}.
 }
 \seealso{
 \code{\link[=sure_trendfilter]{sure_trendfilter()}}, \code{\link[=bootstrap_trendfilter]{bootstrap_trendfilter()}}
-}
-\author{
-\bold{Collin A. Politsch, Ph.D.} \cr
-Email: collinpolitsch@gmail.com \cr
-Website: \href{https://collinpolitsch.com/}{collinpolitsch.com} \cr
-GitHub: \href{https://github.com/capolitsch/}{github.com/capolitsch} \cr \cr
 }
