@@ -249,7 +249,7 @@ cv_trendfilter <- function(x, y, weights,
                            lambda_choice = c("lambda_min", "lambda_1se"),
                            validation_functional = "WMAE",
                            x_eval, nx_eval = 1500L,
-                           mc_cores = detectCores(),
+                           mc_cores = parallel::detectCores(),
                            optimization_params,
                            seed = 1) {
   if (missing(x) || is.null(x)) stop("x must be passed.")
