@@ -1,5 +1,17 @@
-# Deploy to central docs directory that's on GitHub Pages
+# Deploy to docs directory
 destination: docs/
+
+url: https://capolitsch.github.io/trendfiltering
+
+home:
+  title: State-of-the-art denoising
+  links:
+  - text: See my other work at
+    href: "https://collinpolitsch.com/"
+
+authors:
+  Collin A. Politsch:
+    href: "https://collinpolitsch.com/"
 
 template:
   code_folding: show
@@ -14,9 +26,15 @@ template:
     code_font:
       google: "JetBrains Mono"
 
-authors:
-  Collin A. Politsch:
-    href: "https://collinpolitsch.com/"
+development:
+  mode: release
+
+reference:
+  - title: "Functions"
+  - contents:
+      - '`cv_trendfilter`'
+      - '`sure_trendfilter`'
+      - '`bootstrap_trendfilter`'
 
 navbar:
   structure:
@@ -39,16 +57,16 @@ navbar:
       icon: fab fa-github fa-lg
       href: "https://github.com/capolitsch/trendfiltering"
 
-reference:
-  - title: "Functions"
-  - contents:
-      - '`cv_trendfilter`'
-      - '`sure_trendfilter`'
-      - '`bootstrap_trendfilter`'
+redirects:
+  - [reference/papers.html, papers.html]
+  - [bootstrap_trendfilter.html, reference/bootstrap_trendfilter.html]
+  - [cv_trendfilter.html, reference/cv_trendfilter.html]
+  - [sure_trendfilter.html, reference/sure_trendfilter.html]
 
 repo:
+  branch: main
   url:
-    home: "https://github.com/capolitsch/trendfiltering"
-    source: "https://github.com/capolitsch/trendfiltering"
-    issue: "https://github.com/capolitsch/trendfiltering/issues"
-    user: "https://github.com/capolitsch"
+    home: "https://github.com/capolitsch/trendfiltering/"
+    source: "https://github.com/capolitsch/trendfiltering/blob/main/"
+    issue: "https://github.com/capolitsch/trendfiltering/issues/"
+    user: "https://github.com/"
