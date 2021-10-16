@@ -18,8 +18,8 @@ Remotes: statsmaths/glmgen/R_pkg/glmgen/
 Depends: 
     R (>= 3.5.0),
     mathjaxr (>= 1.4)
-Imports: 
     remotes (>= 2.4.0),
+Imports: 
     glmgen (>= 0.0.3), 
     dplyr (>= 1.0.5), 
     tidyr (>= 1.1.3),
