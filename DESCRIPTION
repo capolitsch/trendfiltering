@@ -15,7 +15,7 @@ URL:
 BugReports: https://github.com/capolitsch/trendfiltering/issues
 LazyData: true
 Remotes:
-  github::glmgen/glmgen/tree/master/R_pkg/glmgen@ace72493ce30a427e1ff17f90bc7286362176245
+  github::glmgen/glmgen/R_pkg/glmgen@ace72493ce30a427e1ff17f90bc7286362176245
 Depends: 
   R (>= 3.5.0),
   glmgen (>= 0.0.3),
