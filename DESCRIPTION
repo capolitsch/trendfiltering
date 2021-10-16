@@ -10,13 +10,14 @@ Authors@R: c(person(given = "Collin A.",
 Description: The state-of-the-art method for denoising 1D signals
 License: MIT
 URL:
-    https://capolitsch.github.io/trendfiltering
-    https://github.com/capolitsch/trendfiltering
+  https://capolitsch.github.io/trendfiltering
+  https://github.com/capolitsch/trendfiltering
 BugReports: https://github.com/capolitsch/trendfiltering/issues
 LazyData: true
 Depends: 
-    R (>= 3.5.0),
-    mathjaxr (>= 1.4)
+  R (>= 3.5.0),
+  mathjaxr (>= 1.4-0),
+  remotes (>= 2.4.0)
 Imports: 
     genlasso (>= 1.5),
     dplyr (>= 1.0.5), 
@@ -32,5 +33,4 @@ Encoding: UTF-8
 RdMacros: mathjaxr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-Suggests: 
-    covr
+Suggests: covr
