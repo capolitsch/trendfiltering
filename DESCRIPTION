@@ -10,15 +10,15 @@ Authors@R: c(person(given = "Collin A.",
 Description: The state-of-the-art method for denoising 1D signals
 License: MIT
 URL:
-    https://capolitsch.github.io/trendfiltering
-    https://github.com/capolitsch/trendfiltering
+  https://capolitsch.github.io/trendfiltering
+  https://github.com/capolitsch/trendfiltering
 BugReports: https://github.com/capolitsch/trendfiltering/issues
 LazyData: true
 Remotes: statsmaths/glmgen/R_pkg/glmgen/
 Depends: 
-    R (>= 3.5.0),
-    mathjaxr (>= 1.4)
-    remotes (>= 2.4.0),
+  R (>= 3.5.0),
+  mathjaxr (>= 1.4-0),
+  remotes (>= 2.4.0)
 Imports: 
     glmgen (>= 0.0.3), 
     dplyr (>= 1.0.5), 
