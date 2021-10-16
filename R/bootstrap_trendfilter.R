@@ -104,8 +104,8 @@
 #' head(spec)
 #'
 #' \dontrun{
-#'   sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
-#'   opt_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")
+#' sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+#' opt_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")
 #' }
 #' @importFrom glmgen trendfilter
 #' @importFrom dplyr %>% mutate case_when select n
@@ -208,7 +208,7 @@ bootstrap_trendfilter <- function(obj,
   return(obj)
 }
 
-#' @importFrom genlasso trendfilter
+#' @importFrom glmgen trendfilter
 tf_estimator <- function(b, data, obj, mode = "lambda") {
   if (mode == "edf") {
     tf_fit <- trendfilter(

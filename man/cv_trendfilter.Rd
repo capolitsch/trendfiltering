@@ -230,18 +230,18 @@ data(eclipsing_binary)
 head(EB)
 
 \dontrun{
-  cv_tf <- cv_trendfilter(
-    x = EB$phase,
-    y = EB$flux,
-    weights = 1 / EB$std_err^2,
-    validation_functional = "MAE",
-    lambdas = exp(seq(20, 7, length = 250)),
-    optimization_params = list(
-      max_iter = 5e3,
-      obj_tol = 1e-6,
-      thinning = T
-    )
+cv_tf <- cv_trendfilter(
+  x = EB$phase,
+  y = EB$flux,
+  weights = 1 / EB$std_err^2,
+  validation_functional = "MAE",
+  lambdas = exp(seq(20, 7, length = 250)),
+  optimization_params = list(
+    max_iter = 5e3,
+    obj_tol = 1e-6,
+    thinning = T
   )
+)
 }
 }
 \references{

@@ -97,8 +97,8 @@ data(quasar_spectrum)
 head(spec)
 
 \dontrun{
-  sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
-  opt_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")
+sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+opt_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")
 }
 }
 \references{
