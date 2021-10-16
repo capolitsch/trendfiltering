@@ -15,23 +15,22 @@ URL:
 BugReports: https://github.com/capolitsch/trendfiltering/issues
 LazyData: true
 Remotes:
-  github::glmgen/glmgen/R_pkg/glmgen
+  github::glmgen/glmgen/R_pkg/glmgen@master
 Depends: 
   R (>= 3.5.0),
+  glmgen (>= 0.0.3),
+  genlasso (>= 1.5),
   mathjaxr (>= 1.4-0),
   remotes (>= 2.4.0)
 Imports: 
-  glmgen (>= 0.0.3),
-  genlasso (>= 1.5),
   dplyr (>= 1.0.5), 
   tidyr (>= 1.1.3),
-  tidyselect,
+  tidyselect (>= 1.1.1),
   magrittr (>= 2.0.1),
-  matrixStats (>= 0.58.0), 
-  knitr,
-  rmarkdown
+  matrixStats (>= 0.58.0),
+  rmarkdown (>= 2.11)
 VignetteBuilder:
-  knitr
+  rmarkdown
 Encoding: UTF-8
 RdMacros: mathjaxr
 Roxygen: list(markdown = TRUE)
