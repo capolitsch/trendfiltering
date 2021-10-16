@@ -409,6 +409,6 @@ sure_trendfilter <- function(x, y, weights,
     y_scale = y_scale,
     data_scaled = data_scaled
   ),
-  class = "sure_tf"
+  class = c("sure_tf", "list")
   )
 }

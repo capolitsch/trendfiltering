@@ -204,11 +204,11 @@ bootstrap_trendfilter <- function(obj,
     "admm_params", "n_iter", "n_iter_boots", "x_scale", "y_scale",
     "data_scaled"
   )]
-  class(obj) <- "bootstrap_tf"
+  class(obj) <- c("bootstrap_tf", "list")
   return(obj)
 }
 
-#' @importFrom glmgen trendfilter
+#' @importFrom genlasso trendfilter
 tf_estimator <- function(b, data, obj, mode = "lambda") {
   if (mode == "edf") {
     tf_fit <- trendfilter(

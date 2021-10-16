@@ -414,7 +414,7 @@ cv_trendfilter <- function(x, y, weights,
       x_scale = x_scale,
       y_scale = y_scale
     ),
-    class = "cv_tf"
+    class = c("cv_tf", "list")
   )
 
   rm(
