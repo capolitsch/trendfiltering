@@ -14,14 +14,11 @@ URL:
   https://github.com/capolitsch/trendfiltering
 BugReports: https://github.com/capolitsch/trendfiltering/issues
 LazyData: true
-Remotes: 
-  url::https://github.com/capolitsch/glmgen/blob/master/glmgen.zip
 Depends: 
   R (>= 3.5.0),
   mathjaxr (>= 1.4-0),
   remotes (>= 2.4.0)
 Imports: 
-  glmgen (>= 0.0.3),
   genlasso (>= 1.5),
   dplyr (>= 1.0.5), 
   tidyr (>= 1.1.3),
