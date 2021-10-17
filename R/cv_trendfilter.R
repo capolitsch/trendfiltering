@@ -213,11 +213,7 @@
 #' \href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{
 #' The Elements of Statistical Learning: Data Mining, Inference, and
 #' Prediction}. 2nd edition. Springer Series in Statistics. (See Sections 7.10
-#' and 7.12)} \cr
-#' \item{Tibshirani (2013).
-#' \href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
-#' Model selection and validation 2: Model assessment, more cross-validation}.
-#' \emph{36-462: Data Mining course notes} (Carnegie Mellon University).}}
+#' and 7.12)}}
 #'
 #' @seealso [sure_trendfilter()], [bootstrap_trendfilter()]
 #'
