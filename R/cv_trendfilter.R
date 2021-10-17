@@ -127,7 +127,7 @@
 #' |Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
 #' \mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n}
 #' |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-#' where \mjseqn{w_i} is the \mjseqn{i}th element of the `weights` vector.
+#' where \mjseqn{w_i:=}`weights[i]`.
 #'
 #' If constant weights are passed, or if nothing is passed, then the weighted
 #' and unweighted counterparts are equivalent. \cr
