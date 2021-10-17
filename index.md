@@ -2,5 +2,6 @@
 
 ## Installation
 ``` r
-devtools::install_github("capolitsch/trendfiltering")
+install.packages("remotes")
+remotes::install_github("capolitsch/trendfiltering")
 ```
