@@ -190,16 +190,6 @@
 #' Trend Filtering – II. Denoising astronomical signals with varying degrees of
 #' smoothness}. \emph{MNRAS}, 492(3), p. 4019-4032.}}
 #'
-#' \bold{Trend filtering theory}
-#' \enumerate{
-#' \item{Tibshirani (2014).
-#' \href{https://projecteuclid.org/euclid.aos/1395234979}{Adaptive piecewise
-#' polynomial estimation via trend filtering}. \emph{The Annals of Statistics}.
-#' 42(1), p. 285-323.} \cr
-#' \item{Tibshirani (2020). \href{https://arxiv.org/abs/2003.03886}{Divided
-#' Differences, Falling Factorials, and Discrete Splines: Another Look at Trend
-#' Filtering and Related Problems}. arXiv: 2003.03886.}}
-#'
 #' \bold{Stein's unbiased risk estimate}
 #' \enumerate{
 #' \item{Tibshirani and Wasserman (2015).
