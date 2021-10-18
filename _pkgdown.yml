@@ -1,7 +1,7 @@
 # Deploy to docs directory
 destination: docs/
 
-url: https://capolitsch.github.io/trendfiltering
+url: "https://capolitsch.github.io/trendfiltering"
 
 home:
   title: >
@@ -10,9 +10,6 @@ home:
   links:
   - text: See my other work at
     href: "https://collinpolitsch.com/"
-  citation:
-  - text: Citing the trendfiltering R package
-    href: authors.html
 
 authors:
   Collin A. Politsch:

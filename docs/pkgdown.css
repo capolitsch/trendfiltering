@@ -52,12 +52,14 @@ footer p {
   margin-bottom: 0;
 }
 
-img.icon {
-  float: right;
-}
-
-img {
-  max-width: 100%;
+figure {
+    border: thin #c0c0c0 solid;
+    display: table;
+    flex-flow: column;
+    padding: 5px;
+    max-width: 600px;
+    position: absolute;
+    bottom: 0px;
 }
 
 /* Fix bug in bootstrap (only seen in firefox) */
