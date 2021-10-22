@@ -116,7 +116,7 @@ bootstrap_trendfilter <- function(obj,
                                   bootstrap_algorithm, level = 0.95, B = 100L,
                                   return_ensemble = FALSE, prune = TRUE,
                                   mc_cores = parallel::detectCores()) {
-  stopifnot(class(obj) %in% c("sure_tf", "cv_tf"))
+  stopifnot(any(class(obj) %in% c("sure_tf", "cv_tf")))
   stopifnot(is.double(level) & level > 0 & level < 1)
   stopifnot(B >= 10)
 
