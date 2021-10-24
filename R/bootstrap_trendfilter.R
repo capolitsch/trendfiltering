@@ -161,6 +161,7 @@ bootstrap_trendfilter <- function(obj,
   ) %>%
     unlist() %>%
     as.integer()
+
   obj$n_iter_boots <- lapply(
     X = 1:B,
     FUN = function(X) par_out[[X]][["n_iter"]]
