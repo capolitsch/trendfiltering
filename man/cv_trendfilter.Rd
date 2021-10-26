@@ -216,7 +216,7 @@ stated below.
 |Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
 \mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n}
 |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-where \mjseqn{w_i} is the \mjseqn{i}th element of the \code{weights} vector.
+where \mjseqn{w_i:=}\code{weights[i]}.
 
 If constant weights are passed, or if nothing is passed, then the weighted
 and unweighted counterparts are equivalent. \cr
@@ -262,11 +262,7 @@ smoothness}. \emph{MNRAS}, 492(3), p. 4019-4032.}}
 \href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{
 The Elements of Statistical Learning: Data Mining, Inference, and
 Prediction}. 2nd edition. Springer Series in Statistics. (See Sections 7.10
-and 7.12)} \cr
-\item{Tibshirani (2013).
-\href{https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf}{
-Model selection and validation 2: Model assessment, more cross-validation}.
-\emph{36-462: Data Mining course notes} (Carnegie Mellon University).}}
+and 7.12)}}
 }
 \seealso{
 \code{\link[=sure_trendfilter]{sure_trendfilter()}}, \code{\link[=bootstrap_trendfilter]{bootstrap_trendfilter()}}

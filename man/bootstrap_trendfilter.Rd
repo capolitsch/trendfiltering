@@ -11,7 +11,7 @@ bootstrap_trendfilter(
   B = 100L,
   return_ensemble = FALSE,
   prune = TRUE,
-  mc_cores = parallel::detectCores()
+  mc_cores = parallel::detectCores() - 4
 )
 }
 \arguments{
@@ -41,7 +41,7 @@ ensemble that is used to compute the variability bands. Defaults to
 
 \item{mc_cores}{Multi-core computing using the
 \code{\link[parallel:parallel-package]{parallel}} package: The number of cores to
-utilize. Defaults to the number of cores detected.}
+utilize. Defaults to the number of cores detected, minus 4.}
 }
 \value{
 An object of class \code{bootstrap_tf}. This is a comprehensive

@@ -20,7 +20,7 @@
 #' `prune = TRUE`. Do not change this unless you know what you are doing!
 #' @param mc_cores Multi-core computing using the
 #' [`parallel`][`parallel::parallel-package`] package: The number of cores to
-#' utilize. Defaults to the number of cores detected.
+#' utilize. Defaults to the number of cores detected, minus 4.
 #'
 #' @details Our recommendations for when to use each of the possible settings
 #' for the `bootstrap_algorithm` argument are shown in the table below. See
@@ -115,14 +115,14 @@
 bootstrap_trendfilter <- function(obj,
                                   bootstrap_algorithm, level = 0.95, B = 100L,
                                   return_ensemble = FALSE, prune = TRUE,
-                                  mc_cores = parallel::detectCores()) {
+                                  mc_cores = parallel::detectCores() - 4) {
   stopifnot(any(class(obj) %in% c("sure_tf", "cv_tf")))
   stopifnot(is.double(level) & level > 0 & level < 1)
   stopifnot(B >= 10)
 
   if (!prune) warning("I hope you know what you are doing!")
 
-  if (mc_cores < detectCores()) {
+  if (mc_cores < detectCores()/2) {
     warning(paste0(
       "Your machine has ", detectCores(),
       " cores. Consider increasing mc_cores to speed up computation."
