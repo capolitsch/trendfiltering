@@ -246,7 +246,7 @@ cv_trendfilter <- function(x, y, weights,
                            lambda_choice = c("lambda_min", "lambda_1se"),
                            validation_functional = "WMAE",
                            nx_eval = 1500L, x_eval,
-                           mc_cores = parallel::detectCores(),
+                           mc_cores = parallel::detectCores() - 4,
                            optimization_params) {
   if (missing(x) || is.null(x)) stop("x must be passed.")
   if (missing(y) || is.null(y)) stop("y must be passed.")
@@ -356,10 +356,25 @@ cv_trendfilter <- function(x, y, weights,
   rm(x, y, weights)
 
   if (missing(optimization_params)) {
-    optimization_params <- list(max_iter = 600L, obj_tol = 1e-10)
+    optimization_params <- list(
+      max_iter = 600L,
+      obj_tol = 1e-10
+    )
+  } else {
+    if (!("max_iter" %in% names(optimization_params))) {
+      optimization_params$max_iter <- 600L
+    }
+    if (!("obj_tol" %in% names(optimization_params))) {
+      optimization_params$obj_tol <- 1e-10
+    }
+    if (!("thinning" %in% names(optimization_params))) {
+      thinning <- NULL
+    } else {
+      thinning <- optimization_params$thinning
+      optimization_params$thinning <- NULL
+    }
   }
-  thinning <- optimization_params$thinning
-  optimization_params$thinning <- NULL
+
   admm_params <- do.call(trendfilter.control.list, optimization_params)
   x_scale <- median(diff(data$x))
   y_scale <- median(abs(data$y)) / 10
