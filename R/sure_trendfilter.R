@@ -306,6 +306,7 @@ sure_trendfilter <- function(x, y, weights,
       max_iter = 600L,
       obj_tol = 1e-10
       )
+    thinning <- NULL
   } else {
     if (!("max_iter" %in% names(optimization_params))) {
       optimization_params$max_iter <- 600L

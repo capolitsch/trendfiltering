@@ -362,6 +362,7 @@ cv_trendfilter <- function(x, y, weights,
       max_iter = 600L,
       obj_tol = 1e-10
     )
+    thinning <- NULL
   } else {
     if (!("max_iter" %in% names(optimization_params))) {
       optimization_params$max_iter <- 600L
@@ -376,7 +377,6 @@ cv_trendfilter <- function(x, y, weights,
       optimization_params$thinning <- NULL
     }
   }
-
   admm_params <- do.call(trendfilter.control.list, optimization_params)
   x_scale <- median(diff(data$x))
   y_scale <- median(abs(data$y)) / 10
