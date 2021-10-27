@@ -138,7 +138,7 @@ to use <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> vs. <
   validation_functional <span class='op'>=</span> <span class='st'>"WMAE"</span>,
   nx_eval <span class='op'>=</span> <span class='fl'>1500L</span>,
   <span class='va'>x_eval</span>,
-  mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span>,
+  mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>4</span>,
   <span class='va'>optimization_params</span>
 <span class='op'>)</span></pre>
 
@@ -277,7 +277,7 @@ elements of <code>x</code> that fall into the same bin, then we thin the data.</
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class <code>cv_tf</code>. This is a list with the
-following elements:</p>
+following elements:</p><dl>
 <dt>x_eval</dt><dd><p>Input grid used to evaluate the optimized trend filtering
 estimate on.</p></dd>
 <dt>tf_estimate</dt><dd><p>Optimized trend filtering estimate, evaluated at
@@ -333,6 +333,8 @@ algorithm, constructed by passing the `optimization_params` list to
 smaller, better conditioned data set is used for fitting.</p></dd>
 <dt>x_scale, y_scale, data_scaled</dt><dd><p>For internal use.</p></dd>
 
+</dl>
+
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
@@ -363,7 +365,7 @@ stated below.</p>
 |Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}\]
 \[WMAE(\lambda) = \sum_{i=1}^{n}
 |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}\]
-where \(w_i\) is the \(i\)th element of the <code>weights</code> vector.</p>
+where \(w_i:=\)<code>weights[i]</code>.</p>
 <p>If constant weights are passed, or if nothing is passed, then the weighted
 and unweighted counterparts are equivalent. <br /></p>
 <p>Briefly stated, weighting helps combat heteroskedasticity (varying levels
@@ -387,11 +389,7 @@ smoothness</a>. <em>MNRAS</em>, 492(3), p. 4019-4032.</p></li>
 <a href='https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf'>
 The Elements of Statistical Learning: Data Mining, Inference, and
 Prediction</a>. 2nd edition. Springer Series in Statistics. (See Sections 7.10
-and 7.12) <br /></p></li>
-<li><p>Tibshirani (2013).
-<a href='https://www.stat.cmu.edu/~ryantibs/datamining/lectures/19-val2.pdf'>
-Model selection and validation 2: Model assessment, more cross-validation</a>.
-<em>36-462: Data Mining course notes</em> (Carnegie Mellon University).</p></li>
+and 7.12)</p></li>
 </ol>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

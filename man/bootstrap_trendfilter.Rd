@@ -47,6 +47,7 @@ utilize. Defaults to the number of cores detected, minus 4.}
 An object of class \code{bootstrap_tf}. This is a comprehensive
 list containing all of the analysis important information, data, and
 results:
+\describe{
 \item{tf_standard_errors}{The standard errors of the optimized trend
 filtering point estimator.}
 \item{bootstrap_lower_band}{Vector of lower bounds for the pointwise
@@ -77,6 +78,7 @@ filtering estimate.}
 \item{...}{Named elements inherited from \code{obj} --- an object either of class
 \code{\link[=sure_trendfilter]{sure_tf}} or \code{\link[=cv_trendfilter]{cv_tf}}. See the relevant
 function documentation for details.}
+}
 }
 \description{
 Construct pointwise variability bands via a bootstrap

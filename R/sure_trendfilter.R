@@ -136,6 +136,7 @@
 #'
 #' @return An object of class [`sure_tf`][sure_trendfilter()]. This is a list
 #' with the following elements:
+#' \describe{
 #' \item{x_eval}{Input grid used to evaluate the optimized trend filtering
 #' estimate on.}
 #' \item{tf_estimate}{Optimized trend filtering estimate, evaluated at
@@ -175,6 +176,7 @@
 #' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so that a
 #' smaller, better conditioned data set is used for fitting.}
 #' \item{x_scale, y_scale, data_scaled}{For internal use.}
+#' }
 #'
 #' @export sure_trendfilter
 #'

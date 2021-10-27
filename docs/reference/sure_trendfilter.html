@@ -233,7 +233,7 @@ elements of <code>x</code> that fall into the same bin, then we thin the data.</
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class <code>sure_tf</code>. This is a list
-with the following elements:</p>
+with the following elements:</p><dl>
 <dt>x_eval</dt><dd><p>Input grid used to evaluate the optimized trend filtering
 estimate on.</p></dd>
 <dt>tf_estimate</dt><dd><p>Optimized trend filtering estimate, evaluated at
@@ -273,6 +273,8 @@ algorithm, constructed by passing the <code>optimization_params</code> list to
 <dt>thinning</dt><dd><p>Logical. If <code>TRUE</code>, then the data are preprocessed so that a
 smaller, better conditioned data set is used for fitting.</p></dd>
 <dt>x_scale, y_scale, data_scaled</dt><dd><p>For internal use.</p></dd>
+
+</dl>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -356,16 +358,6 @@ Trend Filtering – II. Denoising astronomical signals with varying degrees of
 smoothness</a>. <em>MNRAS</em>, 492(3), p. 4019-4032.</p></li>
 </ol>
 
-<p><b>Trend filtering theory</b></p><ol>
-<li><p>Tibshirani (2014).
-<a href='https://projecteuclid.org/euclid.aos/1395234979'>Adaptive piecewise
-polynomial estimation via trend filtering</a>. <em>The Annals of Statistics</em>.
-42(1), p. 285-323. <br /></p></li>
-<li><p>Tibshirani (2020). <a href='https://arxiv.org/abs/2003.03886'>Divided
-Differences, Falling Factorials, and Discrete Splines: Another Look at Trend
-Filtering and Related Problems</a>. arXiv: 2003.03886.</p></li>
-</ol>
-
 <p><b>Stein's unbiased risk estimate</b></p><ol>
 <li><p>Tibshirani and Wasserman (2015).
 <a href='http://www.stat.cmu.edu/~larry/=sml/stein.pdf'>Stein’s Unbiased Risk
@@ -406,8 +398,7 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
 #&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
 #&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'>
 <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'>sure_trendfilter</span><span class='op'>(</span><span class='va'>spec</span><span class='op'>$</span><span class='va'>log10_wavelength</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>flux</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>weights</span><span class='op'>)</span>
-<span class='op'>}</span>
+<span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'>sure_trendfilter</span><span class='op'>(</span><span class='va'>spec</span><span class='op'>$</span><span class='va'>log10_wavelength</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>flux</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>weights</span><span class='op'>)</span><span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

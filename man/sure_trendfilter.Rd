@@ -85,6 +85,7 @@ elements of \code{x} that fall into the same bin, then we thin the data.}}
 \value{
 An object of class \code{\link[=sure_trendfilter]{sure_tf}}. This is a list
 with the following elements:
+\describe{
 \item{x_eval}{Input grid used to evaluate the optimized trend filtering
 estimate on.}
 \item{tf_estimate}{Optimized trend filtering estimate, evaluated at
@@ -124,6 +125,7 @@ algorithm, constructed by passing the \code{optimization_params} list to
 \item{thinning}{Logical. If \code{TRUE}, then the data are preprocessed so that a
 smaller, better conditioned data set is used for fitting.}
 \item{x_scale, y_scale, data_scaled}{For internal use.}
+}
 }
 \description{
 \code{\link[=sure_trendfilter]{sure_trendfilter()}} optimizes the trend filtering hyperparameter via a grid

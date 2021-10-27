@@ -36,6 +36,7 @@
 #' @return An object of class `bootstrap_tf`. This is a comprehensive
 #' list containing all of the analysis important information, data, and
 #' results:
+#' \describe{
 #' \item{tf_standard_errors}{The standard errors of the optimized trend
 #' filtering point estimator.}
 #' \item{bootstrap_lower_band}{Vector of lower bounds for the pointwise
@@ -66,6 +67,7 @@
 #' \item{...}{Named elements inherited from `obj` --- an object either of class
 #' [`sure_tf`][sure_trendfilter] or [`cv_tf`][cv_trendfilter]. See the relevant
 #' function documentation for details.}
+#' }
 #'
 #' @export bootstrap_trendfilter
 #'

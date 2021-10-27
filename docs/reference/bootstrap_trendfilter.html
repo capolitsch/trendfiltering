@@ -127,7 +127,7 @@
   B <span class='op'>=</span> <span class='fl'>100L</span>,
   return_ensemble <span class='op'>=</span> <span class='cn'>FALSE</span>,
   prune <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span>
+  mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>4</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -174,7 +174,7 @@ ensemble that is used to compute the variability bands. Defaults to
       <th>mc_cores</th>
       <td><p>Multi-core computing using the
 <code><a href='https://rdrr.io/r/parallel/parallel-package.html'>parallel</a></code> package: The number of cores to
-utilize. Defaults to the number of cores detected.</p></td>
+utilize. Defaults to the number of cores detected, minus 4.</p></td>
     </tr>
     </table>
 
@@ -182,7 +182,7 @@ utilize. Defaults to the number of cores detected.</p></td>
 
     <p>An object of class <code>bootstrap_tf</code>. This is a comprehensive
 list containing all of the analysis important information, data, and
-results:</p>
+results:</p><dl>
 <dt>tf_standard_errors</dt><dd><p>The standard errors of the optimized trend
 filtering point estimator.</p></dd>
 <dt>bootstrap_lower_band</dt><dd><p>Vector of lower bounds for the pointwise
@@ -213,6 +213,8 @@ filtering estimate.</p></dd>
 <dt>...</dt><dd><p>Named elements inherited from <code>obj</code> --- an object either of class
 <code><a href='sure_trendfilter.html'>sure_tf</a></code> or <code><a href='cv_trendfilter.html'>cv_tf</a></code>. See the relevant
 function documentation for details.</p></dd>
+
+</dl>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
