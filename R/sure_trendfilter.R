@@ -95,7 +95,7 @@
 #' \mjsdeqn{y_i = f(x_i) + \epsilon_i, \quad\quad x_1,\dots,x_n\in(a,b),}
 #' where \mjseqn{y_i} is a noisy observation of a signal \mjseqn{f(x_i)} and the
 #' \mjseqn{\epsilon_i} have mean zero with variance
-#' \mjseqn{\sigma_{i}^{2} = {Var}(\epsilon_{i})}. Let
+#' \mjseqn{\sigma_{i}^{2} = \textrm{Var}(\epsilon_{i})}. Let
 #' \mjseqn{\hat{f}(\cdot\;; \lambda)} denote the trend filtering estimator of
 #' order \mjseqn{k} with tuneable hyperparameter \mjseqn{\lambda}. The
 #' fixed-input mean-squared prediction error (MSPE) of the estimator
@@ -108,9 +108,9 @@
 #' fixed-input MSPE via the following formula:
 #' \mjsdeqn{\hat{R}(\lambda) =
 #' \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \hat{f}(x_i; \lambda)\big)^2 +
-#' \frac{2\overline{\sigma}^{2}{df}(\hat{f})}{n},}
+#' \frac{2\overline{\sigma}^{2}\textrm{df}(\hat{f})}{n},}
 #' where \mjseqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}
-#' and \mjseqn{{df}(\hat{f})} is the effective degrees of
+#' and \mjseqn{\textrm{df}(\hat{f})} is the effective degrees of
 #' freedom of the trend filtering estimator (with a fixed choice of
 #' hyperparameter). The generalized lasso results of
 #' [Tibshirani and Taylor (2012)](
@@ -118,12 +118,12 @@
 #' provide the following formula for the effective degrees of freedom of a trend
 #' filtering estimator (with a fixed hyperparameter choice):
 #' \mjsdeqn{{df}(\hat{f}) =
-#' \mathbb{E}\left\[\mathrm{number of knots in}\;\hat{f}\right\] + k + 1.}
+#' \mathbb{E}\left\[\textrm{number of knots in}\;\hat{f}\right\] + k + 1.}
 #' The optimal hyperparameter value is then defined as
 #' \mjsdeqn{\hat{\lambda} = \arg\min_{\lambda}
 #' \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \hat{f}(x_i; \lambda)\big)^2 +
 #' \frac{2\hat{\overline{\sigma}}^{2}\hat{\textrm{df}}(\hat{f})}{n},}
-#' where \mjseqn{\hat{\textnormal{df}}} is the estimate for the effective
+#' where \mjseqn{\hat{\mathrm{df}}} is the estimate for the effective
 #' degrees of freedom that is obtained by replacing the expectation with the
 #' observed number of knots, and \mjseqn{\hat{\overline{\sigma}}^2}
 #' is an estimate of \mjseqn{\overline{\sigma}^2}. We define
