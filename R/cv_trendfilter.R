@@ -233,15 +233,16 @@
 #'   optimization_params = list(
 #'     max_iter = 5e3,
 #'     obj_tol = 1e-6,
-#'     thinning = T
+#'     thinning = TRUE
 #'   )
 #' )
 #' @importFrom dplyr mutate arrange case_when group_split bind_rows
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom parallel mclapply detectCores
 #' @importFrom matrixStats rowSds
-#' @importFrom magrittr %$% %>%
+#' @importFrom magrittr %$% %>% %<>%
 #' @importFrom tidyr tibble drop_na
+#' @importFrom stats median
 cv_trendfilter <- function(x, y, weights,
                            k = 2L, nlambdas = 250L, lambdas, V = 10L,
                            lambda_choice = c("lambda_min", "lambda_1se"),
@@ -344,11 +345,11 @@ cv_trendfilter <- function(x, y, weights,
   if (length(weights) == 1) weights <- rep(weights, length(y))
   lambda_choice <- match.arg(lambda_choice)
 
-  x <- x %>% as.double()
-  y <- y %>% as.double()
-  weights <- weights %>% as.double()
-  k <- k %>% as.integer()
-  V <- V %>% as.integer()
+  x %<>% as.double()
+  y %<>% as.double()
+  weights %<>% as.double()
+  k %<>% as.integer()
+  V %<>% as.integer()
 
   data <- tibble(x, y, weights) %>%
     arrange(x) %>%
@@ -363,13 +364,13 @@ cv_trendfilter <- function(x, y, weights,
     )
     thinning <- NULL
   } else {
-    if (!("max_iter" %in% names(optimization_params))) {
+    if (!!!("max_iter" %in% names(optimization_params))) {
       optimization_params$max_iter <- 600L
     }
-    if (!("obj_tol" %in% names(optimization_params))) {
+    if (!!!("obj_tol" %in% names(optimization_params))) {
       optimization_params$obj_tol <- 1e-10
     }
-    if (!("thinning" %in% names(optimization_params))) {
+    if (!!!("thinning" %in% names(optimization_params))) {
       thinning <- NULL
     } else {
       thinning <- optimization_params$thinning
@@ -395,7 +396,7 @@ cv_trendfilter <- function(x, y, weights,
   if (missing(lambdas)) {
     lambdas <- exp(seq(16, -10, length = nlambdas))
   } else {
-    lambdas <- lambdas %>%
+    lambdas %<>%
       as.double() %>%
       sort(decreasing = T)
   }
@@ -403,7 +404,7 @@ cv_trendfilter <- function(x, y, weights,
   if (missing(x_eval)) {
     x_eval <- seq(min(data$x), max(data$x), length = nx_eval)
   } else {
-    x_eval <- x_eval %>%
+    x_eval %<>%
       as.double() %>%
       sort()
   }
@@ -434,15 +435,15 @@ cv_trendfilter <- function(x, y, weights,
     data, nx_eval, admm_params, data_scaled, x_eval, x_scale, y_scale
   )
 
-  cv_out <- matrix(unlist(mclapply(
+  cv_out <- mclapply(
     1:(obj$V),
     FUN = trendfilter_validate,
     data_folded = data_folded,
     obj = obj,
     mc.cores = mc_cores
-  )),
-  ncol = obj$V
-  )
+  ) %>%
+    unlist() %>%
+    matrix(ncol = obj$V)
 
   errors <- cv_out %>%
     rowMeans() %>%
@@ -506,12 +507,14 @@ cv_trendfilter <- function(x, y, weights,
   # Return the objective tolerance to its previous setting
   obj$admm_params$obj_tol <- obj$admm_params$obj_tol * 1e2
 
-  obj$data_scaled$fitted_values <- glmgen:::predict.trendfilter(
-    out,
-    lambda = lambda_pred,
-    x.new = obj$data_scaled$x
-  ) %>%
-    as.double()
+  obj$data_scaled %<>% mutate(fitted_values = (
+    glmgen:::predict.trendfilter(
+      out,
+      lambda = lambda_pred,
+      x.new = obj$data_scaled$x
+    ) %>%
+      as.double()
+  ))
   obj$data_scaled$residuals <- obj$data_scaled$y - obj$data_scaled$fitted_values
   obj$tf_estimate <- glmgen:::predict.trendfilter(
     out,

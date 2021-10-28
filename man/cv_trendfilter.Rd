@@ -241,7 +241,7 @@ cv_tf <- cv_trendfilter(
   optimization_params = list(
     max_iter = 5e3,
     obj_tol = 1e-6,
-    thinning = T
+    thinning = TRUE
   )
 )
 }
