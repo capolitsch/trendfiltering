@@ -28,7 +28,7 @@ details below for recommendations on when each option is appropriate.}
 \item{B}{The number of bootstrap samples used to estimate the pointwise
 variability bands. Defaults to \code{B = 100}.}
 
-\item{return_ensemble}{\loadmathjax Logical. If \code{TRUE}, the full trend
+\item{return_ensemble}{Logical. If \code{TRUE}, the full trend
 filtering bootstrap ensemble is returned as an \mjseqn{n \times B} matrix,
 less any columns from post-hoc pruning (see \code{prune} below). Defaults to
 \code{return_ensemble = FALSE} to save memory.}
@@ -81,13 +81,12 @@ function documentation for details.}
 }
 }
 \description{
-Construct pointwise variability bands via a bootstrap
+\loadmathjax See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for details.
 }
 \details{
 Our recommendations for when to use each of the possible settings
 for the \code{bootstrap_algorithm} argument are shown in the table below. See
-\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-Politsch et al. (2020a)} for more details.\tabular{ll}{
+\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for more details.\tabular{ll}{
    Scenario \tab Uncertainty quantification \cr
    \code{x} is irregularly sampled \tab \code{bootstrap_algorithm = "nonparametric"} \cr
    \code{x} is regularly sampled and reciprocal variances are not available \tab \code{bootstrap_algorithm = "wild"} \cr
@@ -97,7 +96,6 @@ Politsch et al. (2020a)} for more details.\tabular{ll}{
 \examples{
 data(quasar_spectrum)
 head(spec)
-
 \dontrun{
 sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
 opt_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")

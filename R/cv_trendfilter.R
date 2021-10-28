@@ -74,30 +74,31 @@
 #' parameter choices will almost always suffice. However, the following
 #' parameters may require some adjustments to ensure that your trend filtering
 #' estimate has sufficiently converged:
-#' \enumerate{
-#' \item{`max_iter`}: Maximum iterations allowed for the trend filtering convex
+#' \describe{
+#' \item{`max_iter`}{Maximum iterations allowed for the trend filtering convex
 #' optimization. Defaults to `max_iter = 600L`. See the `n_iter` element of the
 #' function output for the actual number of iterations taken for every
 #' hyperparameter choice in `lambdas`. If any of the elements of `n_iter` are
-#' equal to `max_iter`, the objective function's tolerance has not been
-#' achieved and `max_iter` may need to be increased.
-#' \item{`obj_tol`}: The tolerance used in the convex optimization stopping
+#' equal to `max_iter`, the objective function's tolerance has not been achieved
+#' and `max_iter` may need to be increased.}
+#' \item{`obj_tol`}{The tolerance used in the convex optimization stopping
 #' criterion; when the relative change in the objective function is less than
 #' this value, the algorithm terminates. Thus, decreasing this setting will
 #' increase the precision of the solution returned by the optimization. Defaults
 #' to `obj_tol = 1e-10`. If the returned trend filtering estimate does not
 #' appear to have fully converged to a reasonable estimate of the signal, this
 #' issue can be resolve by some combination of decreasing `obj_tol` and
-#' increasing `max_iter`.
-#' \item{`thinning`}: Logical. If `TRUE`, then the data are preprocessed so that
+#' increasing `max_iter`.}
+#' \item{`thinning`}{Logical. If `TRUE`, then the data are preprocessed so that
 #' a smaller, better conditioned data set is used for fitting. When left `NULL`
 #' (the default setting), the optimization will automatically detect whether
 #' thinning should be applied (i.e. cases in which the numerical fitting
 #' algorithm will struggle to converge). This preprocessing procedure is
-#' controlled by the `x_tol` argument below.
-#' \item{`x_tol`}: Controls the automatic detection of when thinning should be
+#' controlled by the `x_tol` argument below.}
+#' \item{`x_tol`}{Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
-#' elements of `x` that fall into the same bin, then we thin the data.}
+#' elements of `x` that fall into the same bin, then we thin the data.
+#' }}
 #'
 #' @details \loadmathjax Our recommendations for when to use [cv_trendfilter()]
 #' vs. [sure_trendfilter()] are shown in the table below.
@@ -223,7 +224,6 @@
 #' data(eclipsing_binary)
 #' head(EB)
 #'
-#' \dontrun{
 #' cv_tf <- cv_trendfilter(
 #'   x = EB$phase,
 #'   y = EB$flux,
@@ -236,7 +236,6 @@
 #'     thinning = T
 #'   )
 #' )
-#' }
 #' @importFrom dplyr mutate arrange case_when group_split bind_rows
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom parallel mclapply detectCores

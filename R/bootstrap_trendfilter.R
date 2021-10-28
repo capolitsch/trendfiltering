@@ -1,5 +1,8 @@
 #' Construct pointwise variability bands via a bootstrap
 #'
+#' \loadmathjax See [Politsch et al. (2020a)](
+#' https://academic.oup.com/mnras/article/492/3/4005/5704413) for details.
+#'
 #' @param obj An object of class [`sure_tf`][sure_trendfilter()] or
 #' [`cv_tf`][cv_trendfilter].
 #' @param level The level of the pointwise variability bands. Defaults to
@@ -9,7 +12,7 @@
 #' @param bootstrap_algorithm A string specifying which variation of the
 #' bootstrap to use. One of `c("nonparametric","parametric","wild")`. See
 #' details below for recommendations on when each option is appropriate.
-#' @param return_ensemble \loadmathjax Logical. If `TRUE`, the full trend
+#' @param return_ensemble Logical. If `TRUE`, the full trend
 #' filtering bootstrap ensemble is returned as an \mjseqn{n \times B} matrix,
 #' less any columns from post-hoc pruning (see `prune` below). Defaults to
 #' `return_ensemble = FALSE` to save memory.
@@ -24,8 +27,8 @@
 #'
 #' @details Our recommendations for when to use each of the possible settings
 #' for the `bootstrap_algorithm` argument are shown in the table below. See
-#' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-#' Politsch et al. (2020a)} for more details.
+#' [Politsch et al. (2020a)](
+#' https://academic.oup.com/mnras/article/492/3/4005/5704413) for more details.
 #'
 #' | Scenario                                                            |        Uncertainty quantification      |
 #' | :---                                                                |                   :---                 |
@@ -104,7 +107,6 @@
 #' @examples
 #' data(quasar_spectrum)
 #' head(spec)
-#'
 #' \dontrun{
 #' sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
 #' opt_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")
@@ -117,15 +119,14 @@
 bootstrap_trendfilter <- function(obj,
                                   bootstrap_algorithm, level = 0.95, B = 100L,
                                   return_ensemble = FALSE, prune = TRUE,
-                                  mc_cores = parallel::detectCores() - 4
-                                  ) {
+                                  mc_cores = parallel::detectCores() - 4) {
   stopifnot(any(class(obj) %in% c("sure_tf", "cv_tf")))
   stopifnot(is.double(level) & level > 0 & level < 1)
   stopifnot(B >= 10)
 
   if (!prune) warning("I hope you know what you are doing!")
 
-  if (mc_cores < detectCores()/2) {
+  if (mc_cores < detectCores() / 2) {
     warning(paste0(
       "Your machine has ", detectCores(),
       " cores. Consider increasing mc_cores to speed up computation."

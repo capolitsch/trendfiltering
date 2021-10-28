@@ -98,30 +98,31 @@ technical understanding of the ADMM algorithm is needed and the default
 parameter choices will almost always suffice. However, the following
 parameters may require some adjustments to ensure that your trend filtering
 estimate has sufficiently converged:
-\enumerate{
-\item{\code{max_iter}}: Maximum iterations allowed for the trend filtering convex
+\describe{
+\item{\code{max_iter}}{Maximum iterations allowed for the trend filtering convex
 optimization. Defaults to \code{max_iter = 600L}. See the \code{n_iter} element of the
 function output for the actual number of iterations taken for every
 hyperparameter choice in \code{lambdas}. If any of the elements of \code{n_iter} are
-equal to \code{max_iter}, the objective function's tolerance has not been
-achieved and \code{max_iter} may need to be increased.
-\item{\code{obj_tol}}: The tolerance used in the convex optimization stopping
+equal to \code{max_iter}, the objective function's tolerance has not been achieved
+and \code{max_iter} may need to be increased.}
+\item{\code{obj_tol}}{The tolerance used in the convex optimization stopping
 criterion; when the relative change in the objective function is less than
 this value, the algorithm terminates. Thus, decreasing this setting will
 increase the precision of the solution returned by the optimization. Defaults
 to \code{obj_tol = 1e-10}. If the returned trend filtering estimate does not
 appear to have fully converged to a reasonable estimate of the signal, this
 issue can be resolve by some combination of decreasing \code{obj_tol} and
-increasing \code{max_iter}.
-\item{\code{thinning}}: Logical. If \code{TRUE}, then the data are preprocessed so that
+increasing \code{max_iter}.}
+\item{\code{thinning}}{Logical. If \code{TRUE}, then the data are preprocessed so that
 a smaller, better conditioned data set is used for fitting. When left \code{NULL}
 (the default setting), the optimization will automatically detect whether
 thinning should be applied (i.e. cases in which the numerical fitting
 algorithm will struggle to converge). This preprocessing procedure is
-controlled by the \code{x_tol} argument below.
-\item{\code{x_tol}}: Controls the automatic detection of when thinning should be
+controlled by the \code{x_tol} argument below.}
+\item{\code{x_tol}}{Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size \code{x_tol} and find at least two
-elements of \code{x} that fall into the same bin, then we thin the data.}}
+elements of \code{x} that fall into the same bin, then we thin the data.
+}}}
 }
 \value{
 An object of class \code{\link[=cv_trendfilter]{cv_tf}}. This is a list with the
@@ -231,7 +232,6 @@ sensitive to outliers than squared error.
 data(eclipsing_binary)
 head(EB)
 
-\dontrun{
 cv_tf <- cv_trendfilter(
   x = EB$phase,
   y = EB$flux,
@@ -244,7 +244,6 @@ cv_tf <- cv_trendfilter(
     thinning = T
   )
 )
-}
 }
 \references{
 \bold{Companion references}

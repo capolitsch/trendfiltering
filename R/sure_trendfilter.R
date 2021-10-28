@@ -1,9 +1,9 @@
 #' Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
 #' risk estimate
 #'
-#' [`sure_trendfilter()`] optimizes the trend filtering hyperparameter via a grid
-#' search over a vector of candidate hyperparameter settings and selects the
-#' value that minimizes an unbiased estimate of the model's generalization
+#' [`sure_trendfilter()`] optimizes the trend filtering hyperparameter via a
+#' grid search over a vector of candidate hyperparameter values and selects
+#' the value that minimizes an unbiased estimate of the model's generalization
 #' error. See details for when to use [`sure_trendfilter()`] vs.
 #' [cv_trendfilter()].
 #'
@@ -25,44 +25,46 @@
 #' grid.
 #' @param lambdas (Optional) Overrides `nlambdas` if passed. The vector of trend
 #' filtering hyperparameter values for the grid search. Use of this argument is
-#' discouraged unless you know what you are doing.
+#' discouraged for non-experts.
 #' @param nx_eval Integer. If nothing is passed to `x_eval`, then it is defined
 #' as `x_eval = seq(min(x), max(x), length = nx_eval)`.
-#' @param x_eval (Optional) A grid of inputs to evaluate the optimized trend
-#' filtering estimate on. May be ignored, in which case the grid is determined
-#' by `nx_eval`.
-#' @param optimization_params (Optional) A named list of parameter choices to be
-#' passed to the trend filtering ADMM algorithm ([Ramdas and Tibshirani 2016](
-#' http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf)). See the
+#' @param x_eval (Optional) Overrides `nx_eval` if passed. A grid of inputs to
+#' evaluate the optimized trend filtering estimate on.
+#' @param optimization_params (Optional) A named list of optimization parameter
+#' values to be passed to the trend filtering ADMM algorithm of
+#' [Ramdas and Tibshirani 2016](
+#' http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf) (implemented in the
+#' [glmgen][] package. See the
 #' [glmgen::trendfilter.control.list()] documentation for full details. No
 #' technical understanding of the ADMM algorithm is needed and the default
 #' parameter choices will almost always suffice. However, the following
 #' parameters may require some adjustments to ensure that your trend filtering
 #' estimate has sufficiently converged:
-#' \enumerate{
-#' \item{`max_iter`}: Maximum iterations allowed for the trend filtering convex
+#' \describe{
+#' \item{`max_iter`}{Maximum iterations allowed for the trend filtering
 #' optimization. Defaults to `max_iter = 600L`. See the `n_iter` element of the
 #' function output for the actual number of iterations taken for every
 #' hyperparameter choice in `lambdas`. If any of the elements of `n_iter` are
-#' equal to `max_iter`, the objective function's tolerance has not been
-#' achieved and `max_iter` may need to be increased.
-#' \item{`obj_tol`}: The tolerance used in the convex optimization stopping
+#' equal to `max_iter`, the objective function's tolerance has not been reached
+#' and `max_iter` may need to be increased.}
+#' \item{`obj_tol`}{The tolerance used in the convex optimization stopping
 #' criterion; when the relative change in the objective function is less than
 #' this value, the algorithm terminates. Thus, decreasing this setting will
 #' increase the precision of the solution returned by the optimization. Defaults
 #' to `obj_tol = 1e-10`. If the returned trend filtering estimate does not
 #' appear to have fully converged to a reasonable estimate of the signal, this
-#' issue can be resolve by some combination of decreasing `obj_tol` and
-#' increasing `max_iter`.
-#' \item{`thinning`}: Logical. If `TRUE`, then the data are preprocessed so that
+#' issue can be resolved by some combination of decreasing `obj_tol` and
+#' increasing `max_iter`.}
+#' \item{`thinning`}{Logical. If `TRUE`, then the data are preprocessed so that
 #' a smaller, better conditioned data set is used for fitting. When left `NULL`
 #' (the default setting), the optimization will automatically detect whether
 #' thinning should be applied (i.e. cases in which the numerical fitting
 #' algorithm will struggle to converge). This preprocessing procedure is
-#' controlled by the `x_tol` argument below.
-#' \item{`x_tol`}: Controls the automatic detection of when thinning should be
+#' controlled by the `x_tol` argument below.}
+#' \item{`x_tol`}{Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
-#' elements of `x` that fall into the same bin, then we thin the data.}
+#' elements of `x` that fall into the same bin, then the data is thinned.
+#' }}
 #'
 #' @details \loadmathjax Our recommendations for when to use [cv_trendfilter()]
 #' vs. [sure_trendfilter()] are shown in the table below.
@@ -83,8 +85,9 @@
 #' # Trend filtering with Stein's unbiased risk estimate
 #' Here we describe the general motivation for optimizing a trend filtering
 #' estimator with respect to Stein's unbiased risk estimate. See
-#' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-#' Politsch et al. (2020a)} for more details. \cr
+#' [Politsch et al. (2020a)](
+#' https://academic.oup.com/mnras/article/492/3/4005/5704413) for more details.
+#' \cr
 #'
 #' Suppose we observe noisy measurements of an output variable of interest
 #' (e.g., flux, magnitude, photon counts) according to the data generating
@@ -92,7 +95,7 @@
 #' \mjsdeqn{y_i = f(x_i) + \epsilon_i, \quad\quad x_1,\dots,x_n\in(a,b),}
 #' where \mjseqn{y_i} is a noisy observation of a signal \mjseqn{f(x_i)} and the
 #' \mjseqn{\epsilon_i} have mean zero with variance
-#' \mjseqn{\sigma_{i}^{2} = \text{Var}(\epsilon_{i})}. Let
+#' \mjseqn{\sigma_{i}^{2} = {Var}(\epsilon_{i})}. Let
 #' \mjseqn{\hat{f}(\cdot\;; \lambda)} denote the trend filtering estimator of
 #' order \mjseqn{k} with tuneable hyperparameter \mjseqn{\lambda}. The
 #' fixed-input mean-squared prediction error (MSPE) of the estimator
@@ -105,22 +108,22 @@
 #' fixed-input MSPE via the following formula:
 #' \mjsdeqn{\hat{R}(\lambda) =
 #' \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \hat{f}(x_i; \lambda)\big)^2 +
-#' \frac{2\overline{\sigma}^{2}\text{df}(\hat{f})}{n},}
+#' \frac{2\overline{\sigma}^{2}{df}(\hat{f})}{n},}
 #' where \mjseqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}
-#' and \mjseqn{\text{df}(\hat{f})} is the effective degrees of
+#' and \mjseqn{{df}(\hat{f})} is the effective degrees of
 #' freedom of the trend filtering estimator (with a fixed choice of
 #' hyperparameter). The generalized lasso results of
 #' [Tibshirani and Taylor (2012)](
 #' https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full)
 #' provide the following formula for the effective degrees of freedom of a trend
 #' filtering estimator (with a fixed hyperparameter choice):
-#' \mjsdeqn{\text{df}(\hat{f}) =
-#' \mathbb{E}\left\[\text{number of knots in}\;\hat{f}\right\] + k + 1.}
+#' \mjsdeqn{{df}(\hat{f}) =
+#' \mathbb{E}\left\[{number of knots in}\;\hat{f}\right\] + k + 1.}
 #' The optimal hyperparameter value is then defined as
 #' \mjsdeqn{\hat{\lambda} = \arg\min_{\lambda}
 #' \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \hat{f}(x_i; \lambda)\big)^2 +
-#' \frac{2\hat{\overline{\sigma}}^{2}\hat{\text{df}}(\hat{f})}{n},}
-#' where \mjseqn{\hat{\text{df}}} is the estimate for the effective
+#' \frac{2\hat{\overline{\sigma}}^{2}\hat{{df}}(\hat{f})}{n},}
+#' where \mjseqn{\hat{{df}}} is the estimate for the effective
 #' degrees of freedom that is obtained by replacing the expectation with the
 #' observed number of knots, and \mjseqn{\hat{\overline{\sigma}}^2}
 #' is an estimate of \mjseqn{\overline{\sigma}^2}. We define
@@ -221,15 +224,19 @@
 #' data(quasar_spectrum)
 #' head(spec)
 #'
-#' \dontrun{
-#' sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)}
+#' sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom tidyr drop_na tibble
 #' @importFrom dplyr %>% arrange filter select
-#' @importFrom magrittr %$%
-sure_trendfilter <- function(x, y, weights,
-                             k = 2L, nlambdas = 250L, lambdas,
-                             nx_eval = 1500L, x_eval,
+#' @importFrom magrittr %$% %<>%
+sure_trendfilter <- function(x,
+                             y,
+                             weights,
+                             k = 2L,
+                             nlambdas = 250L,
+                             lambdas,
+                             nx_eval = 1500L,
+                             x_eval,
                              optimization_params) {
   if (missing(x) || is.null(x)) stop("x must be passed.")
   if (missing(y) || is.null(y)) stop("y must be passed.")
@@ -282,10 +289,10 @@ sure_trendfilter <- function(x, y, weights,
 
   if (length(weights) == 1) weights <- rep(weights, length(x))
 
-  x <- x %>% as.double()
-  y <- y %>% as.double()
-  weights <- weights %>% as.double()
-  k <- k %>% as.integer()
+  x %<>% as.double()
+  y %<>% as.double()
+  weights %<>% as.double()
+  k %<>% as.integer()
 
   data <- tibble(x, y, weights) %>%
     arrange(x) %>%
@@ -296,7 +303,7 @@ sure_trendfilter <- function(x, y, weights,
   if (missing(lambdas)) {
     lambdas <- exp(seq(16, -10, length = nlambdas))
   } else {
-    lambdas <- lambdas %>%
+    lambdas %<>%
       as.double() %>%
       sort(decreasing = T)
   }
@@ -305,7 +312,7 @@ sure_trendfilter <- function(x, y, weights,
     optimization_params <- list(
       max_iter = 600L,
       obj_tol = 1e-10
-      )
+    )
     thinning <- NULL
   } else {
     if (!("max_iter" %in% names(optimization_params))) {
@@ -351,6 +358,7 @@ sure_trendfilter <- function(x, y, weights,
   optimisms <- 2 * out$df / nrow(data) * mean(1 / data_scaled$weights) %>%
     as.double()
   generalization_errors <- training_errors + optimisms
+
   edfs <- out$df %>% as.integer()
   n_iter <- out$iter %>% as.integer()
   i_min <- min(which.min(generalization_errors)) %>% as.integer()
@@ -359,7 +367,7 @@ sure_trendfilter <- function(x, y, weights,
   if (missing(x_eval)) {
     x_eval <- seq(min(data$x), max(data$x), length = nx_eval)
   } else {
-    x_eval <- x_eval %>%
+    x_eval %<>%
       as.double() %>%
       sort()
   }
@@ -367,9 +375,14 @@ sure_trendfilter <- function(x, y, weights,
   # Increase the TF solution's algorithmic precision for the optimized estimate
   admm_params$obj_tol <- admm_params$obj_tol * 1e-2
 
-  out <- trendfilter(data_scaled$x, data_scaled$y, data_scaled$weights,
-    lambda = lambda_min, k = k,
-    thinning = thinning, control = admm_params
+  out <- trendfilter(
+    data_scaled$x,
+    data_scaled$y,
+    data_scaled$weights,
+    lambda = lambda_min,
+    k = k,
+    thinning = thinning,
+    control = admm_params
   )
 
   # Return the objective tolerance to its previous setting
@@ -389,7 +402,7 @@ sure_trendfilter <- function(x, y, weights,
   ) %>%
     as.double()
 
-  data_scaled <- data_scaled %>% mutate(residuals = y - fitted_values)
+  data_scaled %<>% mutate(residuals = y - fitted_values)
 
   structure(list(
     x_eval = x_eval,
