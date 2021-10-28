@@ -229,8 +229,8 @@
 #' sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom tidyr drop_na tibble
-#' @importFrom dplyr %>% arrange filter select
-#' @importFrom magrittr %$% %<>%
+#' @importFrom dplyr arrange filter select
+#' @importFrom magrittr %>% %$% %<>%
 #' @importFrom stats median
 sure_trendfilter <- function(x,
                              y,
@@ -253,6 +253,7 @@ sure_trendfilter <- function(x,
   if (missing(lambdas)) {
     if (nlambdas < 0 || nlambdas != round(nlambdas)) {
       stop("nlambdas must be a positive integer")
+    } else {
       nlambdas <- nlambdas %>% as.integer()
     }
   } else {

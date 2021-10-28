@@ -243,11 +243,17 @@
 #' @importFrom magrittr %$% %>% %<>%
 #' @importFrom tidyr tibble drop_na
 #' @importFrom stats median
-cv_trendfilter <- function(x, y, weights,
-                           k = 2L, nlambdas = 250L, lambdas, V = 10L,
+cv_trendfilter <- function(x,
+                           y,
+                           weights,
+                           k = 2L,
+                           nlambdas = 250L,
+                           lambdas,
+                           V = 10L,
                            lambda_choice = c("lambda_min", "lambda_1se"),
                            validation_functional = "WMAE",
-                           nx_eval = 1500L, x_eval,
+                           nx_eval = 1500L,
+                           x_eval,
                            mc_cores = parallel::detectCores() - 4,
                            optimization_params) {
   if (missing(x) || is.null(x)) stop("x must be passed.")
@@ -280,6 +286,7 @@ cv_trendfilter <- function(x, y, weights,
   if (missing(lambdas)) {
     if (nlambdas < 0 || nlambdas != round(nlambdas)) {
       stop("nlambdas must be a positive integer")
+    } else {
       nlambdas <- nlambdas %>% as.integer()
     }
   } else {
