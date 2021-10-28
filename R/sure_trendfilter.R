@@ -123,7 +123,7 @@
 #' \mjsdeqn{\hat{\lambda} = \arg\min_{\lambda}
 #' \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \hat{f}(x_i; \lambda)\big)^2 +
 #' \frac{2\hat{\overline{\sigma}}^{2}\hat{{df}}(\hat{f})}{n},}
-#' where \mjseqn{\hat{{df}}} is the estimate for the effective
+#' where \mjseqn{\hat{\verb{df}}} is the estimate for the effective
 #' degrees of freedom that is obtained by replacing the expectation with the
 #' observed number of knots, and \mjseqn{\hat{\overline{\sigma}}^2}
 #' is an estimate of \mjseqn{\overline{\sigma}^2}. We define
