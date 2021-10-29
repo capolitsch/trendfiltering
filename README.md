@@ -9,10 +9,6 @@ install.packages("remotes")
 remotes::install_github("capolitsch/trendfiltering")
 ```
 
-## Code of Conduct
-
-Please note that the trendfiltering project is released with a [Contributor Code of Conduct](https://capolitsch.github.io/trendfiltering/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.
-
 ## Key references:
 
 1. Politsch et al. (2020a). Trend Filtering – I. A modern statistical tool for time-domain astronomy and Astronomical Spectroscopy. 
