@@ -515,14 +515,15 @@ cv_trendfilter <- function(x,
   # Return the objective tolerance to its previous setting
   obj$admm_params$obj_tol <- obj$admm_params$obj_tol * 1e2
 
-  obj$data_scaled %<>% mutate(fitted_values = (
-    glmgen:::predict.trendfilter(
-      out,
-      lambda = lambda_pred,
-      x.new = obj$data_scaled$x
-    ) %>%
-      as.double()
-  ))
+  obj$data_scaled %<>% mutate(
+    fitted_values = (
+      glmgen:::predict.trendfilter(
+        out,
+        lambda = lambda_pred,
+        x.new = obj$data_scaled$x
+      ) %>%
+        as.double()
+    ))
   obj$data_scaled$residuals <- obj$data_scaled$y - obj$data_scaled$fitted_values
   obj$tf_estimate <- glmgen:::predict.trendfilter(
     out,
