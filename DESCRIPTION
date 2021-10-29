@@ -7,7 +7,12 @@ Authors@R: c(person(given = "Collin A.",
              role = c("aut","cre"),
              email = "collinpolitsch@gmail.com",
              comment = c(ORCID = "0000-0003-3727-9167")))
-Description: A suite of tools for 
+Description: A suite of tools for denoising one-dimensional signals
+  with trend filtering. Optimizing the hyparameter via Stein's
+  unbiased risk estimate or V-fold cross validation with an
+  arbitrary validation loss functional. One-standard-error
+  rules, relaxed trend filtering, and bootstrap variations for
+  uncertainty quantification in every data analysis setting.
 License: MIT
 URL: https://capolitsch.github.io/trendfiltering
 BugReports: https://github.com/capolitsch/trendfiltering/issues
