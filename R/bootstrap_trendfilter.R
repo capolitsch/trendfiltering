@@ -173,25 +173,25 @@ bootstrap_trendfilter <- function(obj,
     as.integer()
 
   obj$n_pruned <- (B - ncol(tf_boot_ensemble)) %>% as.integer()
-  
+
   obj$tf_standard_errors <- apply(
-    tf_boot_ensemble, 
-    1, 
+    tf_boot_ensemble,
+    1,
     sd
   )
   obj$bootstrap_lower_band <- apply(
-    tf_boot_ensemble, 
+    tf_boot_ensemble,
     1,
     quantile,
     probs = (1 - level) / 2
   )
   obj$bootstrap_upper_band <- apply(
-    tf_boot_ensemble, 
+    tf_boot_ensemble,
     1,
     quantile,
     probs = 1 - (1 - level) / 2
   )
-  
+
   obj <- c(
     obj,
     list(

@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Construct pointwise variability bands via a bootstrap — bootstrap_trendfilter" />
-<meta property="og:description" content="Construct pointwise variability bands via a bootstrap" />
+<meta property="og:description" content="
+ See Politsch et al. (2020a) for details." />
 
 
 
@@ -117,7 +118,8 @@
     </div>
 
     <div class="ref-description">
-    <p>Construct pointwise variability bands via a bootstrap</p>
+    <p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
+ See <a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Politsch et al. (2020a)</a> for details.</p>
     </div>
 
     <pre class="usage"><span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span>
@@ -156,8 +158,7 @@ variability bands. Defaults to <code>B = 100</code>.</p></td>
     </tr>
     <tr>
       <th>return_ensemble</th>
-      <td><p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
- Logical. If <code>TRUE</code>, the full trend
+      <td><p>Logical. If <code>TRUE</code>, the full trend
 filtering bootstrap ensemble is returned as an \(n \times B\) matrix,
 less any columns from post-hoc pruning (see <code>prune</code> below). Defaults to
 <code>return_ensemble = FALSE</code> to save memory.</p></td>
@@ -220,8 +221,7 @@ function documentation for details.</p></dd>
 
     <p>Our recommendations for when to use each of the possible settings
 for the <code>bootstrap_algorithm</code> argument are shown in the table below. See
-<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>
-Politsch et al. (2020a)</a> for more details.</p><table class='table'>
+<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Politsch et al. (2020a)</a> for more details.</p><table class='table'>
 <tr><td>Scenario</td><td>Uncertainty quantification</td></tr>
 <tr><td><code>x</code> is irregularly sampled</td><td><code>bootstrap_algorithm = "nonparametric"</code></td></tr>
 <tr><td><code>x</code> is regularly sampled and reciprocal variances are not available</td><td><code>bootstrap_algorithm = "wild"</code></td></tr>

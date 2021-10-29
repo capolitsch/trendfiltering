@@ -52,12 +52,11 @@ evaluate the optimized trend filtering estimate on.}
 \item{optimization_params}{(Optional) A named list of optimization parameter
 values to be passed to the trend filtering ADMM algorithm of
 \href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and Tibshirani 2016} (implemented in the
-[glmgen][] package. See the
-\code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}} documentation for full details. No
-technical understanding of the ADMM algorithm is needed and the default
-parameter choices will almost always suffice. However, the following
-parameters may require some adjustments to ensure that your trend filtering
-estimate has sufficiently converged:
+\code{glmgen} package. See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}} documentation
+for full details. No technical understanding of the ADMM algorithm is needed
+and the default parameter choices will almost always suffice. However, the
+following parameters may require some adjustments to ensure that your trend
+filtering estimate has sufficiently converged:
 \describe{
 \item{\code{max_iter}}{Maximum iterations allowed for the trend filtering
 optimization. Defaults to \code{max_iter = 600L}. See the \code{n_iter} element of the

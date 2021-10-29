@@ -523,7 +523,8 @@ cv_trendfilter <- function(x,
         x.new = obj$data_scaled$x
       ) %>%
         as.double()
-    ))
+    )
+  )
   obj$data_scaled$residuals <- obj$data_scaled$y - obj$data_scaled$fitted_values
   obj$tf_estimate <- glmgen:::predict.trendfilter(
     out,
@@ -575,7 +576,7 @@ trendfilter_validate <- function(validation_index, data_folded, obj) {
     )[[1]]
 
     validation_errors <- apply(
-      tf_validate_preds, 
+      tf_validate_preds,
       2,
       loss_func,
       y = data_validate$y,
@@ -586,7 +587,7 @@ trendfilter_validate <- function(validation_index, data_folded, obj) {
     loss_func <- obj$validation_functional
 
     validation_errors <- apply(
-      tf_validate_preds * obj$y_scale, 
+      tf_validate_preds * obj$y_scale,
       2,
       loss_func,
       y = data_validate$y * obj$y_scale,
