@@ -313,7 +313,7 @@ cv_trendfilter <- function(x,
     }
   }
 
-  if (mc_cores < detectCores()) {
+  if (mc_cores < detectCores()/2) {
     warning(
       paste0(
         "Your machine has ", detectCores(), " cores. ",
