@@ -94,7 +94,7 @@ utilize. Defaults to the number of cores detected.}
 \item{optimization_params}{(Optional) A named list of optimization parameter
 values to be passed to the trend filtering ADMM algorithm of
 \href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and Tibshirani 2016} (implemented in the
-\code{glmgen} package. See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}} documentation
+\code{glmgen} package). See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}} documentation
 for full details. No technical understanding of the ADMM algorithm is needed
 and the default parameter choices will almost always suffice. However, the
 following parameters may require some adjustments to ensure that your trend
@@ -188,23 +188,23 @@ smaller, better conditioned data set is used for fitting.}
 \description{
 \code{\link[=cv_trendfilter]{cv_trendfilter()}} optimizes the trend filtering hyperparameter via V-fold
 cross validation on a grid of candidate hyperparameter settings and selects
-the value that minimizes a user-specified loss metric. See details for when
-to use \code{\link[=sure_trendfilter]{sure_trendfilter()}} vs. \code{\link[=cv_trendfilter]{cv_trendfilter()}}.
+the value that minimizes a user-specified loss metric. See details below for
+when you should use \code{\link[=sure_trendfilter]{sure_trendfilter()}} vs. \code{\link[=cv_trendfilter]{cv_trendfilter()}}.
 }
 \details{
 \loadmathjax Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}}
 vs. \code{\link[=sure_trendfilter]{sure_trendfilter()}} are shown in the table below.
 
-A regularly-sampled data set with some discarded pixels (either sporadically
-or in large consecutive chunks) is still considered regularly sampled. When
-the inputs are regularly sampled on a transformed scale, we recommend
-transforming to that scale and carrying out the full trend filtering analysis
-on that scale. See the example below for a case when the inputs are evenly
-sampled on the \code{log10(x)} scale.\tabular{lc}{
+For our purposes, an evenly sampled data set with some discarded pixels
+(either sporadically or in large consecutive chunks) is still considered to
+be evenly sampled. When the inputs are evenly sampled on a transformed scale,
+we recommend transforming to that scale and carrying out the full trend
+filtering analysis on that scale. See the \code{\link[=sure_trendfilter]{sure_trendfilter()}} examples for
+a case when the inputs are evenly sampled on the \code{log10(x)} scale.\tabular{lc}{
    Scenario \tab Hyperparameter optimization \cr
-   \code{x} is irregularly sampled \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
-   \code{x} is regularly sampled and reciprocal variances are not available \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
-   \code{x} is regularly sampled and reciprocal variances are available \tab \code{\link[=sure_trendfilter]{sure_trendfilter()}} \cr
+   \code{x} is unevenly sampled \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
+   \code{x} is evenly sampled and reciprocal variances are not available \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
+   \code{x} is evenly sampled and reciprocal variances are available \tab \code{\link[=sure_trendfilter]{sure_trendfilter()}} \cr
 }
 
 
@@ -220,7 +220,7 @@ stated below.
 |Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
 \mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n}
 |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-where \mjseqn{w_i:=}\code{weights[i]}.
+where \mjseqn{w_i:=} \code{weights[i]}.
 
 If constant weights are passed, or if nothing is passed, then the weighted
 and unweighted counterparts are equivalent. \cr

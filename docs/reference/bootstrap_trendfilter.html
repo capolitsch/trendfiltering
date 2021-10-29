@@ -221,11 +221,17 @@ function documentation for details.</p></dd>
 
     <p>Our recommendations for when to use each of the possible settings
 for the <code>bootstrap_algorithm</code> argument are shown in the table below. See
-<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Politsch et al. (2020a)</a> for more details.</p><table class='table'>
+<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Politsch et al. (2020a)</a> for more details.</p>
+<p>For our purposes, an evenly sampled data set with some discarded pixels
+(either sporadically or in large consecutive chunks) is still considered to
+be evenly sampled. When the inputs are evenly sampled on a transformed scale,
+we recommend transforming to that scale and carrying out the full trend
+filtering analysis on that scale. See the example below for a case when the
+inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p><table class='table'>
 <tr><td>Scenario</td><td>Uncertainty quantification</td></tr>
-<tr><td><code>x</code> is irregularly sampled</td><td><code>bootstrap_algorithm = "nonparametric"</code></td></tr>
-<tr><td><code>x</code> is regularly sampled and reciprocal variances are not available</td><td><code>bootstrap_algorithm = "wild"</code></td></tr>
-<tr><td><code>x</code> is regularly sampled and reciprocal variances are available</td><td><code>bootstrap_algorithm = "parametric"</code></td></tr>
+<tr><td><code>x</code> is unevenly sampled</td><td><code>bootstrap_algorithm = "nonparametric"</code></td></tr>
+<tr><td><code>x</code> is evenly sampled and reciprocal variances are not available</td><td><code>bootstrap_algorithm = "wild"</code></td></tr>
+<tr><td><code>x</code> is evenly sampled and reciprocal variances are available</td><td><code>bootstrap_algorithm = "parametric"</code></td></tr>
 </table>
 
 

@@ -2,8 +2,8 @@
 #'
 #' [`cv_trendfilter()`] optimizes the trend filtering hyperparameter via V-fold
 #' cross validation on a grid of candidate hyperparameter settings and selects
-#' the value that minimizes a user-specified loss metric. See details for when
-#' to use [sure_trendfilter()] vs. [`cv_trendfilter()`].
+#' the value that minimizes a user-specified loss metric. See details below for
+#' when you should use [`sure_trendfilter()`] vs. [cv_trendfilter()].
 #'
 #' @param x Vector of observed values for the input variable.
 #' @param y Vector of observed values for the output variable.
@@ -70,7 +70,7 @@
 #' values to be passed to the trend filtering ADMM algorithm of
 #' [Ramdas and Tibshirani 2016](
 #' http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf) (implemented in the
-#' `glmgen` package. See the [glmgen::trendfilter.control.list()] documentation
+#' `glmgen` package). See the [glmgen::trendfilter.control.list()] documentation
 #' for full details. No technical understanding of the ADMM algorithm is needed
 #' and the default parameter choices will almost always suffice. However, the
 #' following parameters may require some adjustments to ensure that your trend
@@ -104,18 +104,18 @@
 #' @details \loadmathjax Our recommendations for when to use [cv_trendfilter()]
 #' vs. [sure_trendfilter()] are shown in the table below.
 #'
-#' A regularly-sampled data set with some discarded pixels (either sporadically
-#' or in large consecutive chunks) is still considered regularly sampled. When
-#' the inputs are regularly sampled on a transformed scale, we recommend
-#' transforming to that scale and carrying out the full trend filtering analysis
-#' on that scale. See the example below for a case when the inputs are evenly
-#' sampled on the `log10(x)` scale.
+#' For our purposes, an evenly sampled data set with some discarded pixels
+#' (either sporadically or in large consecutive chunks) is still considered to
+#' be evenly sampled. When the inputs are evenly sampled on a transformed scale,
+#' we recommend transforming to that scale and carrying out the full trend
+#' filtering analysis on that scale. See the [`sure_trendfilter()`] examples for
+#' a case when the inputs are evenly sampled on the `log10(x)` scale.
 #'
-#' | Scenario                                                            |  Hyperparameter optimization  |
-#' | :---                                                                |                         :---: |
-#' | `x` is irregularly sampled                                          |      [`cv_trendfilter()`]     |
-#' | `x` is regularly sampled and reciprocal variances are not available |      [`cv_trendfilter()`]     |
-#' | `x` is regularly sampled and reciprocal variances are available     |      [`sure_trendfilter()`]   |
+#' | Scenario                                                         |  Hyperparameter optimization  |
+#' | :---                                                             |                         :---: |
+#' | `x` is unevenly sampled                                          |      [`cv_trendfilter()`]     |
+#' | `x` is evenly sampled and reciprocal variances are not available |      [`cv_trendfilter()`]     |
+#' | `x` is evenly sampled and reciprocal variances are available     |      [`sure_trendfilter()`]   |
 #'
 #' The formal definitions of the common validation loss functionals available
 #' via the options `validation_functional = c("MSE","MAE","WMSE","WMAE")` are
@@ -129,7 +129,7 @@
 #' |Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
 #' \mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n}
 #' |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-#' where \mjseqn{w_i:=}`weights[i]`.
+#' where \mjseqn{w_i:=} `weights[i]`.
 #'
 #' If constant weights are passed, or if nothing is passed, then the weighted
 #' and unweighted counterparts are equivalent. \cr
