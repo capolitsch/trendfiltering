@@ -174,17 +174,25 @@ bootstrap_trendfilter <- function(obj,
     as.integer()
 
   obj$n_pruned <- (B - ncol(tf_boot_ensemble)) %>% as.integer()
-  obj$tf_standard_errors <- apply(tf_boot_ensemble, 1, sd)
+  
+  obj$tf_standard_errors <- apply(
+    tf_boot_ensemble, 
+    1, 
+    sd
+  )
   obj$bootstrap_lower_band <- apply(
-    tf_boot_ensemble, 1,
+    tf_boot_ensemble, 
+    1,
     quantile,
     probs = (1 - level) / 2
   )
   obj$bootstrap_upper_band <- apply(
-    tf_boot_ensemble, 1,
+    tf_boot_ensemble, 
+    1,
     quantile,
     probs = 1 - (1 - level) / 2
   )
+  
   obj <- c(
     obj,
     list(
@@ -231,7 +239,7 @@ tf_estimator <- function(b, data, obj, mode = "lambda") {
     edf_min <- tf_fit$df[i_min]
     n_iter <- tf_fit$iter[i_min]
 
-    if (obj$prune && edf_min <= 2) {
+    if (obj$prune && edf_min <= 4) {
       return(list(tf_estimate = integer(0), df = NA, n_iter = NA))
     }
   }
