@@ -372,13 +372,13 @@ cv_trendfilter <- function(x,
     )
     thinning <- NULL
   } else {
-    if (!!!("max_iter" %in% names(optimization_params))) {
+    if (!("max_iter" %in% names(optimization_params))) {
       optimization_params$max_iter <- 600L
     }
-    if (!!!("obj_tol" %in% names(optimization_params))) {
+    if (!("obj_tol" %in% names(optimization_params))) {
       optimization_params$obj_tol <- 1e-10
     }
-    if (!!!("thinning" %in% names(optimization_params))) {
+    if (!("thinning" %in% names(optimization_params))) {
       thinning <- NULL
     } else {
       thinning <- optimization_params$thinning
