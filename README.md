@@ -1,10 +1,5 @@
 # trendfiltering R package
 
-<!-- badges: start -->
-[![R-CMD-check](https://github.com/capolitsch/trendfiltering/workflows/R-CMD-check/badge.svg)](https://github.com/capolitsch/trendfiltering/actions)
-[![Codecov test coverage](https://codecov.io/gh/capolitsch/trendfiltering/branch/main/graph/badge.svg)](https://codecov.io/gh/capolitsch/trendfiltering?branch=main)
-<!-- badges: end -->
-
 The `trendfiltering` package can be installed from GitHub using the command 
 below.
 
