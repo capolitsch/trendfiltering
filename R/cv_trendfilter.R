@@ -66,9 +66,11 @@
 #' @param mc_cores Multi-core computing using the
 #' [`parallel`][`parallel::parallel-package`] package: The number of cores to
 #' utilize. Defaults to the number of cores detected.
-#' @param optimization_params (Optional) A named list of parameter choices to be
-#' passed to the trend filtering ADMM algorithm ([Ramdas and Tibshirani 2016](
-#' http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf)). See the
+#' @param optimization_params (Optional) A named list of optimization parameter
+#' values to be passed to the trend filtering ADMM algorithm of
+#' [Ramdas and Tibshirani 2016](
+#' http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf) (implemented in the
+#' [glmgen][] package. See the
 #' [glmgen::trendfilter.control.list()] documentation for full details. No
 #' technical understanding of the ADMM algorithm is needed and the default
 #' parameter choices will almost always suffice. However, the following
