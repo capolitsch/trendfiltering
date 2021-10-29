@@ -1,5 +1,10 @@
 # trendfiltering R package
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/capolitsch/trendfiltering/workflows/R-CMD-check/badge.svg)](https://github.com/capolitsch/trendfiltering/actions)
+[![Codecov test coverage](https://codecov.io/gh/capolitsch/trendfiltering/branch/main/graph/badge.svg)](https://codecov.io/gh/capolitsch/trendfiltering?branch=main)
+<!-- badges: end -->
+
 The `trendfiltering` package can be installed from GitHub using the command 
 below.
 
@@ -8,6 +13,11 @@ below.
 install.packages("remotes")
 remotes::install_github("capolitsch/trendfiltering")
 ```
+
+## Code of Conduct
+
+Please note that the trendfiltering project is released with a [Contributor Code of Conduct](https://capolitsch.github.io/trendfiltering/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.
+
 ## Key references:
 
 1. Politsch et al. (2020a). Trend Filtering – I. A modern statistical tool for time-domain astronomy and Astronomical Spectroscopy. 
