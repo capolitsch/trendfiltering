@@ -99,9 +99,12 @@ estimators fit during validation.}
 corresponding to the descending-ordered \code{lambdas} vector.}
 \item{lambda_min}{Hyperparameter value that minimizes the SURE generalization
 error curve.}
-\item{i_min}{Index of \code{lambdas} that minimizes the SURE error curve.}
 \item{edf_min}{Effective degrees of freedom of the optimized trend
 filtering estimator.}
+\item{i_min}{Index of \code{lambdas} that minimizes the SURE error curve.}
+\item{cost_change}{The relative change in the cost functional values
+between the ADMM algorithm's penultimate and final iterations, for
+every hyperparameter choice.}
 \item{n_iter}{The number of iterations taken by the ADMM algorithm along its
 approximate solution path.
 converge within the given tolerance, for each hyperparameter value. If many

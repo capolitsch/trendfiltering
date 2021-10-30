@@ -98,9 +98,12 @@
 #' corresponding to the descending-ordered `lambdas` vector.}
 #' \item{lambda_min}{Hyperparameter value that minimizes the SURE generalization
 #' error curve.}
-#' \item{i_min}{Index of `lambdas` that minimizes the SURE error curve.}
 #' \item{edf_min}{Effective degrees of freedom of the optimized trend
 #' filtering estimator.}
+#' \item{i_min}{Index of `lambdas` that minimizes the SURE error curve.}
+#' \item{cost_change}{The relative change in the cost functional values
+#' between the ADMM algorithm's penultimate and final iterations, for
+#' every hyperparameter choice.}
 #' \item{n_iter}{The number of iterations taken by the ADMM algorithm along its
 #' approximate solution path.
 #' converge within the given tolerance, for each hyperparameter value. If many
@@ -327,17 +330,7 @@ sure_trendfilter <- function(x,
   n_iter <- out$iter %>% as.integer()
   i_min <- min(which.min(generalization_errors)) %>% as.integer()
   lambda_min <- lambdas[i_min]
-
-  if (missing(x_eval)) {
-    x_eval <- seq(min(data$x), max(data$x), length = nx_eval)
-  } else {
-    x_eval %<>%
-      as.double() %>%
-      sort()
-  }
-
-  # Increase the TF solution's algorithmic precision for the optimized estimate
-  admm_params$obj_tol <- admm_params$obj_tol * 1e-2
+  cost_change <- out$obj[,length(lambdas)]
 
   out <- trendfilter(
     data_scaled$x,
@@ -349,8 +342,13 @@ sure_trendfilter <- function(x,
     control = admm_params
   )
 
-  # Return the objective tolerance to its previous setting
-  admm_params$obj_tol <- admm_params$obj_tol * 1e2
+  if (missing(x_eval)) {
+    x_eval <- seq(min(data$x), max(data$x), length = nx_eval)
+  } else {
+    x_eval %<>%
+      as.double() %>%
+      sort()
+  }
 
   tf_estimate <- glmgen:::predict.trendfilter(
     out,
@@ -379,6 +377,7 @@ sure_trendfilter <- function(x,
       edfs = edfs,
       edf_min = out$df,
       i_min = i_min,
+      cost_change = cost_change,
       n_iter = n_iter,
       training_errors = training_errors * y_scale^2,
       optimisms = optimisms * y_scale^2,
