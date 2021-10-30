@@ -193,20 +193,20 @@ when you should use \code{\link[=sure_trendfilter]{sure_trendfilter()}} vs. \cod
 }
 \details{
 \loadmathjax Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}}
-vs. \code{\link[=sure_trendfilter]{sure_trendfilter()}} are shown in the table below.
-
-For our purposes, an evenly sampled data set with some discarded pixels
-(either sporadically or in large consecutive chunks) is still considered to
-be evenly sampled. When the inputs are evenly sampled on a transformed scale,
-we recommend transforming to that scale and carrying out the full trend
-filtering analysis on that scale. See the \code{\link[=sure_trendfilter]{sure_trendfilter()}} examples for
-a case when the inputs are evenly sampled on the \code{log10(x)} scale.\tabular{lc}{
+vs. \code{\link[=sure_trendfilter]{sure_trendfilter()}} are shown in the table below.\tabular{lc}{
    Scenario \tab Hyperparameter optimization \cr
    \code{x} is unevenly sampled \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
    \code{x} is evenly sampled and reciprocal variances are not available \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
    \code{x} is evenly sampled and reciprocal variances are available \tab \code{\link[=sure_trendfilter]{sure_trendfilter()}} \cr
 }
 
+
+For our purposes, an evenly sampled data set with some discarded pixels
+(either sporadically or in large consecutive chunks) is still considered to
+be evenly sampled. When the inputs are evenly sampled on a transformed scale,
+we recommend transforming to that scale and carrying out the full trend
+filtering analysis on that scale. See the \code{\link[=sure_trendfilter]{sure_trendfilter()}} examples for
+a case when the inputs are evenly sampled on the \code{log10(x)} scale.
 
 The formal definitions of the common validation loss functionals available
 via the options \code{validation_functional = c("MSE","MAE","WMSE","WMAE")} are

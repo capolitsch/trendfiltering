@@ -104,18 +104,18 @@
 #' @details \loadmathjax Our recommendations for when to use [cv_trendfilter()]
 #' vs. [sure_trendfilter()] are shown in the table below.
 #'
+#' | Scenario                                                         |  Hyperparameter optimization  |
+#' | :---                                                             |                         :---: |
+#' | `x` is unevenly sampled                                          |      [`cv_trendfilter()`]     |
+#' | `x` is evenly sampled and reciprocal variances are not available |      [`cv_trendfilter()`]     |
+#' | `x` is evenly sampled and reciprocal variances are available     |      [`sure_trendfilter()`]   |
+#'
 #' For our purposes, an evenly sampled data set with some discarded pixels
 #' (either sporadically or in large consecutive chunks) is still considered to
 #' be evenly sampled. When the inputs are evenly sampled on a transformed scale,
 #' we recommend transforming to that scale and carrying out the full trend
 #' filtering analysis on that scale. See the [`sure_trendfilter()`] examples for
 #' a case when the inputs are evenly sampled on the `log10(x)` scale.
-#'
-#' | Scenario                                                         |  Hyperparameter optimization  |
-#' | :---                                                             |                         :---: |
-#' | `x` is unevenly sampled                                          |      [`cv_trendfilter()`]     |
-#' | `x` is evenly sampled and reciprocal variances are not available |      [`cv_trendfilter()`]     |
-#' | `x` is evenly sampled and reciprocal variances are available     |      [`sure_trendfilter()`]   |
 #'
 #' The formal definitions of the common validation loss functionals available
 #' via the options `validation_functional = c("MSE","MAE","WMSE","WMAE")` are

@@ -69,18 +69,18 @@
 #' @details Our recommendations for when to use [cv_trendfilter()]
 #' vs. [sure_trendfilter()] are shown in the table below.
 #'
+#' | Scenario                                                         |  Hyperparameter optimization  |
+#' | :---                                                             |                         :---: |
+#' | `x` is unevenly sampled                                          |      [`cv_trendfilter()`]     |
+#' | `x` is evenly sampled and reciprocal variances are not available |      [`cv_trendfilter()`]     |
+#' | `x` is evenly sampled and reciprocal variances are available     |      [`sure_trendfilter()`]   |
+#'
 #' For our purposes, an evenly sampled data set with some discarded pixels
 #' (either sporadically or in large consecutive chunks) is still considered to
 #' be evenly sampled. When the inputs are evenly sampled on a transformed scale,
 #' we recommend transforming to that scale and carrying out the full trend
 #' filtering analysis on that scale. See the example below for a case when the
 #' inputs are evenly sampled on the `log10(x)` scale.
-#'
-#' | Scenario                                                         |  Hyperparameter optimization  |
-#' | :---                                                             |                         :---: |
-#' | `x` is unevenly sampled                                          |      [`cv_trendfilter()`]     |
-#' | `x` is evenly sampled and reciprocal variances are not available |      [`cv_trendfilter()`]     |
-#' | `x` is evenly sampled and reciprocal variances are available     |      [`sure_trendfilter()`]   |
 #'
 #' @return An object of class [`sure_tf`][sure_trendfilter()]. This is a list
 #' with the following elements:
