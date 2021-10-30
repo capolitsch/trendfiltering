@@ -66,8 +66,8 @@
 #' elements of `x` that fall into the same bin, then the data is thinned.
 #' }}
 #'
-#' @details Our recommendations for when to use [cv_trendfilter()] vs.
-#' [sure_trendfilter()] are shown in the table below.
+#' @details \loadmathjax Our recommendations for when to use [cv_trendfilter()]
+#' vs. [sure_trendfilter()] are shown in the table below.
 #'
 #' For our purposes, an evenly sampled data set with some discarded pixels
 #' (either sporadically or in large consecutive chunks) is still considered to
