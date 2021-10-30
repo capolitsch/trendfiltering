@@ -49,7 +49,7 @@
 #' precision of the approximate solution given by the ADMM algorithm can be
 #' increased by decreasing `obj_tol` and/or increasing `max_iter`.}
 #' \item{`max_iter`}{Maximum iterations allowed for the trend filtering
-#' optimization. Defaults to `max_iter = floor(nrow(data) / 2)`. See the
+#' optimization. Defaults to `max_iter = length(y)`. See the
 #' `n_iter` element of the `sure_trendfilter()` output for the actual number of
 #' iterations the ADMM algorithm took, for every candidate hyperparameter value
 #' in `lambdas`. If any of the elements of `n_iter` are equal to `max_iter`,
@@ -292,13 +292,13 @@ sure_trendfilter <- function(x,
 
   if (missing(optimization_params)) {
     optimization_params <- list(
-      max_iter = floor(nrow(data) / 2),
+      max_iter = nrow(data),
       obj_tol = 1e-10
     )
     thinning <- NULL
   } else {
     if (!("max_iter" %in% names(optimization_params))) {
-      optimization_params$max_iter <- floor(nrow(data) / 2)
+      optimization_params$max_iter <- nrow(data)
     }
     if (!("obj_tol" %in% names(optimization_params))) {
       optimization_params$obj_tol <- 1e-10
