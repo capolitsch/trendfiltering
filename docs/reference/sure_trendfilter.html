@@ -198,7 +198,7 @@ evaluate the optimized trend filtering estimate on.</p></td>
       <td><p>(Optional) A named list of optimization parameter
 values to be passed to the trend filtering ADMM algorithm of
 <a href='http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf'>Ramdas and Tibshirani 2016</a> (implemented in the
-<code>glmgen</code> package). See the <code><a href='https://rdrr.io/pkg/glmgen/man/trendfilter.control.list.html'>glmgen::trendfilter.control.list()</a></code> documentation
+<code>glmgen</code> package). See the <code><a href='https://github.com/glmgen/glmgen/blob/master/R_pkg/glmgen/man/trendfilter.control.list.Rd'>glmgen::trendfilter.control.list()</a></code> documentation
 for full details. No technical understanding of the ADMM algorithm is needed
 and the default parameter choices will almost always suffice. However, the
 following parameters may require some adjustments to ensure that your trend
@@ -269,7 +269,7 @@ observed inputs <code>x</code>.</p></dd>
 <dt>k</dt><dd><p>Degree of the trend filtering estimator.</p></dd>
 <dt>admm_params</dt><dd><p>List of parameter settings for the trend filtering ADMM
 algorithm, constructed by passing the <code>optimization_params</code> list to
-<code><a href='https://rdrr.io/pkg/glmgen/man/trendfilter.control.list.html'>glmgen::trendfilter.control.list()</a></code>.</p></dd>
+<code><a href='https://github.com/glmgen/glmgen/blob/master/R_pkg/glmgen/man/trendfilter.control.list.Rd'>glmgen::trendfilter.control.list()</a></code>.</p></dd>
 <dt>thinning</dt><dd><p>Logical. If <code>TRUE</code>, then the data are preprocessed so that a
 smaller, better conditioned data set is used for fitting.</p></dd>
 <dt>x_scale, y_scale, data_scaled</dt><dd><p>For internal use.</p></dd>
