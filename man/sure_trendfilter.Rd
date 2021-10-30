@@ -137,7 +137,7 @@ mean-squared error (at the observed inputs). See details below for when you
 should use \code{\link[=sure_trendfilter]{sure_trendfilter()}} vs. \code{\link[=cv_trendfilter]{cv_trendfilter()}}.
 }
 \details{
-\loadmathjax Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}}
+Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}}
 vs. \code{\link[=sure_trendfilter]{sure_trendfilter()}} are shown in the table below.
 
 For our purposes, an evenly sampled data set with some discarded pixels
