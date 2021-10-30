@@ -330,7 +330,7 @@ sure_trendfilter <- function(x,
   n_iter <- out$iter %>% as.integer()
   i_min <- min(which.min(generalization_errors)) %>% as.integer()
   lambda_min <- lambdas[i_min]
-  cost_change <- out$obj[nrow(out$obj),]
+  cost_change <- out$obj[nrow(out$obj), ]
 
   out <- trendfilter(
     data_scaled$x,
