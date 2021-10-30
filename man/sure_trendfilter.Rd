@@ -11,7 +11,6 @@ sure_trendfilter(
   weights,
   k = 2L,
   nlambdas = 250L,
-  lambdas,
   nx_eval = 1500L,
   x_eval,
   optimization_params
@@ -23,9 +22,10 @@ sure_trendfilter(
 \item{y}{Vector of observed values for the output variable.}
 
 \item{weights}{Weights for the observed outputs, defined as the reciprocal
-variance of the additive noise that contaminates the signal. \code{weights} can be
-passed as a scalar when the noise is expected to have equal variance for all
-observations. Otherwise, \code{weights} must have the same length as \code{x} and \code{y}.}
+variance of the additive noise that contaminates the signal in \code{y}.
+When the noise is expected to have equal variance for all observations,
+\code{weights} can be passed as a scalar. Otherwise, \code{weights} must have the same
+length as \code{x} and \code{y}.}
 
 \item{k}{Degree of the piecewise polynomials that make up the trend
 filtering estimate. Defaults to \code{k = 2} (i.e. a piecewise quadratic
@@ -34,17 +34,15 @@ disallowed since their smoothness is indistinguishable from \code{k = 2} and
 their use can lead to instability in the convex optimization.}
 
 \item{nlambdas}{The number of hyperparameter settings to test during
-validation. When nothing is passed to \code{lambdas} (highly recommended for
-general use), the grid is automatically constructed by
-\code{\link[=sure_trendfilter]{sure_trendfilter()}}, with \code{nlambdas} controlling the granularity of the
-grid.}
+validation. The hyperparameter grid is dynamically constructed to be
+representative of the full model space between a single polynomial solution
+and an interpolating solution, with \code{nlambdas} controlling the granularity
+of the grid.}
 
-\item{lambdas}{(Optional) Overrides \code{nlambdas} if passed. The vector of trend
-filtering hyperparameter values for the grid search. Use of this argument is
-discouraged for non-experts.}
-
-\item{nx_eval}{Integer. If nothing is passed to \code{x_eval}, then it is defined
-as \code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
+\item{nx_eval}{Integer. The length of the input grid that the optimized
+trend filtering estimate is evaluated on; i.e. if nothing is passed to
+\code{x_eval}, then it is defined as
+\code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
 
 \item{x_eval}{(Optional) Overrides \code{nx_eval} if passed. A grid of inputs to
 evaluate the optimized trend filtering estimate on.}
@@ -53,25 +51,26 @@ evaluate the optimized trend filtering estimate on.}
 values to be passed to the trend filtering ADMM algorithm of
 \href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and Tibshirani 2016} (implemented in the
 \code{glmgen} package). See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}} documentation
-for full details. No technical understanding of the ADMM algorithm is needed
-and the default parameter choices will almost always suffice. However, the
+for full details. The default parameter choices will almost always suffice,
+but when adjustments are necessary, no technical understanding of the ADMM
+algorithm is needed in order to do so. The
 following parameters may require some adjustments to ensure that your trend
 filtering estimate has sufficiently converged:
 \describe{
+\item{\code{obj_tol}}{The objective tolerance that, together with \code{max_iter},
+determines the ADMM algorithm's stopping criterion. The algorithm will stop
+either (1) when the relative change in the objective function is less than
+\code{obj_tol}; or (2) when the number of iterations has reached \code{max_iter}.
+This argument defaults to \code{obj_tol = 1e-10}. Therefore, when necessary, the
+precision of the approximate solution given by the ADMM algorithm can be
+increased by decreasing \code{obj_tol} and/or increasing \code{max_iter}.}
 \item{\code{max_iter}}{Maximum iterations allowed for the trend filtering
 optimization. Defaults to \code{max_iter = 600L}. See the \code{n_iter} element of the
-function output for the actual number of iterations taken for every
-hyperparameter choice in \code{lambdas}. If any of the elements of \code{n_iter} are
-equal to \code{max_iter}, the objective function's tolerance has not been reached
-and \code{max_iter} may need to be increased.}
-\item{\code{obj_tol}}{The tolerance used in the convex optimization stopping
-criterion; when the relative change in the objective function is less than
-this value, the algorithm terminates. Thus, decreasing this setting will
-increase the precision of the solution returned by the optimization. Defaults
-to \code{obj_tol = 1e-10}. If the returned trend filtering estimate does not
-appear to have fully converged to a reasonable estimate of the signal, this
-issue can be resolved by some combination of decreasing \code{obj_tol} and
-increasing \code{max_iter}.}
+\code{sure_trendfilter()} output for the actual number of iterations the
+ADMM algorithm took, for every candidate hyperparameter value in \code{lambdas}.
+If any of the elements of \code{n_iter} are equal to \code{max_iter}, the objective
+function's tolerance has not been reached and \code{max_iter} may need to be
+increased.}
 \item{\code{thinning}}{Logical. If \code{TRUE}, then the data are preprocessed so that
 a smaller, better conditioned data set is used for fitting. When left \code{NULL}
 (the default setting), the optimization will automatically detect whether
@@ -103,7 +102,8 @@ error curve.}
 \item{i_min}{Index of \code{lambdas} that minimizes the SURE error curve.}
 \item{edf_min}{Effective degrees of freedom of the optimized trend
 filtering estimator.}
-\item{n_iter}{The number of iterations needed for the ADMM algorithm to
+\item{n_iter}{The number of iterations taken by the ADMM algorithm along its
+approximate solution path.
 converge within the given tolerance, for each hyperparameter value. If many
 of these are exactly equal to \code{max_iter}, then their solutions have not
 converged with the tolerance specified by \code{obj_tol}. In which case, it is
@@ -133,12 +133,12 @@ order to make for a more tractable/stable problem and solution.}
 \code{\link[=sure_trendfilter]{sure_trendfilter()}} optimizes the trend filtering hyperparameter via a
 grid search over a vector of candidate hyperparameter values and selects
 the value that minimizes an unbiased estimate of the model's generalization
-error. See details below for when you should use \code{\link[=sure_trendfilter]{sure_trendfilter()}} vs.
-\code{\link[=cv_trendfilter]{cv_trendfilter()}}.
+mean-squared error (at the observed inputs). See details below for when you
+should use \code{\link[=sure_trendfilter]{sure_trendfilter()}} vs. \code{\link[=cv_trendfilter]{cv_trendfilter()}}.
 }
 \details{
-Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}}
-vs. \code{\link[=sure_trendfilter]{sure_trendfilter()}} are shown in the table below.
+Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} vs.
+\code{\link[=sure_trendfilter]{sure_trendfilter()}} are shown in the table below.
 
 For our purposes, an evenly sampled data set with some discarded pixels
 (either sporadically or in large consecutive chunks) is still considered to
@@ -158,9 +158,8 @@ estimator with respect to Stein's unbiased risk estimate. See
 \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for more details.
 \cr
 
-Suppose we observe noisy measurements of an output variable of interest
-(e.g., flux, magnitude, photon counts) according to the data generating
-process
+Suppose we observe noisy measurements of an output variable of interest (e.g.
+flux, magnitude, photon counts) according to the data generating process
 \mjsdeqn{y_i = f(x_i) + \epsilon_i, \quad\quad x_1,\dots,x_n\in(a,b),}
 where \mjseqn{y_i} is a noisy observation of a signal \mjseqn{f(x_i)} and the
 \mjseqn{\epsilon_i} have mean zero with variance
@@ -197,8 +196,7 @@ knots, and \mjseqn{\hat{\overline{\sigma}}^2} is an estimate of
 \code{mean(1 / weights)}, so \code{weights} must be passed in order to use
 \code{sure_trendfilter()}. If a reliable estimate of \mjseqn{\overline{\sigma}^2}
 is not available a priori, a data-driven estimate can be constructed, e.g.
-see \href{https://link.springer.com/book/10.1007/978-0-387-21736-9}{Wasserman (2004)}
-or
+see \href{https://link.springer.com/book/10.1007/978-0-387-21736-9}{Wasserman (2004)} or
 \href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{Hastie, Tibshirani, and Friedman (2009)}.
 \cr \cr
 }
