@@ -86,19 +86,20 @@ function documentation for details.}
 \details{
 Our recommendations for when to use each of the possible settings
 for the \code{bootstrap_algorithm} argument are shown in the table below. See
-\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for more details.
+\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for more details.\tabular{ll}{
+   Scenario \tab Uncertainty quantification \cr
+   \code{x} is unevenly sampled \tab \code{bootstrap_algorithm = "nonparametric"} \cr
+   \code{x} is evenly sampled and reciprocal variances are not available \tab \code{bootstrap_algorithm = "wild"} \cr
+   \code{x} is evenly sampled and reciprocal variances are available \tab \code{bootstrap_algorithm = "parametric"} \cr
+}
+
 
 For our purposes, an evenly sampled data set with some discarded pixels
 (either sporadically or in large consecutive chunks) is still considered to
 be evenly sampled. When the inputs are evenly sampled on a transformed scale,
 we recommend transforming to that scale and carrying out the full trend
 filtering analysis on that scale. See the example below for a case when the
-inputs are evenly sampled on the \code{log10(x)} scale.\tabular{ll}{
-   Scenario \tab Uncertainty quantification \cr
-   \code{x} is unevenly sampled \tab \code{bootstrap_algorithm = "nonparametric"} \cr
-   \code{x} is evenly sampled and reciprocal variances are not available \tab \code{bootstrap_algorithm = "wild"} \cr
-   \code{x} is evenly sampled and reciprocal variances are available \tab \code{bootstrap_algorithm = "parametric"} \cr
-}
+inputs are evenly sampled on the \code{log10(x)} scale.
 }
 \examples{
 data(quasar_spectrum)

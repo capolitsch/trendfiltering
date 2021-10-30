@@ -30,18 +30,18 @@
 #' [Politsch et al. (2020a)](
 #' https://academic.oup.com/mnras/article/492/3/4005/5704413) for more details.
 #'
+#' | Scenario                                                         |        Uncertainty quantification      |
+#' | :---                                                             |                   :---                 |
+#' | `x` is unevenly sampled                                          | `bootstrap_algorithm = "nonparametric"`|
+#' | `x` is evenly sampled and reciprocal variances are not available | `bootstrap_algorithm = "wild"`         |
+#' | `x` is evenly sampled and reciprocal variances are available     | `bootstrap_algorithm = "parametric"`   |
+#'
 #' For our purposes, an evenly sampled data set with some discarded pixels
 #' (either sporadically or in large consecutive chunks) is still considered to
 #' be evenly sampled. When the inputs are evenly sampled on a transformed scale,
 #' we recommend transforming to that scale and carrying out the full trend
 #' filtering analysis on that scale. See the example below for a case when the
 #' inputs are evenly sampled on the `log10(x)` scale.
-#'
-#' | Scenario                                                         |        Uncertainty quantification      |
-#' | :---                                                             |                   :---                 |
-#' | `x` is unevenly sampled                                          | `bootstrap_algorithm = "nonparametric"`|
-#' | `x` is evenly sampled and reciprocal variances are not available | `bootstrap_algorithm = "wild"`         |
-#' | `x` is evenly sampled and reciprocal variances are available     | `bootstrap_algorithm = "parametric"`   |
 #'
 #' @return An object of class `bootstrap_tf`. This is a comprehensive
 #' list containing all of the analysis important information, data, and
