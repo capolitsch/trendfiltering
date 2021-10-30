@@ -73,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trendfiltering</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
       </span>
     </div>
 
@@ -221,13 +221,7 @@ function documentation for details.</p></dd>
 
     <p>Our recommendations for when to use each of the possible settings
 for the <code>bootstrap_algorithm</code> argument are shown in the table below. See
-<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Politsch et al. (2020a)</a> for more details.</p>
-<p>For our purposes, an evenly sampled data set with some discarded pixels
-(either sporadically or in large consecutive chunks) is still considered to
-be evenly sampled. When the inputs are evenly sampled on a transformed scale,
-we recommend transforming to that scale and carrying out the full trend
-filtering analysis on that scale. See the example below for a case when the
-inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p><table class='table'>
+<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Politsch et al. (2020a)</a> for more details.</p><table class='table'>
 <tr><td>Scenario</td><td>Uncertainty quantification</td></tr>
 <tr><td><code>x</code> is unevenly sampled</td><td><code>bootstrap_algorithm = "nonparametric"</code></td></tr>
 <tr><td><code>x</code> is evenly sampled and reciprocal variances are not available</td><td><code>bootstrap_algorithm = "wild"</code></td></tr>
@@ -235,6 +229,13 @@ inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'
 </table>
 
 
+
+<p>For our purposes, an evenly sampled data set with some discarded pixels
+(either sporadically or in large consecutive chunks) is still considered to
+be evenly sampled. When the inputs are evenly sampled on a transformed scale,
+we recommend transforming to that scale and carrying out the full trend
+filtering analysis on that scale. See the example below for a case when the
+inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p><b>Companion references</b></p><ol>

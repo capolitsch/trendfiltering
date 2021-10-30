@@ -24,6 +24,6 @@ Society</em>, 492(3), p. 4005-4018.
 <br /></p></li>
 <li><p style="font-family: Garamond, serif;">Politsch (2021).
 trendfiltering: The state-of-the-art method for denoising 1D signals. R package
-version 0.1.0, <URL: https://capolitsch.github.io/trendfiltering/></p></li>
+version 0.1.0, URL: https://capolitsch.github.io/trendfiltering/</p></li>
 </ol>
 </font>
