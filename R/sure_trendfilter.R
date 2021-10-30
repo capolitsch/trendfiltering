@@ -109,30 +109,29 @@
 #' fixed-input MSPE via the following formula:
 #' \mjsdeqn{\hat{R}(\lambda) =
 #' \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \hat{f}(x_i; \lambda)\big)^2 +
-#' \frac{2\overline{\sigma}^{2}df(\hat{f})}{n},}
-#' where \mjseqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2}
-#' and \mjseqn{df(\hat{f})} is the effective degrees of
-#' freedom of the trend filtering estimator (with a fixed choice of
-#' hyperparameter). The generalized lasso results of
-#' [Tibshirani and Taylor (2012)](
+#' \frac{2\overline{\sigma}^{2}df(\hat{f})}{n},} where
+#' \mjseqn{\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2} and
+#' \mjseqn{df(\hat{f})} is the effective degrees of freedom of the trend
+#' filtering estimator (with a fixed choice of hyperparameter). The generalized
+#' lasso results of [Tibshirani and Taylor (2012)](
 #' https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full)
 #' provide the following formula for the effective degrees of freedom of a trend
 #' filtering estimator (with a fixed hyperparameter choice):
 #' \mjsdeqn{df(\hat{f}) = E\left\[K(\hat{f})\right\] + k + 1},
-#' where \mjseqn{K(\hat{f})} is the number of knots in \mjseqn{\hat{f}}.
-#' The optimal hyperparameter value is then defined as
+#' where \mjseqn{K(\hat{f})} is the number of knots in \mjseqn{\hat{f}}. The
+#' optimal hyperparameter value is then defined as
 #' \mjsdeqn{\hat{\lambda} = \arg\min_{\lambda}
 #' \frac{1}{n}\sum_{i=1}^{n}\big(y_i - \hat{f}(x_i; \lambda)\big)^2 +
 #' \frac{2\hat{\overline{\sigma}}^{2}\hat{df}(\hat{f})}{n},}
-#' where \mjseqn{\hat{df}} is the estimate for the effective
-#' degrees of freedom that is obtained by replacing the expectation with the
-#' observed number of knots, and \mjseqn{\hat{\overline{\sigma}}^2}
-#' is an estimate of \mjseqn{\overline{\sigma}^2}. We define
-#' \mjseqn{\overline{\sigma}^2} as `mean(1 / weights)`, so `weights` must be
-#' passed in order to use `sure_trendfilter()`. If a reliable estimate of
-#' \mjseqn{\overline{\sigma}^2} is not available a priori, a data-driven
-#' estimate can be constructed, e.g. see
-#' [Wasserman (2004)](https://link.springer.com/book/10.1007/978-0-387-21736-9)
+#' where \mjseqn{\hat{df}} is the estimate for the effective degrees of freedom
+#' that is obtained by replacing the expectation with the observed number of
+#' knots, and \mjseqn{\hat{\overline{\sigma}}^2} is an estimate of
+#' \mjseqn{\overline{\sigma}^2}. We define \mjseqn{\overline{\sigma}^2} as
+#' `mean(1 / weights)`, so `weights` must be passed in order to use
+#' `sure_trendfilter()`. If a reliable estimate of \mjseqn{\overline{\sigma}^2}
+#' is not available a priori, a data-driven estimate can be constructed, e.g.
+#' see [Wasserman (2004)](
+#' https://link.springer.com/book/10.1007/978-0-387-21736-9)
 #' or
 #' [Hastie, Tibshirani, and Friedman (2009)](
 #' https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf).
@@ -143,8 +142,8 @@
 #' \describe{
 #' \item{x_eval}{Input grid used to evaluate the optimized trend filtering
 #' estimate on.}
-#' \item{tf_estimate}{Optimized trend filtering estimate, evaluated at
-#' `x_eval`.}
+#' \item{tf_estimate}{Optimized trend filtering estimate, evaluated at `x_eval`.
+#' }
 #' \item{validation_method}{"SURE"}
 #' \item{lambdas}{Vector of hyperparameter values evaluated in the grid search
 #' (always returned in descending order).}
@@ -177,8 +176,9 @@
 #' \item{admm_params}{List of parameter settings for the trend filtering ADMM
 #' algorithm, constructed by passing the `optimization_params` list to
 #' [glmgen::trendfilter.control.list()].}
-#' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so that a
-#' smaller, better conditioned data set is used for fitting.}
+#' \item{thinning}{Logical. If `TRUE`, then the data were preprocessed such
+#' that a reduced subset was passed to the trend filtering ADMM algorithm in
+#' order to make for a more tractable/stable problem and solution.}
 #' \item{x_scale, y_scale, data_scaled}{For internal use.}
 #' }
 #'
