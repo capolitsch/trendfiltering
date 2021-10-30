@@ -65,12 +65,12 @@ This argument defaults to \code{obj_tol = 1e-10}. Therefore, when necessary, the
 precision of the approximate solution given by the ADMM algorithm can be
 increased by decreasing \code{obj_tol} and/or increasing \code{max_iter}.}
 \item{\code{max_iter}}{Maximum iterations allowed for the trend filtering
-optimization. Defaults to \code{max_iter = 600L}. See the \code{n_iter} element of the
-\code{sure_trendfilter()} output for the actual number of iterations the
-ADMM algorithm took, for every candidate hyperparameter value in \code{lambdas}.
-If any of the elements of \code{n_iter} are equal to \code{max_iter}, the objective
-function's tolerance has not been reached and \code{max_iter} may need to be
-increased.}
+optimization. Defaults to \code{max_iter = floor(nrow(data) / 2)}. See the
+\code{n_iter} element of the \code{sure_trendfilter()} output for the actual number of
+iterations the ADMM algorithm took, for every candidate hyperparameter value
+in \code{lambdas}. If any of the elements of \code{n_iter} are equal to \code{max_iter},
+the objective function's tolerance has not been reached and \code{max_iter} may
+need to be increased.}
 \item{\code{thinning}}{Logical. If \code{TRUE}, then the data are preprocessed so that
 a smaller, better conditioned data set is used for fitting. When left \code{NULL}
 (the default setting), the optimization will automatically detect whether
