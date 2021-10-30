@@ -230,7 +230,6 @@
 #' @importFrom tidyr drop_na tibble
 #' @importFrom dplyr arrange filter select first last
 #' @importFrom magrittr %>% %$% %<>%
-#' @importFrom data.table rleid
 #' @importFrom stats median approx
 sure_trendfilter <- function(x,
                              y,
@@ -325,7 +324,7 @@ sure_trendfilter <- function(x,
     ) %>%
     select(x, y, weights)
 
-  if (nlambdas > 150) {
+  if (nlambdas >= 150) {
     nlambdas_start <- 100
   } else {
     nlambdas_start <- 50
@@ -349,9 +348,10 @@ sure_trendfilter <- function(x,
       xout = seq(
         min(out$df),
         max(out$df),
-        length = nlambdas - nlambdas_start - 2)[
-          -c(1, nlambdas - nlambdas_start - 2)
-          ]
+        length = nlambdas - nlambdas_start - 2
+      )[
+        -c(1, nlambdas - nlambdas_start - 2)
+      ]
     )[["y"]] %>%
       suppressWarnings() %>%
       exp(),

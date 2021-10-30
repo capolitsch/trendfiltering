@@ -3,7 +3,6 @@
 export(bootstrap_trendfilter)
 export(cv_trendfilter)
 export(sure_trendfilter)
-importFrom(data.table,rleid)
 importFrom(dplyr,"%>%")
 importFrom(dplyr,arrange)
 importFrom(dplyr,bind_rows)
