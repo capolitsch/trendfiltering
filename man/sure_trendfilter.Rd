@@ -102,7 +102,7 @@ error curve.}
 \item{edf_min}{Effective degrees of freedom of the optimized trend
 filtering estimator.}
 \item{i_min}{Index of \code{lambdas} that minimizes the SURE error curve.}
-\item{cost_change}{The relative change in the cost functional values
+\item{cost_functional}{The relative change in the cost functional values
 between the ADMM algorithm's penultimate and final iterations, for
 every hyperparameter choice.}
 \item{n_iter}{The number of iterations taken by the ADMM algorithm along its
@@ -140,8 +140,8 @@ mean-squared error (at the observed inputs). See details below for when you
 should use \code{\link[=sure_trendfilter]{sure_trendfilter()}} vs. \code{\link[=cv_trendfilter]{cv_trendfilter()}}.
 }
 \details{
-Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}}
-vs. \code{\link[=sure_trendfilter]{sure_trendfilter()}} are shown in the table below.\tabular{lc}{
+Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} vs.
+\code{\link[=sure_trendfilter]{sure_trendfilter()}} are shown in the table below.\tabular{lc}{
    Scenario \tab Hyperparameter optimization \cr
    \code{x} is unevenly sampled \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
    \code{x} is evenly sampled and reciprocal variances are not available \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr

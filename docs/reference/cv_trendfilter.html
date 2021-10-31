@@ -84,7 +84,7 @@ when you should use sure_trendfilter() vs. cv_trendfilter()." />
         <li>
   <a href="../index.html">
     <span class="fas fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -98,16 +98,16 @@ when you should use sure_trendfilter() vs. cv_trendfilter()." />
         <li>
   <a href="https://github.com/capolitsch/trendfiltering">
     <span class="fab fa-github fa-lg"></span>
-
+     
   </a>
 </li>
       </ul>
-
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header>
 
@@ -132,10 +132,7 @@ when you should use <code><a href='sure_trendfilter.html'>sure_trendfilter()</a>
   <span class='va'>weights</span>,
   k <span class='op'>=</span> <span class='fl'>2L</span>,
   nlambdas <span class='op'>=</span> <span class='fl'>250L</span>,
-  <span class='va'>lambdas</span>,
   V <span class='op'>=</span> <span class='fl'>10L</span>,
-  lambda_choice <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lambda_min"</span>, <span class='st'>"lambda_1se"</span><span class='op'>)</span>,
-  validation_functional <span class='op'>=</span> <span class='st'>"WMAE"</span>,
   nx_eval <span class='op'>=</span> <span class='fl'>1500L</span>,
   <span class='va'>x_eval</span>,
   mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>4</span>,
@@ -177,49 +174,9 @@ general use), the grid is automatically constructed by <code>cv_trendfilter()</c
 with <code>nlambdas</code> controlling the granularity of the grid.</p></td>
     </tr>
     <tr>
-      <th>lambdas</th>
-      <td><p>(Optional) Overrides <code>nlambdas</code> if passed. The vector of trend
-filtering hyperparameter values for the grid search. Use of this argument is
-discouraged unless you know what you are doing.</p></td>
-    </tr>
-    <tr>
       <th>V</th>
       <td><p>Number of folds the data are partitioned into for the V-fold cross
 validation. Defaults to <code>V = 10</code>.</p></td>
-    </tr>
-    <tr>
-      <th>lambda_choice</th>
-      <td><p>One of <code><a href='https://rdrr.io/r/base/c.html'>c("lambda_min","lambda_1se")</a></code>. The choice
-of hyperparameter that is used for optimized trend filtering estimate.
-Defaults to <code>lambda_choice = "lambda_min"</code>.</p><ul>
-<li><p><code>"lambda_min"</code>: The hyperparameter value that minimizes the cross
-validation error curve.</p></li>
-<li><p><code>"lambda_1se"</code>: The largest hyperparameter value with a cross
-validation error within 1 standard error of the minimum cross validation
-error. This choice therefore favors simpler (i.e. smoother) trend filtering
-estimates. The motivation here is essentially Occam's razor: the two models
-yield results that are quantitatively very close, so we favor the simpler
-model. See Section 7.10 of
-<a href='https://web.stanford.edu/~hastie/Papers/ESLII.pdf'>Hastie, Tibshirani, and Friedman (2009)</a>
-for more details on the ``one-standard-error rule''.</p></li>
-</ul></td>
-    </tr>
-    <tr>
-      <th>validation_functional</th>
-      <td><p>Loss functional to optimize during cross
-validation. Some common choices can be used by passing an appropriate string
---- one of <code><a href='https://rdrr.io/r/base/c.html'>c("MSE","MAE","WMSE","WMAE")</a></code>, i.e. mean-absolute deviations
-error, mean-squared error, and their weighted counterparts. Defaults to
-<code>validation_functional = "WMAE"</code>.</p>
-<p>Alternatively, custom validation loss functionals can be used by instead
-passing a function to <code>validation_functional</code>. The function should take three
-vector arguments --- <code>y</code>, <code>tf_estimate</code>, and <code>weights</code> --- and return a
-single scalar value for the validation loss. For example,
-<code>validation_functional = "WMAE"</code> is equivalent to passing the following
-function:<div class="sourceCode r"></p><pre><span class='kw'>function</span><span class='op'>(</span><span class='va'>tf_estimate</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span><span class='op'>{</span>
-  <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>tf_estimate</span> <span class='op'>-</span> <span class='va'>y</span><span class='op'>)</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>weights</span><span class='op'>)</span> <span class='op'>/</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>weights</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-<span class='op'>}</span>
-</pre><p></div></p></td>
     </tr>
     <tr>
       <th>nx_eval</th>
@@ -273,12 +230,46 @@ applied to the data. If we make bins of size <code>x_tol</code> and find at leas
 elements of <code>x</code> that fall into the same bin, then we thin the data.</p></dd>
 </dl></td>
     </tr>
+    <tr>
+      <th>validation_functional</th>
+      <td><p>Loss functional to optimize during cross
+validation. Some common choices can be used by passing an appropriate string
+--- one of <code><a href='https://rdrr.io/r/base/c.html'>c("MSE","MAE","WMSE","WMAE")</a></code>, i.e. mean-absolute deviations
+error, mean-squared error, and their weighted counterparts. Defaults to
+<code>validation_functional = "WMAE"</code>.</p>
+<p>Alternatively, custom validation loss functionals can be used by instead
+passing a function to <code>validation_functional</code>. The function should take three
+vector arguments --- <code>y</code>, <code>tf_estimate</code>, and <code>weights</code> --- and return a
+single scalar value for the validation loss. For example,
+<code>validation_functional = "WMAE"</code> is equivalent to passing the following
+function:<div class="sourceCode r"></p><pre><span class='kw'>function</span><span class='op'>(</span><span class='va'>tf_estimate</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>tf_estimate</span> <span class='op'>-</span> <span class='va'>y</span><span class='op'>)</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>weights</span><span class='op'>)</span> <span class='op'>/</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>weights</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+</pre><p></div></p></td>
+    </tr>
+    <tr>
+      <th>lambda_choice</th>
+      <td><p>One of <code><a href='https://rdrr.io/r/base/c.html'>c("lambda_min","lambda_1se")</a></code>. The choice
+of hyperparameter that is used for optimized trend filtering estimate.
+Defaults to <code>lambda_choice = "lambda_min"</code>.</p><ul>
+<li><p><code>"lambda_min"</code>: The hyperparameter value that minimizes the cross
+validation error curve.</p></li>
+<li><p><code>"lambda_1se"</code>: The largest hyperparameter value with a cross
+validation error within 1 standard error of the minimum cross validation
+error. This choice therefore favors simpler (i.e. smoother) trend filtering
+estimates. The motivation here is essentially Occam's razor: the two models
+yield results that are quantitatively very close, so we favor the simpler
+model. See Section 7.10 of
+<a href='https://web.stanford.edu/~hastie/Papers/ESLII.pdf'>Hastie, Tibshirani, and Friedman (2009)</a>
+for more details on the ``one-standard-error rule''.</p></li>
+</ul></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>cv_tf</code>. This is a list with the
-following elements:</p><dl>
+    <p>An object of class <code>cv_tf</code>. This is a list with the following
+elements:</p><dl>
 <dt>x_eval</dt><dd><p>Input grid used to evaluate the optimized trend filtering
 estimate on.</p></dd>
 <dt>tf_estimate</dt><dd><p>Optimized trend filtering estimate, evaluated at
@@ -314,6 +305,9 @@ minimum of the cross validation error curves.</p></dd>
 filtering estimator.</p></dd>
 <dt>edf_1se</dt><dd><p>Effective degrees of freedom of the 1-stand-error rule
 trend filtering estimator.</p></dd>
+<dt>cost_functional</dt><dd><p>The relative change in the cost functional values
+between the ADMM algorithm's penultimate and final iterations, for
+every hyperparameter choice.</p></dd>
 <dt>n_iter</dt><dd><p>The number of iterations needed for the ADMM algorithm to
 converge within the given tolerance, for each hyperparameter value. If many
 of these are exactly equal to `max_iter`, then their solutions have not
@@ -368,7 +362,7 @@ stated below.</p>
 |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}\]
 where \(w_i:=\) <code>weights[i]</code>.</p>
 <p>If constant weights are passed, or if nothing is passed, then the weighted
-and unweighted counterparts are equivalent. <br /></p>
+and unweighted counterparts are equivalent.</p>
 <p>Briefly stated, weighting helps combat heteroskedasticity (varying levels
 of uncertainty in the output measurements) and absolute error is less
 sensitive to outliers than squared error.</p>
@@ -421,7 +415,7 @@ and 7.12)</p></li>
     thinning <span class='op'>=</span> <span class='cn'>TRUE</span>
   <span class='op'>)</span>
 <span class='op'>)</span>
-</div></pre>
+</div><div class='output co'>#&gt; <span class='error'>Error in cv_trendfilter(x = EB$phase, y = EB$flux, weights = 1/EB$std_err^2,     validation_functional = "MAE", lambdas = exp(seq(20, 7, length = 250)),     optimization_params = list(max_iter = 5000, obj_tol = 1e-06,         thinning = TRUE)): unused arguments (validation_functional = "MAE", lambdas = exp(seq(20, 7, length = 250)))</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -433,7 +427,7 @@ and 7.12)</p></li>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://collinpolitsch.com/'>Collin A. Politsch, Ph.D.</a></p>
+  <p>Developed by Collin A. Politsch.</p>
 </div>
 
 <div class="pkgdown">
@@ -443,7 +437,7 @@ and 7.12)</p></li>
       </footer>
    </div>
 
-
+  
 
 
   </body>

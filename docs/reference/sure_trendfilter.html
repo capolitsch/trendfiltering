@@ -87,7 +87,7 @@ should use sure_trendfilter() vs. cv_trendfilter()." />
         <li>
   <a href="../index.html">
     <span class="fas fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -101,16 +101,16 @@ should use sure_trendfilter() vs. cv_trendfilter()." />
         <li>
   <a href="https://github.com/capolitsch/trendfiltering">
     <span class="fab fa-github fa-lg"></span>
-
+     
   </a>
 </li>
       </ul>
-
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header>
 
@@ -246,7 +246,7 @@ error curve.</p></dd>
 <dt>edf_min</dt><dd><p>Effective degrees of freedom of the optimized trend
 filtering estimator.</p></dd>
 <dt>i_min</dt><dd><p>Index of <code>lambdas</code> that minimizes the SURE error curve.</p></dd>
-<dt>cost_change</dt><dd><p>The relative change in the cost functional values
+<dt>cost_functional</dt><dd><p>The relative change in the cost functional values
 between the ADMM algorithm's penultimate and final iterations, for
 every hyperparameter choice.</p></dd>
 <dt>n_iter</dt><dd><p>The number of iterations taken by the ADMM algorithm along its
@@ -279,8 +279,8 @@ order to make for a more tractable/stable problem and solution.</p></dd>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Our recommendations for when to use <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>
-vs. <code>sure_trendfilter()</code> are shown in the table below.</p><table class='table'>
+    <p>Our recommendations for when to use <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code> vs.
+<code>sure_trendfilter()</code> are shown in the table below.</p><table class='table'>
 <tr><td>Scenario</td><td>Hyperparameter optimization</td></tr>
 <tr><td><code>x</code> is unevenly sampled</td><td><code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code></td></tr>
 <tr><td><code>x</code> is evenly sampled and reciprocal variances are not available</td><td><code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code></td></tr>
@@ -342,10 +342,10 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
 #&gt;   log10_wavelength   flux weights
 #&gt;              <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
 #&gt; <span style='color: #BCBCBC;'>1</span>             3.55  0.424  0.041<span style='text-decoration: underline;'>7</span>
-#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125
-#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128
-#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121
-#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134
+#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125 
+#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128 
+#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121 
+#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
 #&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'>
 <span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'>sure_trendfilter</span><span class='op'>(</span><span class='va'>spec</span><span class='op'>$</span><span class='va'>log10_wavelength</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>flux</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>weights</span><span class='op'>)</span>
 </div></pre>
@@ -360,7 +360,7 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://collinpolitsch.com/'>Collin A. Politsch, Ph.D.</a></p>
+  <p>Developed by Collin A. Politsch.</p>
 </div>
 
 <div class="pkgdown">
@@ -370,7 +370,7 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
       </footer>
    </div>
 
-
+  
 
 
   </body>

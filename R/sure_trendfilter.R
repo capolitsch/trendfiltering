@@ -101,7 +101,7 @@
 #' \item{edf_min}{Effective degrees of freedom of the optimized trend
 #' filtering estimator.}
 #' \item{i_min}{Index of `lambdas` that minimizes the SURE error curve.}
-#' \item{cost_change}{The relative change in the cost functional values
+#' \item{cost_functional}{The relative change in the cost functional values
 #' between the ADMM algorithm's penultimate and final iterations, for
 #' every hyperparameter choice.}
 #' \item{n_iter}{The number of iterations taken by the ADMM algorithm along its
@@ -330,7 +330,7 @@ sure_trendfilter <- function(x,
   n_iter <- out$iter %>% as.integer()
   i_min <- min(which.min(generalization_errors)) %>% as.integer()
   lambda_min <- lambdas[i_min]
-  cost_change <- out$obj[nrow(out$obj), ]
+  cost_functional <- out$obj[nrow(out$obj), ]
 
   out <- trendfilter(
     data_scaled$x,
@@ -377,7 +377,7 @@ sure_trendfilter <- function(x,
       edfs = edfs,
       edf_min = out$df,
       i_min = i_min,
-      cost_change = cost_change,
+      cost_functional = cost_functional,
       n_iter = n_iter,
       training_errors = training_errors * y_scale^2,
       optimisms = optimisms * y_scale^2,

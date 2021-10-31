@@ -173,7 +173,7 @@
 #' filtering estimator.}
 #' \item{edf_1se}{Effective degrees of freedom of the 1-stand-error rule
 #' trend filtering estimator.}
-#' \item{cost_change}{The relative change in the cost functional values
+#' \item{cost_functional}{The relative change in the cost functional values
 #' between the ADMM algorithm's penultimate and final iterations, for
 #' every hyperparameter choice.}
 #' \item{n_iter}{The number of iterations needed for the ADMM algorithm to
