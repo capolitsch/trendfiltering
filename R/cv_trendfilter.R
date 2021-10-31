@@ -21,9 +21,6 @@
 #' validation. When nothing is passed to `lambdas` (highly recommended for
 #' general use), the grid is automatically constructed by [`cv_trendfilter()`],
 #' with `nlambdas` controlling the granularity of the grid.
-#' @param lambdas (Optional) Overrides `nlambdas` if passed. The vector of trend
-#' filtering hyperparameter values for the grid search. Use of this argument is
-#' discouraged unless you know what you are doing.
 #' @param nx_eval Integer. If nothing is passed to `x_eval`, then it is defined
 #' as `x_eval = seq(min(x), max(x), length = nx_eval)`.
 #' @param x_eval (Optional) A grid of inputs to evaluate the optimized trend
@@ -252,10 +249,7 @@ cv_trendfilter <- function(x,
                            weights,
                            k = 2L,
                            nlambdas = 250L,
-                           lambdas,
                            V = 10L,
-                           lambda_choice = c("lambda_min", "lambda_1se"),
-                           validation_functional = "WMAE",
                            nx_eval = 1500L,
                            x_eval,
                            mc_cores = parallel::detectCores() - 4,
