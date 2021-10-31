@@ -41,27 +41,27 @@
 #' following parameters may require some adjustments to ensure that your trend
 #' filtering estimate has sufficiently converged:
 #' \describe{
-#' \item{`obj_tol`}{The objective tolerance that, together with `max_iter`,
+#' \item{obj_tol}{The objective tolerance that, together with `max_iter`,
 #' determines the ADMM algorithm's stopping criterion. The algorithm will stop
 #' either (1) when the relative change in the objective function is less than
 #' `obj_tol`; or (2) when the number of iterations has reached `max_iter`.
 #' This argument defaults to `obj_tol = 1e-10`. Therefore, when necessary, the
 #' precision of the approximate solution given by the ADMM algorithm can be
 #' increased by decreasing `obj_tol` and/or increasing `max_iter`.}
-#' \item{`max_iter`}{Maximum iterations allowed for the trend filtering
+#' \item{max_iter}{Maximum iterations allowed for the trend filtering
 #' optimization. Defaults to `max_iter = length(y)`. See the
 #' `n_iter` element of the `sure_trendfilter()` output for the actual number of
 #' iterations the ADMM algorithm took, for every candidate hyperparameter value
 #' in `lambdas`. If any of the elements of `n_iter` are equal to `max_iter`,
 #' the objective function's tolerance has not been reached and `max_iter` may
 #' need to be increased.}
-#' \item{`thinning`}{Logical. If `TRUE`, then the data are preprocessed so that
+#' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so that
 #' a smaller, better conditioned data set is used for fitting. When left `NULL`
 #' (the default setting), the optimization will automatically detect whether
 #' thinning should be applied (i.e. cases in which the numerical fitting
 #' algorithm will struggle to converge). This preprocessing procedure is
 #' controlled by the `x_tol` argument below.}
-#' \item{`x_tol`}{Controls the automatic detection of when thinning should be
+#' \item{x_tol}{Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
 #' elements of `x` that fall into the same bin, then the data is thinned.
 #' }}

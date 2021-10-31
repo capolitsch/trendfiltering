@@ -96,29 +96,29 @@ understanding of the ADMM algorithm is needed in order to do so. The
 following parameters may require some adjustments to ensure that your trend
 filtering estimate has sufficiently converged:
 \describe{
-\item{\code{max_iter}}{Maximum iterations allowed for the trend filtering convex
-optimization. Defaults to \code{max_iter = 600L}. See the \code{n_iter} element of the
-function output for the actual number of iterations taken for every
-hyperparameter choice in \code{lambdas}. If any of the elements of \code{n_iter} are
-equal to \code{max_iter}, the objective function's tolerance has not been achieved
-and \code{max_iter} may need to be increased.}
-\item{\code{obj_tol}}{The tolerance used in the convex optimization stopping
-criterion; when the relative change in the objective function is less than
-this value, the algorithm terminates. Thus, decreasing this setting will
-increase the precision of the solution returned by the optimization. Defaults
-to \code{obj_tol = 1e-10}. If the returned trend filtering estimate does not
-appear to have fully converged to a reasonable estimate of the signal, this
-issue can be resolve by some combination of decreasing \code{obj_tol} and
-increasing \code{max_iter}.}
-\item{\code{thinning}}{Logical. If \code{TRUE}, then the data are preprocessed so that
+\item{obj_tol}{The objective tolerance that, together with \code{max_iter},
+determines the ADMM algorithm's stopping criterion. The algorithm will stop
+either (1) when the relative change in the objective function is less than
+\code{obj_tol}; or (2) when the number of iterations has reached \code{max_iter}.
+This argument defaults to \code{obj_tol = 1e-10}. Therefore, when necessary, the
+precision of the approximate solution given by the ADMM algorithm can be
+increased by decreasing \code{obj_tol} and/or increasing \code{max_iter}.}
+\item{max_iter}{Maximum iterations allowed for the trend filtering
+optimization. Defaults to \code{max_iter = length(y)}. See the
+\code{n_iter} element of the \code{sure_trendfilter()} output for the actual number of
+iterations the ADMM algorithm took, for every candidate hyperparameter value
+in \code{lambdas}. If any of the elements of \code{n_iter} are equal to \code{max_iter},
+the objective function's tolerance has not been reached and \code{max_iter} may
+need to be increased.}
+\item{thinning}{Logical. If \code{TRUE}, then the data are preprocessed so that
 a smaller, better conditioned data set is used for fitting. When left \code{NULL}
 (the default setting), the optimization will automatically detect whether
 thinning should be applied (i.e. cases in which the numerical fitting
 algorithm will struggle to converge). This preprocessing procedure is
 controlled by the \code{x_tol} argument below.}
-\item{\code{x_tol}}{Controls the automatic detection of when thinning should be
+\item{x_tol}{Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size \code{x_tol} and find at least two
-elements of \code{x} that fall into the same bin, then we thin the data.
+elements of \code{x} that fall into the same bin, then the data is thinned.
 }}}
 }
 \value{

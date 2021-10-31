@@ -87,7 +87,7 @@ should use sure_trendfilter() vs. cv_trendfilter()." />
         <li>
   <a href="../index.html">
     <span class="fas fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -101,16 +101,16 @@ should use sure_trendfilter() vs. cv_trendfilter()." />
         <li>
   <a href="https://github.com/capolitsch/trendfiltering">
     <span class="fab fa-github fa-lg"></span>
-
+     
   </a>
 </li>
       </ul>
-
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header>
 
@@ -200,27 +200,27 @@ always suffice, but when adjustments are necessary, no technical
 understanding of the ADMM algorithm is needed in order to do so. The
 following parameters may require some adjustments to ensure that your trend
 filtering estimate has sufficiently converged:</p><dl>
-<dt><code>obj_tol</code></dt><dd><p>The objective tolerance that, together with <code>max_iter</code>,
+<dt>obj_tol</dt><dd><p>The objective tolerance that, together with <code>max_iter</code>,
 determines the ADMM algorithm's stopping criterion. The algorithm will stop
 either (1) when the relative change in the objective function is less than
 <code>obj_tol</code>; or (2) when the number of iterations has reached <code>max_iter</code>.
 This argument defaults to <code>obj_tol = 1e-10</code>. Therefore, when necessary, the
 precision of the approximate solution given by the ADMM algorithm can be
 increased by decreasing <code>obj_tol</code> and/or increasing <code>max_iter</code>.</p></dd>
-<dt><code>max_iter</code></dt><dd><p>Maximum iterations allowed for the trend filtering
+<dt>max_iter</dt><dd><p>Maximum iterations allowed for the trend filtering
 optimization. Defaults to <code>max_iter = length(y)</code>. See the
 <code>n_iter</code> element of the <code>sure_trendfilter()</code> output for the actual number of
 iterations the ADMM algorithm took, for every candidate hyperparameter value
 in <code>lambdas</code>. If any of the elements of <code>n_iter</code> are equal to <code>max_iter</code>,
 the objective function's tolerance has not been reached and <code>max_iter</code> may
 need to be increased.</p></dd>
-<dt><code>thinning</code></dt><dd><p>Logical. If <code>TRUE</code>, then the data are preprocessed so that
+<dt>thinning</dt><dd><p>Logical. If <code>TRUE</code>, then the data are preprocessed so that
 a smaller, better conditioned data set is used for fitting. When left <code>NULL</code>
 (the default setting), the optimization will automatically detect whether
 thinning should be applied (i.e. cases in which the numerical fitting
 algorithm will struggle to converge). This preprocessing procedure is
 controlled by the <code>x_tol</code> argument below.</p></dd>
-<dt><code>x_tol</code></dt><dd><p>Controls the automatic detection of when thinning should be
+<dt>x_tol</dt><dd><p>Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size <code>x_tol</code> and find at least two
 elements of <code>x</code> that fall into the same bin, then the data is thinned.</p></dd>
 </dl></td>
@@ -342,10 +342,10 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
 #&gt;   log10_wavelength   flux weights
 #&gt;              <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
 #&gt; <span style='color: #BCBCBC;'>1</span>             3.55  0.424  0.041<span style='text-decoration: underline;'>7</span>
-#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125
-#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128
-#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121
-#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134
+#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125 
+#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128 
+#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121 
+#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
 #&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'>
 <span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'>sure_trendfilter</span><span class='op'>(</span><span class='va'>spec</span><span class='op'>$</span><span class='va'>log10_wavelength</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>flux</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>weights</span><span class='op'>)</span>
 </div></pre>
@@ -370,7 +370,7 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
       </footer>
    </div>
 
-
+  
 
 
   </body>
