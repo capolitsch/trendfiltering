@@ -457,7 +457,7 @@ cv_trendfilter <- function(x,
     }
   }
 
-  lambdas <- c(
+  obj$lambdas <- c(
     lambdas_start,
     approx(
       x = edfs_start,
