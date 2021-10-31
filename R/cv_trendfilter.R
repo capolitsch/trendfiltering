@@ -465,8 +465,8 @@ cv_trendfilter <- function(x,
       xout = seq(
         min(edfs_start),
         max(edfs_start),
-        length = nlambdas - length(lambdas_start) - 2
-      )[-c(1, nlambdas - length(lambdas_start) - 2)]
+        length = nlambdas - length(lambdas_start) + 2
+      )[-c(1, nlambdas - length(lambdas_start) + 2)]
     )[["y"]] %>%
       suppressWarnings() %>%
       exp()

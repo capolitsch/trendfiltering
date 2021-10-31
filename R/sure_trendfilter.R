@@ -293,7 +293,7 @@ sure_trendfilter <- function(x,
   lambdas_start <- out$lambda
   edfs_start <- out$df
 
-  if (any(out$df) == nrow(data)) {
+  if (any(out$df == nrow(data))) {
     inds <- which(out$df == nrow(data))[-1]
     if (length(inds) > 0) {
       lambdas_start <- lambdas_start[-inds]
@@ -301,8 +301,8 @@ sure_trendfilter <- function(x,
     }
   }
 
-  if (any(out$df <= obj$k + 2)) {
-    inds <- which(out$df <= obj$k + 2)
+  if (any(out$df <= k + 2)) {
+    inds <- which(out$df <= k + 2)
     if (length(inds) > 1) {
       inds <- inds[-last(inds)]
       lambdas_start <- lambdas_start[-inds]
@@ -318,8 +318,8 @@ sure_trendfilter <- function(x,
       xout = seq(
         min(edfs_start),
         max(edfs_start),
-        length = nlambdas - length(lambdas_start) - 2
-      )[-c(1, nlambdas - length(lambdas_start) - 2)]
+        length = nlambdas - length(lambdas_start) + 2
+      )[-c(1, nlambdas - length(lambdas_start) + 2)]
     )[["y"]] %>%
       suppressWarnings() %>%
       exp()
