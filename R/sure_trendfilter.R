@@ -66,8 +66,8 @@
 #' elements of `x` that fall into the same bin, then the data is thinned.
 #' }}
 #'
-#' @details Our recommendations for when to use [cv_trendfilter()]
-#' vs. [sure_trendfilter()] are shown in the table below.
+#' @details Our recommendations for when to use [cv_trendfilter()] vs.
+#' [sure_trendfilter()] are shown in the table below.
 #'
 #' | Scenario                                                         |  Hyperparameter optimization  |
 #' | :---                                                             |                         :---: |

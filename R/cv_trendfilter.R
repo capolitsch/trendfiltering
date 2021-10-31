@@ -132,14 +132,14 @@
 #' where \mjseqn{w_i:=} `weights[i]`.
 #'
 #' If constant weights are passed, or if nothing is passed, then the weighted
-#' and unweighted counterparts are equivalent. \cr
+#' and unweighted counterparts are equivalent.
 #'
 #' Briefly stated, weighting helps combat heteroskedasticity (varying levels
 #' of uncertainty in the output measurements) and absolute error is less
 #' sensitive to outliers than squared error.
 #'
-#' @return An object of class [`cv_tf`][cv_trendfilter]. This is a list with the
-#' following elements:
+#' @return An object of class `cv_tf`. This is a list with the following
+#' elements:
 #' \describe{
 #' \item{x_eval}{Input grid used to evaluate the optimized trend filtering
 #' estimate on.}
@@ -176,6 +176,9 @@
 #' filtering estimator.}
 #' \item{edf_1se}{Effective degrees of freedom of the 1-stand-error rule
 #' trend filtering estimator.}
+#' \item{cost_change}{The relative change in the cost functional values
+#' between the ADMM algorithm's penultimate and final iterations, for
+#' every hyperparameter choice.}
 #' \item{n_iter}{The number of iterations needed for the ADMM algorithm to
 #' converge within the given tolerance, for each hyperparameter value. If many
 #' of these are exactly equal to `max_iter`, then their solutions have not
