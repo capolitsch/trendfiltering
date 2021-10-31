@@ -143,17 +143,16 @@ estimators fit during validation.}
 trend filtering generalization error, for each hyperparameter value
 (ordered corresponding to the descending-ordered \code{lambdas} vector).}
 \item{se_errors}{The standard errors of the cross validation errors.
-These are particularly useful for implementing the
-``1-standard-error rule''.}
+These are particularly useful for implementing the "1-standard-error rule".}
 \item{lambda_min}{Hyperparameter value that minimizes the cross validation
 generalization error curve.}
 \item{lambda_1se}{Largest hyperparameter value that is within one standard
 error of the minimum hyperparameter's cross validation error.}
 \item{lambda_choice}{One of \code{c("lambda_min", "lambda_1se")}. The choice
 of hyperparameter that is used for the returned trend filtering estimate
-evaluation `tf_estimate`.}
-\item{i_min}{Index of `lambdas` that minimizes the cross validation error.}
-\item{i_1se}{Index of `lambdas` that gives the largest hyperparameter
+evaluation \code{tf_estimate}.}
+\item{i_min}{Index of \code{lambdas} that minimizes the cross validation error.}
+\item{i_1se}{Index of \code{lambdas} that gives the largest hyperparameter
 value that has a cross validation error within 1 standard error of the
 minimum of the cross validation error curves.}
 \item{edf_min}{Effective degrees of freedom of the optimized trend
@@ -165,21 +164,21 @@ between the ADMM algorithm's penultimate and final iterations, for
 every hyperparameter choice.}
 \item{n_iter}{The number of iterations needed for the ADMM algorithm to
 converge within the given tolerance, for each hyperparameter value. If many
-of these are exactly equal to `max_iter`, then their solutions have not
-converged with the tolerance specified by `obj_tol`. In which case, it is
-often prudent to increase `max_iter`.}
+of these are exactly equal to \code{max_iter}, then their solutions have not
+converged with the tolerance specified by \code{obj_tol}. In which case, it is
+often prudent to increase \code{max_iter}.}
 \item{x}{Vector of observed inputs.}
 \item{y}{Vector of observed outputs.}
 \item{weights}{Weights for the observed outputs, defined as the reciprocal
 variance of the additive noise that contaminates the signal.}
 \item{fitted_values}{Optimized trend filtering estimate, evaluated at the
-observed inputs `x`.}
-\item{residuals}{`residuals = y - fitted_values`}
+observed inputs \code{x}.}
+\item{residuals}{\code{residuals = y - fitted_values}}
 \item{k}{Degree of the trend filtering estimator.}
 \item{admm_params}{List of parameter settings for the trend filtering ADMM
-algorithm, constructed by passing the `optimization_params` list to
+algorithm, constructed by passing the \code{optimization_params} list to
 \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}.}
-\item{thinning}{Logical. If `TRUE`, then the data are preprocessed so that a
+\item{thinning}{Logical. If \code{TRUE}, then the data are preprocessed so that a
 smaller, better conditioned data set is used for fitting.}
 \item{x_scale, y_scale, data_scaled}{For internal use.}
 }

@@ -157,8 +157,7 @@
 #' trend filtering generalization error, for each hyperparameter value
 #' (ordered corresponding to the descending-ordered `lambdas` vector).}
 #' \item{se_errors}{The standard errors of the cross validation errors.
-#' These are particularly useful for implementing the
-#' ``1-standard-error rule''.}
+#' These are particularly useful for implementing the "1-standard-error rule".}
 #' \item{lambda_min}{Hyperparameter value that minimizes the cross validation
 #' generalization error curve.}
 #' \item{lambda_1se}{Largest hyperparameter value that is within one standard
@@ -438,16 +437,36 @@ cv_trendfilter <- function(x,
     control = obj$admm_params
   )
 
-  obj$lambdas <- c(
-    out$lambda,
+  lambdas_start <- out$lambda
+  edfs_start <- out$df
+
+  if (any(out$df == length(obj$x))) {
+    inds <- which(out$df == length(obj$x))[-1]
+    if (length(inds) > 0) {
+      lambdas_start <- lambdas_start[-inds]
+      edfs_start <- edfs_start[-inds]
+    }
+  }
+
+  if (any(out$df <= obj$k + 2)) {
+    inds <- which(out$df <= obj$k + 2)
+    if (length(inds) > 1) {
+      inds <- inds[-last(inds)]
+      lambdas_start <- lambdas_start[-inds]
+      edfs_start <- edfs_start[-inds]
+    }
+  }
+
+  lambdas <- c(
+    lambdas_start,
     approx(
-      x = out$df,
-      y = log(out$lambda),
+      x = edfs_start,
+      y = log(lambdas_start),
       xout = seq(
-        min(out$df),
-        max(out$df),
-        length = nlambdas - nlambdas_start - 2
-      )[-c(1, nlambdas - nlambdas_start - 2)]
+        min(edfs_start),
+        max(edfs_start),
+        length = nlambdas - length(lambdas_start) - 2
+      )[-c(1, nlambdas - length(lambdas_start) - 2)]
     )[["y"]] %>%
       suppressWarnings() %>%
       exp()

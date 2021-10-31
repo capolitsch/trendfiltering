@@ -291,17 +291,16 @@ estimators fit during validation.</p></dd>
 trend filtering generalization error, for each hyperparameter value
 (ordered corresponding to the descending-ordered <code>lambdas</code> vector).</p></dd>
 <dt>se_errors</dt><dd><p>The standard errors of the cross validation errors.
-These are particularly useful for implementing the
-``1-standard-error rule''.</p></dd>
+These are particularly useful for implementing the "1-standard-error rule".</p></dd>
 <dt>lambda_min</dt><dd><p>Hyperparameter value that minimizes the cross validation
 generalization error curve.</p></dd>
 <dt>lambda_1se</dt><dd><p>Largest hyperparameter value that is within one standard
 error of the minimum hyperparameter's cross validation error.</p></dd>
 <dt>lambda_choice</dt><dd><p>One of <code><a href='https://rdrr.io/r/base/c.html'>c("lambda_min", "lambda_1se")</a></code>. The choice
 of hyperparameter that is used for the returned trend filtering estimate
-evaluation `tf_estimate`.</p></dd>
-<dt>i_min</dt><dd><p>Index of `lambdas` that minimizes the cross validation error.</p></dd>
-<dt>i_1se</dt><dd><p>Index of `lambdas` that gives the largest hyperparameter
+evaluation <code>tf_estimate</code>.</p></dd>
+<dt>i_min</dt><dd><p>Index of <code>lambdas</code> that minimizes the cross validation error.</p></dd>
+<dt>i_1se</dt><dd><p>Index of <code>lambdas</code> that gives the largest hyperparameter
 value that has a cross validation error within 1 standard error of the
 minimum of the cross validation error curves.</p></dd>
 <dt>edf_min</dt><dd><p>Effective degrees of freedom of the optimized trend
@@ -313,21 +312,21 @@ between the ADMM algorithm's penultimate and final iterations, for
 every hyperparameter choice.</p></dd>
 <dt>n_iter</dt><dd><p>The number of iterations needed for the ADMM algorithm to
 converge within the given tolerance, for each hyperparameter value. If many
-of these are exactly equal to `max_iter`, then their solutions have not
-converged with the tolerance specified by `obj_tol`. In which case, it is
-often prudent to increase `max_iter`.</p></dd>
+of these are exactly equal to <code>max_iter</code>, then their solutions have not
+converged with the tolerance specified by <code>obj_tol</code>. In which case, it is
+often prudent to increase <code>max_iter</code>.</p></dd>
 <dt>x</dt><dd><p>Vector of observed inputs.</p></dd>
 <dt>y</dt><dd><p>Vector of observed outputs.</p></dd>
 <dt>weights</dt><dd><p>Weights for the observed outputs, defined as the reciprocal
 variance of the additive noise that contaminates the signal.</p></dd>
 <dt>fitted_values</dt><dd><p>Optimized trend filtering estimate, evaluated at the
-observed inputs `x`.</p></dd>
-<dt>residuals</dt><dd><p>`residuals = y - fitted_values`</p></dd>
+observed inputs <code>x</code>.</p></dd>
+<dt>residuals</dt><dd><p><code>residuals = y - fitted_values</code></p></dd>
 <dt>k</dt><dd><p>Degree of the trend filtering estimator.</p></dd>
 <dt>admm_params</dt><dd><p>List of parameter settings for the trend filtering ADMM
-algorithm, constructed by passing the `optimization_params` list to
+algorithm, constructed by passing the <code>optimization_params</code> list to
 <code><a href='https://rdrr.io/pkg/glmgen/man/trendfilter.control.list.html'>glmgen::trendfilter.control.list()</a></code>.</p></dd>
-<dt>thinning</dt><dd><p>Logical. If `TRUE`, then the data are preprocessed so that a
+<dt>thinning</dt><dd><p>Logical. If <code>TRUE</code>, then the data are preprocessed so that a
 smaller, better conditioned data set is used for fitting.</p></dd>
 <dt>x_scale, y_scale, data_scaled</dt><dd><p>For internal use.</p></dd>
 
@@ -417,7 +416,7 @@ and 7.12)</p></li>
     thinning <span class='op'>=</span> <span class='cn'>TRUE</span>
   <span class='op'>)</span>
 <span class='op'>)</span>
-</div></pre>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: all scheduled cores encountered errors in user code</span></div><div class='output co'>#&gt; <span class='error'>Error in rowMeans(.): 'x' must be numeric</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
