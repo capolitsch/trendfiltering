@@ -231,7 +231,7 @@
 #'   weights = 1 / EB$std_err^2,
 #'   validation_functional = "MAE",
 #'   optimization_params = list(
-#'     max_iter = 5e3,
+#'     max_iter = 1e4,
 #'     obj_tol = 1e-6,
 #'     thinning = TRUE
 #'   )
