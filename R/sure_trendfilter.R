@@ -20,10 +20,10 @@
 #' disallowed since their smoothness is indistinguishable from `k = 2` and
 #' their use can lead to instability in the convex optimization.
 #' @param nlambdas The number of hyperparameter settings to test during
-#' validation. The hyperparameter grid is dynamically constructed to be
-#' representative of the full model space between a single polynomial solution
-#' and an interpolating solution, with `nlambdas` controlling the granularity
-#' of the grid.
+#' validation. Defaults to `nlambdas = 250`. The hyperparameter grid is
+#' dynamically constructed to be representative of the full model space between
+#' a single polynomial solution and an interpolating solution, with `nlambdas`
+#' controlling the granularity of the grid.
 #' @param nx_eval Integer. The length of the input grid that the optimized
 #' trend filtering estimate is evaluated on; i.e. if nothing is passed to
 #' `x_eval`, then it is defined as
@@ -32,12 +32,12 @@
 #' evaluate the optimized trend filtering estimate on.
 #' @param optimization_params (Optional) A named list of optimization parameter
 #' values to be passed to the trend filtering ADMM algorithm of
-#' [Ramdas and Tibshirani 2016](
-#' http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf) (implemented in the
-#' `glmgen` package). See the [glmgen::trendfilter.control.list()] documentation
-#' for full details. The default parameter choices will almost always suffice,
-#' but when adjustments are necessary, no technical understanding of the ADMM
-#' algorithm is needed in order to do so. The
+#' [Ramdas and Tibshirani (2016)](
+#' http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf), which is implemented in
+#' the `glmgen` R package. See the [glmgen::trendfilter.control.list()]
+#' documentation for full details. The default parameter choices will almost
+#' always suffice, but when adjustments are necessary, no technical
+#' understanding of the ADMM algorithm is needed in order to do so. The
 #' following parameters may require some adjustments to ensure that your trend
 #' filtering estimate has sufficiently converged:
 #' \describe{
@@ -291,6 +291,7 @@ sure_trendfilter <- function(x,
   )
 
   lambdas <- c(
+    out$lambda,
     approx(
       x = out$df,
       y = log(out$lambda),
@@ -298,13 +299,10 @@ sure_trendfilter <- function(x,
         min(out$df),
         max(out$df),
         length = nlambdas - nlambdas_start - 2
-      )[
-        -c(1, nlambdas - nlambdas_start - 2)
-      ]
+      )[-c(1, nlambdas - nlambdas_start - 2)]
     )[["y"]] %>%
       suppressWarnings() %>%
-      exp(),
-    out$lambda
+      exp()
   ) %>%
     unique() %>%
     sort(decreasing = TRUE)

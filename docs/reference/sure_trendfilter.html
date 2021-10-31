@@ -87,7 +87,7 @@ should use sure_trendfilter() vs. cv_trendfilter()." />
         <li>
   <a href="../index.html">
     <span class="fas fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li>
@@ -101,16 +101,16 @@ should use sure_trendfilter() vs. cv_trendfilter()." />
         <li>
   <a href="https://github.com/capolitsch/trendfiltering">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
-      
+
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header>
 
@@ -172,10 +172,10 @@ their use can lead to instability in the convex optimization.</p></td>
     <tr>
       <th>nlambdas</th>
       <td><p>The number of hyperparameter settings to test during
-validation. The hyperparameter grid is dynamically constructed to be
-representative of the full model space between a single polynomial solution
-and an interpolating solution, with <code>nlambdas</code> controlling the granularity
-of the grid.</p></td>
+validation. Defaults to <code>nlambdas = 250</code>. The hyperparameter grid is
+dynamically constructed to be representative of the full model space between
+a single polynomial solution and an interpolating solution, with <code>nlambdas</code>
+controlling the granularity of the grid.</p></td>
     </tr>
     <tr>
       <th>nx_eval</th>
@@ -193,11 +193,11 @@ evaluate the optimized trend filtering estimate on.</p></td>
       <th>optimization_params</th>
       <td><p>(Optional) A named list of optimization parameter
 values to be passed to the trend filtering ADMM algorithm of
-<a href='http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf'>Ramdas and Tibshirani 2016</a> (implemented in the
-<code>glmgen</code> package). See the <code><a href='https://rdrr.io/pkg/glmgen/man/trendfilter.control.list.html'>glmgen::trendfilter.control.list()</a></code> documentation
-for full details. The default parameter choices will almost always suffice,
-but when adjustments are necessary, no technical understanding of the ADMM
-algorithm is needed in order to do so. The
+<a href='http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf'>Ramdas and Tibshirani (2016)</a>, which is implemented in
+the <code>glmgen</code> R package. See the <code><a href='https://rdrr.io/pkg/glmgen/man/trendfilter.control.list.html'>glmgen::trendfilter.control.list()</a></code>
+documentation for full details. The default parameter choices will almost
+always suffice, but when adjustments are necessary, no technical
+understanding of the ADMM algorithm is needed in order to do so. The
 following parameters may require some adjustments to ensure that your trend
 filtering estimate has sufficiently converged:</p><dl>
 <dt><code>obj_tol</code></dt><dd><p>The objective tolerance that, together with <code>max_iter</code>,
@@ -342,10 +342,10 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
 #&gt;   log10_wavelength   flux weights
 #&gt;              <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
 #&gt; <span style='color: #BCBCBC;'>1</span>             3.55  0.424  0.041<span style='text-decoration: underline;'>7</span>
-#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125 
-#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128 
-#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121 
-#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
+#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125
+#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128
+#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121
+#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134
 #&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'>
 <span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'>sure_trendfilter</span><span class='op'>(</span><span class='va'>spec</span><span class='op'>$</span><span class='va'>log10_wavelength</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>flux</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>weights</span><span class='op'>)</span>
 </div></pre>
@@ -370,7 +370,7 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
       </footer>
    </div>
 
-  
+
 
 
   </body>

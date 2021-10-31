@@ -11,6 +11,8 @@ cv_trendfilter(
   k = 2L,
   nlambdas = 250L,
   V = 10L,
+  lambda_choice = c("lambda_min", "lambda_1se"),
+  validation_functional = "WMAE",
   nx_eval = 1500L,
   x_eval,
   mc_cores = parallel::detectCores() - 4,
@@ -42,6 +44,37 @@ with \code{nlambdas} controlling the granularity of the grid.}
 \item{V}{Number of folds the data are partitioned into for the V-fold cross
 validation. Defaults to \code{V = 10}.}
 
+\item{lambda_choice}{One of \code{c("lambda_min","lambda_1se")}. The choice
+of hyperparameter that is used for optimized trend filtering estimate.
+Defaults to \code{lambda_choice = "lambda_min"}.
+\itemize{
+\item{\code{"lambda_min"}}: The hyperparameter value that minimizes the cross
+validation error curve.
+\item{\code{"lambda_1se"}}: The largest hyperparameter value with a cross
+validation error within 1 standard error of the minimum cross validation
+error. This choice therefore favors simpler (i.e. smoother) trend filtering
+estimates. The motivation here is essentially Occam's razor: the two models
+yield results that are quantitatively very close, so we favor the simpler
+model. See Section 7.10 of
+\href{https://web.stanford.edu/~hastie/Papers/ESLII.pdf}{Hastie, Tibshirani, and Friedman (2009)}
+for more details on the "one-standard-error rule".}}
+
+\item{validation_functional}{Loss functional to optimize during cross
+validation. Some common choices can be used by passing an appropriate string
+--- one of \code{c("MSE","MAE","WMSE","WMAE")}, i.e. mean-absolute deviations
+error, mean-squared error, and their weighted counterparts. Defaults to
+\code{validation_functional = "WMAE"}.
+
+Alternatively, custom validation loss functionals can be used by instead
+passing a function to \code{validation_functional}. The function should take three
+vector arguments --- \code{y}, \code{tf_estimate}, and \code{weights} --- and return a
+single scalar value for the validation loss. For example,
+\code{validation_functional = "WMAE"} is equivalent to passing the following
+function:\if{html}{\out{<div class="sourceCode r">}}\preformatted{function(tf_estimate, y, weights)\{
+  sum(abs(tf_estimate - y) * sqrt(weights) / sum(sqrt(weights)))
+\}
+}\if{html}{\out{</div>}}}
+
 \item{nx_eval}{Integer. If nothing is passed to \code{x_eval}, then it is defined
 as \code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
 
@@ -55,10 +88,11 @@ utilize. Defaults to the number of cores detected.}
 
 \item{optimization_params}{(Optional) A named list of optimization parameter
 values to be passed to the trend filtering ADMM algorithm of
-\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and Tibshirani 2016} (implemented in the
-\code{glmgen} package). See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}} documentation
-for full details. No technical understanding of the ADMM algorithm is needed
-and the default parameter choices will almost always suffice. However, the
+\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and Tibshirani (2016)}, which is implemented in
+the \code{glmgen} R package. See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}
+documentation for full details. The default parameter choices will almost
+always suffice, but when adjustments are necessary, no technical
+understanding of the ADMM algorithm is needed in order to do so. The
 following parameters may require some adjustments to ensure that your trend
 filtering estimate has sufficiently converged:
 \describe{
@@ -86,37 +120,6 @@ controlled by the \code{x_tol} argument below.}
 applied to the data. If we make bins of size \code{x_tol} and find at least two
 elements of \code{x} that fall into the same bin, then we thin the data.
 }}}
-
-\item{validation_functional}{Loss functional to optimize during cross
-validation. Some common choices can be used by passing an appropriate string
---- one of \code{c("MSE","MAE","WMSE","WMAE")}, i.e. mean-absolute deviations
-error, mean-squared error, and their weighted counterparts. Defaults to
-\code{validation_functional = "WMAE"}.
-
-Alternatively, custom validation loss functionals can be used by instead
-passing a function to \code{validation_functional}. The function should take three
-vector arguments --- \code{y}, \code{tf_estimate}, and \code{weights} --- and return a
-single scalar value for the validation loss. For example,
-\code{validation_functional = "WMAE"} is equivalent to passing the following
-function:\if{html}{\out{<div class="sourceCode r">}}\preformatted{function(tf_estimate, y, weights)\{
-  sum(abs(tf_estimate - y) * sqrt(weights) / sum(sqrt(weights)))
-\}
-}\if{html}{\out{</div>}}}
-
-\item{lambda_choice}{One of \code{c("lambda_min","lambda_1se")}. The choice
-of hyperparameter that is used for optimized trend filtering estimate.
-Defaults to \code{lambda_choice = "lambda_min"}.
-\itemize{
-\item{\code{"lambda_min"}}: The hyperparameter value that minimizes the cross
-validation error curve.
-\item{\code{"lambda_1se"}}: The largest hyperparameter value with a cross
-validation error within 1 standard error of the minimum cross validation
-error. This choice therefore favors simpler (i.e. smoother) trend filtering
-estimates. The motivation here is essentially Occam's razor: the two models
-yield results that are quantitatively very close, so we favor the simpler
-model. See Section 7.10 of
-\href{https://web.stanford.edu/~hastie/Papers/ESLII.pdf}{Hastie, Tibshirani, and Friedman (2009)}
-for more details on the ``one-standard-error rule''.}}
 }
 \value{
 An object of class \code{cv_tf}. This is a list with the following
@@ -234,7 +237,6 @@ cv_tf <- cv_trendfilter(
   y = EB$flux,
   weights = 1 / EB$std_err^2,
   validation_functional = "MAE",
-  lambdas = exp(seq(20, 7, length = 250)),
   optimization_params = list(
     max_iter = 5e3,
     obj_tol = 1e-6,

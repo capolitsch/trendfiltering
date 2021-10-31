@@ -59,17 +59,18 @@
 #' model. See Section 7.10 of
 #' [Hastie, Tibshirani, and Friedman (2009)](
 #' https://web.stanford.edu/~hastie/Papers/ESLII.pdf)
-#' for more details on the ``one-standard-error rule''.}
+#' for more details on the "one-standard-error rule".}
 #' @param mc_cores Multi-core computing using the
 #' [`parallel`][`parallel::parallel-package`] package: The number of cores to
 #' utilize. Defaults to the number of cores detected.
 #' @param optimization_params (Optional) A named list of optimization parameter
 #' values to be passed to the trend filtering ADMM algorithm of
-#' [Ramdas and Tibshirani 2016](
-#' http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf) (implemented in the
-#' `glmgen` package). See the [glmgen::trendfilter.control.list()] documentation
-#' for full details. No technical understanding of the ADMM algorithm is needed
-#' and the default parameter choices will almost always suffice. However, the
+#' [Ramdas and Tibshirani (2016)](
+#' http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf), which is implemented in
+#' the `glmgen` R package. See the [glmgen::trendfilter.control.list()]
+#' documentation for full details. The default parameter choices will almost
+#' always suffice, but when adjustments are necessary, no technical
+#' understanding of the ADMM algorithm is needed in order to do so. The
 #' following parameters may require some adjustments to ensure that your trend
 #' filtering estimate has sufficiently converged:
 #' \describe{
@@ -230,7 +231,6 @@
 #'   y = EB$flux,
 #'   weights = 1 / EB$std_err^2,
 #'   validation_functional = "MAE",
-#'   lambdas = exp(seq(20, 7, length = 250)),
 #'   optimization_params = list(
 #'     max_iter = 5e3,
 #'     obj_tol = 1e-6,
@@ -250,6 +250,8 @@ cv_trendfilter <- function(x,
                            k = 2L,
                            nlambdas = 250L,
                            V = 10L,
+                           lambda_choice = c("lambda_min", "lambda_1se"),
+                           validation_functional = "WMAE",
                            nx_eval = 1500L,
                            x_eval,
                            mc_cores = parallel::detectCores() - 4,
@@ -281,22 +283,10 @@ cv_trendfilter <- function(x,
     }
   }
 
-  if (missing(lambdas)) {
-    if (nlambdas < 0 || nlambdas != round(nlambdas)) {
-      stop("nlambdas must be a positive integer")
-    } else {
-      nlambdas <- nlambdas %>% as.integer()
-    }
+  if (nlambdas < 0 || nlambdas != round(nlambdas)) {
+    stop("nlambdas must be a positive integer")
   } else {
-    if (min(lambdas) <= 0L) {
-      stop("All specified lambda values must be positive.")
-    }
-    if (length(lambdas) < 25L) {
-      warning("Recommended to provide more candidate hyperparameter values.")
-    }
-    if (!all(lambdas == sort(lambdas, decreasing = T))) {
-      warning("Sorting lambdas to descending order.")
-    }
+    nlambdas <- nlambdas %>% as.integer()
   }
 
   if (missing(x_eval)) {
@@ -398,14 +388,6 @@ cv_trendfilter <- function(x,
   data_folded <- data_scaled %>%
     group_split(sample(rep_len(1:V, nrow(data_scaled))), .keep = FALSE)
 
-  if (missing(lambdas)) {
-    lambdas <- exp(seq(16, -10, length = nlambdas))
-  } else {
-    lambdas %<>%
-      as.double() %>%
-      sort(decreasing = T)
-  }
-
   if (missing(x_eval)) {
     x_eval <- seq(min(data$x), max(data$x), length = nx_eval)
   } else {
@@ -420,7 +402,6 @@ cv_trendfilter <- function(x,
       validation_method = paste0(V, "-fold CV"),
       V = V,
       validation_functional = validation_functional,
-      lambdas = lambdas,
       lambda_choice = lambda_choice,
       x = data$x,
       y = data$y,
@@ -436,9 +417,43 @@ cv_trendfilter <- function(x,
   )
 
   rm(
-    V, validation_functional, lambdas, nlambdas, lambda_choice, k, thinning,
+    V, validation_functional, lambda_choice, k, thinning,
     data, nx_eval, admm_params, data_scaled, x_eval, x_scale, y_scale
   )
+
+  if (nlambdas >= 150) {
+    nlambdas_start <- 100
+  } else {
+    nlambdas_start <- 50
+  }
+
+  out <- trendfilter(
+    x = obj$data_scaled$x,
+    y = obj$data_scaled$y,
+    weights = obj$data_scaled$weights,
+    lambda.min.ratio = 1e-16,
+    nlambda = nlambdas_start,
+    k = obj$k,
+    thinning = obj$thinning,
+    control = obj$admm_params
+  )
+
+  obj$lambdas <- c(
+    out$lambda,
+    approx(
+      x = out$df,
+      y = log(out$lambda),
+      xout = seq(
+        min(out$df),
+        max(out$df),
+        length = nlambdas - nlambdas_start - 2
+      )[-c(1, nlambdas - nlambdas_start - 2)]
+    )[["y"]] %>%
+      suppressWarnings() %>%
+      exp()
+  ) %>%
+    unique() %>%
+    sort(decreasing = TRUE)
 
   cv_out <- mclapply(
     1:(obj$V),

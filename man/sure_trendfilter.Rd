@@ -34,10 +34,10 @@ disallowed since their smoothness is indistinguishable from \code{k = 2} and
 their use can lead to instability in the convex optimization.}
 
 \item{nlambdas}{The number of hyperparameter settings to test during
-validation. The hyperparameter grid is dynamically constructed to be
-representative of the full model space between a single polynomial solution
-and an interpolating solution, with \code{nlambdas} controlling the granularity
-of the grid.}
+validation. Defaults to \code{nlambdas = 250}. The hyperparameter grid is
+dynamically constructed to be representative of the full model space between
+a single polynomial solution and an interpolating solution, with \code{nlambdas}
+controlling the granularity of the grid.}
 
 \item{nx_eval}{Integer. The length of the input grid that the optimized
 trend filtering estimate is evaluated on; i.e. if nothing is passed to
@@ -49,11 +49,11 @@ evaluate the optimized trend filtering estimate on.}
 
 \item{optimization_params}{(Optional) A named list of optimization parameter
 values to be passed to the trend filtering ADMM algorithm of
-\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and Tibshirani 2016} (implemented in the
-\code{glmgen} package). See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}} documentation
-for full details. The default parameter choices will almost always suffice,
-but when adjustments are necessary, no technical understanding of the ADMM
-algorithm is needed in order to do so. The
+\href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and Tibshirani (2016)}, which is implemented in
+the \code{glmgen} R package. See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}
+documentation for full details. The default parameter choices will almost
+always suffice, but when adjustments are necessary, no technical
+understanding of the ADMM algorithm is needed in order to do so. The
 following parameters may require some adjustments to ensure that your trend
 filtering estimate has sufficiently converged:
 \describe{
