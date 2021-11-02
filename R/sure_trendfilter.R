@@ -1,65 +1,65 @@
 #' Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
 #' risk estimate
 #'
-#' [`sure_trendfilter()`] optimizes the trend filtering hyperparameter via a
-#' grid search over a vector of candidate hyperparameter values and selects
-#' the value that minimizes an unbiased estimate of the model's generalization
-#' mean-squared error (at the observed inputs). See details below for when you
-#' should use [`sure_trendfilter()`] vs. [cv_trendfilter()].
+#' For every candidate hyperparameter value, compute an unbiased estimate of the
+#' trend filtering model's predictive mean-squared error. See details below
+#' for when you should use [`sure_trendfilter()`] versus [cv_trendfilter()].
 #'
 #' @param x Vector of observed values for the input variable.
 #' @param y Vector of observed values for the output variable.
 #' @param weights Weights for the observed outputs, defined as the reciprocal
 #' variance of the additive noise that contaminates the signal in `y`.
 #' When the noise is expected to have equal variance for all observations,
-#' `weights` can be passed as a scalar. Otherwise, `weights` must have the same
-#' length as `x` and `y`.
-#' @param k Degree of the piecewise polynomials that make up the trend
-#' filtering estimate. Defaults to `k = 2` (i.e. a piecewise quadratic
+#' `weights` can be passed as a scalar. Otherwise, `weights` must be a vector
+#' with the same length as `x` and `y`.
+#' @param k Degree of the polynomials that make up the piecewise-polynomial
+#' trend filtering estimate. Defaults to `k = 2` (i.e. a piecewise quadratic
 #' estimate). Must be one of `k = 0,1,2`. Higher order polynomials are
 #' disallowed since their smoothness is indistinguishable from `k = 2` and
 #' their use can lead to instability in the convex optimization.
-#' @param nlambdas The number of hyperparameter settings to test during
-#' validation. Defaults to `nlambdas = 250`. The hyperparameter grid is
-#' dynamically constructed to be representative of the full model space between
-#' a single polynomial solution and an interpolating solution, with `nlambdas`
+#' @param nlambdas Number of hyperparameter values to test during validation.
+#' Defaults to `nlambdas = 250`. The hyperparameter grid is dynamically
+#' constructed to span the full model space lying between a single polynomial
+#' solution (i.e. a power law) and an interpolating solution, with `nlambdas`
 #' controlling the granularity of the grid.
-#' @param nx_eval Integer. The length of the input grid that the optimized
-#' trend filtering estimate is evaluated on; i.e. if nothing is passed to
-#' `x_eval`, then it is defined as
-#' `x_eval = seq(min(x), max(x), length = nx_eval)`.
-#' @param x_eval (Optional) Overrides `nx_eval` if passed. A grid of inputs to
-#' evaluate the optimized trend filtering estimate on.
-#' @param optimization_params (Optional) A named list of optimization parameter
-#' values to be passed to the trend filtering ADMM algorithm of
+#' @param optimization_params (Optional) A named list of parameter values to be
+#' passed to the trend filtering ADMM algorithm of
 #' [Ramdas and Tibshirani (2016)](
 #' http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf), which is implemented in
 #' the `glmgen` R package. See the [glmgen::trendfilter.control.list()]
-#' documentation for full details. The default parameter choices will almost
-#' always suffice, but when adjustments are necessary, no technical
-#' understanding of the ADMM algorithm is needed in order to do so. The
-#' following parameters may require some adjustments to ensure that your trend
-#' filtering estimate has sufficiently converged:
+#' documentation for a full list of the algorithm's parameters. The default
+#' parameter choices will almost always suffice, but when adjustments do need to
+#' be made, one can do so without any technical understanding of the ADMM
+#' algorithm. In particular, the four parameter descriptions below should serve
+#' as sufficient working knowledge.
 #' \describe{
-#' \item{obj_tol}{The objective tolerance that, together with `max_iter`,
-#' determines the ADMM algorithm's stopping criterion. The algorithm will stop
-#' either (1) when the relative change in the objective function is less than
-#' `obj_tol`; or (2) when the number of iterations has reached `max_iter`.
-#' This argument defaults to `obj_tol = 1e-10`. Therefore, when necessary, the
-#' precision of the approximate solution given by the ADMM algorithm can be
-#' increased by decreasing `obj_tol` and/or increasing `max_iter`.}
-#' \item{max_iter}{Maximum iterations allowed for the trend filtering
-#' optimization. Defaults to `max_iter = length(y)`. See the
-#' `n_iter` element of the `sure_trendfilter()` output for the actual number of
-#' iterations the ADMM algorithm took, for every candidate hyperparameter value
-#' in `lambdas`. If any of the elements of `n_iter` are equal to `max_iter`,
-#' the objective function's tolerance has not been reached and `max_iter` may
-#' need to be increased.}
+#' \item{obj_tol}{A stopping threshold for the ADMM algorithm. If the relative
+#' change in the algorithm's cost functional between two consecutive steps is
+#' less than `obj_tol`, the algorithm terminates. The algorithm's termination
+#' can also result from it reaching the maximum tolerable iterations set
+#' by the `max_iter` parameter (see below). The `obj_tol` parameter defaults to
+#' `obj_tol = 1e-10`. The `cost_functional` vector, returned within the
+#' `sure_trendfilter()` output, gives the relative change in the trend filtering
+#' cost functional over the algorithm's final iteration, for every candidate
+#' hyperparameter value.}
+#' \item{max_iter}{Maximum number of ADMM iterations that we will tolerate.
+#' Defaults to `max_iter = length(y)`. The actual number of iterations performed
+#' by the algorithm, for every candidate hyperparameter value, is returned in
+#' the `n_iter` vector, within the `sure_trendfilter()` output. If any of the
+#' elements of `n_iter` are equal to `max_iter`, the tolerance defined by
+#' `obj_tol` has not been attained and `max_iter` may need to be increased.}
 #' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so that
-#' a smaller, better conditioned data set is used for fitting. When left `NULL`
-#' (the default setting), the optimization will automatically detect whether
-#' thinning should be applied (i.e. cases in which the numerical fitting
-#' algorithm will struggle to converge). This preprocessing procedure is
+#' a smaller, better-conditioned data set is used to fit the trend filtering
+#' estimate. This can be very useful when a data set samples a signal so well
+#' that very little additional information / predictive accuracy is gained
+#' by fitting the trend filtering estimate on the full data set, compared to
+#' some fraction of it. See the [`cv_trendfilter()`] examples for a case study
+#' of this nature, when the goal is to denoise the light curve (i.e. a
+#' brightness time series) of a binary star system, after it has been folded
+#' (i.e. stacked) based on the orbital period of the star system. When left
+#' `thinning = NULL` (the default setting), the optimization will automatically
+#' detect whether thinning should be applied (i.e. cases in which the numerical
+#' fitting algorithm will struggle to converge). This preprocessing procedure is
 #' controlled by the `x_tol` argument below.}
 #' \item{x_tol}{Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
@@ -82,45 +82,48 @@
 #' filtering analysis on that scale. See the example below for a case when the
 #' inputs are evenly sampled on the `log10(x)` scale.
 #'
-#' @return An object of class [`sure_tf`][sure_trendfilter()]. This is a list
-#' with the following elements:
+#' @return An object of class `sure_tf`. This is a list with the following
+#' elements:
 #' \describe{
-#' \item{x_eval}{Input grid used to evaluate the optimized trend filtering
-#' estimate on.}
-#' \item{tf_estimate}{Optimized trend filtering estimate, evaluated at `x_eval`.
-#' }
-#' \item{validation_method}{"SURE"}
 #' \item{lambdas}{Vector of hyperparameter values evaluated in the grid search
 #' (always returned in descending order).}
 #' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
-#' estimators fit during validation.}
+#' estimators fit during model validation.}
 #' \item{generalization_errors}{Vector of SURE generalization error estimates,
-#' corresponding to the descending-ordered `lambdas` vector.}
+#' ordered according to the descending-ordered `lambdas` vector.}
+#' \item{se_errors}{The standard errors of the SURE estimates of the trend
+#' filtering model's generalization error for every candidate hyperparameter
+#' value in `lambdas`. These are particularly useful for implementing the
+#' "1-standard-error rule".}
 #' \item{lambda_min}{Hyperparameter value that minimizes the SURE generalization
 #' error curve.}
+#' \item{lambda_1se}{Largest hyperparameter value that is within one standard
+#' error of the minimum hyperparameter's cross validation error.}
 #' \item{edf_min}{Effective degrees of freedom of the optimized trend
 #' filtering estimator.}
 #' \item{i_min}{Index of `lambdas` that minimizes the SURE error curve.}
+#' \item{i_1se}{Index of `lambdas` that gives the largest hyperparameter
+#' value that has a cross validation error within 1 standard error of the
+#' minimum of the cross validation error curves.}
+#' \item{edf_min}{Effective degrees of freedom of the optimized trend
+#' filtering estimator.}
+#' \item{edf_1se}{Effective degrees of freedom of the 1-stand-error rule
+#' trend filtering estimator.}
 #' \item{cost_functional}{The relative change in the cost functional values
-#' between the ADMM algorithm's penultimate and final iterations, for
-#' every hyperparameter choice.}
-#' \item{n_iter}{The number of iterations taken by the ADMM algorithm along its
-#' approximate solution path.
-#' converge within the given tolerance, for each hyperparameter value. If many
-#' of these are exactly equal to `max_iter`, then their solutions have not
-#' converged with the tolerance specified by `obj_tol`. In which case, it is
-#' often prudent to increase `max_iter`.}
+#' between the ADMM algorithm penultimate and ultimate state, for every
+#' hyperparameter choice.}
+#' \item{n_iter}{The number of iterations taken by the ADMM algorithm, for
+#' every candidate hyperparameter value in `lambdas`. If an element of `n_iter`
+#' is exactly equal to `max_iter`, then the ADMM algorithm stopped before
+#' reaching the tolerance specified by `obj_tol`. In these cases, you may need
+#' to increase `max_iter`.}
 #' \item{training_errors}{Mean-squared error between the observed outputs `y`
 #' and the trend filtering estimate, for every hyperparameter choice.}
 #' \item{optimisms}{SURE-estimated optimisms, i.e.
 #' `optimisms = generalization_errors - training_errors`.}
 #' \item{x}{Vector of observed inputs.}
 #' \item{y}{Vector of observed outputs.}
-#' \item{weights}{Weights for the observed outputs, defined as the reciprocal
-#' variance of the additive noise that contaminates the signal.}
-#' \item{fitted_values}{Optimized trend filtering estimate, evaluated at the
-#' observed inputs `x`.}
-#' \item{residuals}{`residuals = y - fitted_values`}
+#' \item{weights}{Vector of weights for the observed outputs.}
 #' \item{k}{Degree of the trend filtering estimator.}
 #' \item{admm_params}{List of parameter settings for the trend filtering ADMM
 #' algorithm, constructed by passing the `optimization_params` list to
@@ -177,22 +180,22 @@
 #' sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
 #' @importFrom glmgen trendfilter trendfilter.control.list
 #' @importFrom tidyr drop_na tibble
-#' @importFrom dplyr arrange filter select first last
+#' @importFrom dplyr arrange filter select
 #' @importFrom magrittr %>% %$% %<>%
-#' @importFrom stats median approx
+#' @importFrom matrixStats rowSds
+#' @importFrom stats median
 sure_trendfilter <- function(x,
                              y,
                              weights,
                              k = 2L,
                              nlambdas = 250L,
-                             nx_eval = 1500L,
-                             x_eval,
                              optimization_params) {
   if (missing(x) || is.null(x)) stop("x must be passed.")
   if (missing(y) || is.null(y)) stop("y must be passed.")
   if (length(x) != length(y)) stop("x and y must have equal length.")
   if (length(y) < k + 2) stop("Must have >= k + 2 observations.")
   if (k < 0 || k != round(k)) stop("k must be a nonnegative integer.")
+
   if (k > 2) {
     stop("k > 2 are algorithmically unstable and do not improve upon k = 2.")
   }
@@ -203,26 +206,13 @@ sure_trendfilter <- function(x,
     nlambdas %<>% as.integer()
   }
 
-  if (missing(x_eval)) {
-    if (!(class(nx_eval) %in% c("numeric", "integer"))) {
-      stop("nx_eval must be a positive integer.")
-    }
-    if (nx_eval < 1 || nx_eval != round(nx_eval)) {
-      stop("nx_eval must be a positive integer.")
-    }
-  } else {
-    if (any(x_eval < min(x) || x_eval > max(x))) {
-      stop("x_eval should all be in range(x).")
-    }
-  }
-
   if (missing(weights) || !(class(weights) %in% c("numeric", "integer"))) {
     stop("weights must be passed to use sure_trendfilter.")
   }
 
   if (!(length(weights) %in% c(1, length(y)))) {
     stop(
-      "weights must either have length 1 or length(y) to use sure_trendfilter."
+      "weights must either have length 1 or length(y) to use sure_trendfilter()."
     )
   }
 
@@ -237,33 +227,18 @@ sure_trendfilter <- function(x,
     arrange(x) %>%
     filter(weights > 0) %>%
     drop_na()
-  rm(x, y, weights)
 
   if (missing(optimization_params)) {
-    optimization_params <- list(
-      max_iter = nrow(data),
-      obj_tol = 1e-10
-    )
-    thinning <- NULL
-  } else {
-    if (!("max_iter" %in% names(optimization_params))) {
-      optimization_params$max_iter <- nrow(data)
-    }
-    if (!("obj_tol" %in% names(optimization_params))) {
-      optimization_params$obj_tol <- 1e-10
-    }
-    if (!("thinning" %in% names(optimization_params))) {
-      thinning <- NULL
-    } else {
-      thinning <- optimization_params$thinning
-      optimization_params$thinning <- NULL
-    }
+    optimization_params <- NULL
   }
-
+  opt_params <- get_optimization_params(optimization_params, n = length(x))
+  optimization_params <- opt_params$optimization_params
+  thinning <- opt_params$thinning
   admm_params <- do.call(trendfilter.control.list, optimization_params)
-  x_scale <- diff(data$x) %>% median()
+  x_scale <- data$x %>%
+    diff() %>%
+    median()
   y_scale <- median(abs(data$y)) / 10
-  admm_params$x_tol <- admm_params$x_tol / x_scale
 
   data_scaled <- data %>%
     mutate(
@@ -273,61 +248,34 @@ sure_trendfilter <- function(x,
     ) %>%
     select(x, y, weights)
 
-  if (nlambdas >= 150) {
-    nlambdas_start <- 100
-  } else {
-    nlambdas_start <- 50
-  }
+  admm_params$x_tol <- admm_params$x_tol / x_scale
 
-  out <- trendfilter(
-    x = data_scaled$x,
-    y = data_scaled$y,
-    weights = data_scaled$weights,
-    lambda.min.ratio = 1e-16,
-    nlambda = nlambdas_start,
-    k = k,
-    thinning = thinning,
-    control = admm_params
+  obj <- structure(
+    list(
+      validation_method = "SURE",
+      nlambdas = nlambdas,
+      n = nrow(data),
+      x = data$x,
+      y = data$y,
+      weights = data$weights,
+      k = k,
+      thinning = thinning,
+      admm_params = admm_params,
+      data_scaled = data_scaled,
+      x_scale = x_scale,
+      y_scale = y_scale
+    ),
+    class = c("sure_tf", "list")
   )
 
-  lambdas_start <- out$lambda
-  edfs_start <- out$df
+  rm(
+    k, thinning, data, admm_params, data_scaled, optimization_params, nlambdas,
+    opt_params, x_scale, y_scale, x, y, weights
+  )
 
-  if (any(out$df == nrow(data))) {
-    inds <- which(out$df == nrow(data))[-1]
-    if (length(inds) > 0) {
-      lambdas_start <- lambdas_start[-inds]
-      edfs_start <- edfs_start[-inds]
-    }
-  }
+  obj %<>% get_lambdas()
 
-  if (any(out$df <= k + 2)) {
-    inds <- which(out$df <= k + 2)
-    if (length(inds) > 1) {
-      inds <- inds[-last(inds)]
-      lambdas_start <- lambdas_start[-inds]
-      edfs_start <- edfs_start[-inds]
-    }
-  }
-
-  lambdas <- c(
-    lambdas_start,
-    approx(
-      x = edfs_start,
-      y = log(lambdas_start),
-      xout = seq(
-        min(edfs_start),
-        max(edfs_start),
-        length = nlambdas - length(lambdas_start) + 2
-      )[-c(1, nlambdas - length(lambdas_start) + 2)]
-    )[["y"]] %>%
-      suppressWarnings() %>%
-      exp()
-  ) %>%
-    unique() %>%
-    sort(decreasing = TRUE)
-
-  out <- trendfilter(
+  out <- obj %$% trendfilter(
     x = data_scaled$x,
     y = data_scaled$y,
     weights = data_scaled$weights,
@@ -337,80 +285,93 @@ sure_trendfilter <- function(x,
     control = admm_params
   )
 
-  training_errors <- (out$beta - data_scaled$y)^2 %>%
-    colMeans() %>%
-    as.double()
-  optimisms <- 2 * out$df / nrow(data) * mean(1 / data_scaled$weights) %>%
-    as.double()
-  generalization_errors <- training_errors + optimisms
+  squared_residuals_mat <- (out$beta - obj$data_scaled$y)^2
+  optimisms_mat <- 2 / (obj$data_scaled$weights * obj$n) * matrix(
+    rep(out$df, each = obj$n), nrow = obj$n
+  )
 
-  edfs <- out$df %>% as.integer()
-  n_iter <- out$iter %>% as.integer()
-  i_min <- min(which.min(generalization_errors)) %>% as.integer()
-  lambda_min <- lambdas[i_min]
-  cost_functional <- out$obj[nrow(out$obj), ]
+  generalization_errors_mat <- (squared_residuals_mat + optimisms_mat) * obj$y_scale^2
+  obj$generalization_errors <- generalization_errors_mat %>% colMeans()
+  obj$edfs <- out$df %>% as.integer()
+  obj$n_iter <- out$iter %>% as.integer()
+  obj$i_min <- min(which.min(obj$generalization_errors)) %>% as.integer()
+  obj$lambda_min <- obj$lambdas[obj$i_min]
+  obj$edf_min <- obj$edfs[obj$i_min] %>% as.integer()
+  obj$cost_functional <- out$obj[nrow(out$obj), ]
+
+  obj$se_errors <- replicate(
+    5000,
+    generalization_errors_mat[sample(1:obj$n, replace = TRUE), ] %>%
+      colMeans()
+  ) %>%
+    rowSds()
+
+  obj$i_1se <- obj %$% which(
+    generalization_errors <= generalization_errors[i_min] + se_errors[i_min]
+  ) %>%
+    min()
+  obj$lambda_1se <- obj$lambdas[obj$i_1se]
+  obj$edf_1se <- obj$edfs[obj$i_1se]
+
+  obj[c(
+    "lambdas", "edfs", "generalization_errors", "se_errors", "lambda_min",
+    "lambda_1se", "i_min", "i_1se", "edf_min", "edf_1se", "cost_functional",
+    "n_iter", "x", "y", "weights", "k", "admm_params", "thinning", "x_scale",
+    "y_scale", "data_scaled"
+  )]
+}
+
+
+#' @importFrom dplyr slice_head group_split n
+#' @importFrom magrittr %>% %$%
+#' @importFrom matrixStats rowSds
+#' @importFrom parallel mclapply
+#' @noRd
+estimate_sure_variance_by_blocking <- function(obj, V = 10) {
+  # Experimental CV-like procedure for getting SURE standard error bars.
+  # Could potentially produce biased-upward error estimates when the signal
+  # and/or noise has significant spatial variability.
+
+  data_folded <- obj$data_scaled %>%
+    slice_head(n = max(which(1:length(obj$x) %% V == 0))) %>%
+    group_split(rep(1:V, each = n() / V, length = n()), .keep = FALSE)
+
+  sure_error_mat <- mclapply(
+    1:V,
+    FUN = sure_fold_error,
+    data_folded = data_folded,
+    obj = obj,
+    mc.cores = obj$mc_cores
+  ) %>%
+    unlist() %>%
+    matrix(ncol = V)
+
+  rowSds(sure_error_mat) %>% as.double()
+}
+
+
+#' @importFrom glmgen trendfilter
+#' @importFrom dplyr bind_rows %>%
+#' @noRd
+sure_fold_error <- function(validation_index, data_folded, obj) {
+  data_train <- data_folded[-validation_index] %>% bind_rows()
 
   out <- trendfilter(
-    data_scaled$x,
-    data_scaled$y,
-    data_scaled$weights,
-    lambda = lambda_min,
-    k = k,
-    thinning = thinning,
-    control = admm_params
+    x = data_train$x,
+    y = data_train$y,
+    weights = data_train$weights,
+    k = obj$k,
+    lambda = obj$lambdas,
+    thinning = obj$thinning,
+    control = obj$admm_params
   )
 
-  if (missing(x_eval)) {
-    x_eval <- seq(min(data$x), max(data$x), length = nx_eval)
-  } else {
-    x_eval %<>%
-      as.double() %>%
-      sort()
-  }
+  training_errors <- (out$beta - data_train$y)^2 %>%
+    colMeans() * obj$y_scale^2 %>%
+      as.double()
+  optimisms <- 2 * out$df * obj$y_scale^2 / nrow(data_train) *
+    mean(1 / data_train$weights) %>%
+      as.double()
 
-  tf_estimate <- glmgen:::predict.trendfilter(
-    out,
-    lambda = lambda_min,
-    x.new = x_eval / x_scale
-  ) %>%
-    as.double()
-
-  data_scaled$fitted_values <- glmgen:::predict.trendfilter(
-    out,
-    lambda = lambda_min,
-    x.new = data_scaled$x
-  ) %>%
-    as.double()
-
-  data_scaled %<>% mutate(residuals = y - fitted_values)
-
-  structure(
-    list(
-      x_eval = x_eval,
-      tf_estimate = tf_estimate * y_scale,
-      validation_method = "SURE",
-      lambdas = lambdas,
-      generalization_errors = generalization_errors * y_scale^2,
-      lambda_min = lambda_min,
-      edfs = edfs,
-      edf_min = out$df,
-      i_min = i_min,
-      cost_functional = cost_functional,
-      n_iter = n_iter,
-      training_errors = training_errors * y_scale^2,
-      optimisms = optimisms * y_scale^2,
-      x = data$x,
-      y = data$y,
-      weights = data$weights,
-      fitted_values = data_scaled$fitted_values * y_scale,
-      residuals = data_scaled$residuals * y_scale,
-      k = k,
-      admm_params = admm_params,
-      thinning = thinning,
-      x_scale = x_scale,
-      y_scale = y_scale,
-      data_scaled = data_scaled
-    ),
-    class = c("sure_tf", "list")
-  )
+  training_errors + optimisms
 }

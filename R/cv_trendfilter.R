@@ -1,4 +1,4 @@
-#' Optimize the trend filtering hyperparameter by V-fold cross validation
+#' Validate the trend filtering hyperparameter by V-fold cross validation
 #'
 #' [`cv_trendfilter()`] optimizes the trend filtering hyperparameter via V-fold
 #' cross validation on a grid of candidate hyperparameter settings and selects
@@ -139,11 +139,6 @@
 #' @return An object of class `cv_tf`. This is a list with the following
 #' elements:
 #' \describe{
-#' \item{x_eval}{Input grid used to evaluate the optimized trend filtering
-#' estimate on.}
-#' \item{tf_estimate}{Optimized trend filtering estimate, evaluated at
-#' `x_eval`.}
-#' \item{validation_method}{`paste0(V,"-fold CV")`}
 #' \item{validation_functional}{Type of error that validation was performed on.
 #' Either one of `c("MSE","MAE","WMSE","WMAE")` or a custom function passed by
 #' the user.}
@@ -162,9 +157,6 @@
 #' generalization error curve.}
 #' \item{lambda_1se}{Largest hyperparameter value that is within one standard
 #' error of the minimum hyperparameter's cross validation error.}
-#' \item{lambda_choice}{One of `c("lambda_min", "lambda_1se")`. The choice
-#' of hyperparameter that is used for the returned trend filtering estimate
-#' evaluation `tf_estimate`.}
 #' \item{i_min}{Index of `lambdas` that minimizes the cross validation error.}
 #' \item{i_1se}{Index of `lambdas` that gives the largest hyperparameter
 #' value that has a cross validation error within 1 standard error of the
@@ -384,9 +376,6 @@ cv_trendfilter <- function(x,
     ) %>%
     select(x, y, weights)
 
-  data_folded <- data_scaled %>%
-    group_split(sample(rep_len(1:V, nrow(data_scaled))), .keep = FALSE)
-
   if (missing(x_eval)) {
     x_eval <- seq(min(data$x), max(data$x), length = nx_eval)
   } else {
@@ -474,9 +463,12 @@ cv_trendfilter <- function(x,
     unique() %>%
     sort(decreasing = TRUE)
 
+  data_folded <- data_scaled %>%
+    group_split(sample(rep_len(1:V, nrow(data_scaled))), .keep = FALSE)
+
   cv_out <- mclapply(
     1:(obj$V),
-    FUN = trendfilter_validate,
+    FUN = validate_trendfilter,
     data_folded = data_folded,
     obj = obj,
     mc.cores = mc_cores
@@ -577,7 +569,7 @@ cv_trendfilter <- function(x,
   return(obj)
 }
 
-trendfilter_validate <- function(validation_index, data_folded, obj) {
+validate_trendfilter <- function(validation_index, data_folded, obj) {
   data_train <- data_folded[-validation_index] %>% bind_rows()
   data_validate <- data_folded[[validation_index]]
 

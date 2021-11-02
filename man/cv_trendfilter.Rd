@@ -2,7 +2,7 @@
 % Please edit documentation in R/cv_trendfilter.R
 \name{cv_trendfilter}
 \alias{cv_trendfilter}
-\title{Optimize the trend filtering hyperparameter by V-fold cross validation}
+\title{Validate the trend filtering hyperparameter by V-fold cross validation}
 \usage{
 cv_trendfilter(
   x,
@@ -125,11 +125,6 @@ elements of \code{x} that fall into the same bin, then the data is thinned.
 An object of class \code{cv_tf}. This is a list with the following
 elements:
 \describe{
-\item{x_eval}{Input grid used to evaluate the optimized trend filtering
-estimate on.}
-\item{tf_estimate}{Optimized trend filtering estimate, evaluated at
-\code{x_eval}.}
-\item{validation_method}{\code{paste0(V,"-fold CV")}}
 \item{validation_functional}{Type of error that validation was performed on.
 Either one of \code{c("MSE","MAE","WMSE","WMAE")} or a custom function passed by
 the user.}
@@ -148,9 +143,6 @@ These are particularly useful for implementing the "1-standard-error rule".}
 generalization error curve.}
 \item{lambda_1se}{Largest hyperparameter value that is within one standard
 error of the minimum hyperparameter's cross validation error.}
-\item{lambda_choice}{One of \code{c("lambda_min", "lambda_1se")}. The choice
-of hyperparameter that is used for the returned trend filtering estimate
-evaluation \code{tf_estimate}.}
 \item{i_min}{Index of \code{lambdas} that minimizes the cross validation error.}
 \item{i_1se}{Index of \code{lambdas} that gives the largest hyperparameter
 value that has a cross validation error within 1 standard error of the

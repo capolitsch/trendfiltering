@@ -5,16 +5,7 @@
 \title{Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
 risk estimate}
 \usage{
-sure_trendfilter(
-  x,
-  y,
-  weights,
-  k = 2L,
-  nlambdas = 250L,
-  nx_eval = 1500L,
-  x_eval,
-  optimization_params
-)
+sure_trendfilter(x, y, weights, k = 2L, nlambdas = 250L, optimization_params)
 }
 \arguments{
 \item{x}{Vector of observed values for the input variable.}
@@ -24,58 +15,58 @@ sure_trendfilter(
 \item{weights}{Weights for the observed outputs, defined as the reciprocal
 variance of the additive noise that contaminates the signal in \code{y}.
 When the noise is expected to have equal variance for all observations,
-\code{weights} can be passed as a scalar. Otherwise, \code{weights} must have the same
-length as \code{x} and \code{y}.}
+\code{weights} can be passed as a scalar. Otherwise, \code{weights} must be a vector
+with the same length as \code{x} and \code{y}.}
 
-\item{k}{Degree of the piecewise polynomials that make up the trend
-filtering estimate. Defaults to \code{k = 2} (i.e. a piecewise quadratic
+\item{k}{Degree of the polynomials that make up the piecewise-polynomial
+trend filtering estimate. Defaults to \code{k = 2} (i.e. a piecewise quadratic
 estimate). Must be one of \verb{k = 0,1,2}. Higher order polynomials are
 disallowed since their smoothness is indistinguishable from \code{k = 2} and
 their use can lead to instability in the convex optimization.}
 
-\item{nlambdas}{The number of hyperparameter settings to test during
-validation. Defaults to \code{nlambdas = 250}. The hyperparameter grid is
-dynamically constructed to be representative of the full model space between
-a single polynomial solution and an interpolating solution, with \code{nlambdas}
+\item{nlambdas}{Number of hyperparameter values to test during validation.
+Defaults to \code{nlambdas = 250}. The hyperparameter grid is dynamically
+constructed to span the full model space lying between a single polynomial
+solution (i.e. a power law) and an interpolating solution, with \code{nlambdas}
 controlling the granularity of the grid.}
 
-\item{nx_eval}{Integer. The length of the input grid that the optimized
-trend filtering estimate is evaluated on; i.e. if nothing is passed to
-\code{x_eval}, then it is defined as
-\code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
-
-\item{x_eval}{(Optional) Overrides \code{nx_eval} if passed. A grid of inputs to
-evaluate the optimized trend filtering estimate on.}
-
-\item{optimization_params}{(Optional) A named list of optimization parameter
-values to be passed to the trend filtering ADMM algorithm of
+\item{optimization_params}{(Optional) A named list of parameter values to be
+passed to the trend filtering ADMM algorithm of
 \href{http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf}{Ramdas and Tibshirani (2016)}, which is implemented in
 the \code{glmgen} R package. See the \code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}
-documentation for full details. The default parameter choices will almost
-always suffice, but when adjustments are necessary, no technical
-understanding of the ADMM algorithm is needed in order to do so. The
-following parameters may require some adjustments to ensure that your trend
-filtering estimate has sufficiently converged:
+documentation for a full list of the algorithm's parameters. The default
+parameter choices will almost always suffice, but when adjustments do need to
+be made, one can do so without any technical understanding of the ADMM
+algorithm. In particular, the four parameter descriptions below should serve
+as sufficient working knowledge.
 \describe{
-\item{obj_tol}{The objective tolerance that, together with \code{max_iter},
-determines the ADMM algorithm's stopping criterion. The algorithm will stop
-either (1) when the relative change in the objective function is less than
-\code{obj_tol}; or (2) when the number of iterations has reached \code{max_iter}.
-This argument defaults to \code{obj_tol = 1e-10}. Therefore, when necessary, the
-precision of the approximate solution given by the ADMM algorithm can be
-increased by decreasing \code{obj_tol} and/or increasing \code{max_iter}.}
-\item{max_iter}{Maximum iterations allowed for the trend filtering
-optimization. Defaults to \code{max_iter = length(y)}. See the
-\code{n_iter} element of the \code{sure_trendfilter()} output for the actual number of
-iterations the ADMM algorithm took, for every candidate hyperparameter value
-in \code{lambdas}. If any of the elements of \code{n_iter} are equal to \code{max_iter},
-the objective function's tolerance has not been reached and \code{max_iter} may
-need to be increased.}
+\item{obj_tol}{A stopping threshold for the ADMM algorithm. If the relative
+change in the algorithm's cost functional between two consecutive steps is
+less than \code{obj_tol}, the algorithm terminates. The algorithm's termination
+can also result from it reaching the maximum tolerable iterations set
+by the \code{max_iter} parameter (see below). The \code{obj_tol} parameter defaults to
+\code{obj_tol = 1e-10}. The \code{cost_functional} vector, returned within the
+\code{sure_trendfilter()} output, gives the relative change in the trend filtering
+cost functional over the algorithm's final iteration, for every candidate
+hyperparameter value.}
+\item{max_iter}{Maximum number of ADMM iterations that we will tolerate.
+Defaults to \code{max_iter = length(y)}. The actual number of iterations performed
+by the algorithm, for every candidate hyperparameter value, is returned in
+the \code{n_iter} vector, within the \code{sure_trendfilter()} output. If any of the
+elements of \code{n_iter} are equal to \code{max_iter}, the tolerance defined by
+\code{obj_tol} has not been attained and \code{max_iter} may need to be increased.}
 \item{thinning}{Logical. If \code{TRUE}, then the data are preprocessed so that
-a smaller, better conditioned data set is used for fitting. When left \code{NULL}
-(the default setting), the optimization will automatically detect whether
-thinning should be applied (i.e. cases in which the numerical fitting
-algorithm will struggle to converge). This preprocessing procedure is
+a smaller, better-conditioned data set is used to fit the trend filtering
+estimate. This can be very useful when a data set samples a signal so well
+that very little additional information / predictive accuracy is gained
+by fitting the trend filtering estimate on the full data set, compared to
+some fraction of it. See the \code{\link[=cv_trendfilter]{cv_trendfilter()}} examples for a case study
+of this nature, when the goal is to denoise the light curve (i.e. a
+brightness time series) of a binary star system, after it has been folded
+(i.e. stacked) based on the orbital period of the star system. When left
+\code{thinning = NULL} (the default setting), the optimization will automatically
+detect whether thinning should be applied (i.e. cases in which the numerical
+fitting algorithm will struggle to converge). This preprocessing procedure is
 controlled by the \code{x_tol} argument below.}
 \item{x_tol}{Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size \code{x_tol} and find at least two
@@ -83,45 +74,48 @@ elements of \code{x} that fall into the same bin, then the data is thinned.
 }}}
 }
 \value{
-An object of class \code{\link[=sure_trendfilter]{sure_tf}}. This is a list
-with the following elements:
+An object of class \code{sure_tf}. This is a list with the following
+elements:
 \describe{
-\item{x_eval}{Input grid used to evaluate the optimized trend filtering
-estimate on.}
-\item{tf_estimate}{Optimized trend filtering estimate, evaluated at \code{x_eval}.
-}
-\item{validation_method}{"SURE"}
 \item{lambdas}{Vector of hyperparameter values evaluated in the grid search
 (always returned in descending order).}
 \item{edfs}{Vector of effective degrees of freedom for all trend filtering
-estimators fit during validation.}
+estimators fit during model validation.}
 \item{generalization_errors}{Vector of SURE generalization error estimates,
-corresponding to the descending-ordered \code{lambdas} vector.}
+ordered according to the descending-ordered \code{lambdas} vector.}
+\item{se_errors}{The standard errors of the SURE estimates of the trend
+filtering model's generalization error for every candidate hyperparameter
+value in \code{lambdas}. These are particularly useful for implementing the
+"1-standard-error rule".}
 \item{lambda_min}{Hyperparameter value that minimizes the SURE generalization
 error curve.}
+\item{lambda_1se}{Largest hyperparameter value that is within one standard
+error of the minimum hyperparameter's cross validation error.}
 \item{edf_min}{Effective degrees of freedom of the optimized trend
 filtering estimator.}
 \item{i_min}{Index of \code{lambdas} that minimizes the SURE error curve.}
+\item{i_1se}{Index of \code{lambdas} that gives the largest hyperparameter
+value that has a cross validation error within 1 standard error of the
+minimum of the cross validation error curves.}
+\item{edf_min}{Effective degrees of freedom of the optimized trend
+filtering estimator.}
+\item{edf_1se}{Effective degrees of freedom of the 1-stand-error rule
+trend filtering estimator.}
 \item{cost_functional}{The relative change in the cost functional values
-between the ADMM algorithm's penultimate and final iterations, for
-every hyperparameter choice.}
-\item{n_iter}{The number of iterations taken by the ADMM algorithm along its
-approximate solution path.
-converge within the given tolerance, for each hyperparameter value. If many
-of these are exactly equal to \code{max_iter}, then their solutions have not
-converged with the tolerance specified by \code{obj_tol}. In which case, it is
-often prudent to increase \code{max_iter}.}
+between the ADMM algorithm penultimate and ultimate state, for every
+hyperparameter choice.}
+\item{n_iter}{The number of iterations taken by the ADMM algorithm, for
+every candidate hyperparameter value in \code{lambdas}. If an element of \code{n_iter}
+is exactly equal to \code{max_iter}, then the ADMM algorithm stopped before
+reaching the tolerance specified by \code{obj_tol}. In these cases, you may need
+to increase \code{max_iter}.}
 \item{training_errors}{Mean-squared error between the observed outputs \code{y}
 and the trend filtering estimate, for every hyperparameter choice.}
 \item{optimisms}{SURE-estimated optimisms, i.e.
 \code{optimisms = generalization_errors - training_errors}.}
 \item{x}{Vector of observed inputs.}
 \item{y}{Vector of observed outputs.}
-\item{weights}{Weights for the observed outputs, defined as the reciprocal
-variance of the additive noise that contaminates the signal.}
-\item{fitted_values}{Optimized trend filtering estimate, evaluated at the
-observed inputs \code{x}.}
-\item{residuals}{\code{residuals = y - fitted_values}}
+\item{weights}{Vector of weights for the observed outputs.}
 \item{k}{Degree of the trend filtering estimator.}
 \item{admm_params}{List of parameter settings for the trend filtering ADMM
 algorithm, constructed by passing the \code{optimization_params} list to
@@ -133,11 +127,9 @@ order to make for a more tractable/stable problem and solution.}
 }
 }
 \description{
-\code{\link[=sure_trendfilter]{sure_trendfilter()}} optimizes the trend filtering hyperparameter via a
-grid search over a vector of candidate hyperparameter values and selects
-the value that minimizes an unbiased estimate of the model's generalization
-mean-squared error (at the observed inputs). See details below for when you
-should use \code{\link[=sure_trendfilter]{sure_trendfilter()}} vs. \code{\link[=cv_trendfilter]{cv_trendfilter()}}.
+For every candidate hyperparameter value, compute an unbiased estimate of the
+trend filtering model's predictive mean-squared error. See details below
+for when you should use \code{\link[=sure_trendfilter]{sure_trendfilter()}} versus \code{\link[=cv_trendfilter]{cv_trendfilter()}}.
 }
 \details{
 Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} vs.
