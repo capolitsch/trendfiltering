@@ -287,7 +287,8 @@ sure_trendfilter <- function(x,
 
   squared_residuals_mat <- (out$beta - obj$data_scaled$y)^2
   optimisms_mat <- 2 / (obj$data_scaled$weights * obj$n) * matrix(
-    rep(out$df, each = obj$n), nrow = obj$n
+    rep(out$df, each = obj$n),
+    nrow = obj$n
   )
 
   generalization_errors_mat <- (squared_residuals_mat + optimisms_mat) * obj$y_scale^2
@@ -313,65 +314,14 @@ sure_trendfilter <- function(x,
   obj$lambda_1se <- obj$lambdas[obj$i_1se]
   obj$edf_1se <- obj$edfs[obj$i_1se]
 
+  obj$model_fit <- obj[c(
+    "data_scaled", "k", "admm_params", "thinning", "x_scale", "y_scale", "x",
+    "y", "weights",
+  )]
+
   obj[c(
     "lambdas", "edfs", "generalization_errors", "se_errors", "lambda_min",
     "lambda_1se", "i_min", "i_1se", "edf_min", "edf_1se", "cost_functional",
-    "n_iter", "x", "y", "weights", "k", "admm_params", "thinning", "x_scale",
-    "y_scale", "data_scaled"
+    "n_iter", "model_fit"
   )]
-}
-
-
-#' @importFrom dplyr slice_head group_split n
-#' @importFrom magrittr %>% %$%
-#' @importFrom matrixStats rowSds
-#' @importFrom parallel mclapply
-#' @noRd
-estimate_sure_variance_by_blocking <- function(obj, V = 10) {
-  # Experimental CV-like procedure for getting SURE standard error bars.
-  # Could potentially produce biased-upward error estimates when the signal
-  # and/or noise has significant spatial variability.
-
-  data_folded <- obj$data_scaled %>%
-    slice_head(n = max(which(1:length(obj$x) %% V == 0))) %>%
-    group_split(rep(1:V, each = n() / V, length = n()), .keep = FALSE)
-
-  sure_error_mat <- mclapply(
-    1:V,
-    FUN = sure_fold_error,
-    data_folded = data_folded,
-    obj = obj,
-    mc.cores = obj$mc_cores
-  ) %>%
-    unlist() %>%
-    matrix(ncol = V)
-
-  rowSds(sure_error_mat) %>% as.double()
-}
-
-
-#' @importFrom glmgen trendfilter
-#' @importFrom dplyr bind_rows %>%
-#' @noRd
-sure_fold_error <- function(validation_index, data_folded, obj) {
-  data_train <- data_folded[-validation_index] %>% bind_rows()
-
-  out <- trendfilter(
-    x = data_train$x,
-    y = data_train$y,
-    weights = data_train$weights,
-    k = obj$k,
-    lambda = obj$lambdas,
-    thinning = obj$thinning,
-    control = obj$admm_params
-  )
-
-  training_errors <- (out$beta - data_train$y)^2 %>%
-    colMeans() * obj$y_scale^2 %>%
-      as.double()
-  optimisms <- 2 * out$df * obj$y_scale^2 / nrow(data_train) *
-    mean(1 / data_train$weights) %>%
-      as.double()
-
-  training_errors + optimisms
 }

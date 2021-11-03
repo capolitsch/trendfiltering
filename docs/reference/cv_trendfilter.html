@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Optimize the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter • trendfiltering</title>
+<title>Validate the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter • trendfiltering</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Optimize the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter" />
+<meta property="og:title" content="Validate the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter" />
 <meta property="og:description" content="cv_trendfilter() optimizes the trend filtering hyperparameter via V-fold
 cross validation on a grid of candidate hyperparameter settings and selects
 the value that minimizes a user-specified loss metric. See details below for
@@ -114,7 +114,7 @@ when you should use sure_trendfilter() vs. cv_trendfilter()." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Optimize the trend filtering hyperparameter by V-fold cross validation</h1>
+    <h1>Validate the trend filtering hyperparameter by V-fold cross validation</h1>
     <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/cv_trendfilter.R'><code>R/cv_trendfilter.R</code></a></small>
     <div class="hidden name"><code>cv_trendfilter.Rd</code></div>
     </div>
@@ -273,11 +273,6 @@ elements of <code>x</code> that fall into the same bin, then the data is thinned
 
     <p>An object of class <code>cv_tf</code>. This is a list with the following
 elements:</p><dl>
-<dt>x_eval</dt><dd><p>Input grid used to evaluate the optimized trend filtering
-estimate on.</p></dd>
-<dt>tf_estimate</dt><dd><p>Optimized trend filtering estimate, evaluated at
-<code>x_eval</code>.</p></dd>
-<dt>validation_method</dt><dd><p><code><a href='https://rdrr.io/r/base/paste.html'>paste0(V,"-fold CV")</a></code></p></dd>
 <dt>validation_functional</dt><dd><p>Type of error that validation was performed on.
 Either one of <code><a href='https://rdrr.io/r/base/c.html'>c("MSE","MAE","WMSE","WMAE")</a></code> or a custom function passed by
 the user.</p></dd>
@@ -296,9 +291,6 @@ These are particularly useful for implementing the "1-standard-error rule".</p><
 generalization error curve.</p></dd>
 <dt>lambda_1se</dt><dd><p>Largest hyperparameter value that is within one standard
 error of the minimum hyperparameter's cross validation error.</p></dd>
-<dt>lambda_choice</dt><dd><p>One of <code><a href='https://rdrr.io/r/base/c.html'>c("lambda_min", "lambda_1se")</a></code>. The choice
-of hyperparameter that is used for the returned trend filtering estimate
-evaluation <code>tf_estimate</code>.</p></dd>
 <dt>i_min</dt><dd><p>Index of <code>lambdas</code> that minimizes the cross validation error.</p></dd>
 <dt>i_1se</dt><dd><p>Index of <code>lambdas</code> that gives the largest hyperparameter
 value that has a cross validation error within 1 standard error of the
@@ -416,7 +408,7 @@ and 7.12)</p></li>
     thinning <span class='op'>=</span> <span class='cn'>TRUE</span>
   <span class='op'>)</span>
 <span class='op'>)</span>
-</div></pre>
+</div><div class='output co'>#&gt; <span class='error'>Error in group_split(., sample(rep_len(1:V, nrow(data_scaled))), .keep = FALSE): object 'data_scaled' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

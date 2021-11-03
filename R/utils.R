@@ -14,7 +14,7 @@ get_optimization_params <- function(optimization_params = NULL, n) {
     thinning <- NULL
   } else {
     stopifnot(all(names(optimization_params) %in%
-                    c(names(formals(trendfilter.control.list)), "thinning")))
+      c(names(formals(trendfilter.control.list)), "thinning")))
 
     if (!("max_iter" %in% names(optimization_params))) {
       optimization_params$max_iter <- n
