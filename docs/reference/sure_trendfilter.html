@@ -250,17 +250,7 @@ to increase <code>max_iter</code>.</p></dd>
 and the trend filtering estimate, for every hyperparameter choice.</p></dd>
 <dt>optimisms</dt><dd><p>SURE-estimated optimisms, i.e.
 <code>optimisms = generalization_errors - training_errors</code>.</p></dd>
-<dt>x</dt><dd><p>Vector of observed inputs.</p></dd>
-<dt>y</dt><dd><p>Vector of observed outputs.</p></dd>
-<dt>weights</dt><dd><p>Vector of weights for the observed outputs.</p></dd>
-<dt>k</dt><dd><p>Degree of the trend filtering estimator.</p></dd>
-<dt>admm_params</dt><dd><p>List of parameter settings for the trend filtering ADMM
-algorithm, constructed by passing the <code>optimization_params</code> list to
-<code><a href='https://rdrr.io/pkg/glmgen/man/trendfilter.control.list.html'>glmgen::trendfilter.control.list()</a></code>.</p></dd>
-<dt>thinning</dt><dd><p>Logical. If <code>TRUE</code>, then the data were preprocessed such
-that a reduced subset was passed to the trend filtering ADMM algorithm in
-order to make for a more tractable/stable problem and solution.</p></dd>
-<dt>x_scale, y_scale, data_scaled</dt><dd><p>For internal use.</p></dd>
+<dt>model_fit</dt><dd><p></p></dd>
 
 </dl>
 

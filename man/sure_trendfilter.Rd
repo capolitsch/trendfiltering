@@ -113,17 +113,7 @@ to increase \code{max_iter}.}
 and the trend filtering estimate, for every hyperparameter choice.}
 \item{optimisms}{SURE-estimated optimisms, i.e.
 \code{optimisms = generalization_errors - training_errors}.}
-\item{x}{Vector of observed inputs.}
-\item{y}{Vector of observed outputs.}
-\item{weights}{Vector of weights for the observed outputs.}
-\item{k}{Degree of the trend filtering estimator.}
-\item{admm_params}{List of parameter settings for the trend filtering ADMM
-algorithm, constructed by passing the \code{optimization_params} list to
-\code{\link[glmgen:trendfilter.control.list]{glmgen::trendfilter.control.list()}}.}
-\item{thinning}{Logical. If \code{TRUE}, then the data were preprocessed such
-that a reduced subset was passed to the trend filtering ADMM algorithm in
-order to make for a more tractable/stable problem and solution.}
-\item{x_scale, y_scale, data_scaled}{For internal use.}
+\item{model_fit}{}
 }
 }
 \description{
