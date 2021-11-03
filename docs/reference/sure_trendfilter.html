@@ -190,19 +190,16 @@ by the algorithm, for every candidate hyperparameter value, is returned in
 the <code>n_iter</code> vector, within the <code>sure_trendfilter()</code> output. If any of the
 elements of <code>n_iter</code> are equal to <code>max_iter</code>, the tolerance defined by
 <code>obj_tol</code> has not been attained and <code>max_iter</code> may need to be increased.</p></dd>
-<dt>thinning</dt><dd><p>Logical. If <code>TRUE</code>, then the data are preprocessed so that
-a smaller, better-conditioned data set is used to fit the trend filtering
-estimate. This can be very useful when a data set samples a signal so well
-that very little additional information / predictive accuracy is gained
-by fitting the trend filtering estimate on the full data set, compared to
-some fraction of it. See the <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code> examples for a case study
-of this nature, when the goal is to denoise the light curve (i.e. a
-brightness time series) of a binary star system, after it has been folded
-(i.e. stacked) based on the orbital period of the star system. When left
-<code>thinning = NULL</code> (the default setting), the optimization will automatically
-detect whether thinning should be applied (i.e. cases in which the numerical
-fitting algorithm will struggle to converge). This preprocessing procedure is
-controlled by the <code>x_tol</code> argument below.</p></dd>
+<dt>thinning</dt><dd><p>Logical. If <code>thinning = TRUE</code>, then the data are preprocessed
+so that a smaller data set is used to fit the trend filtering estimate, which
+will ease the ADMM algorithm's convergence. This can be
+very useful when a signal is so well-sampled that very little additional
+information / predictive accuracy is gained by fitting the trend filtering
+estimate on the full data set, compared to some subset of it. See the
+<code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code> examples for a case study of this nature. When nothing
+is passed to <code>thinning</code>, the algorithm will automatically detect whether
+thinning should be applied. This preprocessing procedure is controlled by the
+<code>x_tol</code> parameter below.</p></dd>
 <dt>x_tol</dt><dd><p>Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size <code>x_tol</code> and find at least two
 elements of <code>x</code> that fall into the same bin, then the data is thinned.</p></dd>
@@ -214,43 +211,46 @@ elements of <code>x</code> that fall into the same bin, then the data is thinned
 
     <p>An object of class <code>sure_tf</code>. This is a list with the following
 elements:</p><dl>
-<dt>lambdas</dt><dd><p>Vector of hyperparameter values evaluated in the grid search
-(always returned in descending order).</p></dd>
-<dt>edfs</dt><dd><p>Vector of effective degrees of freedom for all trend filtering
-estimators fit during model validation.</p></dd>
-<dt>generalization_errors</dt><dd><p>Vector of SURE generalization error estimates,
-ordered according to the descending-ordered <code>lambdas</code> vector.</p></dd>
-<dt>se_errors</dt><dd><p>The standard errors of the SURE estimates of the trend
-filtering model's generalization error for every candidate hyperparameter
-value in <code>lambdas</code>. These are particularly useful for implementing the
-"1-standard-error rule".</p></dd>
-<dt>lambda_min</dt><dd><p>Hyperparameter value that minimizes the SURE generalization
+<dt>lambdas</dt><dd><p>Vector of candidate hyperparameter values (always returned in
+descending order).</p></dd>
+<dt>edfs</dt><dd><p>Number of effective degrees of freedom in the trend filtering
+estimator, for every hyperparameter value in <code>lambdas</code>.</p></dd>
+<dt>validation_errors</dt><dd><p>Vector of mean-squared prediction errors estimated
+by SURE, for every hyperparameter value in <code>lambdas</code>.</p></dd>
+<dt>se_validation_errors</dt><dd><p>Vector of estimated standard errors for the
+<code>validation_errors</code>.</p></dd>
+<dt>lambda_min</dt><dd><p>Hyperparameter value that minimizes the SURE validation
 error curve.</p></dd>
-<dt>lambda_1se</dt><dd><p>Largest hyperparameter value that is within one standard
-error of the minimum hyperparameter's cross validation error.</p></dd>
-<dt>edf_min</dt><dd><p>Effective degrees of freedom of the optimized trend
-filtering estimator.</p></dd>
-<dt>i_min</dt><dd><p>Index of <code>lambdas</code> that minimizes the SURE error curve.</p></dd>
-<dt>i_1se</dt><dd><p>Index of <code>lambdas</code> that gives the largest hyperparameter
-value that has a cross validation error within 1 standard error of the
-minimum of the cross validation error curves.</p></dd>
-<dt>edf_min</dt><dd><p>Effective degrees of freedom of the optimized trend
-filtering estimator.</p></dd>
-<dt>edf_1se</dt><dd><p>Effective degrees of freedom of the 1-stand-error rule
+<dt>lambda_1se</dt><dd><p>The largest hyperparameter value (corresponding to the
+smoothest trend filtering estimate) that yields a SURE error within
+one standard error of <code><a href='https://rdrr.io/r/base/Extremes.html'>min(validation_errors)</a></code>. We call this the
+"1-standard-error rule" hyperparameter, and it serves as an Occam's
+razor-esque heuristic. That is, given two models with approximately equal
+performance (here, in terms of MSE), it may be wise to opt for the simpler
+model, i.e. the model with fewer effective degrees of freedom.</p></dd>
+<dt>edf_min</dt><dd><p>Number of effective degrees of freedom in the minimum-SURE
 trend filtering estimator.</p></dd>
-<dt>cost_functional</dt><dd><p>The relative change in the cost functional values
-between the ADMM algorithm penultimate and ultimate state, for every
-hyperparameter choice.</p></dd>
-<dt>n_iter</dt><dd><p>The number of iterations taken by the ADMM algorithm, for
-every candidate hyperparameter value in <code>lambdas</code>. If an element of <code>n_iter</code>
+<dt>edf_1se</dt><dd><p>Number of effective degrees of freedom in the 1-stand-error
+rule trend filtering estimator.</p></dd>
+<dt>i_min</dt><dd><p>Index of <code>lambdas</code> that minimizes the SURE error curve.</p></dd>
+<dt>i_1se</dt><dd><p>Index of <code>lambdas</code> that gives the 1-standard-error rule
+hyperparameter.</p></dd>
+<dt>cost_functional</dt><dd><p>The relative change in the cost functional over the
+ADMM algorithm's final iteration, for every candidate hyperparameter in
+<code>lambdas</code>.</p></dd>
+<dt>n_iter</dt><dd><p>Total number of iterations taken by the ADMM algorithm, for
+every candidate hyperparameter in <code>lambdas</code>. If an element of <code>n_iter</code>
 is exactly equal to <code>max_iter</code>, then the ADMM algorithm stopped before
-reaching the tolerance specified by <code>obj_tol</code>. In these cases, you may need
-to increase <code>max_iter</code>.</p></dd>
-<dt>training_errors</dt><dd><p>Mean-squared error between the observed outputs <code>y</code>
-and the trend filtering estimate, for every hyperparameter choice.</p></dd>
+reaching the tolerance set by <code>obj_tol</code>. In these cases, you may need
+to increase <code>max_iter</code> to ensure the trend filtering solution has
+converged to satisfactory precision.</p></dd>
+<dt>training_errors</dt><dd><p>In-sample mean-squared error between the observed
+outputs <code>y</code> and the trend filtering estimate, for every hyperparameter value
+in <code>lambdas</code>.</p></dd>
 <dt>optimisms</dt><dd><p>SURE-estimated optimisms, i.e.
-<code>optimisms = generalization_errors - training_errors</code>.</p></dd>
-<dt>model_fit</dt><dd><p></p></dd>
+<code>optimisms = validation_errors - training_errors</code>.</p></dd>
+<dt>model_fit</dt><dd><p>A list of objects that is used internally by other
+functions that operate on the <code>sure_trendfilter()</code> output.</p></dd>
 
 </dl>
 
@@ -325,7 +325,7 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
 #&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
 #&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'>
 <span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'>sure_trendfilter</span><span class='op'>(</span><span class='va'>spec</span><span class='op'>$</span><span class='va'>log10_wavelength</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>flux</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>weights</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in c("data_scaled", "k", "admm_params", "thinning", "x_scale", "y_scale",     "x", "y", "weights", ): argument 10 is empty</span></div></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -48,19 +48,16 @@
 #' the `n_iter` vector, within the `sure_trendfilter()` output. If any of the
 #' elements of `n_iter` are equal to `max_iter`, the tolerance defined by
 #' `obj_tol` has not been attained and `max_iter` may need to be increased.}
-#' \item{thinning}{Logical. If `TRUE`, then the data are preprocessed so that
-#' a smaller, better-conditioned data set is used to fit the trend filtering
-#' estimate. This can be very useful when a data set samples a signal so well
-#' that very little additional information / predictive accuracy is gained
-#' by fitting the trend filtering estimate on the full data set, compared to
-#' some fraction of it. See the [`cv_trendfilter()`] examples for a case study
-#' of this nature, when the goal is to denoise the light curve (i.e. a
-#' brightness time series) of a binary star system, after it has been folded
-#' (i.e. stacked) based on the orbital period of the star system. When left
-#' `thinning = NULL` (the default setting), the optimization will automatically
-#' detect whether thinning should be applied (i.e. cases in which the numerical
-#' fitting algorithm will struggle to converge). This preprocessing procedure is
-#' controlled by the `x_tol` argument below.}
+#' \item{thinning}{Logical. If `thinning = TRUE`, then the data are preprocessed
+#' so that a smaller data set is used to fit the trend filtering estimate, which
+#' will ease the ADMM algorithm's convergence. This can be
+#' very useful when a signal is so well-sampled that very little additional
+#' information / predictive accuracy is gained by fitting the trend filtering
+#' estimate on the full data set, compared to some subset of it. See the
+#' [`cv_trendfilter()`] examples for a case study of this nature. When nothing
+#' is passed to `thinning`, the algorithm will automatically detect whether
+#' thinning should be applied. This preprocessing procedure is controlled by the
+#' `x_tol` parameter below.}
 #' \item{x_tol}{Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
 #' elements of `x` that fall into the same bin, then the data is thinned.
@@ -85,43 +82,46 @@
 #' @return An object of class `sure_tf`. This is a list with the following
 #' elements:
 #' \describe{
-#' \item{lambdas}{Vector of hyperparameter values evaluated in the grid search
-#' (always returned in descending order).}
-#' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
-#' estimators fit during model validation.}
-#' \item{generalization_errors}{Vector of SURE generalization error estimates,
-#' ordered according to the descending-ordered `lambdas` vector.}
-#' \item{se_errors}{The standard errors of the SURE estimates of the trend
-#' filtering model's generalization error for every candidate hyperparameter
-#' value in `lambdas`. These are particularly useful for implementing the
-#' "1-standard-error rule".}
-#' \item{lambda_min}{Hyperparameter value that minimizes the SURE generalization
+#' \item{lambdas}{Vector of candidate hyperparameter values (always returned in
+#' descending order).}
+#' \item{edfs}{Number of effective degrees of freedom in the trend filtering
+#' estimator, for every hyperparameter value in `lambdas`.}
+#' \item{validation_errors}{Vector of mean-squared prediction errors estimated
+#' by SURE, for every hyperparameter value in `lambdas`.}
+#' \item{se_validation_errors}{Vector of estimated standard errors for the
+#' `validation_errors`.}
+#' \item{lambda_min}{Hyperparameter value that minimizes the SURE validation
 #' error curve.}
-#' \item{lambda_1se}{Largest hyperparameter value that is within one standard
-#' error of the minimum hyperparameter's cross validation error.}
-#' \item{edf_min}{Effective degrees of freedom of the optimized trend
-#' filtering estimator.}
-#' \item{i_min}{Index of `lambdas` that minimizes the SURE error curve.}
-#' \item{i_1se}{Index of `lambdas` that gives the largest hyperparameter
-#' value that has a cross validation error within 1 standard error of the
-#' minimum of the cross validation error curves.}
-#' \item{edf_min}{Effective degrees of freedom of the optimized trend
-#' filtering estimator.}
-#' \item{edf_1se}{Effective degrees of freedom of the 1-stand-error rule
+#' \item{lambda_1se}{The largest hyperparameter value (corresponding to the
+#' smoothest trend filtering estimate) that yields a SURE error within
+#' one standard error of `min(validation_errors)`. We call this the
+#' "1-standard-error rule" hyperparameter, and it serves as an Occam's
+#' razor-esque heuristic. That is, given two models with approximately equal
+#' performance (here, in terms of MSE), it may be wise to opt for the simpler
+#' model, i.e. the model with fewer effective degrees of freedom.}
+#' \item{edf_min}{Number of effective degrees of freedom in the minimum-SURE
 #' trend filtering estimator.}
-#' \item{cost_functional}{The relative change in the cost functional values
-#' between the ADMM algorithm penultimate and ultimate state, for every
-#' hyperparameter choice.}
-#' \item{n_iter}{The number of iterations taken by the ADMM algorithm, for
-#' every candidate hyperparameter value in `lambdas`. If an element of `n_iter`
+#' \item{edf_1se}{Number of effective degrees of freedom in the 1-stand-error
+#' rule trend filtering estimator.}
+#' \item{i_min}{Index of `lambdas` that minimizes the SURE error curve.}
+#' \item{i_1se}{Index of `lambdas` that gives the 1-standard-error rule
+#' hyperparameter.}
+#' \item{cost_functional}{The relative change in the cost functional over the
+#' ADMM algorithm's final iteration, for every candidate hyperparameter in
+#' `lambdas`.}
+#' \item{n_iter}{Total number of iterations taken by the ADMM algorithm, for
+#' every candidate hyperparameter in `lambdas`. If an element of `n_iter`
 #' is exactly equal to `max_iter`, then the ADMM algorithm stopped before
-#' reaching the tolerance specified by `obj_tol`. In these cases, you may need
-#' to increase `max_iter`.}
-#' \item{training_errors}{Mean-squared error between the observed outputs `y`
-#' and the trend filtering estimate, for every hyperparameter choice.}
+#' reaching the tolerance set by `obj_tol`. In these cases, you may need
+#' to increase `max_iter` to ensure the trend filtering solution has
+#' converged to satisfactory precision.}
+#' \item{training_errors}{In-sample mean-squared error between the observed
+#' outputs `y` and the trend filtering estimate, for every hyperparameter value
+#' in `lambdas`.}
 #' \item{optimisms}{SURE-estimated optimisms, i.e.
-#' `optimisms = generalization_errors - training_errors`.}
-#' \item{model_fit}{}
+#' `optimisms = validation_errors - training_errors`.}
+#' \item{model_fit}{A list of objects that is used internally by other
+#' functions that operate on the `sure_trendfilter()` output.}
 #' }
 #'
 #' @export sure_trendfilter
@@ -240,22 +240,18 @@ sure_trendfilter <- function(x,
 
   admm_params$x_tol <- admm_params$x_tol / x_scale
 
-  obj <- structure(
-    list(
-      validation_method = "SURE",
-      nlambdas = nlambdas,
-      n = nrow(data),
-      x = data$x,
-      y = data$y,
-      weights = data$weights,
-      k = k,
-      thinning = thinning,
-      admm_params = admm_params,
-      data_scaled = data_scaled,
-      x_scale = x_scale,
-      y_scale = y_scale
-    ),
-    class = c("sure_tf", "list")
+  obj <- list(
+    nlambdas = nlambdas,
+    n = nrow(data),
+    x = data$x,
+    y = data$y,
+    weights = data$weights,
+    k = k,
+    thinning = thinning,
+    admm_params = admm_params,
+    data_scaled = data_scaled,
+    x_scale = x_scale,
+    y_scale = y_scale
   )
 
   rm(
@@ -281,24 +277,25 @@ sure_trendfilter <- function(x,
     nrow = obj$n
   )
 
-  generalization_errors_mat <- (squared_residuals_mat + optimisms_mat) * obj$y_scale^2
-  obj$generalization_errors <- generalization_errors_mat %>% colMeans()
+  validation_errors_mat <- (squared_residuals_mat + optimisms_mat) *
+    obj$y_scale^2
+  obj$validation_errors <- validation_errors_mat %>% colMeans()
   obj$edfs <- out$df %>% as.integer()
   obj$n_iter <- out$iter %>% as.integer()
-  obj$i_min <- min(which.min(obj$generalization_errors)) %>% as.integer()
+  obj$i_min <- min(which.min(obj$validation_errors)) %>% as.integer()
   obj$lambda_min <- obj$lambdas[obj$i_min]
   obj$edf_min <- obj$edfs[obj$i_min] %>% as.integer()
   obj$cost_functional <- out$obj[nrow(out$obj), ]
 
-  obj$se_errors <- replicate(
+  obj$se_validation_errors <- replicate(
     5000,
-    generalization_errors_mat[sample(1:obj$n, replace = TRUE), ] %>%
+    validation_errors_mat[sample(1:obj$n, replace = TRUE), ] %>%
       colMeans()
   ) %>%
     rowSds()
 
   obj$i_1se <- obj %$% which(
-    generalization_errors <= generalization_errors[i_min] + se_errors[i_min]
+    validation_errors <= validation_errors[i_min] + se_validation_errors[i_min]
   ) %>%
     min()
   obj$lambda_1se <- obj$lambdas[obj$i_1se]
@@ -306,12 +303,15 @@ sure_trendfilter <- function(x,
 
   obj$model_fit <- obj[c(
     "data_scaled", "k", "admm_params", "thinning", "x_scale", "y_scale", "x",
-    "y", "weights",
+    "y", "weights"
   )]
 
-  obj[c(
-    "lambdas", "edfs", "generalization_errors", "se_errors", "lambda_min",
+  obj <- obj[c(
+    "lambdas", "edfs", "validation_errors", "se_validation_errors", "lambda_min",
     "lambda_1se", "i_min", "i_1se", "edf_min", "edf_1se", "cost_functional",
     "n_iter", "model_fit"
   )]
+
+  class(obj) <- c("sure_tf", "list")
+  return(obj)
 }

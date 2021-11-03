@@ -55,19 +55,16 @@ by the algorithm, for every candidate hyperparameter value, is returned in
 the \code{n_iter} vector, within the \code{sure_trendfilter()} output. If any of the
 elements of \code{n_iter} are equal to \code{max_iter}, the tolerance defined by
 \code{obj_tol} has not been attained and \code{max_iter} may need to be increased.}
-\item{thinning}{Logical. If \code{TRUE}, then the data are preprocessed so that
-a smaller, better-conditioned data set is used to fit the trend filtering
-estimate. This can be very useful when a data set samples a signal so well
-that very little additional information / predictive accuracy is gained
-by fitting the trend filtering estimate on the full data set, compared to
-some fraction of it. See the \code{\link[=cv_trendfilter]{cv_trendfilter()}} examples for a case study
-of this nature, when the goal is to denoise the light curve (i.e. a
-brightness time series) of a binary star system, after it has been folded
-(i.e. stacked) based on the orbital period of the star system. When left
-\code{thinning = NULL} (the default setting), the optimization will automatically
-detect whether thinning should be applied (i.e. cases in which the numerical
-fitting algorithm will struggle to converge). This preprocessing procedure is
-controlled by the \code{x_tol} argument below.}
+\item{thinning}{Logical. If \code{thinning = TRUE}, then the data are preprocessed
+so that a smaller data set is used to fit the trend filtering estimate, which
+will ease the ADMM algorithm's convergence. This can be
+very useful when a signal is so well-sampled that very little additional
+information / predictive accuracy is gained by fitting the trend filtering
+estimate on the full data set, compared to some subset of it. See the
+\code{\link[=cv_trendfilter]{cv_trendfilter()}} examples for a case study of this nature. When nothing
+is passed to \code{thinning}, the algorithm will automatically detect whether
+thinning should be applied. This preprocessing procedure is controlled by the
+\code{x_tol} parameter below.}
 \item{x_tol}{Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size \code{x_tol} and find at least two
 elements of \code{x} that fall into the same bin, then the data is thinned.
@@ -77,43 +74,46 @@ elements of \code{x} that fall into the same bin, then the data is thinned.
 An object of class \code{sure_tf}. This is a list with the following
 elements:
 \describe{
-\item{lambdas}{Vector of hyperparameter values evaluated in the grid search
-(always returned in descending order).}
-\item{edfs}{Vector of effective degrees of freedom for all trend filtering
-estimators fit during model validation.}
-\item{generalization_errors}{Vector of SURE generalization error estimates,
-ordered according to the descending-ordered \code{lambdas} vector.}
-\item{se_errors}{The standard errors of the SURE estimates of the trend
-filtering model's generalization error for every candidate hyperparameter
-value in \code{lambdas}. These are particularly useful for implementing the
-"1-standard-error rule".}
-\item{lambda_min}{Hyperparameter value that minimizes the SURE generalization
+\item{lambdas}{Vector of candidate hyperparameter values (always returned in
+descending order).}
+\item{edfs}{Number of effective degrees of freedom in the trend filtering
+estimator, for every hyperparameter value in \code{lambdas}.}
+\item{validation_errors}{Vector of mean-squared prediction errors estimated
+by SURE, for every hyperparameter value in \code{lambdas}.}
+\item{se_validation_errors}{Vector of estimated standard errors for the
+\code{validation_errors}.}
+\item{lambda_min}{Hyperparameter value that minimizes the SURE validation
 error curve.}
-\item{lambda_1se}{Largest hyperparameter value that is within one standard
-error of the minimum hyperparameter's cross validation error.}
-\item{edf_min}{Effective degrees of freedom of the optimized trend
-filtering estimator.}
-\item{i_min}{Index of \code{lambdas} that minimizes the SURE error curve.}
-\item{i_1se}{Index of \code{lambdas} that gives the largest hyperparameter
-value that has a cross validation error within 1 standard error of the
-minimum of the cross validation error curves.}
-\item{edf_min}{Effective degrees of freedom of the optimized trend
-filtering estimator.}
-\item{edf_1se}{Effective degrees of freedom of the 1-stand-error rule
+\item{lambda_1se}{The largest hyperparameter value (corresponding to the
+smoothest trend filtering estimate) that yields a SURE error within
+one standard error of \code{min(validation_errors)}. We call this the
+"1-standard-error rule" hyperparameter, and it serves as an Occam's
+razor-esque heuristic. That is, given two models with approximately equal
+performance (here, in terms of MSE), it may be wise to opt for the simpler
+model, i.e. the model with fewer effective degrees of freedom.}
+\item{edf_min}{Number of effective degrees of freedom in the minimum-SURE
 trend filtering estimator.}
-\item{cost_functional}{The relative change in the cost functional values
-between the ADMM algorithm penultimate and ultimate state, for every
-hyperparameter choice.}
-\item{n_iter}{The number of iterations taken by the ADMM algorithm, for
-every candidate hyperparameter value in \code{lambdas}. If an element of \code{n_iter}
+\item{edf_1se}{Number of effective degrees of freedom in the 1-stand-error
+rule trend filtering estimator.}
+\item{i_min}{Index of \code{lambdas} that minimizes the SURE error curve.}
+\item{i_1se}{Index of \code{lambdas} that gives the 1-standard-error rule
+hyperparameter.}
+\item{cost_functional}{The relative change in the cost functional over the
+ADMM algorithm's final iteration, for every candidate hyperparameter in
+\code{lambdas}.}
+\item{n_iter}{Total number of iterations taken by the ADMM algorithm, for
+every candidate hyperparameter in \code{lambdas}. If an element of \code{n_iter}
 is exactly equal to \code{max_iter}, then the ADMM algorithm stopped before
-reaching the tolerance specified by \code{obj_tol}. In these cases, you may need
-to increase \code{max_iter}.}
-\item{training_errors}{Mean-squared error between the observed outputs \code{y}
-and the trend filtering estimate, for every hyperparameter choice.}
+reaching the tolerance set by \code{obj_tol}. In these cases, you may need
+to increase \code{max_iter} to ensure the trend filtering solution has
+converged to satisfactory precision.}
+\item{training_errors}{In-sample mean-squared error between the observed
+outputs \code{y} and the trend filtering estimate, for every hyperparameter value
+in \code{lambdas}.}
 \item{optimisms}{SURE-estimated optimisms, i.e.
-\code{optimisms = generalization_errors - training_errors}.}
-\item{model_fit}{}
+\code{optimisms = validation_errors - training_errors}.}
+\item{model_fit}{A list of objects that is used internally by other
+functions that operate on the \code{sure_trendfilter()} output.}
 }
 }
 \description{

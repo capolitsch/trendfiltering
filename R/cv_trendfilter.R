@@ -384,29 +384,23 @@ cv_trendfilter <- function(x,
       sort()
   }
 
-  obj <- structure(
-    list(
-      x_eval = x_eval,
-      validation_method = paste0(V, "-fold CV"),
-      V = V,
-      validation_functional = validation_functional,
-      lambda_choice = lambda_choice,
-      x = data$x,
-      y = data$y,
-      weights = data$weights,
-      k = k,
-      thinning = thinning,
-      admm_params = admm_params,
-      data_scaled = data_scaled,
-      x_scale = x_scale,
-      y_scale = y_scale
-    ),
-    class = c("cv_tf", "list")
+  obj <- list(
+    V = V,
+    validation_functional = validation_functional,
+    x = data$x,
+    y = data$y,
+    weights = data$weights,
+    k = k,
+    thinning = thinning,
+    admm_params = admm_params,
+    data_scaled = data_scaled,
+    x_scale = x_scale,
+    y_scale = y_scale
   )
 
   rm(
-    V, validation_functional, lambda_choice, k, thinning,
-    data, nx_eval, admm_params, data_scaled, x_eval, x_scale, y_scale
+    V, validation_functional, k, thinning, data, admm_params, data_scaled,
+    x_scale, y_scale
   )
 
   if (nlambdas >= 150) {
@@ -566,6 +560,8 @@ cv_trendfilter <- function(x,
     "fitted_values", "residuals", "k", "thinning", "admm_params",
     "x_scale", "y_scale", "data_scaled"
   )]
+
+  class(obj) <- c("cv_tf", "list")
   return(obj)
 }
 
