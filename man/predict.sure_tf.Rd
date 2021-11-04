@@ -17,6 +17,21 @@ evaluate the optimized trend filtering estimate on.}
 trend filtering estimate is evaluated on; i.e. if nothing is passed to
 \code{x_eval}, then it is defined as
 \code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
+
+\item{lambda_choice}{One of \code{c("lambda_min","lambda_1se")}. The choice
+of hyperparameter that is used for optimized trend filtering estimate.
+Defaults to \code{lambda_choice = "lambda_min"}.
+\itemize{
+\item{\code{"lambda_min"}}: The hyperparameter value that minimizes the cross
+validation error curve.
+\item{\code{"lambda_1se"}}: The largest hyperparameter value with a cross
+validation error within 1 standard error of the minimum cross validation
+error. This choice therefore favors simpler (i.e. smoother) trend filtering
+estimates. The motivation here is essentially Occam's razor: the two models
+yield results that are quantitatively very close, so we favor the simpler
+model. See Section 7.10 of
+\href{https://web.stanford.edu/~hastie/Papers/ESLII.pdf}{Hastie, Tibshirani, and Friedman (2009)}
+for more details on the "one-standard-error rule".}}
 }
 \value{
 A list with the following elements:

@@ -38,33 +38,33 @@ get_optimization_params <- function(optimization_params = NULL, n) {
 #' @importFrom dplyr last %>%
 #' @importFrom stats approx
 #' @noRd
-get_lambdas <- function(obj) {
-  nlambdas_start <- ifelse(obj$nlambdas >= 150, 100, 50)
+get_lambdas <- function(nlambdas, data, k, thinning, admm_params) {
+  nlambdas_start <- ifelse(nlambdas >= 150, 100, 50)
 
   out <- trendfilter(
-    x = obj$data_scaled$x,
-    y = obj$data_scaled$y,
-    weights = obj$data_scaled$weights,
+    x = data$x,
+    y = data$y,
+    weights = data$weights,
     lambda.min.ratio = 1e-16,
     nlambda = nlambdas_start,
-    k = obj$k,
-    thinning = obj$thinning,
-    control = obj$admm_params
+    k = k,
+    thinning = thinning,
+    control = admm_params
   )
 
   lambdas_start <- out$lambda
   edfs_start <- out$df
 
-  if (any(out$df == length(obj$x))) {
-    inds <- which(out$df == length(obj$x))[-1]
+  if (any(out$df == nrow(data))) {
+    inds <- which(out$df == nrow(data))[-1]
     if (length(inds) > 0) {
       lambdas_start <- lambdas_start[-inds]
       edfs_start <- edfs_start[-inds]
     }
   }
 
-  if (any(out$df <= obj$k + 2)) {
-    inds <- which(out$df <= obj$k + 2)
+  if (any(out$df <= k + 2)) {
+    inds <- which(out$df <= k + 2)
     if (length(inds) > 1) {
       inds <- inds[-last(inds)]
       lambdas_start <- lambdas_start[-inds]
@@ -72,7 +72,7 @@ get_lambdas <- function(obj) {
     }
   }
 
-  obj$lambdas <- c(
+  c(
     lambdas_start,
     approx(
       x = edfs_start,
@@ -80,14 +80,12 @@ get_lambdas <- function(obj) {
       xout = seq(
         min(edfs_start),
         max(edfs_start),
-        length = obj$nlambdas - length(lambdas_start) + 2
-      )[-c(1, obj$nlambdas - length(lambdas_start) + 2)]
+        length = nlambdas - length(lambdas_start) + 2
+      )[-c(1, nlambdas - length(lambdas_start) + 2)]
     )[["y"]] %>%
       suppressWarnings() %>%
       exp()
   ) %>%
     unique() %>%
     sort(decreasing = TRUE)
-
-  return(obj)
 }

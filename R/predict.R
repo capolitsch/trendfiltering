@@ -11,6 +11,21 @@
 #' trend filtering estimate is evaluated on; i.e. if nothing is passed to
 #' `x_eval`, then it is defined as
 #' `x_eval = seq(min(x), max(x), length = nx_eval)`.
+#' @param lambda_choice One of `c("lambda_min","lambda_1se")`. The choice
+#' of hyperparameter that is used for optimized trend filtering estimate.
+#' Defaults to `lambda_choice = "lambda_min"`.
+#' \itemize{
+#' \item{`"lambda_min"`}: The hyperparameter value that minimizes the cross
+#' validation error curve.
+#' \item{`"lambda_1se"`}: The largest hyperparameter value with a cross
+#' validation error within 1 standard error of the minimum cross validation
+#' error. This choice therefore favors simpler (i.e. smoother) trend filtering
+#' estimates. The motivation here is essentially Occam's razor: the two models
+#' yield results that are quantitatively very close, so we favor the simpler
+#' model. See Section 7.10 of
+#' [Hastie, Tibshirani, and Friedman (2009)](
+#' https://web.stanford.edu/~hastie/Papers/ESLII.pdf)
+#' for more details on the "one-standard-error rule".}
 #'
 #' @return A list with the following elements:
 #' \describe{
@@ -49,6 +64,11 @@ predict.sure_tf <- function(obj, lambda, x_eval, nx_eval) {
       sort()
   }
 
+  lambda_pred <- case_when(
+    obj$lambda_choice == "lambda_min" ~ obj$lambda_min,
+    obj$lambda_choice == "lambda_1se" ~ obj$lambda_1se
+  )
+
   out <- obj %$% trendfilter(
     data_scaled$x,
     data_scaled$y,
@@ -72,6 +92,42 @@ predict.sure_tf <- function(obj, lambda, x_eval, nx_eval) {
     x.new = obj$data_scaled$x
   ) %>%
     as.double()
+
+  # Increase the TF solution's algorithmic precision for the optimized estimate
+  obj$admm_params$obj_tol <- obj$admm_params$obj_tol * 1e-2
+
+  out <- obj %$% trendfilter(
+    x = data_scaled$x,
+    y = data_scaled$y,
+    weights = data_scaled$weights,
+    lambda = lambdas,
+    k = k,
+    thinning = thinning,
+    control = admm_params
+  )
+
+  # Return the objective tolerance to its previous setting
+  obj$admm_params$obj_tol <- obj$admm_params$obj_tol * 1e2
+
+  obj$data_scaled %<>% mutate(
+    fitted_values = (
+      glmgen:::predict.trendfilter(
+        out,
+        lambda = lambda_pred,
+        x.new = obj$data_scaled$x
+      ) %>%
+        as.double()
+    )
+  )
+  obj$data_scaled$residuals <- obj$data_scaled$y - obj$data_scaled$fitted_values
+  obj$tf_estimate <- glmgen:::predict.trendfilter(
+    out,
+    lambda = lambda_pred,
+    x.new = obj$x_eval / obj$x_scale
+  ) * obj$y_scale %>%
+    as.double()
+  obj$fitted_values <- obj$data_scaled$fitted_values * obj$y_scale
+  obj$residuals <- obj$y - obj$fitted_values
 
   obj$data_scaled %<>% mutate(residuals = y - fitted_values)
   obj$fitted_values <- obj$data_scaled$fitted_values * obj$y_scale

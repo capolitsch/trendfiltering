@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Validate the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter • trendfiltering</title>
+<title>Optimize the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter • trendfiltering</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,11 @@
 
 
 
-<meta property="og:title" content="Validate the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter" />
-<meta property="og:description" content="cv_trendfilter() optimizes the trend filtering hyperparameter via V-fold
-cross validation on a grid of candidate hyperparameter settings and selects
-the value that minimizes a user-specified loss metric. See details below for
-when you should use sure_trendfilter() vs. cv_trendfilter()." />
+<meta property="og:title" content="Optimize the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter" />
+<meta property="og:description" content="For every candidate hyperparameter value, estimate the corresponding trend
+filtering model's out-of-sample error by V-fold cross validation. Here, any
+error metric can be defined. See details below for when you should use
+cv_trendfilter() versus sure_trendfilter()." />
 
 
 
@@ -114,16 +114,16 @@ when you should use sure_trendfilter() vs. cv_trendfilter()." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Validate the trend filtering hyperparameter by V-fold cross validation</h1>
+    <h1>Optimize the trend filtering hyperparameter by V-fold cross validation</h1>
     <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/cv_trendfilter.R'><code>R/cv_trendfilter.R</code></a></small>
     <div class="hidden name"><code>cv_trendfilter.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>cv_trendfilter()</code> optimizes the trend filtering hyperparameter via V-fold
-cross validation on a grid of candidate hyperparameter settings and selects
-the value that minimizes a user-specified loss metric. See details below for
-when you should use <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> vs. <code>cv_trendfilter()</code>.</p>
+    <p>For every candidate hyperparameter value, estimate the corresponding trend
+filtering model's out-of-sample error by V-fold cross validation. Here, any
+error metric can be defined. See details below for when you should use
+<code>cv_trendfilter()</code> versus <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>cv_trendfilter</span><span class='op'>(</span>
@@ -133,10 +133,7 @@ when you should use <code><a href='sure_trendfilter.html'>sure_trendfilter()</a>
   k <span class='op'>=</span> <span class='fl'>2L</span>,
   nlambdas <span class='op'>=</span> <span class='fl'>250L</span>,
   V <span class='op'>=</span> <span class='fl'>10L</span>,
-  lambda_choice <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lambda_min"</span>, <span class='st'>"lambda_1se"</span><span class='op'>)</span>,
-  validation_functional <span class='op'>=</span> <span class='st'>"WMAE"</span>,
-  nx_eval <span class='op'>=</span> <span class='fl'>1500L</span>,
-  <span class='va'>x_eval</span>,
+  <span class='va'>validation_error</span>,
   mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>4</span>,
   <span class='va'>optimization_params</span>
 <span class='op'>)</span></pre>
@@ -154,114 +151,92 @@ when you should use <code><a href='sure_trendfilter.html'>sure_trendfilter()</a>
     </tr>
     <tr>
       <th>weights</th>
-      <td><p>(Optional) Weights for the observed outputs, defined as the
-reciprocal variance of the additive noise that contaminates the signal.
-<code>weights</code> can be passed as a scalar when the noise is expected to have equal
-variance for all observations. Otherwise, <code>weights</code> must have the same length
-as <code>x</code> and <code>y</code>.</p></td>
+      <td><p>Weights for the observed outputs, defined as the reciprocal
+variance of the additive noise that contaminates the signal in <code>y</code>.
+When the noise is expected to have equal variance for all observations,
+<code>weights</code> can be passed as a scalar. Otherwise, <code>weights</code> must be a vector
+with the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
     <tr>
       <th>k</th>
-      <td><p>Degree of the piecewise polynomials that make up the trend
-filtering estimate. Defaults to <code>k = 2</code> (i.e. a piecewise quadratic
+      <td><p>Degree of the polynomials that make up the piecewise-polynomial
+trend filtering estimate. Defaults to <code>k = 2</code> (i.e. a piecewise quadratic
 estimate). Must be one of <code>k = 0,1,2</code>. Higher order polynomials are
 disallowed since their smoothness is indistinguishable from <code>k = 2</code> and
 their use can lead to instability in the convex optimization.</p></td>
     </tr>
     <tr>
       <th>nlambdas</th>
-      <td><p>The number of hyperparameter settings to test during
-validation. When nothing is passed to <code>lambdas</code> (highly recommended for
-general use), the grid is automatically constructed by <code>cv_trendfilter()</code>,
-with <code>nlambdas</code> controlling the granularity of the grid.</p></td>
+      <td><p>Number of hyperparameter values to test during validation.
+Defaults to <code>nlambdas = 250</code>. The hyperparameter grid is dynamically
+constructed to span the full model space lying between a single polynomial
+solution (i.e. a power law) and an interpolating solution, with <code>nlambdas</code>
+controlling the granularity of the grid.</p></td>
     </tr>
     <tr>
       <th>V</th>
-      <td><p>Number of folds the data are partitioned into for the V-fold cross
-validation. Defaults to <code>V = 10</code>.</p></td>
+      <td><p>Number of folds that the data are partitioned into for the V-fold
+cross validation. Defaults to <code>V = 10</code>.</p></td>
     </tr>
     <tr>
-      <th>lambda_choice</th>
-      <td><p>One of <code><a href='https://rdrr.io/r/base/c.html'>c("lambda_min","lambda_1se")</a></code>. The choice
-of hyperparameter that is used for optimized trend filtering estimate.
-Defaults to <code>lambda_choice = "lambda_min"</code>.</p><ul>
-<li><p><code>"lambda_min"</code>: The hyperparameter value that minimizes the cross
-validation error curve.</p></li>
-<li><p><code>"lambda_1se"</code>: The largest hyperparameter value with a cross
-validation error within 1 standard error of the minimum cross validation
-error. This choice therefore favors simpler (i.e. smoother) trend filtering
-estimates. The motivation here is essentially Occam's razor: the two models
-yield results that are quantitatively very close, so we favor the simpler
-model. See Section 7.10 of
-<a href='https://web.stanford.edu/~hastie/Papers/ESLII.pdf'>Hastie, Tibshirani, and Friedman (2009)</a>
-for more details on the "one-standard-error rule".</p></li>
-</ul></td>
-    </tr>
-    <tr>
-      <th>validation_functional</th>
-      <td><p>Loss functional to optimize during cross
+      <th>validation_error</th>
+      <td><p>The error functional to optimize during cross
 validation. Some common choices can be used by passing an appropriate string
 --- one of <code><a href='https://rdrr.io/r/base/c.html'>c("MSE","MAE","WMSE","WMAE")</a></code>, i.e. mean-absolute deviations
 error, mean-squared error, and their weighted counterparts. Defaults to
-<code>validation_functional = "WMAE"</code>.</p>
-<p>Alternatively, custom validation loss functionals can be used by instead
-passing a function to <code>validation_functional</code>. The function should take three
+<code>validation_error = "WMAE"</code>.</p>
+<p>Alternatively, custom validation error functionals can be used by instead
+passing a function to <code>validation_error</code>. The function should take three
 vector arguments --- <code>y</code>, <code>tf_estimate</code>, and <code>weights</code> --- and return a
-single scalar value for the validation loss. For example,
-<code>validation_functional = "WMAE"</code> is equivalent to passing the following
-function:<div class="sourceCode r"></p><pre><span class='kw'>function</span><span class='op'>(</span><span class='va'>tf_estimate</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span><span class='op'>{</span>
+single scalar value for the validation error. For example, the default
+setting <code>validation_error = "WMAE"</code> is equivalent to passing the
+following function to <code>validation_error</code>:<div class="sourceCode r"></p><pre><span class='kw'>function</span><span class='op'>(</span><span class='va'>tf_estimate</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span><span class='op'>{</span>
   <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>tf_estimate</span> <span class='op'>-</span> <span class='va'>y</span><span class='op'>)</span> <span class='op'>*</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>weights</span><span class='op'>)</span> <span class='op'>/</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>weights</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
 </pre><p></div></p></td>
     </tr>
     <tr>
-      <th>nx_eval</th>
-      <td><p>Integer. If nothing is passed to <code>x_eval</code>, then it is defined
-as <code>x_eval = seq(min(x), max(x), length = nx_eval)</code>.</p></td>
-    </tr>
-    <tr>
-      <th>x_eval</th>
-      <td><p>(Optional) A grid of inputs to evaluate the optimized trend
-filtering estimate on. May be ignored, in which case the grid is determined
-by <code>nx_eval</code>.</p></td>
-    </tr>
-    <tr>
       <th>mc_cores</th>
       <td><p>Multi-core computing using the
-<code><a href='https://rdrr.io/r/parallel/parallel-package.html'>parallel</a></code> package: The number of cores to
-utilize. Defaults to the number of cores detected.</p></td>
+<code><a href='https://rdrr.io/r/parallel/parallel-package.html'>parallel</a></code> R package: The number of cores to
+utilize. Defaults to the number of cores detected, minus four.</p></td>
     </tr>
     <tr>
       <th>optimization_params</th>
-      <td><p>(Optional) A named list of optimization parameter
-values to be passed to the trend filtering ADMM algorithm of
+      <td><p>(Optional) A named list of parameter values to be
+passed to the trend filtering ADMM algorithm of
 <a href='http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf'>Ramdas and Tibshirani (2016)</a>, which is implemented in
 the <code>glmgen</code> R package. See the <code><a href='https://rdrr.io/pkg/glmgen/man/trendfilter.control.list.html'>glmgen::trendfilter.control.list()</a></code>
-documentation for full details. The default parameter choices will almost
-always suffice, but when adjustments are necessary, no technical
-understanding of the ADMM algorithm is needed in order to do so. The
-following parameters may require some adjustments to ensure that your trend
-filtering estimate has sufficiently converged:</p><dl>
-<dt>obj_tol</dt><dd><p>The objective tolerance that, together with <code>max_iter</code>,
-determines the ADMM algorithm's stopping criterion. The algorithm will stop
-either (1) when the relative change in the objective function is less than
-<code>obj_tol</code>; or (2) when the number of iterations has reached <code>max_iter</code>.
-This argument defaults to <code>obj_tol = 1e-10</code>. Therefore, when necessary, the
-precision of the approximate solution given by the ADMM algorithm can be
-increased by decreasing <code>obj_tol</code> and/or increasing <code>max_iter</code>.</p></dd>
-<dt>max_iter</dt><dd><p>Maximum iterations allowed for the trend filtering
-optimization. Defaults to <code>max_iter = length(y)</code>. See the
-<code>n_iter</code> element of the <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> output for the actual number of
-iterations the ADMM algorithm took, for every candidate hyperparameter value
-in <code>lambdas</code>. If any of the elements of <code>n_iter</code> are equal to <code>max_iter</code>,
-the objective function's tolerance has not been reached and <code>max_iter</code> may
-need to be increased.</p></dd>
-<dt>thinning</dt><dd><p>Logical. If <code>TRUE</code>, then the data are preprocessed so that
-a smaller, better conditioned data set is used for fitting. When left <code>NULL</code>
-(the default setting), the optimization will automatically detect whether
-thinning should be applied (i.e. cases in which the numerical fitting
-algorithm will struggle to converge). This preprocessing procedure is
-controlled by the <code>x_tol</code> argument below.</p></dd>
+documentation for a full list of the algorithm's parameters. The default
+parameter choices will almost always suffice, but when adjustments do need to
+be made, one can do so without any technical understanding of the ADMM
+algorithm. In particular, the four parameter descriptions below should serve
+as sufficient working knowledge.</p><dl>
+<dt>obj_tol</dt><dd><p>A stopping threshold for the ADMM algorithm. If the relative
+change in the algorithm's cost functional between two consecutive steps is
+less than <code>obj_tol</code>, the algorithm terminates. The algorithm's termination
+can also result from it reaching the maximum tolerable iterations set
+by the <code>max_iter</code> parameter (see below). The <code>obj_tol</code> parameter defaults to
+<code>obj_tol = 1e-10</code>. The <code>cost_functional</code> vector, returned within the
+<code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> output, gives the relative change in the trend filtering
+cost functional over the algorithm's final iteration, for every candidate
+hyperparameter value.</p></dd>
+<dt>max_iter</dt><dd><p>Maximum number of ADMM iterations that we will tolerate.
+Defaults to <code>max_iter = length(y)</code>. The actual number of iterations performed
+by the algorithm, for every candidate hyperparameter value, is returned in
+the <code>n_iter</code> vector, within the <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> output. If any of the
+elements of <code>n_iter</code> are equal to <code>max_iter</code>, the tolerance defined by
+<code>obj_tol</code> has not been attained and <code>max_iter</code> may need to be increased.</p></dd>
+<dt>thinning</dt><dd><p>Logical. If <code>thinning = TRUE</code>, then the data are preprocessed
+so that a smaller data set is used to fit the trend filtering estimate, which
+will ease the ADMM algorithm's convergence. This can be
+very useful when a signal is so well-sampled that very little additional
+information / predictive accuracy is gained by fitting the trend filtering
+estimate on the full data set, compared to some subset of it. See the
+<code>cv_trendfilter()</code> examples for a case study of this nature. When nothing
+is passed to <code>thinning</code>, the algorithm will automatically detect whether
+thinning should be applied. This preprocessing procedure is controlled by the
+<code>x_tol</code> parameter below.</p></dd>
 <dt>x_tol</dt><dd><p>Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size <code>x_tol</code> and find at least two
 elements of <code>x</code> that fall into the same bin, then the data is thinned.</p></dd>
@@ -273,62 +248,52 @@ elements of <code>x</code> that fall into the same bin, then the data is thinned
 
     <p>An object of class <code>cv_tf</code>. This is a list with the following
 elements:</p><dl>
-<dt>validation_functional</dt><dd><p>Type of error that validation was performed on.
+<dt>lambdas</dt><dd><p>Vector of candidate hyperparameter values (always returned in
+descending order).</p></dd>
+<dt>edfs</dt><dd><p>Number of effective degrees of freedom in the trend filtering
+estimator, for every hyperparameter value in <code>lambdas</code>.</p></dd>
+<dt>validation_errors</dt><dd><p>Cross validation errors, for every
+hyperparameter value in <code>lambdas</code>.</p></dd>
+<dt>se_validation_errors</dt><dd><p>Vector of estimated standard errors for the
+<code>validation_errors</code>.</p></dd>
+<dt>lambda_min</dt><dd><p>Hyperparameter value that minimizes the cross validation
+error curve.</p></dd>
+<dt>lambda_1se</dt><dd><p>The largest hyperparameter value (corresponding to the
+smoothest trend filtering estimate) that yields a cross validation error
+within one standard error of <code><a href='https://rdrr.io/r/base/Extremes.html'>min(validation_errors)</a></code>. We call this the
+"1-standard-error rule" hyperparameter, and it serves as an Occam's
+razor-esque heuristic. That is, given two models with approximately equal
+performance, it may be wise to opt for the simpler model, i.e. the model with
+fewer effective degrees of freedom.</p></dd>
+<dt>edf_min</dt><dd><p>Number of effective degrees of freedom in the trend filtering
+estimator that minimizes the cross validation error curve.</p></dd>
+<dt>edf_1se</dt><dd><p>Number of effective degrees of freedom in the 1-stand-error
+rule trend filtering estimator.</p></dd>
+<dt>i_min</dt><dd><p>Index of <code>lambdas</code> that minimizes the CV error curve.</p></dd>
+<dt>i_1se</dt><dd><p>Index of <code>lambdas</code> that gives the 1-standard-error rule
+hyperparameter.</p></dd>
+<dt>cost_functional</dt><dd><p>The relative change in the cost functional over the
+ADMM algorithm's final iteration, for every candidate hyperparameter in
+<code>lambdas</code>.</p></dd>
+<dt>n_iter</dt><dd><p>Total number of iterations taken by the ADMM algorithm, for
+every candidate hyperparameter in <code>lambdas</code>. If an element of <code>n_iter</code>
+is exactly equal to <code>max_iter</code>, then the ADMM algorithm stopped before
+reaching the tolerance set by <code>obj_tol</code>. In these cases, you may need
+to increase <code>max_iter</code> to ensure the trend filtering solution has
+converged to satisfactory precision.</p></dd>
+<dt>validation_error</dt><dd><p>Type of error that validation was performed on.
 Either one of <code><a href='https://rdrr.io/r/base/c.html'>c("MSE","MAE","WMSE","WMAE")</a></code> or a custom function passed by
 the user.</p></dd>
-<dt>V</dt><dd><p>The number of folds the data are split into for the V-fold cross
-validation.</p></dd>
-<dt>lambdas</dt><dd><p>Vector of hyperparameter values evaluated in the grid search
-(always returned in descending order).</p></dd>
-<dt>edfs</dt><dd><p>Vector of effective degrees of freedom for all trend filtering
-estimators fit during validation.</p></dd>
-<dt>generalization_errors</dt><dd><p>Vector of cross validation estimates of the
-trend filtering generalization error, for each hyperparameter value
-(ordered corresponding to the descending-ordered <code>lambdas</code> vector).</p></dd>
-<dt>se_errors</dt><dd><p>The standard errors of the cross validation errors.
-These are particularly useful for implementing the "1-standard-error rule".</p></dd>
-<dt>lambda_min</dt><dd><p>Hyperparameter value that minimizes the cross validation
-generalization error curve.</p></dd>
-<dt>lambda_1se</dt><dd><p>Largest hyperparameter value that is within one standard
-error of the minimum hyperparameter's cross validation error.</p></dd>
-<dt>i_min</dt><dd><p>Index of <code>lambdas</code> that minimizes the cross validation error.</p></dd>
-<dt>i_1se</dt><dd><p>Index of <code>lambdas</code> that gives the largest hyperparameter
-value that has a cross validation error within 1 standard error of the
-minimum of the cross validation error curves.</p></dd>
-<dt>edf_min</dt><dd><p>Effective degrees of freedom of the optimized trend
-filtering estimator.</p></dd>
-<dt>edf_1se</dt><dd><p>Effective degrees of freedom of the 1-stand-error rule
-trend filtering estimator.</p></dd>
-<dt>cost_functional</dt><dd><p>The relative change in the cost functional values
-between the ADMM algorithm's penultimate and final iterations, for
-every hyperparameter choice.</p></dd>
-<dt>n_iter</dt><dd><p>The number of iterations needed for the ADMM algorithm to
-converge within the given tolerance, for each hyperparameter value. If many
-of these are exactly equal to <code>max_iter</code>, then their solutions have not
-converged with the tolerance specified by <code>obj_tol</code>. In which case, it is
-often prudent to increase <code>max_iter</code>.</p></dd>
-<dt>x</dt><dd><p>Vector of observed inputs.</p></dd>
-<dt>y</dt><dd><p>Vector of observed outputs.</p></dd>
-<dt>weights</dt><dd><p>Weights for the observed outputs, defined as the reciprocal
-variance of the additive noise that contaminates the signal.</p></dd>
-<dt>fitted_values</dt><dd><p>Optimized trend filtering estimate, evaluated at the
-observed inputs <code>x</code>.</p></dd>
-<dt>residuals</dt><dd><p><code>residuals = y - fitted_values</code></p></dd>
-<dt>k</dt><dd><p>Degree of the trend filtering estimator.</p></dd>
-<dt>admm_params</dt><dd><p>List of parameter settings for the trend filtering ADMM
-algorithm, constructed by passing the <code>optimization_params</code> list to
-<code><a href='https://rdrr.io/pkg/glmgen/man/trendfilter.control.list.html'>glmgen::trendfilter.control.list()</a></code>.</p></dd>
-<dt>thinning</dt><dd><p>Logical. If <code>TRUE</code>, then the data are preprocessed so that a
-smaller, better conditioned data set is used for fitting.</p></dd>
-<dt>x_scale, y_scale, data_scaled</dt><dd><p>For internal use.</p></dd>
+<dt>V</dt><dd><p>The number of folds the data were split into for cross validation.</p></dd>
+<dt>model_fit</dt><dd><p>A list of objects that is used internally by other
+functions that operate on the <code>cv_trendfilter()</code> output.</p></dd>
 
 </dl>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
- Our recommendations for when to use <code>cv_trendfilter()</code>
-vs. <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> are shown in the table below.</p><table class='table'>
+    <p>Our recommendations for when to use <code>cv_trendfilter()</code> versus
+<code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> are shown in the table below.</p><table class='table'>
 <tr><td>Scenario</td><td>Hyperparameter optimization</td></tr>
 <tr><td><code>x</code> is unevenly sampled</td><td><code>cv_trendfilter()</code></td></tr>
 <tr><td><code>x</code> is evenly sampled and reciprocal variances are not available</td><td><code>cv_trendfilter()</code></td></tr>
@@ -343,10 +308,12 @@ be evenly sampled. When the inputs are evenly sampled on a transformed scale,
 we recommend transforming to that scale and carrying out the full trend
 filtering analysis on that scale. See the <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> examples for
 a case when the inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p>
-<p>The formal definitions of the common validation loss functionals available
-via the options <code>validation_functional = c("MSE","MAE","WMSE","WMAE")</code> are
+<p>The formal definitions of the common validation error functionals available
+via the options <code>validation_error = c("MSE","MAE","WMSE","WMAE")</code> are
 stated below.</p>
-<p>\[MSE(\lambda) = \frac{1}{n}
+<p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
+
+\[MSE(\lambda) = \frac{1}{n}
 \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2\]
 \[MAE(\lambda) = \frac{1}{n}
 \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|\]
@@ -357,9 +324,11 @@ stated below.</p>
 where \(w_i:=\) <code>weights[i]</code>.</p>
 <p>If constant weights are passed, or if nothing is passed, then the weighted
 and unweighted counterparts are equivalent.</p>
-<p>Briefly stated, weighting helps combat heteroskedasticity (varying levels
-of uncertainty in the output measurements) and absolute error is less
-sensitive to outliers than squared error.</p>
+<p>Briefly stated, weighting the validation error metric (with reciprocal
+variances) helps prevent the error from being dominated by the model's
+(in)accuracy on a (potentially very small) subset of the data that have
+high variance; and absolute error is less sensitive to outliers than squared
+error.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p><b>Companion references</b></p><ol>
@@ -401,14 +370,14 @@ and 7.12)</p></li>
   x <span class='op'>=</span> <span class='va'>EB</span><span class='op'>$</span><span class='va'>phase</span>,
   y <span class='op'>=</span> <span class='va'>EB</span><span class='op'>$</span><span class='va'>flux</span>,
   weights <span class='op'>=</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='va'>EB</span><span class='op'>$</span><span class='va'>std_err</span><span class='op'>^</span><span class='fl'>2</span>,
-  validation_functional <span class='op'>=</span> <span class='st'>"MAE"</span>,
+  validation_error <span class='op'>=</span> <span class='st'>"MAE"</span>,
   optimization_params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
     max_iter <span class='op'>=</span> <span class='fl'>1e4</span>,
     obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span>,
     thinning <span class='op'>=</span> <span class='cn'>TRUE</span>
   <span class='op'>)</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in group_split(., sample(rep_len(1:V, nrow(data_scaled))), .keep = FALSE): object 'data_scaled' not found</span></div></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

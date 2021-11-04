@@ -122,7 +122,7 @@ trend filtering model's predictive mean-squared error. See details below
 for when you should use \code{\link[=sure_trendfilter]{sure_trendfilter()}} versus \code{\link[=cv_trendfilter]{cv_trendfilter()}}.
 }
 \details{
-Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} vs.
+Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} versus
 \code{\link[=sure_trendfilter]{sure_trendfilter()}} are shown in the table below.\tabular{lc}{
    Scenario \tab Hyperparameter optimization \cr
    \code{x} is unevenly sampled \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr

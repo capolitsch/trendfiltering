@@ -63,7 +63,7 @@
 #' elements of `x` that fall into the same bin, then the data is thinned.
 #' }}
 #'
-#' @details Our recommendations for when to use [cv_trendfilter()] vs.
+#' @details Our recommendations for when to use [cv_trendfilter()] versus
 #' [sure_trendfilter()] are shown in the table below.
 #'
 #' | Scenario                                                         |  Hyperparameter optimization  |
@@ -221,6 +221,7 @@ sure_trendfilter <- function(x,
   if (missing(optimization_params)) {
     optimization_params <- NULL
   }
+
   opt_params <- get_optimization_params(optimization_params, n = length(x))
   optimization_params <- opt_params$optimization_params
   thinning <- opt_params$thinning
@@ -240,28 +241,9 @@ sure_trendfilter <- function(x,
 
   admm_params$x_tol <- admm_params$x_tol / x_scale
 
-  obj <- list(
-    nlambdas = nlambdas,
-    n = nrow(data),
-    x = data$x,
-    y = data$y,
-    weights = data$weights,
-    k = k,
-    thinning = thinning,
-    admm_params = admm_params,
-    data_scaled = data_scaled,
-    x_scale = x_scale,
-    y_scale = y_scale
-  )
+  lambdas <- get_lambdas(nlambdas, data_scaled, k, thinning, admm_params)
 
-  rm(
-    k, thinning, data, admm_params, data_scaled, optimization_params, nlambdas,
-    opt_params, x_scale, y_scale, x, y, weights
-  )
-
-  obj %<>% get_lambdas()
-
-  out <- obj %$% trendfilter(
+  out <- trendfilter(
     x = data_scaled$x,
     y = data_scaled$y,
     weights = data_scaled$weights,
@@ -271,47 +253,58 @@ sure_trendfilter <- function(x,
     control = admm_params
   )
 
-  squared_residuals_mat <- (out$beta - obj$data_scaled$y)^2
-  optimisms_mat <- 2 / (obj$data_scaled$weights * obj$n) * matrix(
-    rep(out$df, each = obj$n),
-    nrow = obj$n
+  squared_residuals_mat <- (out$beta - data_scaled$y)^2
+  optimisms_mat <- 2 / (data_scaled$weights * nrow(data_scaled)) * matrix(
+    rep(out$df, each = nrow(data_scaled)),
+    nrow = nrow(data_scaled)
   )
 
-  validation_errors_mat <- (squared_residuals_mat + optimisms_mat) *
-    obj$y_scale^2
-  obj$validation_errors <- validation_errors_mat %>% colMeans()
-  obj$edfs <- out$df %>% as.integer()
-  obj$n_iter <- out$iter %>% as.integer()
-  obj$i_min <- min(which.min(obj$validation_errors)) %>% as.integer()
-  obj$lambda_min <- obj$lambdas[obj$i_min]
-  obj$edf_min <- obj$edfs[obj$i_min] %>% as.integer()
-  obj$cost_functional <- out$obj[nrow(out$obj), ]
+  validation_errors_mat <- (squared_residuals_mat + optimisms_mat) * y_scale^2
+  validation_errors <- validation_errors_mat %>% colMeans()
+  i_min <- min(which.min(validation_errors)) %>% as.integer()
 
-  obj$se_validation_errors <- replicate(
+  se_validation_errors <- replicate(
     5000,
-    validation_errors_mat[sample(1:obj$n, replace = TRUE), ] %>%
+    validation_errors_mat[sample(1:nrow(data_scaled), replace = TRUE), ] %>%
       colMeans()
   ) %>%
     rowSds()
 
-  obj$i_1se <- obj %$% which(
+  i_1se <- which(
     validation_errors <= validation_errors[i_min] + se_validation_errors[i_min]
-  ) %>%
-    min()
-  obj$lambda_1se <- obj$lambdas[obj$i_1se]
-  obj$edf_1se <- obj$edfs[obj$i_1se]
+  ) %>% min()
 
-  obj$model_fit <- obj[c(
-    "data_scaled", "k", "admm_params", "thinning", "x_scale", "y_scale", "x",
-    "y", "weights"
-  )]
+  tf_model <- structure(
+    list(
+      x = x,
+      y = y,
+      weights = weights,
+      x_scale = x_scale,
+      y_scale = y_scale,
+      data_scaled = data_scaled,
+      k = k,
+      admm_params = admm_params,
+      thinning = thinning
+    ),
+    class = c("tf_model", "list")
+  )
 
-  obj <- obj[c(
-    "lambdas", "edfs", "validation_errors", "se_validation_errors", "lambda_min",
-    "lambda_1se", "i_min", "i_1se", "edf_min", "edf_1se", "cost_functional",
-    "n_iter", "model_fit"
-  )]
-
-  class(obj) <- c("sure_tf", "list")
-  return(obj)
+  structure(
+    list(
+      lambdas = lambdas,
+      edfs = out$df %>% as.integer(),
+      validation_errors = validation_errors,
+      se_validation_errors = se_validation_errors,
+      lambda_min = lambdas[i_min],
+      lambda_1se = lambdas[i_1se],
+      edf_min = out$df[i_min] %>% as.integer(),
+      edf_1se = out$df[i_1se] %>% as.integer(),
+      i_min = i_min,
+      i_1se = i_1se,
+      cost_functional = out$obj[nrow(out$obj), ],
+      n_iter = out$iter %>% as.integer(),
+      tf_model = tf_model
+    ),
+    class = c("sure_tf", "list")
+  )
 }

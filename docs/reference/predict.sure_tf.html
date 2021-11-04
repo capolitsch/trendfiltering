@@ -145,6 +145,23 @@ trend filtering estimate is evaluated on; i.e. if nothing is passed to
 <code>x_eval</code>, then it is defined as
 <code>x_eval = seq(min(x), max(x), length = nx_eval)</code>.</p></td>
     </tr>
+    <tr>
+      <th>lambda_choice</th>
+      <td><p>One of <code><a href='https://rdrr.io/r/base/c.html'>c("lambda_min","lambda_1se")</a></code>. The choice
+of hyperparameter that is used for optimized trend filtering estimate.
+Defaults to <code>lambda_choice = "lambda_min"</code>.</p><ul>
+<li><p><code>"lambda_min"</code>: The hyperparameter value that minimizes the cross
+validation error curve.</p></li>
+<li><p><code>"lambda_1se"</code>: The largest hyperparameter value with a cross
+validation error within 1 standard error of the minimum cross validation
+error. This choice therefore favors simpler (i.e. smoother) trend filtering
+estimates. The motivation here is essentially Occam's razor: the two models
+yield results that are quantitatively very close, so we favor the simpler
+model. See Section 7.10 of
+<a href='https://web.stanford.edu/~hastie/Papers/ESLII.pdf'>Hastie, Tibshirani, and Friedman (2009)</a>
+for more details on the "one-standard-error rule".</p></li>
+</ul></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
