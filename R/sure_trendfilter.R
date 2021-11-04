@@ -2,8 +2,9 @@
 #' risk estimate
 #'
 #' For every candidate hyperparameter value, compute an unbiased estimate of the
-#' trend filtering model's predictive mean-squared error. See details below
-#' for when you should use [`sure_trendfilter()`] versus [cv_trendfilter()].
+#' trend filtering model's predictive mean-squared error. See the details
+#' section for when you should use [`sure_trendfilter()`] versus
+#' [cv_trendfilter()].
 #'
 #' @param x Vector of observed values for the input variable.
 #' @param y Vector of observed values for the output variable.
@@ -21,7 +22,7 @@
 #' Defaults to `nlambdas = 250`. The hyperparameter grid is dynamically
 #' constructed to span the full model space lying between a single polynomial
 #' solution (i.e. a power law) and an interpolating solution, with `nlambdas`
-#' controlling the granularity of the grid.
+#' controlling the granularity of the hyperparameter grid.
 #' @param optimization_params (Optional) A named list of parameter values to be
 #' passed to the trend filtering ADMM algorithm of
 #' [Ramdas and Tibshirani (2016)](

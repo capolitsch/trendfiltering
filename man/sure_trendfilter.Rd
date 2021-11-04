@@ -28,7 +28,7 @@ their use can lead to instability in the convex optimization.}
 Defaults to \code{nlambdas = 250}. The hyperparameter grid is dynamically
 constructed to span the full model space lying between a single polynomial
 solution (i.e. a power law) and an interpolating solution, with \code{nlambdas}
-controlling the granularity of the grid.}
+controlling the granularity of the hyperparameter grid.}
 
 \item{optimization_params}{(Optional) A named list of parameter values to be
 passed to the trend filtering ADMM algorithm of
@@ -118,8 +118,9 @@ functions that operate on the \code{sure_trendfilter()} output.}
 }
 \description{
 For every candidate hyperparameter value, compute an unbiased estimate of the
-trend filtering model's predictive mean-squared error. See details below
-for when you should use \code{\link[=sure_trendfilter]{sure_trendfilter()}} versus \code{\link[=cv_trendfilter]{cv_trendfilter()}}.
+trend filtering model's predictive mean-squared error. See the details
+section for when you should use \code{\link[=sure_trendfilter]{sure_trendfilter()}} versus
+\code{\link[=cv_trendfilter]{cv_trendfilter()}}.
 }
 \details{
 Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} versus

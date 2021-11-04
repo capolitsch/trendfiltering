@@ -6,6 +6,9 @@
 \usage{
 bootstrap_trendfilter(
   obj,
+  lambda_choice,
+  x_eval,
+  nx_eval,
   bootstrap_algorithm,
   level = 0.95,
   B = 100L,
@@ -18,6 +21,29 @@ bootstrap_trendfilter(
 \item{obj}{An object of class \code{\link[=sure_trendfilter]{sure_tf}} or
 \code{\link[=cv_trendfilter]{cv_tf}}.}
 
+\item{lambda_choice}{One of \code{c("lambda_min","lambda_1se")}. The choice
+of hyperparameter that is used for optimized trend filtering estimate.
+Defaults to \code{lambda_choice = "lambda_min"}.
+\itemize{
+\item{\code{"lambda_min"}}: The hyperparameter value that minimizes the cross
+validation error curve.
+\item{\code{"lambda_1se"}}: The largest hyperparameter value with a cross
+validation error within 1 standard error of the minimum cross validation
+error. This choice therefore favors simpler (i.e. smoother) trend filtering
+estimates. The motivation here is essentially Occam's razor: the two models
+yield results that are quantitatively very close, so we favor the simpler
+model. See Section 7.10 of
+\href{https://web.stanford.edu/~hastie/Papers/ESLII.pdf}{Hastie, Tibshirani, and Friedman (2009)}
+for more details on the "one-standard-error rule".}}
+
+\item{x_eval}{(Optional) Overrides \code{nx_eval} if passed. A grid of inputs to
+evaluate the optimized trend filtering estimate on.}
+
+\item{nx_eval}{Integer. The length of the input grid that the optimized
+trend filtering estimate is evaluated on; i.e. if nothing is passed to
+\code{x_eval}, then it is defined as
+\code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
+
 \item{bootstrap_algorithm}{A string specifying which variation of the
 bootstrap to use. One of \code{c("nonparametric","parametric","wild")}. See
 details below for recommendations on when each option is appropriate.}
@@ -28,16 +54,16 @@ details below for recommendations on when each option is appropriate.}
 \item{B}{The number of bootstrap samples used to estimate the pointwise
 variability bands. Defaults to \code{B = 100}.}
 
-\item{return_ensemble}{Logical. If \code{TRUE}, the full trend
-filtering bootstrap ensemble is returned as an \mjseqn{n \times B} matrix,
-less any columns from post-hoc pruning (see \code{prune} below). Defaults to
-\code{return_ensemble = FALSE} to save memory.}
+\item{return_ensemble}{Logical. If \code{TRUE}, the full trend filtering bootstrap
+ensemble is returned as an \mjseqn{n \times B} matrix, less any columns from
+post-hoc pruning (see \code{prune} below). Defaults to \code{return_ensemble = FALSE}
+to save memory.}
 
-\item{prune}{Logical. If \code{TRUE}, then the trend filtering bootstrap
-ensemble is examined for rare instances in which the optimization has
-stopped at zero knots (likely erroneously), and removes them from the
-ensemble that is used to compute the variability bands. Defaults to
-\code{prune = TRUE}. Do not change this unless you know what you are doing!}
+\item{prune}{Logical. If \code{TRUE}, then the trend filtering bootstrap ensemble
+is examined for rare instances in which the optimization has stopped at zero
+knots (likely erroneously), and removes them from the ensemble that is used
+to compute the variability bands. Defaults to \code{prune = TRUE}. Do not change
+this unless you know what you are doing!}
 
 \item{mc_cores}{Multi-core computing using the
 \code{\link[parallel:parallel-package]{parallel}} package: The number of cores to
@@ -45,11 +71,9 @@ utilize. Defaults to the number of cores detected, minus 4.}
 }
 \value{
 An object of class \code{bootstrap_tf}. This is a comprehensive
-list containing all of the analysis important information, data, and
+list containing all of the analysis' important information, data, and
 results:
 \describe{
-\item{tf_standard_errors}{The standard errors of the optimized trend
-filtering point estimator.}
 \item{bootstrap_lower_band}{Vector of lower bounds for the pointwise
 variability bands, evaluated on \code{x_eval}.}
 \item{bootstrap_upper_band}{Vector of upper bounds for the pointwise
@@ -59,25 +83,24 @@ bootstrap was used to obtain the variability bands.}
 \item{level}{The level of the pointwise variability bands.}
 \item{B}{The number of bootstrap samples used to estimate the pointwise
 variability bands.}
-\item{tf_bootstrap_ensemble}{If \code{return_ensemble = TRUE}, the
-full trend filtering bootstrap ensemble as an \mjseqn{n \times B} matrix,
-less any columns from post-hoc pruning (if \code{prune = TRUE}). Else, this will
-return \code{NULL}.}
+\item{tf_bootstrap_ensemble}{If \code{return_ensemble = TRUE}, the full trend
+filtering bootstrap ensemble as an \mjseqn{n \times B} matrix, less any
+columns from post-hoc pruning (if \code{prune = TRUE}). Else, this will return
+\code{NULL}.}
 \item{edf_boots}{An integer vector of the estimated number of effective
 degrees of freedom of each trend filtering bootstrap estimate. These should
-all be relatively close to \code{edf_min} (below).}
+all be relatively close to \code{edf_min}.}
 \item{prune}{Logical. If \code{TRUE}, then the trend filtering bootstrap
 ensemble is examined for rare instances in which the optimization has
 stopped at zero knots (likely erroneously), and removes them from the
 ensemble.}
 \item{n_pruned}{The number of poorly-converged bootstrap trend filtering
 estimates pruned from the ensemble.}
-\item{n_iter_boots}{Vector of the number of iterations needed for the ADMM
-algorithm to converge within the given tolerance, for each bootstrap trend
+\item{n_iter_boots}{Vector of the number of iterations taken by the ADMM
+algorithm before reaching a stopping criterion, for each bootstrap trend
 filtering estimate.}
 \item{...}{Named elements inherited from \code{obj} --- an object either of class
-\code{\link[=sure_trendfilter]{sure_tf}} or \code{\link[=cv_trendfilter]{cv_tf}}. See the relevant
-function documentation for details.}
+\code{\link[=sure_trendfilter]{sure_tf}} or \code{\link[=cv_trendfilter]{cv_tf}}.}
 }
 }
 \description{

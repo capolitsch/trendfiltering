@@ -11,8 +11,8 @@ cv_trendfilter(
   k = 2L,
   nlambdas = 250L,
   V = 10L,
-  validation_error,
   mc_cores = parallel::detectCores() - 4,
+  custom_error_funcs,
   optimization_params
 )
 }
@@ -37,30 +37,33 @@ their use can lead to instability in the convex optimization.}
 Defaults to \code{nlambdas = 250}. The hyperparameter grid is dynamically
 constructed to span the full model space lying between a single polynomial
 solution (i.e. a power law) and an interpolating solution, with \code{nlambdas}
-controlling the granularity of the grid.}
+controlling the granularity of the hyperparameter grid.}
 
 \item{V}{Number of folds that the data are partitioned into for the V-fold
 cross validation. Defaults to \code{V = 10}.}
 
-\item{validation_error}{The error functional to optimize during cross
-validation. Some common choices can be used by passing an appropriate string
---- one of \code{c("MSE","MAE","WMSE","WMAE")}, i.e. mean-absolute deviations
-error, mean-squared error, and their weighted counterparts. Defaults to
-\code{validation_error = "WMAE"}.
-
-Alternatively, custom validation error functionals can be used by instead
-passing a function to \code{validation_error}. The function should take three
-vector arguments --- \code{y}, \code{tf_estimate}, and \code{weights} --- and return a
-single scalar value for the validation error. For example, the default
-setting \code{validation_error = "WMAE"} is equivalent to passing the
-following function to \code{validation_error}:\if{html}{\out{<div class="sourceCode r">}}\preformatted{function(tf_estimate, y, weights)\{
-  sum(abs(tf_estimate - y) * sqrt(weights) / sum(sqrt(weights)))
-\}
-}\if{html}{\out{</div>}}}
-
 \item{mc_cores}{Multi-core computing using the
 \code{\link[parallel:parallel-package]{parallel}} R package: The number of cores to
 utilize. Defaults to the number of cores detected, minus four.}
+
+\item{custom_error_funcs}{(Optional) A named list of one or more
+functions, with each defining an error functional to evaluate on held-out
+folds during cross validation. Mean-squared error (MSE) and mean absolute
+error (MAE) are both evaluated automatically, as well as weighted versions
+(with reciprocal variances as weights) --- WMSE and WMAE. Therefore, the user
+does not need to pass anything to \code{custom_error_funcs} unless they want to
+define a validation error metric other than MSE, MAE, WMSE, and WMAE.
+
+In such a case, each function in the named list passed to
+\code{custom_error_funcs} should take three vector arguments --- \code{y},
+\code{tf_estimate}, and \code{weights} --- and return a single scalar value for the
+validation error. For example, if I also wanted to define a validation
+error curve from the weighted median of the absolute errors, I could pass the
+following list to \code{custom_error_funcs}:\if{html}{\out{<div class="sourceCode r">}}\preformatted{list(MedAE = function(tf_estimate, y, weights) \{
+               matrixStats::weightedMedian(abs(tf_estimate - y), weights)
+             \}
+    )
+}\if{html}{\out{</div>}}}
 
 \item{optimization_params}{(Optional) A named list of parameter values to be
 passed to the trend filtering ADMM algorithm of
@@ -110,26 +113,42 @@ elements:
 descending order).}
 \item{edfs}{Number of effective degrees of freedom in the trend filtering
 estimator, for every hyperparameter value in \code{lambdas}.}
-\item{validation_errors}{Cross validation errors, for every
-hyperparameter value in \code{lambdas}.}
-\item{se_validation_errors}{Vector of estimated standard errors for the
-\code{validation_errors}.}
-\item{lambda_min}{Hyperparameter value that minimizes the cross validation
-error curve.}
-\item{lambda_1se}{The largest hyperparameter value (corresponding to the
-smoothest trend filtering estimate) that yields a cross validation error
-within one standard error of \code{min(validation_errors)}. We call this the
-"1-standard-error rule" hyperparameter, and it serves as an Occam's
-razor-esque heuristic. That is, given two models with approximately equal
-performance, it may be wise to opt for the simpler model, i.e. the model with
-fewer effective degrees of freedom.}
-\item{edf_min}{Number of effective degrees of freedom in the trend filtering
-estimator that minimizes the cross validation error curve.}
-\item{edf_1se}{Number of effective degrees of freedom in the 1-stand-error
-rule trend filtering estimator.}
-\item{i_min}{Index of \code{lambdas} that minimizes the CV error curve.}
-\item{i_1se}{Index of \code{lambdas} that gives the 1-standard-error rule
-hyperparameter.}
+\item{validation_errors}{A named list of vectors, with each representing the
+cross validation error curve for some definition of error. The first 4
+vectors of the list correspond to WMAE, WMSE, MAE, MSE. If any custom
+error functionals were passed to \code{custom_error_funcs}, their cross validation
+curves will follow the first 4.}
+\item{se_validation_errors}{Named list of estimated standard errors for each
+of the cross validation error curves in \code{validation_errors}.}
+\item{lambda_min}{A named vector with length equal to
+\code{length(validation_errors)}, containing the hyperparameter value that
+minimizes the cross validation error curve, for every type validation error.}
+\item{lambda_1se}{A named vector with length equal to
+\code{length(validation_errors)}, containing the "1-standard-error rule"
+hyperparameter, for every type validation error. The "1-standard-error rule"
+hyparameter is the largest hyperparameter value (corresponding to the
+smoothest trend filtering estimate) that has a cross validation error
+within one standard error of the minimum cross validation error. It serves as
+an Occam's razor-esque heuristic. That is, given two models with
+approximately equal performance, it may be wise to opt for the simpler model,
+i.e. the model with fewer effective degrees of freedom.}
+\item{edf_min}{A named vector with length equal to
+\code{length(validation_errors)}, containing the number of effective degrees of
+freedom in the trend filtering estimator that minimizes the cross validation
+error curve, for every type of validation error.}
+\item{edf_1se}{A named vector with length equal to
+\code{length(validation_errors)}, containing the number of effective degrees of
+freedom in the "1-standard-error rule" trend filtering estimator, for every
+type of validation error.}
+\item{i_min}{A named vector with length equal to
+\code{length(validation_errors)}, containing the index of \code{lambdas} that minimizes
+the CV error curve, for every type of validation error.}
+\item{i_1se}{A named vector with length equal to
+\code{length(validation_errors)}, containing the index of \code{lambdas} that
+gives the "1-standard-error rule" hyperparameter value, for every
+type of validation error.}
+\item{validation_error_funcs}{A named list of functions that define the
+types of error that were evaluated during cross validation.}
 \item{cost_functional}{The relative change in the cost functional over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 \code{lambdas}.}
@@ -139,9 +158,6 @@ is exactly equal to \code{max_iter}, then the ADMM algorithm stopped before
 reaching the tolerance set by \code{obj_tol}. In these cases, you may need
 to increase \code{max_iter} to ensure the trend filtering solution has
 converged to satisfactory precision.}
-\item{validation_error}{Type of error that validation was performed on.
-Either one of \code{c("MSE","MAE","WMSE","WMAE")} or a custom function passed by
-the user.}
 \item{V}{The number of folds the data were split into for cross validation.}
 \item{model_fit}{A list of objects that is used internally by other
 functions that operate on the \code{cv_trendfilter()} output.}
@@ -149,8 +165,10 @@ functions that operate on the \code{cv_trendfilter()} output.}
 }
 \description{
 For every candidate hyperparameter value, estimate the corresponding trend
-filtering model's out-of-sample error by V-fold cross validation. Here, any
-error metric can be defined. See details below for when you should use
+filtering model's out-of-sample error by V-fold cross validation. Four
+commonly-used types of error --- MSE, WMSE, MAE, WMAE --- are all evaluated
+and returned, and the user has the option to pass additional error
+functionals to be evaluated. See the details section for when you should use
 \code{\link[=cv_trendfilter]{cv_trendfilter()}} versus \code{\link[=sure_trendfilter]{sure_trendfilter()}}.
 }
 \details{
@@ -170,9 +188,8 @@ we recommend transforming to that scale and carrying out the full trend
 filtering analysis on that scale. See the \code{\link[=sure_trendfilter]{sure_trendfilter()}} examples for
 a case when the inputs are evenly sampled on the \code{log10(x)} scale.
 
-The formal definitions of the common validation error functionals available
-via the options \code{validation_error = c("MSE","MAE","WMSE","WMAE")} are
-stated below.
+The validation error functionals that we automatically compute CV curves for
+are formally defined below.
 
 \loadmathjax
 \mjsdeqn{MSE(\lambda) = \frac{1}{n}
@@ -202,7 +219,6 @@ cv_tf <- cv_trendfilter(
   x = EB$phase,
   y = EB$flux,
   weights = 1 / EB$std_err^2,
-  validation_error = "MAE",
   optimization_params = list(
     max_iter = 1e4,
     obj_tol = 1e-6,

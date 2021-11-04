@@ -5,6 +5,21 @@
 #'
 #' @param obj An object of class [`sure_tf`][sure_trendfilter()] or
 #' [`cv_tf`][cv_trendfilter].
+#' @param lambda_choice One of `c("lambda_min","lambda_1se")`. The choice
+#' of hyperparameter that is used for optimized trend filtering estimate.
+#' Defaults to `lambda_choice = "lambda_min"`.
+#' \itemize{
+#' \item{`"lambda_min"`}: The hyperparameter value that minimizes the cross
+#' validation error curve.
+#' \item{`"lambda_1se"`}: The largest hyperparameter value with a cross
+#' validation error within 1 standard error of the minimum cross validation
+#' error. This choice therefore favors simpler (i.e. smoother) trend filtering
+#' estimates. The motivation here is essentially Occam's razor: the two models
+#' yield results that are quantitatively very close, so we favor the simpler
+#' model. See Section 7.10 of
+#' [Hastie, Tibshirani, and Friedman (2009)](
+#' https://web.stanford.edu/~hastie/Papers/ESLII.pdf)
+#' for more details on the "one-standard-error rule".}
 #' @param level The level of the pointwise variability bands. Defaults to
 #' `level = 0.95`.
 #' @param B The number of bootstrap samples used to estimate the pointwise
@@ -12,15 +27,21 @@
 #' @param bootstrap_algorithm A string specifying which variation of the
 #' bootstrap to use. One of `c("nonparametric","parametric","wild")`. See
 #' details below for recommendations on when each option is appropriate.
-#' @param return_ensemble Logical. If `TRUE`, the full trend
-#' filtering bootstrap ensemble is returned as an \mjseqn{n \times B} matrix,
-#' less any columns from post-hoc pruning (see `prune` below). Defaults to
-#' `return_ensemble = FALSE` to save memory.
-#' @param prune Logical. If `TRUE`, then the trend filtering bootstrap
-#' ensemble is examined for rare instances in which the optimization has
-#' stopped at zero knots (likely erroneously), and removes them from the
-#' ensemble that is used to compute the variability bands. Defaults to
-#' `prune = TRUE`. Do not change this unless you know what you are doing!
+#' @param x_eval (Optional) Overrides `nx_eval` if passed. A grid of inputs to
+#' evaluate the optimized trend filtering estimate on.
+#' @param nx_eval Integer. The length of the input grid that the optimized
+#' trend filtering estimate is evaluated on; i.e. if nothing is passed to
+#' `x_eval`, then it is defined as
+#' `x_eval = seq(min(x), max(x), length = nx_eval)`.
+#' @param return_ensemble Logical. If `TRUE`, the full trend filtering bootstrap
+#' ensemble is returned as an \mjseqn{n \times B} matrix, less any columns from
+#' post-hoc pruning (see `prune` below). Defaults to `return_ensemble = FALSE`
+#' to save memory.
+#' @param prune Logical. If `TRUE`, then the trend filtering bootstrap ensemble
+#' is examined for rare instances in which the optimization has stopped at zero
+#' knots (likely erroneously), and removes them from the ensemble that is used
+#' to compute the variability bands. Defaults to `prune = TRUE`. Do not change
+#' this unless you know what you are doing!
 #' @param mc_cores Multi-core computing using the
 #' [`parallel`][`parallel::parallel-package`] package: The number of cores to
 #' utilize. Defaults to the number of cores detected, minus 4.
@@ -44,11 +65,9 @@
 #' inputs are evenly sampled on the `log10(x)` scale.
 #'
 #' @return An object of class `bootstrap_tf`. This is a comprehensive
-#' list containing all of the analysis important information, data, and
+#' list containing all of the analysis' important information, data, and
 #' results:
 #' \describe{
-#' \item{tf_standard_errors}{The standard errors of the optimized trend
-#' filtering point estimator.}
 #' \item{bootstrap_lower_band}{Vector of lower bounds for the pointwise
 #' variability bands, evaluated on `x_eval`.}
 #' \item{bootstrap_upper_band}{Vector of upper bounds for the pointwise
@@ -58,25 +77,24 @@
 #' \item{level}{The level of the pointwise variability bands.}
 #' \item{B}{The number of bootstrap samples used to estimate the pointwise
 #' variability bands.}
-#' \item{tf_bootstrap_ensemble}{If `return_ensemble = TRUE`, the
-#' full trend filtering bootstrap ensemble as an \mjseqn{n \times B} matrix,
-#' less any columns from post-hoc pruning (if `prune = TRUE`). Else, this will
-#' return `NULL`.}
+#' \item{tf_bootstrap_ensemble}{If `return_ensemble = TRUE`, the full trend
+#' filtering bootstrap ensemble as an \mjseqn{n \times B} matrix, less any
+#' columns from post-hoc pruning (if `prune = TRUE`). Else, this will return
+#' `NULL`.}
 #' \item{edf_boots}{An integer vector of the estimated number of effective
 #' degrees of freedom of each trend filtering bootstrap estimate. These should
-#' all be relatively close to `edf_min` (below).}
+#' all be relatively close to `edf_min`.}
 #' \item{prune}{Logical. If `TRUE`, then the trend filtering bootstrap
 #' ensemble is examined for rare instances in which the optimization has
 #' stopped at zero knots (likely erroneously), and removes them from the
 #' ensemble.}
 #' \item{n_pruned}{The number of poorly-converged bootstrap trend filtering
 #' estimates pruned from the ensemble.}
-#' \item{n_iter_boots}{Vector of the number of iterations needed for the ADMM
-#' algorithm to converge within the given tolerance, for each bootstrap trend
+#' \item{n_iter_boots}{Vector of the number of iterations taken by the ADMM
+#' algorithm before reaching a stopping criterion, for each bootstrap trend
 #' filtering estimate.}
 #' \item{...}{Named elements inherited from `obj` --- an object either of class
-#' [`sure_tf`][sure_trendfilter] or [`cv_tf`][cv_trendfilter]. See the relevant
-#' function documentation for details.}
+#' [`sure_tf`][sure_trendfilter] or [`cv_tf`][cv_trendfilter].}
 #' }
 #'
 #' @export bootstrap_trendfilter
@@ -122,7 +140,7 @@
 #' @importFrom tidyr tibble
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats quantile rnorm
-bootstrap_trendfilter <- function(obj,
+bootstrap_trendfilter <- function(obj, lambda_choice, x_eval, nx_eval,
                                   bootstrap_algorithm, level = 0.95, B = 100L,
                                   return_ensemble = FALSE, prune = TRUE,
                                   mc_cores = parallel::detectCores() - 4) {
@@ -130,12 +148,10 @@ bootstrap_trendfilter <- function(obj,
   stopifnot(is.double(level) & level > 0 & level < 1)
   stopifnot(B >= 10)
 
-  if (!prune) warning("I hope you know what you are doing!")
-
   if (mc_cores < detectCores() / 2) {
     warning(paste0(
-      "Your machine has ", detectCores(),
-      " cores. Consider increasing mc_cores to speed up computation."
+      "Your machine has ", detectCores(), " cores.\n",
+      "Consider increasing mc_cores to speed up computation."
     ))
   }
 
@@ -151,7 +167,7 @@ bootstrap_trendfilter <- function(obj,
   obj$prune <- prune
   par_out <- mclapply(
     1:B,
-    tf_estimator,
+    tf_parallel,
     data = sampler(obj$data_scaled),
     obj = obj,
     mode = "edf",
@@ -227,19 +243,21 @@ bootstrap_trendfilter <- function(obj,
   return(obj)
 }
 
-#' @importFrom glmgen trendfilter
-tf_estimator <- function(b, data, obj, mode = "lambda") {
-  if (mode == "edf") {
-    tf_fit <- trendfilter(
-      x = data$x,
-      y = data$y,
-      weights = data$weights,
-      k = obj$k,
-      lambda = obj$lambdas,
-      thinning = obj$thinning,
-      control = obj$admm_params
-    )
 
+#' @noRd
+#' @importFrom glmgen trendfilter
+tf_parallel <- function(b, data, obj, mode = "lambda") {
+  tf_fit <- trendfilter(
+    x = data$x,
+    y = data$y,
+    weights = data$weights,
+    k = obj$k,
+    lambda = obj$lambda_min,
+    thinning = obj$thinning,
+    control = obj$admm_params
+  )
+
+  if (mode == "edf") {
     i_min <- which.min(abs(tf_fit$df - obj$edf_min))
     lambda_min <- obj$lambdas[i_min]
     edf_min <- tf_fit$df[i_min]
@@ -251,16 +269,6 @@ tf_estimator <- function(b, data, obj, mode = "lambda") {
   }
 
   if (mode == "lambda") {
-    tf_fit <- trendfilter(
-      x = data$x,
-      y = data$y,
-      weights = data$weights,
-      k = obj$k,
-      lambda = obj$lambda_min,
-      thinning = obj$thinning,
-      control = obj$admm_params
-    )
-
     lambda_min <- obj$lambda_min
     edf_min <- tf_fit$df
     n_iter <- tf_fit$iter
@@ -273,26 +281,35 @@ tf_estimator <- function(b, data, obj, mode = "lambda") {
   ) %>%
     as.double()
 
-  return(list(
-    tf_estimate = tf_estimate * obj$y_scale,
-    edf = edf_min,
-    n_iter = n_iter
-  ))
+  return(
+    list(
+      tf_estimate = tf_estimate * obj$y_scale,
+      edf = edf_min,
+      n_iter = n_iter
+    )
+  )
 }
 
 
+####
+
+# Bootstrap sampling/resampling functions
+
+#' @noRd
 #' @importFrom dplyr %>% mutate n
 parametric_sampler <- function(data) {
   data %>% mutate(y = fitted_values + rnorm(n = n(), sd = 1 / sqrt(weights)))
 }
 
 
+#' @noRd
 #' @importFrom dplyr %>% slice_sample n
 nonparametric_resampler <- function(data) {
   data %>% slice_sample(n = n(), replace = TRUE)
 }
 
 
+#' @noRd
 #' @importFrom dplyr %>% mutate n
 wild_sampler <- function(data) {
   data %>% mutate(y = fitted_values + residuals *
