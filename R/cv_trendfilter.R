@@ -182,7 +182,7 @@
 #' to increase `max_iter` to ensure the trend filtering solution has
 #' converged to satisfactory precision.}
 #' \item{V}{The number of folds the data were split into for cross validation.}
-#' \item{model_fit}{A list of objects that is used internally by other
+#' \item{tf_model}{A list of objects that is used internally by other
 #' functions that operate on the `cv_trendfilter()` output.}
 #' }
 #'

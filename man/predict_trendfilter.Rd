@@ -3,28 +3,23 @@
 \name{predict.cv_tf}
 \alias{predict.cv_tf}
 \alias{predict.sure_tf}
-\title{Predict values from a trend filtering object}
+\title{Evaluate an optimized trend filtering estimate}
 \usage{
 \method{predict}{cv_tf}(
   obj,
   validation_error_metric = "WMAE",
   lambda_choice = c("lambda_min", "lambda_1se"),
   x_eval,
-  nx_eval = 1500L
+  nx_eval
 )
 
-\method{predict}{sure_tf}(
-  obj,
-  lambda_choice = c("lambda_min", "lambda_1se"),
-  x_eval,
-  nx_eval = 250L
-)
+\method{predict}{sure_tf}(obj, lambda_choice = c("lambda_min", "lambda_1se"), x_eval, nx_eval)
 }
 \arguments{
-\item{obj}{An object of class \code{\link[=cv_trendfilter]{"cv_tf"}} or
+\item{obj}{An object of class \code{\link[=cv_trendfilter]{'cv_tf'}} or
 \code{\link[=sure_trendfilter]{"sure_tf"}}.}
 
-\item{validation_error_metric}{(For class \code{"cv_tf"} only) A string or
+\item{validation_error_metric}{(For class \code{'cv_tf'} only) A string or
 index specifying which cross validation error curve stored within the
 \code{cv_tf} object will be used to choose the trend filtering hyperparameter.
 The first 4 options are \code{"WMAE"}, \code{"WMSE"}, \code{"MAE"}, and \code{"MSE"}.
@@ -32,10 +27,10 @@ Therefore, for example, one could select the CV curve based on mean absolute
 deviations error by passing either
 \code{validation_error_metric = "MAE"} or \code{validation_error_metric = 3}. If the
 user passed custom error functions to \code{\link[=cv_trendfilter]{cv_trendfilter()}}, then these will
-arise as additional options that follow the first 4, and their string
+be available as additional options following the first 4, and their string
 designations can be seen by running \code{names(obj$validation_error_funcs)}.}
 
-\item{lambda_choice}{One of \code{c("lambda_min","lambda_1se")}. The choice
+\item{lambda_choice}{One of \code{c("lambda_min", "lambda_1se")}. The choice
 of hyperparameter that is used for optimized trend filtering estimate.
 Defaults to \code{lambda_choice = "lambda_min"}.
 \itemize{
@@ -47,22 +42,34 @@ error. This choice therefore favors simpler (i.e. smoother) trend filtering
 estimates.
 }}
 
-\item{x_eval}{(Optional) A grid of inputs to evaluate the optimized trend
-filtering estimate on.}
+\item{x_eval}{A grid of inputs to evaluate the optimized trend filtering
+estimate on. Defaults to the observed values \code{x} when nothing is passed.}
 
-\item{nx_eval}{Integer. The length of the input grid that the optimized
-trend filtering estimate is evaluated on; i.e. if nothing is passed to
-\code{x_eval}, then it is defined as
+\item{nx_eval}{Integer. If passed, overrides \code{x_eval} with
 \code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
 }
 \value{
-The optimized trend filtering estimate, evaluated at \code{x_eval}.
+An object of class \code{'pred_tf'}. This is a list with the following
+elements:
+\describe{
+\item{x_eval}{}
+\item{tf_estimate}{}
+\item{lambdas}{}
+\item{edfs}{}
+\item{validation_error_metric}{}
+\item{validation_errors}{}
+\item{se_validation_errors}{}
+\item{lambda_opt}{}
+\item{edf_opt}{}
+\item{i_opt}{}
+\item{tf_model}{}
+}
 }
 \description{
-Evaluate an optimized trend filtering object on a grid of input values.
+Evaluate an optimized trend filtering estimate on a grid of input values.
 The predict function can be called on an object of class
-\code{\link[=cv_trendfilter]{"cv_tf"}} or \code{\link[=sure_trendfilter]{"sure_tf"}}, and the
-arguments \code{validation_error_metric} (for \code{"cv_tf"} objects only) and
+\code{\link[=cv_trendfilter]{'cv_tf'}} or \code{\link[=sure_trendfilter]{'sure_tf'}}, and the
+arguments \code{validation_error_metric} (for \code{'cv_tf'} objects only) and
 \code{lambda_choice} should be used to specify the desired method for optimizing
 the trend filtering hyperparameter.
 }
@@ -70,8 +77,8 @@ the trend filtering hyperparameter.
 The motivation for using \code{lambda_choice = "lambda_1se"} is essentially
 Occam's razor: the two models yield results that are quantitatively very
 close, so we favor the simpler model. See Section 7.10 of
-\href{https://web.stanford.edu/~hastie/Papers/ESLII.pdf}{Hastie, Tibshirani, and Friedman (2009)}
-for more details on the "one-standard-error rule".
+\href{https://web.stanford.edu/~hastie/Papers/ESLII.pdf}{Hastie, Tibshirani, and Friedman (2009)} for more details on the
+"one-standard-error rule".
 }
 \examples{
 data(eclipsing_binary)
@@ -88,9 +95,11 @@ cv_tf <- cv_trendfilter(
   )
 )
 
-tf_preds <- predict(cv_tf,
+pred_tf <- predict(
+  cv_tf,
   validation_error_metric = "MAE",
-  lambda_choice = "lambda_1se"
+  lambda_choice = "lambda_1se",
+  nx_eval = 1500L
 )
 }
 \seealso{

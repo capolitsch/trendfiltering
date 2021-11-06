@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Predict values from a trend filtering object — predict.cv_tf • trendfiltering</title>
+<title>Evaluate an optimized trend filtering estimate — predict.cv_tf • trendfiltering</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,11 @@
 
 
 
-<meta property="og:title" content="Predict values from a trend filtering object — predict.cv_tf" />
-<meta property="og:description" content="Evaluate an optimized trend filtering object on a grid of input values.
+<meta property="og:title" content="Evaluate an optimized trend filtering estimate — predict.cv_tf" />
+<meta property="og:description" content="Evaluate an optimized trend filtering estimate on a grid of input values.
 The predict function can be called on an object of class
-&quot;cv_tf&quot; or &quot;sure_tf&quot;, and the
-arguments validation_error_metric (for &quot;cv_tf&quot; objects only) and
+'cv_tf' or 'sure_tf', and the
+arguments validation_error_metric (for 'cv_tf' objects only) and
 lambda_choice should be used to specify the desired method for optimizing
 the trend filtering hyperparameter." />
 
@@ -116,16 +116,16 @@ the trend filtering hyperparameter." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Predict values from a trend filtering object</h1>
+    <h1>Evaluate an optimized trend filtering estimate</h1>
     <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/predict.R'><code>R/predict.R</code></a></small>
     <div class="hidden name"><code>predict_trendfilter.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Evaluate an optimized trend filtering object on a grid of input values.
+    <p>Evaluate an optimized trend filtering estimate on a grid of input values.
 The predict function can be called on an object of class
-<code><a href='cv_trendfilter.html'>"cv_tf"</a></code> or <code><a href='sure_trendfilter.html'>"sure_tf"</a></code>, and the
-arguments <code>validation_error_metric</code> (for <code>"cv_tf"</code> objects only) and
+<code><a href='cv_trendfilter.html'>'cv_tf'</a></code> or <code><a href='sure_trendfilter.html'>'sure_tf'</a></code>, and the
+arguments <code>validation_error_metric</code> (for <code>'cv_tf'</code> objects only) and
 <code>lambda_choice</code> should be used to specify the desired method for optimizing
 the trend filtering hyperparameter.</p>
     </div>
@@ -136,28 +136,23 @@ the trend filtering hyperparameter.</p>
   validation_error_metric <span class='op'>=</span> <span class='st'>"WMAE"</span>,
   lambda_choice <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lambda_min"</span>, <span class='st'>"lambda_1se"</span><span class='op'>)</span>,
   <span class='va'>x_eval</span>,
-  nx_eval <span class='op'>=</span> <span class='fl'>1500L</span>
+  <span class='va'>nx_eval</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for sure_tf</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
-  <span class='va'>obj</span>,
-  lambda_choice <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lambda_min"</span>, <span class='st'>"lambda_1se"</span><span class='op'>)</span>,
-  <span class='va'>x_eval</span>,
-  nx_eval <span class='op'>=</span> <span class='fl'>250L</span>
-<span class='op'>)</span></pre>
+<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>obj</span>, lambda_choice <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lambda_min"</span>, <span class='st'>"lambda_1se"</span><span class='op'>)</span>, <span class='va'>x_eval</span>, <span class='va'>nx_eval</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>obj</th>
-      <td><p>An object of class <code><a href='cv_trendfilter.html'>"cv_tf"</a></code> or
+      <td><p>An object of class <code><a href='cv_trendfilter.html'>'cv_tf'</a></code> or
 <code><a href='sure_trendfilter.html'>"sure_tf"</a></code>.</p></td>
     </tr>
     <tr>
       <th>validation_error_metric</th>
-      <td><p>(For class <code>"cv_tf"</code> only) A string or
+      <td><p>(For class <code>'cv_tf'</code> only) A string or
 index specifying which cross validation error curve stored within the
 <code>cv_tf</code> object will be used to choose the trend filtering hyperparameter.
 The first 4 options are <code>"WMAE"</code>, <code>"WMSE"</code>, <code>"MAE"</code>, and <code>"MSE"</code>.
@@ -165,12 +160,12 @@ Therefore, for example, one could select the CV curve based on mean absolute
 deviations error by passing either
 <code>validation_error_metric = "MAE"</code> or <code>validation_error_metric = 3</code>. If the
 user passed custom error functions to <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>, then these will
-arise as additional options that follow the first 4, and their string
+be available as additional options following the first 4, and their string
 designations can be seen by running <code><a href='https://rdrr.io/r/base/names.html'>names(obj$validation_error_funcs)</a></code>.</p></td>
     </tr>
     <tr>
       <th>lambda_choice</th>
-      <td><p>One of <code><a href='https://rdrr.io/r/base/c.html'>c("lambda_min","lambda_1se")</a></code>. The choice
+      <td><p>One of <code><a href='https://rdrr.io/r/base/c.html'>c("lambda_min", "lambda_1se")</a></code>. The choice
 of hyperparameter that is used for optimized trend filtering estimate.
 Defaults to <code>lambda_choice = "lambda_min"</code>.</p><ul>
 <li><p><code>"lambda_min"</code>: The hyperparameter value that minimizes the cross
@@ -183,28 +178,41 @@ estimates.</p></li>
     </tr>
     <tr>
       <th>x_eval</th>
-      <td><p>(Optional) A grid of inputs to evaluate the optimized trend
-filtering estimate on.</p></td>
+      <td><p>A grid of inputs to evaluate the optimized trend filtering
+estimate on. Defaults to the observed values <code>x</code> when nothing is passed.</p></td>
     </tr>
     <tr>
       <th>nx_eval</th>
-      <td><p>Integer. The length of the input grid that the optimized
-trend filtering estimate is evaluated on; i.e. if nothing is passed to
-<code>x_eval</code>, then it is defined as
+      <td><p>Integer. If passed, overrides <code>x_eval</code> with
 <code>x_eval = seq(min(x), max(x), length = nx_eval)</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The optimized trend filtering estimate, evaluated at <code>x_eval</code>.</p>
+    <p>An object of class <code>'pred_tf'</code>. This is a list with the following
+elements:</p><dl>
+<dt>x_eval</dt><dd><p></p></dd>
+<dt>tf_estimate</dt><dd><p></p></dd>
+<dt>lambdas</dt><dd><p></p></dd>
+<dt>edfs</dt><dd><p></p></dd>
+<dt>validation_error_metric</dt><dd><p></p></dd>
+<dt>validation_errors</dt><dd><p></p></dd>
+<dt>se_validation_errors</dt><dd><p></p></dd>
+<dt>lambda_opt</dt><dd><p></p></dd>
+<dt>edf_opt</dt><dd><p></p></dd>
+<dt>i_opt</dt><dd><p></p></dd>
+<dt>tf_model</dt><dd><p></p></dd>
+
+</dl>
+
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The motivation for using <code>lambda_choice = "lambda_1se"</code> is essentially
 Occam's razor: the two models yield results that are quantitatively very
 close, so we favor the simpler model. See Section 7.10 of
-<a href='https://web.stanford.edu/~hastie/Papers/ESLII.pdf'>Hastie, Tibshirani, and Friedman (2009)</a>
-for more details on the "one-standard-error rule".</p>
+<a href='https://web.stanford.edu/~hastie/Papers/ESLII.pdf'>Hastie, Tibshirani, and Friedman (2009)</a> for more details on the
+"one-standard-error rule".</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>, <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code></p></div>
@@ -232,9 +240,11 @@ for more details on the "one-standard-error rule".</p>
   <span class='op'>)</span>
 <span class='op'>)</span>
 
-<span class='va'>tf_preds</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>cv_tf</span>,
+<span class='va'>pred_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
+  <span class='va'>cv_tf</span>,
   validation_error_metric <span class='op'>=</span> <span class='st'>"MAE"</span>,
-  lambda_choice <span class='op'>=</span> <span class='st'>"lambda_1se"</span>
+  lambda_choice <span class='op'>=</span> <span class='st'>"lambda_1se"</span>,
+  nx_eval <span class='op'>=</span> <span class='fl'>1500L</span>
 <span class='op'>)</span>
 </div></pre>
   </div>

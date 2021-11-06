@@ -2,81 +2,24 @@
 % Please edit documentation in R/bootstrap_trendfilter.R
 \name{bootstrap_trendfilter}
 \alias{bootstrap_trendfilter}
-\alias{bootstrap_trendfilter.cv_tf}
-\alias{bootstrap_trendfilter.sure_tf}
 \title{Construct pointwise variability bands via a bootstrap}
 \usage{
 bootstrap_trendfilter(
   obj,
-  validation_error_metric,
-  lambda_choice = c("lambda_min", "lambda_1se"),
   bootstrap_algorithm = c("nonparametric", "parametric", "wild"),
   B = 100L,
-  x_eval,
-  nx_eval = 1500L,
-  mc_cores = parallel::detectCores() - 4
-)
-
-\method{bootstrap_trendfilter}{cv_tf}(
-  obj,
-  validation_error_metric,
-  lambda_choice = c("lambda_min", "lambda_1se"),
-  bootstrap_algorithm = c("nonparametric", "parametric", "wild"),
-  B = 100L,
-  x_eval,
-  nx_eval = 1500L,
-  mc_cores = parallel::detectCores() - 4
-)
-
-\method{bootstrap_trendfilter}{sure_tf}(
-  obj,
-  lambda_choice = c("lambda_min", "lambda_1se"),
-  bootstrap_algorithm = c("nonparametric", "parametric", "wild"),
-  B = 100L,
-  x_eval,
-  nx_eval = 1500L,
   mc_cores = parallel::detectCores() - 4
 )
 }
 \arguments{
-\item{obj}{An object of class \code{\link[=sure_trendfilter]{'sure_tf'}} or
-\code{\link[=cv_trendfilter]{'cv_tf'}}.}
-
-\item{validation_error_metric}{(For object class \code{'cv_tf'} only) A string
-specifying which cross validation error curve to optimize with respect to.
-The options can be returned by running \code{names(obj$validation_errors)}, and
-they can also be specified by passing their index.}
-
-\item{lambda_choice}{One of \code{c("lambda_min","lambda_1se")}. The choice
-of hyperparameter that is used for optimized trend filtering estimate.
-Defaults to \code{lambda_choice = "lambda_min"}.
-\itemize{
-\item{\code{"lambda_min"}}: The hyperparameter value that minimizes the cross
-validation error curve.
-\item{\code{"lambda_1se"}}: The largest hyperparameter value with a cross
-validation error within 1 standard error of the minimum cross validation
-error. This choice therefore favors simpler (i.e. smoother) trend filtering
-estimates. The motivation here is essentially Occam's razor: the two models
-yield results that are quantitatively very close, so we favor the simpler
-model. See Section 7.10 of
-\href{https://web.stanford.edu/~hastie/Papers/ESLII.pdf}{Hastie, Tibshirani, and Friedman (2009)}
-for more details on the "one-standard-error rule".}}
+\item{obj}{An object of class \code{\link[=predict_trendfilter]{'pred_tf'}}.}
 
 \item{bootstrap_algorithm}{A string specifying which variation of the
-bootstrap to use. One of \code{c("nonparametric","parametric","wild")}. See
-details below for recommendations on when each option is appropriate.}
+bootstrap to use. One of \code{c("nonparametric", "parametric", "wild")}. See
+details section below for when each option is appropriate.}
 
 \item{B}{The number of bootstrap samples used to estimate the pointwise
-variability bands. Defaults to \code{B = 100}.}
-
-\item{x_eval}{(Optional) A grid of inputs to evaluate the bootstrap trend
-filtering estimates on. This should be the same as the grid you want the
-variability bands to be evaluated on.}
-
-\item{nx_eval}{Integer. The length of the input grid that the optimized
-trend filtering estimate is evaluated on; i.e. if nothing is passed to
-\code{x_eval}, then it is defined as
-\code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
+variability bands. Defaults to \code{B = 100L}.}
 
 \item{mc_cores}{Multi-core computing using the
 \code{\link[parallel:parallel-package]{parallel}} package: The number of cores to
@@ -86,6 +29,7 @@ utilize. Defaults to the number of cores detected, minus 4.}
 An object of class \code{'bootstrap_tf'}. This is a list with the
 following elements
 \describe{
+\item{x_eval}{}
 \item{ensemble}{The full trend filtering bootstrap ensemble as an
 \mjseqn{n \times B} matrix.}
 \item{edf_boots}{Vector of the estimated number of effective degrees of
@@ -103,9 +47,9 @@ bootstrap was used to generate the ensemble.}
 }
 \description{
 \loadmathjax Generate a bootstrap ensemble of trend filtering estimates in
-order to quantify the uncertainty in the optimized estimate.
-One of three possible bootstrap algorithms should be chosen according to the
-criteria in the details section below. See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for the technical
+order to quantify the uncertainty in the optimized estimate. One of three
+possible bootstrap algorithms should be chosen according to the criteria in
+the details section below. See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for the technical
 details of each bootstrap algorithm. Pointwise variability bands are then
 obtained by passing the \code{bootstrap_trendfilter()} output and a desired level
 (e.g. \code{level = 0.95}) to \code{\link[=vbands]{vbands()}}.
@@ -125,15 +69,46 @@ For our purposes, an evenly sampled data set with some discarded pixels
 (either sporadically or in large consecutive chunks) is still considered to
 be evenly sampled. When the inputs are evenly sampled on a transformed scale,
 we recommend transforming to that scale and carrying out the full trend
-filtering analysis on that scale. See the example below for a case when the
+filtering analysis on that scale. See Example 2 below for a case when the
 inputs are evenly sampled on the \code{log10(x)} scale.
 }
 \examples{
+# Example 1: Phase-folded light curve of an eclipsing binary star system
+
+data(eclipsing_binary)
+head(EB)
+
+cv_tf <- cv_trendfilter(
+  x = EB$phase,
+  y = EB$flux,
+  weights = 1 / EB$std_err^2,
+  optimization_params = list(
+    max_iter = 1e4,
+    obj_tol = 1e-6,
+    thinning = TRUE
+  )
+)
+
+pred_tf <- predict(
+  cv_tf,
+  validation_error_metric = "MAE",
+  lambda_choice = "lambda_1se",
+  nx_eval = 1500L
+)
+
+boot_tf <- bootstrap_trendfilter(pred_tf, "nonparametric")
+bands <- vbands(boot_tf)
+
+
+# Example 2: The "Lyman-alpha forest" of a quasar's electromagnetic spectrum
+
 data(quasar_spectrum)
 head(spec)
 
 sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
-boot_tf <- bootstrap_trendfilter(sure_tf, bootstrap_algorithm = "parametric")
+pred_tf <- predict(sure_tf)
+
+boot_tf <- bootstrap_trendfilter(pred_tf, "parametric")
 bands <- vbands(boot_tf)
 }
 \references{

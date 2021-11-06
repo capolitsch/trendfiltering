@@ -112,7 +112,7 @@ outputs \code{y} and the trend filtering estimate, for every hyperparameter valu
 in \code{lambdas}.}
 \item{optimisms}{SURE-estimated optimisms, i.e.
 \code{optimisms = validation_errors - training_errors}.}
-\item{model_fit}{A list of objects that is used internally by other
+\item{tf_model}{A list of objects that is used internally by other
 functions that operate on the \code{sure_trendfilter()} output.}
 }
 }

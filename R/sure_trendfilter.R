@@ -121,7 +121,7 @@
 #' in `lambdas`.}
 #' \item{optimisms}{SURE-estimated optimisms, i.e.
 #' `optimisms = validation_errors - training_errors`.}
-#' \item{model_fit}{A list of objects that is used internally by other
+#' \item{tf_model}{A list of objects that is used internally by other
 #' functions that operate on the `sure_trendfilter()` output.}
 #' }
 #'
