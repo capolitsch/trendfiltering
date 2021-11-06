@@ -16,8 +16,8 @@
 \method{predict}{sure_tf}(obj, lambda_choice = c("lambda_min", "lambda_1se"), x_eval, nx_eval)
 }
 \arguments{
-\item{obj}{An object of class \code{\link[=cv_trendfilter]{'cv_tf'}} or
-\code{\link[=sure_trendfilter]{"sure_tf"}}.}
+\item{obj}{An object of class '\code{\link[=cv_trendfilter]{cv_tf}}' or
+'\code{\link[=sure_trendfilter]{sure_tf}}'.}
 
 \item{validation_error_metric}{(For class \code{'cv_tf'} only) A string or
 index specifying which cross validation error curve stored within the
@@ -68,7 +68,7 @@ elements:
 \description{
 Evaluate an optimized trend filtering estimate on a grid of input values.
 The predict function can be called on an object of class
-\code{\link[=cv_trendfilter]{'cv_tf'}} or \code{\link[=sure_trendfilter]{'sure_tf'}}, and the
+'\code{\link[=cv_trendfilter]{cv_tf}}' or '\code{\link[=sure_trendfilter]{sure_tf}}', and the
 arguments \code{validation_error_metric} (for \code{'cv_tf'} objects only) and
 \code{lambda_choice} should be used to specify the desired method for optimizing
 the trend filtering hyperparameter.

@@ -37,7 +37,7 @@
 #' filtering analysis on that scale. See Example 2 below for a case when the
 #' inputs are evenly sampled on the `log10(x)` scale.
 #'
-#' @return An object of class `'bootstrap_tf'`. This is a list with the
+#' @return An object of class '`bootstrap_tf`'. This is a list with the
 #' following elements
 #' \describe{
 #' \item{x_eval}{}
@@ -88,6 +88,12 @@
 #'
 #' @examples
 #' # Example 1: Phase-folded light curve of an eclipsing binary star system
+#' #
+#' # The apparent brightness over time of a star system that has two suns
+#' # that regularly eclipse one another from our vantage point on Earth. Here,
+#' # the time series is stacked according to the orbital period of the binary
+#' # system, with the primary eclipse occuring at `phase = 0` and the input
+#' # domain ranging from -0.5 to 0.5.
 #'
 #' data(eclipsing_binary)
 #' head(EB)
@@ -114,7 +120,7 @@
 #' bands <- vbands(boot_tf)
 #'
 #'
-#' # Example 2: The "Lyman-alpha forest" of a quasar's electromagnetic spectrum
+#' # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
 #'
 #' data(quasar_spectrum)
 #' head(spec)
@@ -183,7 +189,7 @@ bootstrap_trendfilter <- function(obj,
     FUN = function(X) par_out[[X]][["tf_estimate"]]
   ) %>%
     unlist() %>%
-    matrix(nrow = length(x_eval))
+    matrix(nrow = length(obj$x_eval))
 
   edf_boots <- lapply(
     X = 1:B,
@@ -207,14 +213,14 @@ bootstrap_trendfilter <- function(obj,
 
   structure(
     list(
-      x_eval = x_eval,
+      x_eval = obj$x_eval,
       ensemble = ensemble,
       edf_boots = edf_boots,
       n_iter_boots = n_iter_boots,
       lambda_boots = lambda_boots,
       bootstrap_algorithm = bootstrap_algorithm
     ),
-    class = c("bootstrap_tf", "list")
+    class = c("boot_tf", "list")
   )
 }
 

@@ -26,7 +26,7 @@ variability bands. Defaults to \code{B = 100L}.}
 utilize. Defaults to the number of cores detected, minus 4.}
 }
 \value{
-An object of class \code{'bootstrap_tf'}. This is a list with the
+An object of class '\code{bootstrap_tf}'. This is a list with the
 following elements
 \describe{
 \item{x_eval}{}
@@ -74,6 +74,12 @@ inputs are evenly sampled on the \code{log10(x)} scale.
 }
 \examples{
 # Example 1: Phase-folded light curve of an eclipsing binary star system
+#
+# The apparent brightness over time of a star system that has two suns
+# that regularly eclipse one another from our vantage point on Earth. Here,
+# the time series is stacked according to the orbital period of the binary
+# system, with the primary eclipse occuring at `phase = 0` and the input
+# domain ranging from -0.5 to 0.5.
 
 data(eclipsing_binary)
 head(EB)
@@ -100,7 +106,7 @@ boot_tf <- bootstrap_trendfilter(pred_tf, "nonparametric")
 bands <- vbands(boot_tf)
 
 
-# Example 2: The "Lyman-alpha forest" of a quasar's electromagnetic spectrum
+# Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
 
 data(quasar_spectrum)
 head(spec)

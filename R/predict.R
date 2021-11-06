@@ -2,13 +2,13 @@
 #'
 #' Evaluate an optimized trend filtering estimate on a grid of input values.
 #' The predict function can be called on an object of class
-#' [`'cv_tf'`][cv_trendfilter()] or [`'sure_tf'`][sure_trendfilter()], and the
+#' '[`cv_tf`][cv_trendfilter()]' or '[`sure_tf`][sure_trendfilter()]', and the
 #' arguments `validation_error_metric` (for `'cv_tf'` objects only) and
 #' `lambda_choice` should be used to specify the desired method for optimizing
 #' the trend filtering hyperparameter.
 #'
-#' @param obj An object of class [`'cv_tf'`][cv_trendfilter()] or
-#' [`"sure_tf"`][sure_trendfilter()].
+#' @param obj An object of class '[`cv_tf`][cv_trendfilter()]' or
+#' '[`sure_tf`][sure_trendfilter()]'.
 #' @param validation_error_metric (For class `'cv_tf'` only) A string or
 #' index specifying which cross validation error curve stored within the
 #' `cv_tf` object will be used to choose the trend filtering hyperparameter.
@@ -177,7 +177,7 @@ predict.cv_tf <- function(obj,
       V = obj$V,
       tf_model = obj$tf_model
     ),
-    class = c("pred_tf", "cv_tf", "list")
+    class = c("pred_tf", "list")
   )
 }
 
@@ -245,6 +245,6 @@ predict.sure_tf <- function(obj,
       i_opt = i_opt,
       tf_model = obj$tf_model
     ),
-    class = c("pred_tf", "sure_tf", "list")
+    class = c("pred_tf", "list")
   )
 }
