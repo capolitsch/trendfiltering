@@ -146,7 +146,7 @@ obtained by passing the <code>bootstrap_trendfilter()</code> output and a desire
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>obj</th>
-      <td><p>An object of class <code>'pred_tf'</code>.</p></td>
+      <td><p>An object of class '<code>pred_tf</code>'.</p></td>
     </tr>
     <tr>
       <th>bootstrap_algorithm</th>
@@ -273,7 +273,7 @@ Bootstrap Methods: Another Look at the Jackknife</a>.
 <span class='op'>)</span>
 
 <span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>pred_tf</span>, <span class='st'>"nonparametric"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: all scheduled cores encountered errors in user code</span></div><div class='output co'>#&gt; <span class='error'>Error in par_out[[X]][["tf_estimate"]]: subscript out of bounds</span></div><div class='input'><span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in matrix(., nrow = length(x_eval)): object 'x_eval' not found</span></div><div class='input'><span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='error'>Error in class(obj) %in% c("bootstrap_tf"): object 'boot_tf' not found</span></div><div class='input'>
 
 <span class='co'># Example 2: The "Lyman-alpha forest" of a quasar's electromagnetic spectrum</span>
@@ -293,7 +293,7 @@ Bootstrap Methods: Another Look at the Jackknife</a>.
 <span class='va'>pred_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>sure_tf</span><span class='op'>)</span>
 
 <span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>pred_tf</span>, <span class='st'>"parametric"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: all scheduled cores encountered errors in user code</span></div><div class='output co'>#&gt; <span class='error'>Error in par_out[[X]][["tf_estimate"]]: subscript out of bounds</span></div><div class='input'><span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in matrix(., nrow = length(x_eval)): object 'x_eval' not found</span></div><div class='input'><span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='error'>Error in class(obj) %in% c("bootstrap_tf"): object 'boot_tf' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

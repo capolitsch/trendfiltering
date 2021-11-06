@@ -9,7 +9,7 @@
 #' obtained by passing the `bootstrap_trendfilter()` output and a desired level
 #' (e.g. `level = 0.95`) to [`vbands()`].
 #'
-#' @param obj An object of class [`'pred_tf'`][predict_trendfilter()].
+#' @param obj An object of class '[`pred_tf`][predict_trendfilter()]'.
 #' @param bootstrap_algorithm A string specifying which variation of the
 #' bootstrap to use. One of `c("nonparametric", "parametric", "wild")`. See
 #' details section below for when each option is appropriate.
@@ -172,7 +172,7 @@ bootstrap_trendfilter <- function(obj,
 
   par_out <- mclapply(
     1:B,
-    bootstrap_parallel_cv,
+    bootstrap_parallel,
     obj = obj,
     sampler = sampler,
     mc.cores = mc_cores
@@ -241,8 +241,8 @@ bootstrap_parallel <- function(b, obj, sampler) {
   n_iter <- tf_fit$iter[i_min]
   lambda <- lambdas[i_min]
 
-  if (edf <= 5 | min(abs(tf_fit$df - obj$edf_opt)) / obj$edf_opt > 0.2) {
-    bootstrap_parallel(1, obj, sampler)
+  if (min(abs(tf_fit$df - obj$edf_opt)) / obj$edf_opt > 0.2) {
+    return(bootstrap_parallel(1, obj, sampler))
   }
 
   tf_estimate <- as.numeric(
@@ -285,7 +285,7 @@ parametric_sampler <- function(data) {
 #' @importFrom dplyr %>% slice_sample n
 #' @noRd
 nonparametric_resampler <- function(data) {
-  data %>% slice_sample(n = n(), replace = TRUE)
+  data %>% slice_sample(n = nrow(data), replace = TRUE)
 }
 
 

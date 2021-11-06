@@ -172,7 +172,7 @@ predict.cv_tf <- function(obj,
       validation_errors = obj$validation_errors[[validation_error_metric]],
       se_validation_errors = obj$se_validation_errors[[validation_error_metric]],
       lambda_opt = obj$lambdas[i_opt],
-      edf_min = obj$edfs[i_opt],
+      edf_opt = obj$edfs[i_opt],
       i_opt = i_opt,
       V = obj$V,
       tf_model = obj$tf_model

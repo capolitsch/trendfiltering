@@ -12,7 +12,7 @@ bootstrap_trendfilter(
 )
 }
 \arguments{
-\item{obj}{An object of class \code{\link[=predict_trendfilter]{'pred_tf'}}.}
+\item{obj}{An object of class '\code{\link[=predict_trendfilter]{pred_tf}}'.}
 
 \item{bootstrap_algorithm}{A string specifying which variation of the
 bootstrap to use. One of \code{c("nonparametric", "parametric", "wild")}. See
