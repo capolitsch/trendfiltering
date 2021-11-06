@@ -46,13 +46,13 @@ cross validation. Defaults to \code{V = 10}.}
 \code{\link[parallel:parallel-package]{parallel}} R package: The number of cores to
 utilize. Defaults to the number of cores detected, minus four.}
 
-\item{custom_error_funcs}{(Optional) A named list of one or more
-functions, with each defining an error functional to evaluate on held-out
-folds during cross validation. Mean-squared error (MSE) and mean absolute
-error (MAE) are both evaluated automatically, as well as weighted versions
-(with reciprocal variances as weights) --- WMSE and WMAE. Therefore, the user
-does not need to pass anything to \code{custom_error_funcs} unless they want to
-define a validation error metric other than MSE, MAE, WMSE, and WMAE.
+\item{custom_error_funcs}{(Optional) A named list of one or more functions,
+with each defining an error functional to evaluate on held-out folds during
+cross validation. Mean-squared error (MSE) and mean absolute error (MAE) are
+both evaluated automatically, as well as weighted versions of each (with
+reciprocal variances as weights) --- WMSE and WMAE. Therefore, the user does
+not need to pass anything to \code{custom_error_funcs} unless they want to define
+a validation error metric other than MSE, MAE, WMSE, and WMAE.
 
 In such a case, each function in the named list passed to
 \code{custom_error_funcs} should take three vector arguments --- \code{y},
@@ -106,7 +106,7 @@ elements of \code{x} that fall into the same bin, then the data is thinned.
 }}}
 }
 \value{
-An object of class \code{cv_tf}. This is a list with the following
+An object of class \code{'cv_tf'}. This is a list with the following
 elements:
 \describe{
 \item{lambdas}{Vector of candidate hyperparameter values (always returned in

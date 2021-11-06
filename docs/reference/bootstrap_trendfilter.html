@@ -41,7 +41,13 @@
 
 <meta property="og:title" content="Construct pointwise variability bands via a bootstrap — bootstrap_trendfilter" />
 <meta property="og:description" content="
- See Politsch et al. (2020a) for details." />
+ Generate a bootstrap ensemble of trend filtering estimates in
+order to quantify the uncertainty in the optimized estimate.
+One of three possible bootstrap algorithms should be chosen according to the
+criteria in the details section below. See Politsch et al. (2020a) for the technical
+details of each bootstrap algorithm. Pointwise variability bands are then
+obtained by passing the bootstrap_trendfilter() output and a desired level
+(e.g. level = 0.95) to vbands()." />
 
 
 
@@ -119,19 +125,46 @@
 
     <div class="ref-description">
     <p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
- See <a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Politsch et al. (2020a)</a> for details.</p>
+ Generate a bootstrap ensemble of trend filtering estimates in
+order to quantify the uncertainty in the optimized estimate.
+One of three possible bootstrap algorithms should be chosen according to the
+criteria in the details section below. See <a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Politsch et al. (2020a)</a> for the technical
+details of each bootstrap algorithm. Pointwise variability bands are then
+obtained by passing the <code>bootstrap_trendfilter()</code> output and a desired level
+(e.g. <code>level = 0.95</code>) to <code><a href='vbands.html'>vbands()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span>
   <span class='va'>obj</span>,
-  <span class='va'>lambda_choice</span>,
-  <span class='va'>x_eval</span>,
-  <span class='va'>nx_eval</span>,
-  <span class='va'>bootstrap_algorithm</span>,
-  level <span class='op'>=</span> <span class='fl'>0.95</span>,
+  <span class='va'>validation_error_metric</span>,
+  lambda_choice <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lambda_min"</span>, <span class='st'>"lambda_1se"</span><span class='op'>)</span>,
+  bootstrap_algorithm <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"nonparametric"</span>, <span class='st'>"parametric"</span>, <span class='st'>"wild"</span><span class='op'>)</span>,
   B <span class='op'>=</span> <span class='fl'>100L</span>,
-  return_ensemble <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  prune <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>x_eval</span>,
+  nx_eval <span class='op'>=</span> <span class='fl'>1500L</span>,
+  mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>4</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for cv_tf</span>
+<span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span>
+  <span class='va'>obj</span>,
+  <span class='va'>validation_error_metric</span>,
+  lambda_choice <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lambda_min"</span>, <span class='st'>"lambda_1se"</span><span class='op'>)</span>,
+  bootstrap_algorithm <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"nonparametric"</span>, <span class='st'>"parametric"</span>, <span class='st'>"wild"</span><span class='op'>)</span>,
+  B <span class='op'>=</span> <span class='fl'>100L</span>,
+  <span class='va'>x_eval</span>,
+  nx_eval <span class='op'>=</span> <span class='fl'>1500L</span>,
+  mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>4</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for sure_tf</span>
+<span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span>
+  <span class='va'>obj</span>,
+  lambda_choice <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lambda_min"</span>, <span class='st'>"lambda_1se"</span><span class='op'>)</span>,
+  bootstrap_algorithm <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"nonparametric"</span>, <span class='st'>"parametric"</span>, <span class='st'>"wild"</span><span class='op'>)</span>,
+  B <span class='op'>=</span> <span class='fl'>100L</span>,
+  <span class='va'>x_eval</span>,
+  nx_eval <span class='op'>=</span> <span class='fl'>1500L</span>,
   mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>4</span>
 <span class='op'>)</span></pre>
 
@@ -140,8 +173,15 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>obj</th>
-      <td><p>An object of class <code><a href='sure_trendfilter.html'>sure_tf</a></code> or
-<code><a href='cv_trendfilter.html'>cv_tf</a></code>.</p></td>
+      <td><p>An object of class <code><a href='sure_trendfilter.html'>'sure_tf'</a></code> or
+<code><a href='cv_trendfilter.html'>'cv_tf'</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>validation_error_metric</th>
+      <td><p>(For object class <code>'cv_tf'</code> only) A string
+specifying which cross validation error curve to optimize with respect to.
+The options can be returned by running <code><a href='https://rdrr.io/r/base/names.html'>names(obj$validation_errors)</a></code>, and
+they can also be specified by passing their index.</p></td>
     </tr>
     <tr>
       <th>lambda_choice</th>
@@ -161,27 +201,10 @@ for more details on the "one-standard-error rule".</p></li>
 </ul></td>
     </tr>
     <tr>
-      <th>x_eval</th>
-      <td><p>(Optional) Overrides <code>nx_eval</code> if passed. A grid of inputs to
-evaluate the optimized trend filtering estimate on.</p></td>
-    </tr>
-    <tr>
-      <th>nx_eval</th>
-      <td><p>Integer. The length of the input grid that the optimized
-trend filtering estimate is evaluated on; i.e. if nothing is passed to
-<code>x_eval</code>, then it is defined as
-<code>x_eval = seq(min(x), max(x), length = nx_eval)</code>.</p></td>
-    </tr>
-    <tr>
       <th>bootstrap_algorithm</th>
       <td><p>A string specifying which variation of the
 bootstrap to use. One of <code><a href='https://rdrr.io/r/base/c.html'>c("nonparametric","parametric","wild")</a></code>. See
 details below for recommendations on when each option is appropriate.</p></td>
-    </tr>
-    <tr>
-      <th>level</th>
-      <td><p>The level of the pointwise variability bands. Defaults to
-<code>level = 0.95</code>.</p></td>
     </tr>
     <tr>
       <th>B</th>
@@ -189,19 +212,17 @@ details below for recommendations on when each option is appropriate.</p></td>
 variability bands. Defaults to <code>B = 100</code>.</p></td>
     </tr>
     <tr>
-      <th>return_ensemble</th>
-      <td><p>Logical. If <code>TRUE</code>, the full trend filtering bootstrap
-ensemble is returned as an \(n \times B\) matrix, less any columns from
-post-hoc pruning (see <code>prune</code> below). Defaults to <code>return_ensemble = FALSE</code>
-to save memory.</p></td>
+      <th>x_eval</th>
+      <td><p>(Optional) A grid of inputs to evaluate the bootstrap trend
+filtering estimates on. This should be the same as the grid you want the
+variability bands to be evaluated on.</p></td>
     </tr>
     <tr>
-      <th>prune</th>
-      <td><p>Logical. If <code>TRUE</code>, then the trend filtering bootstrap ensemble
-is examined for rare instances in which the optimization has stopped at zero
-knots (likely erroneously), and removes them from the ensemble that is used
-to compute the variability bands. Defaults to <code>prune = TRUE</code>. Do not change
-this unless you know what you are doing!</p></td>
+      <th>nx_eval</th>
+      <td><p>Integer. The length of the input grid that the optimized
+trend filtering estimate is evaluated on; i.e. if nothing is passed to
+<code>x_eval</code>, then it is defined as
+<code>x_eval = seq(min(x), max(x), length = nx_eval)</code>.</p></td>
     </tr>
     <tr>
       <th>mc_cores</th>
@@ -213,36 +234,21 @@ utilize. Defaults to the number of cores detected, minus 4.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>bootstrap_tf</code>. This is a comprehensive
-list containing all of the analysis' important information, data, and
-results:</p><dl>
-<dt>bootstrap_lower_band</dt><dd><p>Vector of lower bounds for the pointwise
-variability bands, evaluated on <code>x_eval</code>.</p></dd>
-<dt>bootstrap_upper_band</dt><dd><p>Vector of upper bounds for the pointwise
-variability bands, evaluated on <code>x_eval</code>.</p></dd>
-<dt>bootstrap_algorithm</dt><dd><p>A string specifying which variation of the
-bootstrap was used to obtain the variability bands.</p></dd>
-<dt>level</dt><dd><p>The level of the pointwise variability bands.</p></dd>
-<dt>B</dt><dd><p>The number of bootstrap samples used to estimate the pointwise
-variability bands.</p></dd>
-<dt>tf_bootstrap_ensemble</dt><dd><p>If <code>return_ensemble = TRUE</code>, the full trend
-filtering bootstrap ensemble as an \(n \times B\) matrix, less any
-columns from post-hoc pruning (if <code>prune = TRUE</code>). Else, this will return
-<code>NULL</code>.</p></dd>
-<dt>edf_boots</dt><dd><p>An integer vector of the estimated number of effective
-degrees of freedom of each trend filtering bootstrap estimate. These should
-all be relatively close to <code>edf_min</code>.</p></dd>
-<dt>prune</dt><dd><p>Logical. If <code>TRUE</code>, then the trend filtering bootstrap
-ensemble is examined for rare instances in which the optimization has
-stopped at zero knots (likely erroneously), and removes them from the
-ensemble.</p></dd>
-<dt>n_pruned</dt><dd><p>The number of poorly-converged bootstrap trend filtering
-estimates pruned from the ensemble.</p></dd>
+    <p>An object of class <code>'bootstrap_tf'</code>. This is a list with the
+following elements</p><dl>
+<dt>ensemble</dt><dd><p>The full trend filtering bootstrap ensemble as an
+\(n \times B\) matrix.</p></dd>
+<dt>edf_boots</dt><dd><p>Vector of the estimated number of effective degrees of
+freedom of each trend filtering bootstrap estimate. These should all be
+relatively close to <code>obj$edf_min</code>.</p></dd>
 <dt>n_iter_boots</dt><dd><p>Vector of the number of iterations taken by the ADMM
-algorithm before reaching a stopping criterion, for each bootstrap trend
-filtering estimate.</p></dd>
-<dt>...</dt><dd><p>Named elements inherited from <code>obj</code> --- an object either of class
-<code><a href='sure_trendfilter.html'>sure_tf</a></code> or <code><a href='cv_trendfilter.html'>cv_tf</a></code>.</p></dd>
+algorithm before reaching a stopping criterion, for each bootstrap estimate.</p></dd>
+<dt>lambda_boots</dt><dd><p>Vector of the hyperparameter values used for each
+bootstrap fit. In general, these are not all equal because our bootstrap
+implementation instead seeks to hold the number of effective degrees of
+freedom constant across all bootstrap estimates.</p></dd>
+<dt>bootstrap_algorithm</dt><dd><p>A string specifying which variation of the
+bootstrap was used to generate the ensemble.</p></dd>
 
 </dl>
 
@@ -253,8 +259,8 @@ for the <code>bootstrap_algorithm</code> argument are shown in the table below. 
 <a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Politsch et al. (2020a)</a> for more details.</p><table class='table'>
 <tr><td>Scenario</td><td>Uncertainty quantification</td></tr>
 <tr><td><code>x</code> is unevenly sampled</td><td><code>bootstrap_algorithm = "nonparametric"</code></td></tr>
-<tr><td><code>x</code> is evenly sampled and reciprocal variances are not available</td><td><code>bootstrap_algorithm = "wild"</code></td></tr>
 <tr><td><code>x</code> is evenly sampled and reciprocal variances are available</td><td><code>bootstrap_algorithm = "parametric"</code></td></tr>
+<tr><td><code>x</code> is evenly sampled and reciprocal variances are not available</td><td><code>bootstrap_algorithm = "wild"</code></td></tr>
 </table>
 
 
@@ -296,7 +302,7 @@ Bootstrap Methods: Another Look at the Jackknife</a>.
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>, <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code></p></div>
+    <div class='dont-index'><p><code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>, <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>quasar_spectrum</span><span class='op'>)</span>
@@ -311,8 +317,9 @@ Bootstrap Methods: Another Look at the Jackknife</a>.
 #&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
 #&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'>
 <span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sure_trendfilter.html'>sure_trendfilter</a></span><span class='op'>(</span><span class='va'>spec</span><span class='op'>$</span><span class='va'>log10_wavelength</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>flux</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>weights</span><span class='op'>)</span>
-<span class='va'>opt_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>sure_tf</span>, bootstrap_algorithm <span class='op'>=</span> <span class='st'>"parametric"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: all scheduled cores encountered errors in user code</span></div><div class='output co'>#&gt; <span class='error'>Error in par_out[[X]][["tf_estimate"]]: subscript out of bounds</span></div></pre>
+<span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>sure_tf</span>, bootstrap_algorithm <span class='op'>=</span> <span class='st'>"parametric"</span><span class='op'>)</span>
+<span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

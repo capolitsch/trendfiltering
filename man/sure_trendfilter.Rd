@@ -71,7 +71,7 @@ elements of \code{x} that fall into the same bin, then the data is thinned.
 }}}
 }
 \value{
-An object of class \code{sure_tf}. This is a list with the following
+An object of class \code{'sure_tf'}. This is a list with the following
 elements:
 \describe{
 \item{lambdas}{Vector of candidate hyperparameter values (always returned in

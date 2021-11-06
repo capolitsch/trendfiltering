@@ -26,13 +26,13 @@
 #' controlling the granularity of the hyperparameter grid.
 #' @param V Number of folds that the data are partitioned into for the V-fold
 #' cross validation. Defaults to `V = 10`.
-#' @param custom_error_funcs (Optional) A named list of one or more
-#' functions, with each defining an error functional to evaluate on held-out
-#' folds during cross validation. Mean-squared error (MSE) and mean absolute
-#' error (MAE) are both evaluated automatically, as well as weighted versions
-#' (with reciprocal variances as weights) --- WMSE and WMAE. Therefore, the user
-#' does not need to pass anything to `custom_error_funcs` unless they want to
-#' define a validation error metric other than MSE, MAE, WMSE, and WMAE.
+#' @param custom_error_funcs (Optional) A named list of one or more functions,
+#' with each defining an error functional to evaluate on held-out folds during
+#' cross validation. Mean-squared error (MSE) and mean absolute error (MAE) are
+#' both evaluated automatically, as well as weighted versions of each (with
+#' reciprocal variances as weights) --- WMSE and WMAE. Therefore, the user does
+#' not need to pass anything to `custom_error_funcs` unless they want to define
+#' a validation error metric other than MSE, MAE, WMSE, and WMAE.
 #'
 #' In such a case, each function in the named list passed to
 #' `custom_error_funcs` should take three vector arguments --- `y`,
@@ -129,7 +129,7 @@
 #' high variance; and absolute error is less sensitive to outliers than squared
 #' error.
 #'
-#' @return An object of class `cv_tf`. This is a list with the following
+#' @return An object of class `'cv_tf'`. This is a list with the following
 #' elements:
 #' \describe{
 #' \item{lambdas}{Vector of candidate hyperparameter values (always returned in
@@ -240,6 +240,7 @@ cv_trendfilter <- function(x,
                            mc_cores = parallel::detectCores() - 4,
                            custom_error_funcs,
                            optimization_params) {
+  stopifnot(mc_cores >= 1)
   if (missing(x) || is.null(x)) stop("x must be passed.")
   if (missing(y) || is.null(y)) stop("y must be passed.")
   if (length(x) != length(y)) stop("x and y must have equal length.")
@@ -331,10 +332,7 @@ cv_trendfilter <- function(x,
         }
       }
       validation_error_funcs <- c(
-        list(
-          WMAE = WMAE, WMSE = WMSE,
-          MAE = MAE, MSE = MSE
-        ),
+        list(WMAE = WMAE, WMSE = WMSE, MAE = MAE, MSE = MSE),
         custom_error_funcs
       )
     }
@@ -455,6 +453,7 @@ cv_trendfilter <- function(x,
 
   tf_model <- structure(
     list(
+      model_fit = out,
       x = x,
       y = y,
       weights = weights,

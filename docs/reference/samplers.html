@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Predict method for trend filtering fits — predict.sure_tf • trendfiltering</title>
+<title>Bootstrap sample/resampling functions — parametric_sampler • trendfiltering</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,8 @@
 
 
 
-<meta property="og:title" content="Predict method for trend filtering fits — predict.sure_tf" />
-<meta property="og:description" content="Predict values based on a sure_tf or
-cv_tf object." />
+<meta property="og:title" content="Bootstrap sample/resampling functions — parametric_sampler" />
+<meta property="og:description" content="Bootstrap sample/resampling functions" />
 
 
 
@@ -112,70 +111,36 @@ cv_tf object." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Predict method for trend filtering fits</h1>
-    <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/predict.R'><code>R/predict.R</code></a></small>
-    <div class="hidden name"><code>predict.sure_tf.Rd</code></div>
+    <h1>Bootstrap sample/resampling functions</h1>
+    <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/bootstrap_trendfilter.R'><code>R/bootstrap_trendfilter.R</code></a></small>
+    <div class="hidden name"><code>samplers.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Predict values based on a <code><a href='sure_trendfilter.html'>sure_tf</a></code> or
-<code><a href='cv_trendfilter.html'>cv_tf</a></code> object.</p>
+    <p>Bootstrap sample/resampling functions</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for sure_tf</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>lambda</span>, <span class='va'>x_eval</span>, <span class='va'>nx_eval</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>parametric_sampler</span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>
+
+<span class='fu'>nonparametric_resampler</span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>
+
+<span class='fu'>wild_sampler</span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>obj</th>
-      <td><p>An object of class <code><a href='sure_trendfilter.html'>sure_tf</a></code> or
-<code><a href='cv_trendfilter.html'>cv_tf</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>x_eval</th>
-      <td><p>(Optional) Overrides <code>nx_eval</code> if passed. A grid of inputs to
-evaluate the optimized trend filtering estimate on.</p></td>
-    </tr>
-    <tr>
-      <th>nx_eval</th>
-      <td><p>Integer. The length of the input grid that the optimized
-trend filtering estimate is evaluated on; i.e. if nothing is passed to
-<code>x_eval</code>, then it is defined as
-<code>x_eval = seq(min(x), max(x), length = nx_eval)</code>.</p></td>
-    </tr>
-    <tr>
-      <th>lambda_choice</th>
-      <td><p>One of <code><a href='https://rdrr.io/r/base/c.html'>c("lambda_min","lambda_1se")</a></code>. The choice
-of hyperparameter that is used for optimized trend filtering estimate.
-Defaults to <code>lambda_choice = "lambda_min"</code>.</p><ul>
-<li><p><code>"lambda_min"</code>: The hyperparameter value that minimizes the cross
-validation error curve.</p></li>
-<li><p><code>"lambda_1se"</code>: The largest hyperparameter value with a cross
-validation error within 1 standard error of the minimum cross validation
-error. This choice therefore favors simpler (i.e. smoother) trend filtering
-estimates. The motivation here is essentially Occam's razor: the two models
-yield results that are quantitatively very close, so we favor the simpler
-model. See Section 7.10 of
-<a href='https://web.stanford.edu/~hastie/Papers/ESLII.pdf'>Hastie, Tibshirani, and Friedman (2009)</a>
-for more details on the "one-standard-error rule".</p></li>
-</ul></td>
+      <th>data</th>
+      <td><p>Data frame / tibble with minimal column set: <code>x</code>, <code>y</code>, <code>weights</code>
+(for <code>parametric.sampler</code>), <code>fitted.values</code> (for <code>parametric.sampler</code>), and
+<code>residuals</code> (for <code>wild.sampler</code>)</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list with the following elements:</p><dl>
-<dt>x_eval</dt><dd><p>Input grid used to evaluate the optimized trend filtering
-estimate on.</p></dd>
-<dt>tf_estimate</dt><dd><p>Optimized trend filtering estimate, evaluated at <code>x_eval</code>.</p></dd>
-<dt>fitted_values</dt><dd><p>Optimized trend filtering estimate, evaluated at the
-observed inputs <code>x</code>.</p></dd>
-<dt>residuals</dt><dd><p><code>residuals = y - fitted_values</code></p></dd>
-
-</dl>
-
+    <p>Bootstrap sample returned in the same format as the input data frame
+/ tibble.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

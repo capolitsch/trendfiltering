@@ -190,13 +190,13 @@ utilize. Defaults to the number of cores detected, minus four.</p></td>
     </tr>
     <tr>
       <th>custom_error_funcs</th>
-      <td><p>(Optional) A named list of one or more
-functions, with each defining an error functional to evaluate on held-out
-folds during cross validation. Mean-squared error (MSE) and mean absolute
-error (MAE) are both evaluated automatically, as well as weighted versions
-(with reciprocal variances as weights) --- WMSE and WMAE. Therefore, the user
-does not need to pass anything to <code>custom_error_funcs</code> unless they want to
-define a validation error metric other than MSE, MAE, WMSE, and WMAE.</p>
+      <td><p>(Optional) A named list of one or more functions,
+with each defining an error functional to evaluate on held-out folds during
+cross validation. Mean-squared error (MSE) and mean absolute error (MAE) are
+both evaluated automatically, as well as weighted versions of each (with
+reciprocal variances as weights) --- WMSE and WMAE. Therefore, the user does
+not need to pass anything to <code>custom_error_funcs</code> unless they want to define
+a validation error metric other than MSE, MAE, WMSE, and WMAE.</p>
 <p>In such a case, each function in the named list passed to
 <code>custom_error_funcs</code> should take three vector arguments --- <code>y</code>,
 <code>tf_estimate</code>, and <code>weights</code> --- and return a single scalar value for the
@@ -253,7 +253,7 @@ elements of <code>x</code> that fall into the same bin, then the data is thinned
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>cv_tf</code>. This is a list with the following
+    <p>An object of class <code>'cv_tf'</code>. This is a list with the following
 elements:</p><dl>
 <dt>lambdas</dt><dd><p>Vector of candidate hyperparameter values (always returned in
 descending order).</p></dd>

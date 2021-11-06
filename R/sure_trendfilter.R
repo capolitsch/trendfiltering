@@ -80,7 +80,7 @@
 #' filtering analysis on that scale. See the example below for a case when the
 #' inputs are evenly sampled on the `log10(x)` scale.
 #'
-#' @return An object of class `sure_tf`. This is a list with the following
+#' @return An object of class `'sure_tf'`. This is a list with the following
 #' elements:
 #' \describe{
 #' \item{lambdas}{Vector of candidate hyperparameter values (always returned in
@@ -277,6 +277,7 @@ sure_trendfilter <- function(x,
 
   tf_model <- structure(
     list(
+      model_fit = out,
       x = x,
       y = y,
       weights = weights,

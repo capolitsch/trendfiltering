@@ -32,11 +32,21 @@ development:
   mode: release
 
 reference:
-  - title: "Functions"
+  - title: "Hyperparameter Optimization"
   - contents:
       - '`cv_trendfilter`'
       - '`sure_trendfilter`'
-      - '`bootstrap_trendfilter`'
+  - title: "Predict"
+  - contents:
+      - '`predict.cv_tf`'
+      - '`predict.sure_tf`'
+  - title: "Bootstrap"
+  - contents:
+      - '`bootstrap_trendfilter.cv_tf`'
+      - '`bootstrap_trendfilter.sure_tf`'
+  - title: "Compute variability bands"
+  - contents:
+      - '`vbands`'
 
 navbar:
   structure:
