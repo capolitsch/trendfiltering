@@ -156,9 +156,9 @@ predict.sure_tf <- function(obj,
     if (nx_eval < 1 || nx_eval != round(nx_eval)) {
       stop("nx_eval must be a positive integer.")
     }
-    x_eval <- seq(min(obj$x), max(obj$x), length = nx_eval)
+    x_eval <- seq(min(obj$tf_model$x), max(obj$tf_model$x), length = nx_eval)
   } else {
-    if (any(x_eval < min(obj$x) || x_eval > max(obj$x))) {
+    if (any(x_eval < min(obj$tf_model$x) || x_eval > max(obj$tf_model$x))) {
       stop("x_eval should all be in range(x).")
     }
     x_eval %<>%
