@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,6 +8,7 @@
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
@@ -39,7 +41,10 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
 </head>
+
+
 
 <body data-spy="scroll" data-target="#toc">
 <div class="container template-citation-authors">
@@ -54,8 +59,8 @@
 <span class="icon-bar"></span>
 </button>
 <span class="navbar-brand">
-<a class="navbar-link" href="https://capolitsch.github.io/trendfiltering/">trendfiltering</a>
-<span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+<a class="navbar-link" href="index.html">trendfiltering</a>
+<span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
 </span>
 </div>
 
@@ -63,15 +68,15 @@
 <ul class="nav navbar-nav">
 
 <li>
-<a href="https://capolitsch.github.io/trendfiltering/"><span class="fas fa-home fa-lg"></span></a>
+<a href="index.html"><span class="fas fa-home fa-lg"></span></a>
 </li>
 
 <li>
-<a href="https://capolitsch.github.io/trendfiltering/reference/">Reference</a>
+<a href="reference/index.html">Reference</a>
 </li>
 
 <li>
-<a href="https://capolitsch.github.io/trendfiltering/papers.html">Papers</a>
+<a href="papers.html">Papers</a>
 </li>
 </ul>
 
@@ -93,44 +98,47 @@
 <h1>Citations</h1>
 </div>
 
-<font size = "4" style="font-family: Garamond, serif;"><b>When using the
-<samp><font size = "3">trendfiltering</font></samp> R package, please use the following citations in
-your publications:</b> <br /><br />
-
+<font size="4" style="font-family: Garamond, serif;">
 <ol>
-<li><p style="font-family: Garamond, serif;">Politsch et al. (2020).
-Trend filtering – I. A modern statistical tool for time-domain astronomy and
-astronomical spectroscopy. <em>Monthly Notices of the Royal Astronomical
-Society</em>, 492(3), p. 4005-4018.
-[<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Link</a>]
-<br /></p></li>
-<li><p style="font-family: Garamond, serif;">Politsch (2021).
-trendfiltering: The state-of-the-art method for denoising 1D signals. R package
-version 0.1.0.</p></li>
-</ol></font><br />
+    <li>
+    <p style="font-family: Garamond, serif;">Politsch et al. (2020a).
+    Trend filtering – I. A modern statistical tool for time-domain astronomy and
+    astronomical spectroscopy. <em>Monthly Notices of the Royal Astronomical
+    Society</em>, 492(3), p. 4005-4018.</p>
+    </li>
 
-<font size = "5">BibTeX format:</font>
-<pre>@Article{MNRAStrendfiltering,
+    <li>
+    <p style="font-family: Garamond, serif;">Politsch et al. (2020b).
+    Trend Filtering – II. Denoising astronomical signals with varying degrees of
+    smoothness. <em>Monthly Notices of the Royal Astronomical Society</em>,
+    492(3), p. 4019-4032.</p>
+    </li>
+</ol>
+</font>
+<br>
+
+<font size="5">BibTeX format:</font>
+<div class="sourceCode"><pre>@Article{MNRAStrendfiltering1,
 author = {Collin A. Politsch and Jessi Cisewski-Kehe and Rupert A.C. Croft and Larry Wasserman},
-title = {{Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy}},
+title = {Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy},
 journal = {Monthly Notices of the Royal Astronomical Society},
 year = {2020},
 url = {https://academic.oup.com/mnras/article/492/3/4005/5704413},
-}</pre>
-<pre>@Misc{trendfiltering,
-author = {Collin A. Politsch},
-title = {{trendfiltering: The state-of-the-art method for denoising 1D signals}},
-year = {2021},
-url = {https://capolitsch.github.io/trendfiltering/},
-note = {R package version 0.1.0},
-}</pre>
+}</pre></div>
+<div class="sourceCode"><pre>@Article{MNRAStrendfiltering2,
+author = {Collin A. Politsch and Jessi Cisewski-Kehe and Rupert A.C. Croft and Larry Wasserman},
+title = {Trend filtering – II. Denoising astronomical signals with varying degrees of smoothness},
+journal = {Monthly Notices of the Royal Astronomical Society},
+year = {2020},
+url = {https://academic.oup.com/mnras/article/492/3/4019/5704414},
+}</pre></div>
 
 </div>
 </div>
 
 <footer>
 <div class="copyright">
-<p>Developed by <a href='https://collinpolitsch.com/'>Collin A. Politsch</a>.</p>
+<p>Developed by <a href='https://collinpolitsch.com/'>Collin A. Politsch, Ph.D.</a></p>
 </div>
 
 <div class="pkgdown">

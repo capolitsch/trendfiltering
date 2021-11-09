@@ -1,5 +1,11 @@
 # trendfiltering R package
 
+A suite of tools for denoising one-dimensional signals with
+trend filtering. Optimizing the hyparameter via Stein's unbiased risk
+estimate or V-fold cross validation with an arbitrary validation loss
+functional. One-standard-error rules, relaxed trend filtering, and
+various bootstrap algorithms for uncertainty quantification.
+
 The `trendfiltering` package can be installed from GitHub using the command 
 below.
 

@@ -42,10 +42,9 @@ risk estimate — sure_trendfilter • trendfiltering</title>
 
 <meta property="og:title" content="Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
 risk estimate — sure_trendfilter" />
-<meta property="og:description" content="sure_trendfilter() optimizes the trend filtering hyperparameter via a
-grid search over a vector of candidate hyperparameter values and selects
-the value that minimizes an unbiased estimate of the model's generalization
-error. See details below for when you should use sure_trendfilter() vs.
+<meta property="og:description" content="For every candidate hyperparameter value, compute an unbiased estimate of the
+trend filtering model's predictive mean-squared error. See the details
+section for guidelines on when sure_trendfilter() should be used versus
 cv_trendfilter()." />
 
 
@@ -78,7 +77,7 @@ cv_trendfilter()." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trendfiltering</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -87,7 +86,7 @@ cv_trendfilter()." />
         <li>
   <a href="../index.html">
     <span class="fas fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -101,16 +100,16 @@ cv_trendfilter()." />
         <li>
   <a href="https://github.com/capolitsch/trendfiltering">
     <span class="fab fa-github fa-lg"></span>
-
+     
   </a>
 </li>
       </ul>
-
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header>
 
@@ -124,24 +123,13 @@ risk estimate</h1>
     </div>
 
     <div class="ref-description">
-    <p><code>sure_trendfilter()</code> optimizes the trend filtering hyperparameter via a
-grid search over a vector of candidate hyperparameter values and selects
-the value that minimizes an unbiased estimate of the model's generalization
-error. See details below for when you should use <code>sure_trendfilter()</code> vs.
+    <p>For every candidate hyperparameter value, compute an unbiased estimate of the
+trend filtering model's predictive mean-squared error. See the details
+section for guidelines on when <code>sure_trendfilter()</code> should be used versus
 <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sure_trendfilter</span><span class='op'>(</span>
-  <span class='va'>x</span>,
-  <span class='va'>y</span>,
-  <span class='va'>weights</span>,
-  k <span class='op'>=</span> <span class='fl'>2L</span>,
-  nlambdas <span class='op'>=</span> <span class='fl'>250L</span>,
-  <span class='va'>lambdas</span>,
-  nx_eval <span class='op'>=</span> <span class='fl'>1500L</span>,
-  <span class='va'>x_eval</span>,
-  <span class='va'>optimization_params</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sure_trendfilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span>, k <span class='op'>=</span> <span class='fl'>2L</span>, nlambdas <span class='op'>=</span> <span class='fl'>250L</span>, <span class='va'>optimization_params</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -156,74 +144,66 @@ error. See details below for when you should use <code>sure_trendfilter()</code>
     </tr>
     <tr>
       <th>weights</th>
-      <td><p>Weights for the observed outputs, defined as the reciprocal
-variance of the additive noise that contaminates the signal. <code>weights</code> can be
-passed as a scalar when the noise is expected to have equal variance for all
-observations. Otherwise, <code>weights</code> must have the same length as <code>x</code> and <code>y</code>.</p></td>
+      <td><p>(Optional) Weights for the observed outputs, defined as the
+reciprocal variance of the additive noise that contaminates the output
+signal. When the noise is expected to have an equal variance,
+\(\sigma^2\), for all observations, a scalar can be passed to <code>weights</code>,
+namely <code>weights = </code>\(1/\sigma^2\). Otherwise, <code>weights</code> must be a vector
+with the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
     <tr>
       <th>k</th>
-      <td><p>Degree of the piecewise polynomials that make up the trend
-filtering estimate. Defaults to <code>k = 2</code> (i.e. a piecewise quadratic
+      <td><p>Degree of the polynomials that make up the piecewise-polynomial
+trend filtering estimate. Defaults to <code>k = 2</code> (i.e. a piecewise quadratic
 estimate). Must be one of <code>k = 0,1,2</code>. Higher order polynomials are
 disallowed since their smoothness is indistinguishable from <code>k = 2</code> and
 their use can lead to instability in the convex optimization.</p></td>
     </tr>
     <tr>
       <th>nlambdas</th>
-      <td><p>The number of hyperparameter settings to test during
-validation. When nothing is passed to <code>lambdas</code> (highly recommended for
-general use), the grid is automatically constructed by
-<code>sure_trendfilter()</code>, with <code>nlambdas</code> controlling the granularity of the
-grid.</p></td>
-    </tr>
-    <tr>
-      <th>lambdas</th>
-      <td><p>(Optional) Overrides <code>nlambdas</code> if passed. The vector of trend
-filtering hyperparameter values for the grid search. Use of this argument is
-discouraged for non-experts.</p></td>
-    </tr>
-    <tr>
-      <th>nx_eval</th>
-      <td><p>Integer. If nothing is passed to <code>x_eval</code>, then it is defined
-as <code>x_eval = seq(min(x), max(x), length = nx_eval)</code>.</p></td>
-    </tr>
-    <tr>
-      <th>x_eval</th>
-      <td><p>(Optional) Overrides <code>nx_eval</code> if passed. A grid of inputs to
-evaluate the optimized trend filtering estimate on.</p></td>
+      <td><p>Number of hyperparameter values to test during validation.
+Defaults to <code>nlambdas = 250</code>. The hyperparameter grid is internally
+constructed to span the full trend filtering model space lying by a global
+polynomial solution (i.e. a power law) and an interpolating solution, with
+<code>nlambdas</code> controlling the granularity of the model space that is</p></td>
     </tr>
     <tr>
       <th>optimization_params</th>
-      <td><p>(Optional) A named list of optimization parameter
-values to be passed to the trend filtering ADMM algorithm of
-<a href='http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf'>Ramdas and Tibshirani 2016</a> (implemented in the
-<code>glmgen</code> package). See the <code><a href='https://github.com/glmgen/glmgen/blob/master/R_pkg/glmgen/man/trendfilter.control.list.Rd'>glmgen::trendfilter.control.list()</a></code> documentation
-for full details. No technical understanding of the ADMM algorithm is needed
-and the default parameter choices will almost always suffice. However, the
-following parameters may require some adjustments to ensure that your trend
-filtering estimate has sufficiently converged:</p><dl>
-<dt><code>max_iter</code></dt><dd><p>Maximum iterations allowed for the trend filtering
-optimization. Defaults to <code>max_iter = 600L</code>. See the <code>n_iter</code> element of the
-function output for the actual number of iterations taken for every
-hyperparameter choice in <code>lambdas</code>. If any of the elements of <code>n_iter</code> are
-equal to <code>max_iter</code>, the objective function's tolerance has not been reached
-and <code>max_iter</code> may need to be increased.</p></dd>
-<dt><code>obj_tol</code></dt><dd><p>The tolerance used in the convex optimization stopping
-criterion; when the relative change in the objective function is less than
-this value, the algorithm terminates. Thus, decreasing this setting will
-increase the precision of the solution returned by the optimization. Defaults
-to <code>obj_tol = 1e-10</code>. If the returned trend filtering estimate does not
-appear to have fully converged to a reasonable estimate of the signal, this
-issue can be resolved by some combination of decreasing <code>obj_tol</code> and
-increasing <code>max_iter</code>.</p></dd>
-<dt><code>thinning</code></dt><dd><p>Logical. If <code>TRUE</code>, then the data are preprocessed so that
-a smaller, better conditioned data set is used for fitting. When left <code>NULL</code>
-(the default setting), the optimization will automatically detect whether
-thinning should be applied (i.e. cases in which the numerical fitting
-algorithm will struggle to converge). This preprocessing procedure is
-controlled by the <code>x_tol</code> argument below.</p></dd>
-<dt><code>x_tol</code></dt><dd><p>Controls the automatic detection of when thinning should be
+      <td><p>(Optional) A named list of parameter values to be
+passed to the trend filtering ADMM algorithm of
+<a href='http://www.stat.cmu.edu/~ryantibs/papers/fasttf.pdf'>Ramdas and Tibshirani (2016)</a>, which is implemented in
+the <code>glmgen</code> R package. See the <code><a href='https://rdrr.io/pkg/glmgen/man/trendfilter.control.list.html'>glmgen::trendfilter.control.list()</a></code>
+documentation for a full list of the algorithm's parameters. The default
+parameter choices will almost always suffice, but when adjustments do need to
+be made, one can do so without any technical understanding of the ADMM
+algorithm. In particular, the four parameter descriptions below should serve
+as sufficient working knowledge.</p><dl>
+<dt>obj_tol</dt><dd><p>A stopping threshold for the ADMM algorithm. If the relative
+change in the algorithm's cost functional between two consecutive steps is
+less than <code>obj_tol</code>, the algorithm terminates. The algorithm's termination
+can also result from it reaching the maximum tolerable iterations set
+by the <code>max_iter</code> parameter (see below). The <code>obj_tol</code> parameter defaults to
+<code>obj_tol = 1e-10</code>. The <code>cost_functional</code> vector, returned within the
+<code>sure_trendfilter()</code> output, gives the relative change in the trend filtering
+cost functional over the algorithm's final iteration, for every candidate
+hyperparameter value.</p></dd>
+<dt>max_iter</dt><dd><p>Maximum number of ADMM iterations that we will tolerate.
+Defaults to <code>max_iter = length(y)</code>. The actual number of iterations performed
+by the algorithm, for every candidate hyperparameter value, is returned in
+the <code>n_iter</code> vector, within the <code>sure_trendfilter()</code> output. If any of the
+elements of <code>n_iter</code> are equal to <code>max_iter</code>, the tolerance defined by
+<code>obj_tol</code> has not been attained and <code>max_iter</code> may need to be increased.</p></dd>
+<dt>thinning</dt><dd><p>Logical. If <code>thinning = TRUE</code>, then the data are preprocessed
+so that a smaller data set is used to fit the trend filtering estimate, which
+will ease the ADMM algorithm's convergence. This can be
+very useful when a signal is so well-sampled that very little additional
+information / predictive accuracy is gained by fitting the trend filtering
+estimate on the full data set, compared to some subset of it. See the
+<code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code> examples for a case study of this nature. When nothing
+is passed to <code>thinning</code>, the algorithm will automatically detect whether
+thinning should be applied. This preprocessing procedure is controlled by the
+<code>x_tol</code> parameter below.</p></dd>
+<dt>x_tol</dt><dd><p>Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size <code>x_tol</code> and find at least two
 elements of <code>x</code> that fall into the same bin, then the data is thinned.</p></dd>
 </dl></td>
@@ -232,60 +212,54 @@ elements of <code>x</code> that fall into the same bin, then the data is thinned
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>sure_tf</code>. This is a list
-with the following elements:</p><dl>
-<dt>x_eval</dt><dd><p>Input grid used to evaluate the optimized trend filtering
-estimate on.</p></dd>
-<dt>tf_estimate</dt><dd><p>Optimized trend filtering estimate, evaluated at
-<code>x_eval</code>.</p></dd>
-<dt>validation_method</dt><dd><p>"SURE"</p></dd>
-<dt>lambdas</dt><dd><p>Vector of hyperparameter values evaluated in the grid search
-(always returned in descending order).</p></dd>
-<dt>edfs</dt><dd><p>Vector of effective degrees of freedom for all trend filtering
-estimators fit during validation.</p></dd>
-<dt>generalization_errors</dt><dd><p>Vector of SURE generalization error estimates,
-corresponding to the descending-ordered <code>lambdas</code> vector.</p></dd>
-<dt>lambda_min</dt><dd><p>Hyperparameter value that minimizes the SURE generalization
+    <p>An object of class <code>'sure_tf'</code>. This is a list with the following
+elements:</p><dl>
+<dt>lambdas</dt><dd><p>Vector of candidate hyperparameter values (always returned in
+descending order).</p></dd>
+<dt>edfs</dt><dd><p>Number of effective degrees of freedom in the trend filtering
+estimator, for every hyperparameter value in <code>lambdas</code>.</p></dd>
+<dt>errors</dt><dd><p>Vector of mean-squared prediction errors estimated by SURE, for
+every hyperparameter value in <code>lambdas</code>.</p></dd>
+<dt>se_errors</dt><dd><p>Vector of estimated standard errors for the <code>errors</code>.</p></dd>
+<dt>lambda_min</dt><dd><p>Hyperparameter value that minimizes the SURE validation
 error curve.</p></dd>
+<dt>lambda_1se</dt><dd><p>The largest hyperparameter value (corresponding to the
+smoothest trend filtering estimate) that yields a SURE error within
+one standard error of <code><a href='https://rdrr.io/r/base/Extremes.html'>min(errors)</a></code>. We call this the
+"1-standard-error rule" hyperparameter, and it serves as an Occam's
+razor-esque heuristic. That is, given two models with approximately equal
+performance (here, in terms of MSE), it may be wise to opt for the simpler
+model, i.e. the model with fewer effective degrees of freedom.</p></dd>
+<dt>edf_min</dt><dd><p>Number of effective degrees of freedom in the minimum-SURE
+trend filtering estimator.</p></dd>
+<dt>edf_1se</dt><dd><p>Number of effective degrees of freedom in the 1-stand-error
+rule trend filtering estimator.</p></dd>
 <dt>i_min</dt><dd><p>Index of <code>lambdas</code> that minimizes the SURE error curve.</p></dd>
-<dt>edf_min</dt><dd><p>Effective degrees of freedom of the optimized trend
-filtering estimator.</p></dd>
-<dt>n_iter</dt><dd><p>The number of iterations needed for the ADMM algorithm to
-converge within the given tolerance, for each hyperparameter value. If many
-of these are exactly equal to <code>max_iter</code>, then their solutions have not
-converged with the tolerance specified by <code>obj_tol</code>. In which case, it is
-often prudent to increase <code>max_iter</code>.</p></dd>
-<dt>training_errors</dt><dd><p>Mean-squared error between the observed outputs <code>y</code>
-and the trend filtering estimate, for every hyperparameter choice.</p></dd>
+<dt>i_1se</dt><dd><p>Index of <code>lambdas</code> that gives the 1-standard-error rule
+hyperparameter.</p></dd>
+<dt>cost_functional</dt><dd><p>The relative change in the cost functional over the
+ADMM algorithm's final iteration, for every candidate hyperparameter in
+<code>lambdas</code>.</p></dd>
+<dt>n_iter</dt><dd><p>Total number of iterations taken by the ADMM algorithm, for
+every candidate hyperparameter in <code>lambdas</code>. If an element of <code>n_iter</code>
+is exactly equal to <code>max_iter</code>, then the ADMM algorithm stopped before
+reaching the tolerance set by <code>obj_tol</code>. In these cases, you may need
+to increase <code>max_iter</code> to ensure the trend filtering solution has
+converged to satisfactory precision.</p></dd>
+<dt>training_errors</dt><dd><p>In-sample mean-squared error between the observed
+outputs <code>y</code> and the trend filtering estimate, for every hyperparameter value
+in <code>lambdas</code>.</p></dd>
 <dt>optimisms</dt><dd><p>SURE-estimated optimisms, i.e.
-<code>optimisms = generalization_errors - training_errors</code>.</p></dd>
-<dt>x</dt><dd><p>Vector of observed inputs.</p></dd>
-<dt>y</dt><dd><p>Vector of observed outputs.</p></dd>
-<dt>weights</dt><dd><p>Weights for the observed outputs, defined as the reciprocal
-variance of the additive noise that contaminates the signal.</p></dd>
-<dt>fitted_values</dt><dd><p>Optimized trend filtering estimate, evaluated at the
-observed inputs <code>x</code>.</p></dd>
-<dt>residuals</dt><dd><p><code>residuals = y - fitted_values</code></p></dd>
-<dt>k</dt><dd><p>Degree of the trend filtering estimator.</p></dd>
-<dt>admm_params</dt><dd><p>List of parameter settings for the trend filtering ADMM
-algorithm, constructed by passing the <code>optimization_params</code> list to
-<code><a href='https://github.com/glmgen/glmgen/blob/master/R_pkg/glmgen/man/trendfilter.control.list.Rd'>glmgen::trendfilter.control.list()</a></code>.</p></dd>
-<dt>thinning</dt><dd><p>Logical. If <code>TRUE</code>, then the data are preprocessed so that a
-smaller, better conditioned data set is used for fitting.</p></dd>
-<dt>x_scale, y_scale, data_scaled</dt><dd><p>For internal use.</p></dd>
+<code>optimisms = errors - training_errors</code>.</p></dd>
+<dt>tf_model</dt><dd><p>A list of objects that is used internally by other
+functions that operate on the <code>'sure_tf'</code> object.</p></dd>
 
 </dl>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Our recommendations for when to use <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>
-vs. <code>sure_trendfilter()</code> are shown in the table below.</p>
-<p>For our purposes, an evenly sampled data set with some discarded pixels
-(either sporadically or in large consecutive chunks) is still considered to
-be evenly sampled. When the inputs are evenly sampled on a transformed scale,
-we recommend transforming to that scale and carrying out the full trend
-filtering analysis on that scale. See the example below for a case when the
-inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p><table class='table'>
+    <p>Our recommendations for when to use <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code> versus
+<code>sure_trendfilter()</code> are shown in the table below.</p><table class='table'>
 <tr><td>Scenario</td><td>Hyperparameter optimization</td></tr>
 <tr><td><code>x</code> is unevenly sampled</td><td><code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code></td></tr>
 <tr><td><code>x</code> is evenly sampled and reciprocal variances are not available</td><td><code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code></td></tr>
@@ -293,60 +267,14 @@ inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'
 </table>
 
 
-<h2 class="hasAnchor" id="trend-filtering-with-stein-s-unbiased-risk-estimate"><a class="anchor" href="#trend-filtering-with-stein-s-unbiased-risk-estimate"></a>Trend filtering with Stein's unbiased risk estimate</h2>
 
-    <p>Here we describe the general motivation for optimizing a trend filtering
-estimator with respect to Stein's unbiased risk estimate. See
-<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>
-Politsch et al. (2020a)</a> for more details. <br /></p>
-<p>Suppose we observe noisy measurements of an output variable of interest
-(e.g., flux, magnitude, photon counts) according to the data generating
-process
-\[y_i = f(x_i) + \epsilon_i, \quad\quad x_1,\dots,x_n\in(a,b),\]
-where \(y_i\) is a noisy observation of a signal \(f(x_i)\) and the
-\(\epsilon_i\) have mean zero with variance
-\(\sigma_{i}^{2} = \text{Var}(\epsilon_{i})\). Let
-\(\hat{f}(\cdot\;; \lambda)\) denote the trend filtering estimator of
-order \(k\) with tuneable hyperparameter \(\lambda\). The
-fixed-input mean-squared prediction error (MSPE) of the estimator
-\(\hat{f}\) is defined as
-\[R(\lambda) = \frac{1}{n}\sum_{i=1}^{n}\;\mathbb{E}\left[\left(y_i -
-\hat{f}(x_{i};\lambda)\right)^2\;|\;x_{1},\dots,x_{n}\right]\]
-\[= \frac{1}{n}\sum_{i=1}^{n}\left(\mathbb{E}\left[\left(f(x_i) -
-\hat{f}(x_i;\lambda)\right)^2\;|\;x_1,\dots,x_n\right] + \sigma_i^2\right).\]
-Stein's unbiased risk estimate (SURE) provides an unbiased estimate of the
-fixed-input MSPE via the following formula:
-\[\hat{R}(\lambda) =
-\frac{1}{n}\sum_{i=1}^{n}\big(y_i - \hat{f}(x_i; \lambda)\big)^2 +
-\frac{2\overline{\sigma}^{2}\text{df}(\hat{f})}{n},\]
-where \(\overline{\sigma}^{2} = n^{-1}\sum_{i=1}^{n} \sigma_i^2\)
-and \(\text{df}(\hat{f})\) is the effective degrees of
-freedom of the trend filtering estimator (with a fixed choice of
-hyperparameter). The generalized lasso results of
-<a href='https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full'>Tibshirani and Taylor (2012)</a>
-provide the following formula for the effective degrees of freedom of a trend
-filtering estimator (with a fixed hyperparameter choice):
-\[\text{df}(\hat{f}) =
-\mathbb{E}\left[\text{number of knots in}\;\hat{f}\right] + k + 1.\]
-The optimal hyperparameter value is then defined as
-\[\hat{\lambda} = \arg\min_{\lambda}
-\frac{1}{n}\sum_{i=1}^{n}\big(y_i - \hat{f}(x_i; \lambda)\big)^2 +
-\frac{2\hat{\overline{\sigma}}^{2}\hat{\text{df}}(\hat{f})}{n},\]
-where \(\hat{\text{df}}\) is the estimate for the effective
-degrees of freedom that is obtained by replacing the expectation with the
-observed number of knots, and \(\hat{\overline{\sigma}}^2\)
-is an estimate of \(\overline{\sigma}^2\). We define
-\(\overline{\sigma}^2\) as <code><a href='https://rdrr.io/r/base/mean.html'>mean(1 / weights)</a></code>, so <code>weights</code> must be
-passed in order to use <code>sure_trendfilter</code>. If a reliable estimate of
-\(\overline{\sigma}^2\) is not available a priori, a data-driven
-estimate can be constructed, e.g. see
-<a href='https://link.springer.com/book/10.1007/978-0-387-21736-9'>Wasserman (2004)</a>
-or
-<a href='https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf'>Hastie, Tibshirani, and Friedman (2009)</a>.
-<br /> <br /></p>
-
-
-<h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+<p>For our purposes, an evenly sampled data set with some discarded pixels
+(either sporadically or in large consecutive chunks) is still considered to
+be evenly sampled. When the inputs are evenly sampled on a transformed scale,
+we recommend transforming to that scale and carrying out the full trend
+filtering analysis on that scale. See the example below for a case when the
+inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p><b>Companion references</b></p><ol>
 <li><p>Politsch et al. (2020a).
@@ -393,10 +321,10 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
 #&gt;   log10_wavelength   flux weights
 #&gt;              <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
 #&gt; <span style='color: #BCBCBC;'>1</span>             3.55  0.424  0.041<span style='text-decoration: underline;'>7</span>
-#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125
-#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128
-#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121
-#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134
+#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125 
+#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128 
+#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121 
+#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
 #&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'>
 <span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'>sure_trendfilter</span><span class='op'>(</span><span class='va'>spec</span><span class='op'>$</span><span class='va'>log10_wavelength</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>flux</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>weights</span><span class='op'>)</span>
 </div></pre>
@@ -411,7 +339,7 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://collinpolitsch.com/'>Collin A. Politsch</a>.</p>
+  <p>Developed by Collin A. Politsch.</p>
 </div>
 
 <div class="pkgdown">
@@ -421,7 +349,7 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
       </footer>
    </div>
 
-
+  
 
 
   </body>

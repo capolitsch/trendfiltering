@@ -12,7 +12,7 @@ home:
     href: "https://collinpolitsch.com/"
 
 authors:
-  Collin A. Politsch:
+  Collin A. Politsch, Ph.D.:
     href: "https://collinpolitsch.com/"
 
 template:
@@ -32,11 +32,20 @@ development:
   mode: release
 
 reference:
-  - title: "Functions"
+  - title: "Hyperparameter Optimization"
   - contents:
       - '`cv_trendfilter`'
       - '`sure_trendfilter`'
+  - title: "Predict"
+  - contents:
+      - '`predict.cv_tf`'
+      - '`predict.sure_tf`'
+  - title: "Bootstrap"
+  - contents:
       - '`bootstrap_trendfilter`'
+  - title: "Variability bands"
+  - contents:
+      - '`vbands`'
 
 navbar:
   structure:

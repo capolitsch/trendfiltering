@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -59,24 +60,24 @@
 <span class="icon-bar"></span>
 </button>
 <span class="navbar-brand">
-<a class="navbar-link" href="https://capolitsch.github.io/trendfiltering/">trendfiltering</a>
-<span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+<a class="navbar-link" href="../index.html">trendfiltering</a>
+<span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
 </span>
 </div>
 
 <div id="navbar" class="navbar-collapse collapse">
 <ul class="nav navbar-nav">
 <li>
-<a href="https://capolitsch.github.io/trendfiltering/">
+<a href="../index.html">
 <span class="fas fa-home fa-lg"></span>
 
 </a>
 </li>
 <li>
-<a href="https://capolitsch.github.io/trendfiltering/reference/index.html">Reference</a>
+<a href="../reference/index.html">Reference</a>
 </li>
 <li>
-<a href="https://capolitsch.github.io/trendfiltering/papers.html">Papers</a>
+<a href="../papers.html">Papers</a>
 </li>
 </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -113,37 +114,85 @@
 <tbody>
 <tr>
 <th colspan="2">
-<h2 id="section-functions" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Functions</h2>
+<h2 id="section-hyperparameter" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Hyperparameter Optimization</h2>
 <p class="section-desc"></p>
 </th>
 </tr>
 
 
-</tbody>
-
-<tbody>
-
 <tr>
-
 <td>
 <p><code><a href="cv_trendfilter.html">cv_trendfilter()</a></code> </p>
 </td>
 <td><p>Optimize the trend filtering hyperparameter by V-fold cross validation</p></td>
-</tr><tr>
+</tr>
 
+<tr>
 <td>
 <p><code><a href="sure_trendfilter.html">sure_trendfilter()</a></code> </p>
 </td>
 <td><p>Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
 risk estimate</p></td>
-</tr><tr>
-
-<td>
-<p><code><a href="bootstrap_trendfilter.html">bootstrap_trendfilter()</a></code> </p>
-</td>
-<td><p>Construct pointwise variability bands via a bootstrap</p></td>
 </tr>
+
+
+
+
+<tbody>
+<tr>
+<th colspan="2">
+<h2 id="section-hyperparameter" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Predict</h2>
+<p class="section-desc"></p>
+</th>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="predict_trendfilter.html">predict(<i>&lt;cv_tf&gt;</i>)</a></code>
+<code><a href="predict_trendfilter.html">predict(<i>&lt;sure_tf&gt;</i>)</a></code></p>
+</td>
+<td><p>Evaluate an optimized trend filtering estimator</p></td>
+</tr>
+
+<tbody>
+<tr>
+<th colspan="2">
+<h2 id="section-bootstrap" class="hasAnchor"><a href="#section-bootstrap" class="anchor"></a>Bootstrap</h2>
+<p class="section-desc"></p>
+</th>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="bootstrap_trendfilter.html">bootstrap_trendfilter(<i>&lt;pred_tf&gt;</i>)</a></code></p>
+</td>
+<td><p>Generate an ensemble of trend filtering estimates via a bootstrap</p></td>
+</tr>
+
+
+<tbody>
+<tr>
+<th colspan="2">
+<h2 id="section-bands" class="hasAnchor"><a href="#section-bands" class="anchor"></a>Compute variability bands</h2>
+<p class="section-desc"></p>
+</th>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="vbands.html">vbands(<i>&lt;bootstrap_tf&gt;</i>)</a></code>
+</p>
+</td>
+<td><p>Compute variablity bands from the sample quantiles of the bootstrap ensemble</p></td>
+</tr>
+
+
 </tbody>
+
+
+
+
+
 </table>
 </div>
 
@@ -157,7 +206,7 @@ risk estimate</p></td>
 
 <footer>
 <div class="copyright">
-<p>Developed by <a href='https://collinpolitsch.com/'>Collin A. Politsch</a>.</p>
+<p>Developed by <a href='https://collinpolitsch.com/'>Collin A. Politsch, Ph.D.</a></p>
 </div>
 
 <div class="pkgdown">
