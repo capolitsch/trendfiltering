@@ -22,8 +22,8 @@
 \item{loss_func}{(For class \code{\link[=cv_trendfilter]{'cv_tf'}} only) A string or
 index specifying which cross validation error curve stored within the
 \code{\link[=cv_trendfilter]{'cv_tf'}} object will be used to optimize the trend
-filtering hyperparameter. Run \code{names(obj$cv_loss_funcs)} to see the
-available options. Defaults to \code{loss_func = "WMAE"}.}
+filtering hyperparameter. Run \code{names(obj$loss_funcs)} to see the available
+options. Defaults to \code{loss_func = "WMAE"}.}
 
 \item{lambda_choice}{One of \code{c("lambda_min", "lambda_1se")}. The choice of
 hyperparameter that is used for optimized trend filtering estimate. Defaults
@@ -55,19 +55,14 @@ evaluated on.}
 (always returned in descending order).}
 \item{edfs}{Vector of effective degrees of freedom for all trend filtering
 estimators fit during validation.}
-\item{validation_errors}{Vector of hyperparameter validation errors, obtained
-either via SURE or cross validation.}
-\item{se_validation_errors}{Standard errors for \code{validation_errors}.}
-\item{V}{(\code{'cv_tf'} only) The number of folds the data were partitioned into
-for V-fold cross validation.}
+\item{errors}{Vector of hyperparameter validation errors, obtained either via
+SURE or cross validation.}
+\item{se_errors}{Standard errors for \code{errors}.}
 \item{loss_func}{(\code{'cv_tf'} only) A string or index designating which cross
 validation loss function was selected as the metric with respect to which the
 trend filtering hyperparameter would be optimized.}
-\item{cv_loss_func}{(\code{'cv_tf'} only) A function that computes the cross
-validation loss via the method specified by \code{loss_func}.}
-\item{lambda_opt}{The optimal hyperparameter value, as defined by the
-\code{lambda_choice} argument (as well as \code{loss_func}, if
-\code{class(obj) = "cv_tf"}).}
+\item{lambda_opt}{The optimal hyperparameter value, as defined by
+\code{lambda_choice} (and \code{loss_func} if \code{class(obj) = "cv_tf"}).}
 \item{edf_opt}{Number of effective degrees of freedom in the trend filtering
 estimator with hyperparameter \code{lambda_opt}.}
 \item{i_opt}{The index of \code{lambda_opt} within \code{lambdas}.}

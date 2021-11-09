@@ -12,8 +12,8 @@
 #' @param loss_func (For class [`'cv_tf'`][cv_trendfilter()] only) A string or
 #' index specifying which cross validation error curve stored within the
 #' [`'cv_tf'`][cv_trendfilter()] object will be used to optimize the trend
-#' filtering hyperparameter. Run `names(obj$cv_loss_funcs)` to see the
-#' available options. Defaults to `loss_func = "WMAE"`.
+#' filtering hyperparameter. Run `names(obj$loss_funcs)` to see the available
+#' options. Defaults to `loss_func = "WMAE"`.
 #' @param lambda_choice One of `c("lambda_min", "lambda_1se")`. The choice of
 #' hyperparameter that is used for optimized trend filtering estimate. Defaults
 #' to `lambda_choice = "lambda_min"`.
@@ -48,19 +48,14 @@
 #' (always returned in descending order).}
 #' \item{edfs}{Vector of effective degrees of freedom for all trend filtering
 #' estimators fit during validation.}
-#' \item{validation_errors}{Vector of hyperparameter validation errors, obtained
-#' either via SURE or cross validation.}
-#' \item{se_validation_errors}{Standard errors for `validation_errors`.}
-#' \item{V}{(`'cv_tf'` only) The number of folds the data were partitioned into
-#' for V-fold cross validation.}
+#' \item{errors}{Vector of hyperparameter validation errors, obtained either via
+#' SURE or cross validation.}
+#' \item{se_errors}{Standard errors for `errors`.}
 #' \item{loss_func}{(`'cv_tf'` only) A string or index designating which cross
 #' validation loss function was selected as the metric with respect to which the
 #' trend filtering hyperparameter would be optimized.}
-#' \item{cv_loss_func}{(`'cv_tf'` only) A function that computes the cross
-#' validation loss via the method specified by `loss_func`.}
-#' \item{lambda_opt}{The optimal hyperparameter value, as defined by the
-#' `lambda_choice` argument (as well as `loss_func`, if
-#' `class(obj) = "cv_tf"`).}
+#' \item{lambda_opt}{The optimal hyperparameter value, as defined by
+#' `lambda_choice` (and `loss_func` if `class(obj) = "cv_tf"`).}
 #' \item{edf_opt}{Number of effective degrees of freedom in the trend filtering
 #' estimator with hyperparameter `lambda_opt`.}
 #' \item{i_opt}{The index of `lambda_opt` within `lambdas`.}
@@ -107,7 +102,7 @@ predict.cv_tf <- function(obj,
   )
 
   if (is.character(loss_func)) {
-    stopifnot(loss_func %in% names(obj$cv_errors))
+    stopifnot(loss_func %in% names(obj$errors))
   }
 
   if (is.double(loss_func) | is.integer(loss_func)) {
@@ -177,11 +172,9 @@ predict.cv_tf <- function(obj,
       tf_estimate = tf_estimate,
       lambdas = obj$lambdas,
       edfs = obj$edfs,
-      validation_errors = obj$cv_errors[[loss_func]],
-      se_validation_errors = obj$se_cv_errors[[loss_func]],
-      V = obj$V,
+      errors = obj$errors[[loss_func]],
+      se_errors = obj$se_errors[[loss_func]],
       loss_func = loss_func,
-      cv_loss_func = obj$cv_loss_funcs[[loss_func]],
       lambda_opt = obj$lambdas[i_opt],
       edf_opt = obj$edfs[i_opt],
       i_opt = i_opt,
@@ -248,8 +241,8 @@ predict.sure_tf <- function(obj,
       tf_estimate = tf_estimate,
       lambdas = obj$lambdas,
       edfs = obj$edfs,
-      validation_errors = obj$sure_errors,
-      se_validation_errors = obj$se_sure_errors,
+      errors = obj$errors,
+      se_errors = obj$se_errors,
       lambda_opt = obj$lambdas[i_opt],
       edf_opt = obj$edfs[i_opt],
       i_opt = i_opt,

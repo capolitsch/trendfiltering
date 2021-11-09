@@ -155,8 +155,8 @@ desired method for optimizing the trend filtering hyperparameter.</p>
       <td><p>(For class <code><a href='cv_trendfilter.html'>'cv_tf'</a></code> only) A string or
 index specifying which cross validation error curve stored within the
 <code><a href='cv_trendfilter.html'>'cv_tf'</a></code> object will be used to optimize the trend
-filtering hyperparameter. Run <code><a href='https://rdrr.io/r/base/names.html'>names(obj$cv_loss_funcs)</a></code> to see the
-available options. Defaults to <code>loss_func = "WMAE"</code>.</p></td>
+filtering hyperparameter. Run <code><a href='https://rdrr.io/r/base/names.html'>names(obj$loss_funcs)</a></code> to see the available
+options. Defaults to <code>loss_func = "WMAE"</code>.</p></td>
     </tr>
     <tr>
       <th>lambda_choice</th>
@@ -195,19 +195,14 @@ evaluated on.</p></dd>
 (always returned in descending order).</p></dd>
 <dt>edfs</dt><dd><p>Vector of effective degrees of freedom for all trend filtering
 estimators fit during validation.</p></dd>
-<dt>validation_errors</dt><dd><p>Vector of hyperparameter validation errors, obtained
-either via SURE or cross validation.</p></dd>
-<dt>se_validation_errors</dt><dd><p>Standard errors for <code>validation_errors</code>.</p></dd>
-<dt>V</dt><dd><p>(<code>'cv_tf'</code> only) The number of folds the data were partitioned into
-for V-fold cross validation.</p></dd>
+<dt>errors</dt><dd><p>Vector of hyperparameter validation errors, obtained either via
+SURE or cross validation.</p></dd>
+<dt>se_errors</dt><dd><p>Standard errors for <code>errors</code>.</p></dd>
 <dt>loss_func</dt><dd><p>(<code>'cv_tf'</code> only) A string or index designating which cross
 validation loss function was selected as the metric with respect to which the
 trend filtering hyperparameter would be optimized.</p></dd>
-<dt>cv_loss_func</dt><dd><p>(<code>'cv_tf'</code> only) A function that computes the cross
-validation loss via the method specified by <code>loss_func</code>.</p></dd>
-<dt>lambda_opt</dt><dd><p>The optimal hyperparameter value, as defined by the
-<code>lambda_choice</code> argument (as well as <code>loss_func</code>, if
-<code>class(obj) = "cv_tf"</code>).</p></dd>
+<dt>lambda_opt</dt><dd><p>The optimal hyperparameter value, as defined by
+<code>lambda_choice</code> (and <code>loss_func</code> if <code>class(obj) = "cv_tf"</code>).</p></dd>
 <dt>edf_opt</dt><dd><p>Number of effective degrees of freedom in the trend filtering
 estimator with hyperparameter <code>lambda_opt</code>.</p></dd>
 <dt>i_opt</dt><dd><p>The index of <code>lambda_opt</code> within <code>lambdas</code>.</p></dd>

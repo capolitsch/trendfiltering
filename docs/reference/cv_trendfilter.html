@@ -200,17 +200,17 @@ the machine, <code>mc_cores</code> is internally updated to
     <tr>
       <th>loss_funcs</th>
       <td><p>(Optional) A named list of one or more functions, with each
-defining a loss function that will give rise to its own CV error curve. Mean
-absolute deviations error (MAE), mean-squared error (MSE), log-cosh error,
-Huber loss, mean-squared logarithmic error (MSLE), as well as
-observation-weighted versions of all except MSLE, are all computed internally
-and returned. Therefore, the <code>loss_funcs</code> argument need only be used to
-define loss functions that are not among these common choices.</p>
-<p>Each function within the named list passed to <code>loss_funcs</code> should take three
-vector arguments --- <code>y</code>, <code>tf_estimate</code>, and <code>weights</code> --- and return a
-single scalar value for the validation error. For example, if I wanted a CV
-error curve based on a weighted median of the absolute errors to be computed,
-I would pass the list below to <code>loss_funcs</code>:<div class="sourceCode r"></p><pre><span class='va'>MedAE</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>tf_estimate</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span> <span class='op'>{</span>
+defining a loss function to be evaluated on held-out folds during cross
+validation. By default, <code>cv_trendfilter()</code> will automatically compute and
+return CV error curves for 9 common regression loss functions (see the
+Details section below). Therefore, the <code>loss_funcs</code> argument need only be
+used in order to define loss functions that are not among these 9 choices.</p>
+<p>When defining custom loss functions, each function within the named list
+passed to <code>loss_funcs</code> should take three vector arguments --- <code>y</code>,
+<code>tf_estimate</code>, and <code>weights</code> --- and return a single scalar value for the
+validation error. For example, if I wanted a CV error curve based on a
+weighted median of the absolute errors to be computed, I would pass the list
+below to <code>loss_funcs</code>:<div class="sourceCode r"></p><pre><span class='va'>MedAE</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>tf_estimate</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='fu'>matrixStats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/matrixStats/man/weightedMedian.html'>weightedMedian</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>tf_estimate</span> <span class='op'>-</span> <span class='va'>y</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>weights</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
 
@@ -246,7 +246,7 @@ hyperparameter value.</p></dd>
 <dt>max_iter</dt><dd><p>Maximum number of ADMM iterations that we will tolerate.
 Defaults to <code>max_iter = length(y)</code>. The actual number of iterations performed
 by the algorithm, for every candidate hyperparameter value, is returned in
-the <code>n_iter</code> vector, within the <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> output. If any of the
+the <code>n_iter</code> vector, within the <code>cv_trendfilter()</code> output. If any of the
 elements of <code>n_iter</code> are equal to <code>max_iter</code>, the tolerance defined by
 <code>obj_tol</code> has not been attained and <code>max_iter</code> may need to be increased.</p></dd>
 <dt>thinning</dt><dd><p>Logical. If <code>thinning = TRUE</code>, then the data are preprocessed
@@ -274,18 +274,18 @@ elements:</p><dl>
 descending order).</p></dd>
 <dt>edfs</dt><dd><p>Number of effective degrees of freedom in the trend filtering
 estimator, for every candidate hyperparameter value in <code>lambdas</code>.</p></dd>
-<dt>cv_errors</dt><dd><p>A named list of vectors, with each representing the
+<dt>errors</dt><dd><p>A named list of vectors, with each representing the
 cross validation error curve for a given loss function. The first 9
 vectors of the list correspond to MAE, WMAE, MSE, WMSE, log-cosh error,
 weighted log-cosh error, Huber loss, weighted Huber loss, and MSLE. If any
 custom loss functions were passed to <code>loss_funcs</code>, their cross validation
 curves will follow the first 9.</p></dd>
-<dt>se_cv_errors</dt><dd><p>Standard errors for each of the cross validation error
-curves in <code>cv_errors</code>, within a named list of the same structure.</p></dd>
-<dt>lambda_min</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(cv_errors)</a></code>,
+<dt>se_errors</dt><dd><p>Standard errors for each of the cross validation error
+curves in <code>errors</code>, within a named list of the same structure.</p></dd>
+<dt>lambda_min</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the hyperparameter value that minimizes the cross validation error
 curve, for every loss function.</p></dd>
-<dt>lambda_1se</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(cv_errors)</a></code>,
+<dt>lambda_1se</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the "1-standard-error rule" hyperparameter, for every loss
 function. The "1-standard-error rule" hyparameter is the largest
 hyperparameter value (corresponding to the smoothest trend filtering
@@ -293,21 +293,21 @@ estimate) that has a CV error within one standard error of the minimum CV
 error. It serves as an Occam's razor-like heuristic. That is, given two
 models with approximately equal performance, it may be wise to opt for the
 simpler model, i.e. the model with fewer effective degrees of freedom.</p></dd>
-<dt>edf_min</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(cv_errors)</a></code>,
+<dt>edf_min</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the number of effective degrees of freedom in the trend filtering
 estimator that minimizes the CV error curve, for every loss function.</p></dd>
-<dt>edf_1se</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(cv_errors)</a></code>,
+<dt>edf_1se</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the number of effective degrees of freedom in the
 "1-standard-error rule" trend filtering estimator, for every type of
 validation error.</p></dd>
-<dt>i_min</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(cv_errors)</a></code>,
+<dt>i_min</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the index of <code>lambdas</code> that yields the minimum of the CV error
 curve, for every loss function.</p></dd>
-<dt>i_1se</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(cv_errors)</a></code>,
+<dt>i_1se</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the index of <code>lambdas</code> that gives the "1-standard-error rule"
 hyperparameter value, for every loss function.</p></dd>
-<dt>cv_loss_funcs</dt><dd><p>A named list of functions that defines all loss
-functions evaluated during cross validation.</p></dd>
+<dt>loss_funcs</dt><dd><p>A named list of functions that defines all loss functions
+evaluated during cross validation.</p></dd>
 <dt>cost_functional</dt><dd><p>The relative change in the cost functional over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 <code>lambdas</code>.</p></dd>
@@ -342,7 +342,7 @@ we recommend transforming to that scale and carrying out the full trend
 filtering analysis on that scale. See the <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> examples for
 a case when the inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p>
 <p>The following loss functions are automatically computed during cross
-validation and their CV error curves are returned within the <code>cv_errors</code>
+validation and their CV error curves are returned within the <code>errors</code>
 list of the <code>'cv_tf'</code> output object.</p>
 <ol>
 <li><p>Mean absolute deviations error: \[\text{MAE}(\lambda) =

@@ -88,15 +88,14 @@
 #' descending order).}
 #' \item{edfs}{Number of effective degrees of freedom in the trend filtering
 #' estimator, for every hyperparameter value in `lambdas`.}
-#' \item{sure_errors}{Vector of mean-squared prediction errors estimated
-#' by SURE, for every hyperparameter value in `lambdas`.}
-#' \item{se_sure_errors}{Vector of estimated standard errors for the
-#' `sure_errors`.}
+#' \item{errors}{Vector of mean-squared prediction errors estimated by SURE, for
+#' every hyperparameter value in `lambdas`.}
+#' \item{se_errors}{Vector of estimated standard errors for the `errors`.}
 #' \item{lambda_min}{Hyperparameter value that minimizes the SURE validation
 #' error curve.}
 #' \item{lambda_1se}{The largest hyperparameter value (corresponding to the
 #' smoothest trend filtering estimate) that yields a SURE error within
-#' one standard error of `min(sure_errors)`. We call this the
+#' one standard error of `min(errors)`. We call this the
 #' "1-standard-error rule" hyperparameter, and it serves as an Occam's
 #' razor-esque heuristic. That is, given two models with approximately equal
 #' performance (here, in terms of MSE), it may be wise to opt for the simpler
@@ -121,7 +120,7 @@
 #' outputs `y` and the trend filtering estimate, for every hyperparameter value
 #' in `lambdas`.}
 #' \item{optimisms}{SURE-estimated optimisms, i.e.
-#' `optimisms = sure_errors - training_errors`.}
+#' `optimisms = errors - training_errors`.}
 #' \item{tf_model}{A list of objects that is used internally by other
 #' functions that operate on the `'sure_tf'` object.}
 #' }
@@ -296,8 +295,8 @@ sure_trendfilter <- function(x,
     list(
       lambdas = lambdas,
       edfs = out$df %>% as.integer(),
-      sure_errors = sure_errors,
-      se_sure_errors = se_sure_errors,
+      errors = sure_errors,
+      se_errors = se_sure_errors,
       lambda_min = lambdas[i_min],
       lambda_1se = lambdas[i_1se],
       edf_min = out$df[i_min] %>% as.integer(),

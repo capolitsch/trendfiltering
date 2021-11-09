@@ -52,18 +52,18 @@ the machine, \code{mc_cores} is internally updated to
 \code{mc_cores = parallel::detectCores()}.}
 
 \item{loss_funcs}{(Optional) A named list of one or more functions, with each
-defining a loss function that will give rise to its own CV error curve. Mean
-absolute deviations error (MAE), mean-squared error (MSE), log-cosh error,
-Huber loss, mean-squared logarithmic error (MSLE), as well as
-observation-weighted versions of all except MSLE, are all computed internally
-and returned. Therefore, the \code{loss_funcs} argument need only be used to
-define loss functions that are not among these common choices.
+defining a loss function to be evaluated on held-out folds during cross
+validation. By default, \code{cv_trendfilter()} will automatically compute and
+return CV error curves for 9 common regression loss functions (see the
+Details section below). Therefore, the \code{loss_funcs} argument need only be
+used in order to define loss functions that are not among these 9 choices.
 
-Each function within the named list passed to \code{loss_funcs} should take three
-vector arguments --- \code{y}, \code{tf_estimate}, and \code{weights} --- and return a
-single scalar value for the validation error. For example, if I wanted a CV
-error curve based on a weighted median of the absolute errors to be computed,
-I would pass the list below to \code{loss_funcs}:\if{html}{\out{<div class="sourceCode r">}}\preformatted{MedAE <- function(tf_estimate, y, weights) \{
+When defining custom loss functions, each function within the named list
+passed to \code{loss_funcs} should take three vector arguments --- \code{y},
+\code{tf_estimate}, and \code{weights} --- and return a single scalar value for the
+validation error. For example, if I wanted a CV error curve based on a
+weighted median of the absolute errors to be computed, I would pass the list
+below to \code{loss_funcs}:\if{html}{\out{<div class="sourceCode r">}}\preformatted{MedAE <- function(tf_estimate, y, weights) \{
   matrixStats::weightedMedian(abs(tf_estimate - y), sqrt(weights))
 \}
 
@@ -96,7 +96,7 @@ hyperparameter value.}
 \item{max_iter}{Maximum number of ADMM iterations that we will tolerate.
 Defaults to \code{max_iter = length(y)}. The actual number of iterations performed
 by the algorithm, for every candidate hyperparameter value, is returned in
-the \code{n_iter} vector, within the \code{sure_trendfilter()} output. If any of the
+the \code{n_iter} vector, within the \code{cv_trendfilter()} output. If any of the
 elements of \code{n_iter} are equal to \code{max_iter}, the tolerance defined by
 \code{obj_tol} has not been attained and \code{max_iter} may need to be increased.}
 \item{thinning}{Logical. If \code{thinning = TRUE}, then the data are preprocessed
@@ -122,18 +122,18 @@ elements:
 descending order).}
 \item{edfs}{Number of effective degrees of freedom in the trend filtering
 estimator, for every candidate hyperparameter value in \code{lambdas}.}
-\item{cv_errors}{A named list of vectors, with each representing the
+\item{errors}{A named list of vectors, with each representing the
 cross validation error curve for a given loss function. The first 9
 vectors of the list correspond to MAE, WMAE, MSE, WMSE, log-cosh error,
 weighted log-cosh error, Huber loss, weighted Huber loss, and MSLE. If any
 custom loss functions were passed to \code{loss_funcs}, their cross validation
 curves will follow the first 9.}
-\item{se_cv_errors}{Standard errors for each of the cross validation error
-curves in \code{cv_errors}, within a named list of the same structure.}
-\item{lambda_min}{A named vector with length equal to \code{length(cv_errors)},
+\item{se_errors}{Standard errors for each of the cross validation error
+curves in \code{errors}, within a named list of the same structure.}
+\item{lambda_min}{A named vector with length equal to \code{length(errors)},
 containing the hyperparameter value that minimizes the cross validation error
 curve, for every loss function.}
-\item{lambda_1se}{A named vector with length equal to \code{length(cv_errors)},
+\item{lambda_1se}{A named vector with length equal to \code{length(errors)},
 containing the "1-standard-error rule" hyperparameter, for every loss
 function. The "1-standard-error rule" hyparameter is the largest
 hyperparameter value (corresponding to the smoothest trend filtering
@@ -141,21 +141,21 @@ estimate) that has a CV error within one standard error of the minimum CV
 error. It serves as an Occam's razor-like heuristic. That is, given two
 models with approximately equal performance, it may be wise to opt for the
 simpler model, i.e. the model with fewer effective degrees of freedom.}
-\item{edf_min}{A named vector with length equal to \code{length(cv_errors)},
+\item{edf_min}{A named vector with length equal to \code{length(errors)},
 containing the number of effective degrees of freedom in the trend filtering
 estimator that minimizes the CV error curve, for every loss function.}
-\item{edf_1se}{A named vector with length equal to \code{length(cv_errors)},
+\item{edf_1se}{A named vector with length equal to \code{length(errors)},
 containing the number of effective degrees of freedom in the
 "1-standard-error rule" trend filtering estimator, for every type of
 validation error.}
-\item{i_min}{A named vector with length equal to \code{length(cv_errors)},
+\item{i_min}{A named vector with length equal to \code{length(errors)},
 containing the index of \code{lambdas} that yields the minimum of the CV error
 curve, for every loss function.}
-\item{i_1se}{A named vector with length equal to \code{length(cv_errors)},
+\item{i_1se}{A named vector with length equal to \code{length(errors)},
 containing the index of \code{lambdas} that gives the "1-standard-error rule"
 hyperparameter value, for every loss function.}
-\item{cv_loss_funcs}{A named list of functions that defines all loss
-functions evaluated during cross validation.}
+\item{loss_funcs}{A named list of functions that defines all loss functions
+evaluated during cross validation.}
 \item{cost_functional}{The relative change in the cost functional over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 \code{lambdas}.}
@@ -197,7 +197,7 @@ filtering analysis on that scale. See the \code{\link[=sure_trendfilter]{sure_tr
 a case when the inputs are evenly sampled on the \code{log10(x)} scale.
 
 The following loss functions are automatically computed during cross
-validation and their CV error curves are returned within the \code{cv_errors}
+validation and their CV error curves are returned within the \code{errors}
 list of the \code{'cv_tf'} output object.
 
 \enumerate{

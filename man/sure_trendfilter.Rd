@@ -79,15 +79,14 @@ elements:
 descending order).}
 \item{edfs}{Number of effective degrees of freedom in the trend filtering
 estimator, for every hyperparameter value in \code{lambdas}.}
-\item{sure_errors}{Vector of mean-squared prediction errors estimated
-by SURE, for every hyperparameter value in \code{lambdas}.}
-\item{se_sure_errors}{Vector of estimated standard errors for the
-\code{sure_errors}.}
+\item{errors}{Vector of mean-squared prediction errors estimated by SURE, for
+every hyperparameter value in \code{lambdas}.}
+\item{se_errors}{Vector of estimated standard errors for the \code{errors}.}
 \item{lambda_min}{Hyperparameter value that minimizes the SURE validation
 error curve.}
 \item{lambda_1se}{The largest hyperparameter value (corresponding to the
 smoothest trend filtering estimate) that yields a SURE error within
-one standard error of \code{min(sure_errors)}. We call this the
+one standard error of \code{min(errors)}. We call this the
 "1-standard-error rule" hyperparameter, and it serves as an Occam's
 razor-esque heuristic. That is, given two models with approximately equal
 performance (here, in terms of MSE), it may be wise to opt for the simpler
@@ -112,7 +111,7 @@ converged to satisfactory precision.}
 outputs \code{y} and the trend filtering estimate, for every hyperparameter value
 in \code{lambdas}.}
 \item{optimisms}{SURE-estimated optimisms, i.e.
-\code{optimisms = sure_errors - training_errors}.}
+\code{optimisms = errors - training_errors}.}
 \item{tf_model}{A list of objects that is used internally by other
 functions that operate on the \code{'sure_tf'} object.}
 }
