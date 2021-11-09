@@ -7,7 +7,7 @@
 \usage{
 \method{predict}{cv_tf}(
   obj,
-  validation_error_metric = "WMAE",
+  loss_func = "WMAE",
   lambda_choice = c("lambda_min", "lambda_1se"),
   x_eval,
   nx_eval
@@ -19,20 +19,19 @@
 \item{obj}{An object of class '\code{\link[=cv_trendfilter]{cv_tf}}' or
 '\code{\link[=sure_trendfilter]{sure_tf}}'.}
 
-\item{validation_error_metric}{(For class \code{'cv_tf'} only) A string or
-index specifying which cross validation error curve stored within the
-\code{cv_tf} object will be used to choose the trend filtering hyperparameter.
-The first 4 options are \code{"WMAE"}, \code{"WMSE"}, \code{"MAE"}, and \code{"MSE"}.
-Therefore, for example, one could select the CV curve based on mean absolute
-deviations error by passing either
-\code{validation_error_metric = "MAE"} or \code{validation_error_metric = 3}. If the
-user passed custom error functions to \code{\link[=cv_trendfilter]{cv_trendfilter()}}, then these will
-be available as additional options following the first 4, and their string
-designations can be seen by running \code{names(obj$validation_error_funcs)}.}
+\item{loss_func}{(For class \code{'cv_tf'} only) A string or index specifying
+which cross validation error curve stored within the \code{cv_tf} object will be
+used to choose the trend filtering hyperparameter. The first 4 options are
+\code{"WMAE"}, \code{"WMSE"}, \code{"MAE"}, and \code{"MSE"}. Therefore, for example, one could
+select the CV curve based on mean absolute  deviations error by passing
+either \code{loss_func = "MAE"} or \code{loss_func = 3}. If the user passed custom
+error functions to \code{\link[=cv_trendfilter]{cv_trendfilter()}}, then these will be available as
+additional options following the first 4, and their string designations can
+be seen by running \code{names(obj$cv_loss_funcs)}.}
 
-\item{lambda_choice}{One of \code{c("lambda_min", "lambda_1se")}. The choice
-of hyperparameter that is used for optimized trend filtering estimate.
-Defaults to \code{lambda_choice = "lambda_min"}.
+\item{lambda_choice}{One of \code{c("lambda_min", "lambda_1se")}. The choice of
+hyperparameter that is used for optimized trend filtering estimate. Defaults
+to \code{lambda_choice = "lambda_min"}.
 \itemize{
 \item{\code{"lambda_min"}}: The hyperparameter value that minimizes the cross
 validation error curve.
@@ -56,7 +55,7 @@ elements:
 \item{tf_estimate}{}
 \item{lambdas}{}
 \item{edfs}{}
-\item{validation_error_metric}{}
+\item{loss_func}{}
 \item{validation_errors}{}
 \item{se_validation_errors}{}
 \item{lambda_opt}{}
@@ -66,10 +65,10 @@ elements:
 }
 }
 \description{
-Evaluate an optimized trend filtering estimate on a grid of input values.
-The predict function can be called on an object of class
+Evaluate an optimized trend filtering object on a grid of input values. The
+predict function can be called on an object of class
 '\code{\link[=cv_trendfilter]{cv_tf}}' or '\code{\link[=sure_trendfilter]{sure_tf}}', and the
-arguments \code{validation_error_metric} (for \code{'cv_tf'} objects only) and
+arguments \code{loss_func} (for \code{'cv_tf'} objects only) and
 \code{lambda_choice} should be used to specify the desired method for optimizing
 the trend filtering hyperparameter.
 }
@@ -97,7 +96,7 @@ cv_tf <- cv_trendfilter(
 
 pred_tf <- predict(
   cv_tf,
-  validation_error_metric = "MAE",
+  loss_func = "MAE",
   lambda_choice = "lambda_1se",
   nx_eval = 1500L
 )

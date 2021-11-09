@@ -44,7 +44,7 @@ risk estimate — sure_trendfilter • trendfiltering</title>
 risk estimate — sure_trendfilter" />
 <meta property="og:description" content="For every candidate hyperparameter value, compute an unbiased estimate of the
 trend filtering model's predictive mean-squared error. See the details
-section for when you should use sure_trendfilter() versus
+section for guidelines on when sure_trendfilter() should be used versus
 cv_trendfilter()." />
 
 
@@ -125,7 +125,7 @@ risk estimate</h1>
     <div class="ref-description">
     <p>For every candidate hyperparameter value, compute an unbiased estimate of the
 trend filtering model's predictive mean-squared error. See the details
-section for when you should use <code>sure_trendfilter()</code> versus
+section for guidelines on when <code>sure_trendfilter()</code> should be used versus
 <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>.</p>
     </div>
 
@@ -144,10 +144,11 @@ section for when you should use <code>sure_trendfilter()</code> versus
     </tr>
     <tr>
       <th>weights</th>
-      <td><p>Weights for the observed outputs, defined as the reciprocal
-variance of the additive noise that contaminates the signal in <code>y</code>.
-When the noise is expected to have equal variance for all observations,
-<code>weights</code> can be passed as a scalar. Otherwise, <code>weights</code> must be a vector
+      <td><p>(Optional) Weights for the observed outputs, defined as the
+reciprocal variance of the additive noise that contaminates the output
+signal. When the noise is expected to have an equal variance,
+\(\sigma^2\), for all observations, a scalar can be passed to <code>weights</code>,
+namely <code>weights = </code>\(1/\sigma^2\). Otherwise, <code>weights</code> must be a vector
 with the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
     <tr>
@@ -161,10 +162,10 @@ their use can lead to instability in the convex optimization.</p></td>
     <tr>
       <th>nlambdas</th>
       <td><p>Number of hyperparameter values to test during validation.
-Defaults to <code>nlambdas = 250</code>. The hyperparameter grid is dynamically
-constructed to span the full model space lying between a single polynomial
-solution (i.e. a power law) and an interpolating solution, with <code>nlambdas</code>
-controlling the granularity of the hyperparameter grid.</p></td>
+Defaults to <code>nlambdas = 250</code>. The hyperparameter grid is internally
+constructed to span the full trend filtering model space lying by a global
+polynomial solution (i.e. a power law) and an interpolating solution, with
+<code>nlambdas</code> controlling the granularity of the model space that is</p></td>
     </tr>
     <tr>
       <th>optimization_params</th>

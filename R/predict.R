@@ -1,27 +1,26 @@
 #' Evaluate an optimized trend filtering estimate
 #'
-#' Evaluate an optimized trend filtering estimate on a grid of input values.
-#' The predict function can be called on an object of class
+#' Evaluate an optimized trend filtering object on a grid of input values. The
+#' predict function can be called on an object of class
 #' '[`cv_tf`][cv_trendfilter()]' or '[`sure_tf`][sure_trendfilter()]', and the
-#' arguments `validation_error_metric` (for `'cv_tf'` objects only) and
+#' arguments `loss_func` (for `'cv_tf'` objects only) and
 #' `lambda_choice` should be used to specify the desired method for optimizing
 #' the trend filtering hyperparameter.
 #'
 #' @param obj An object of class '[`cv_tf`][cv_trendfilter()]' or
 #' '[`sure_tf`][sure_trendfilter()]'.
-#' @param validation_error_metric (For class `'cv_tf'` only) A string or
-#' index specifying which cross validation error curve stored within the
-#' `cv_tf` object will be used to choose the trend filtering hyperparameter.
-#' The first 4 options are `"WMAE"`, `"WMSE"`, `"MAE"`, and `"MSE"`.
-#' Therefore, for example, one could select the CV curve based on mean absolute
-#' deviations error by passing either
-#' `validation_error_metric = "MAE"` or `validation_error_metric = 3`. If the
-#' user passed custom error functions to [`cv_trendfilter()`], then these will
-#' be available as additional options following the first 4, and their string
-#' designations can be seen by running `names(obj$validation_error_funcs)`.
-#' @param lambda_choice One of `c("lambda_min", "lambda_1se")`. The choice
-#' of hyperparameter that is used for optimized trend filtering estimate.
-#' Defaults to `lambda_choice = "lambda_min"`.
+#' @param loss_func (For class `'cv_tf'` only) A string or index specifying
+#' which cross validation error curve stored within the `cv_tf` object will be
+#' used to choose the trend filtering hyperparameter. The first 4 options are
+#' `"WMAE"`, `"WMSE"`, `"MAE"`, and `"MSE"`. Therefore, for example, one could
+#' select the CV curve based on mean absolute  deviations error by passing
+#' either `loss_func = "MAE"` or `loss_func = 3`. If the user passed custom
+#' error functions to [`cv_trendfilter()`], then these will be available as
+#' additional options following the first 4, and their string designations can
+#' be seen by running `names(obj$cv_loss_funcs)`.
+#' @param lambda_choice One of `c("lambda_min", "lambda_1se")`. The choice of
+#' hyperparameter that is used for optimized trend filtering estimate. Defaults
+#' to `lambda_choice = "lambda_min"`.
 #' \itemize{
 #' \item{`"lambda_min"`}: The hyperparameter value that minimizes the cross
 #' validation error curve.
@@ -49,7 +48,7 @@
 #' \item{tf_estimate}{}
 #' \item{lambdas}{}
 #' \item{edfs}{}
-#' \item{validation_error_metric}{}
+#' \item{loss_func}{}
 #' \item{validation_errors}{}
 #' \item{se_validation_errors}{}
 #' \item{lambda_opt}{}
@@ -79,40 +78,40 @@
 #'
 #' pred_tf <- predict(
 #'   cv_tf,
-#'   validation_error_metric = "MAE",
+#'   loss_func = "MAE",
 #'   lambda_choice = "lambda_1se",
 #'   nx_eval = 1500L
 #' )
 #' @importFrom dplyr case_when tibble
-#' @importFrom magrittr %>%
+#' @importFrom magrittr %<>% %>%
 #' @export
 predict.cv_tf <- function(obj,
-                          validation_error_metric = "WMAE",
+                          loss_func = "WMAE",
                           lambda_choice = c("lambda_min", "lambda_1se"),
                           x_eval,
                           nx_eval) {
   stopifnot(any(class(obj) == "cv_tf"))
   stopifnot(
-    class(validation_error_metric) %in% c("character", "integer", "numeric")
+    class(loss_func) %in% c("character", "integer", "numeric")
   )
 
-  if (is.character(validation_error_metric)) {
-    stopifnot(validation_error_metric %in% names(obj$validation_errors))
+  if (is.character(loss_func)) {
+    stopifnot(loss_func %in% names(obj$validation_errors))
   }
 
-  if (is.double(validation_error_metric) | is.integer(validation_error_metric)) {
-    if (validation_error_metric != round(validation_error_metric)) {
-      validation_error_metric <- which.min(
-        abs(validation_error_metric - 1:length(obj$i_min))
+  if (is.double(loss_func) | is.integer(loss_func)) {
+    if (loss_func != round(loss_func)) {
+      loss_func <- which.min(
+        abs(loss_func - 1:length(obj$i_min))
       )
 
       warning(
         cat(paste0(
-          "validation_error_metric should either be one of c('",
+          "loss_func should either be one of c('",
           paste(names(obj$i_min), collapse = "', '"),
           "'), or an index in 1:", length(obj$i_min),
-          ".\nChoosing the closest index option: ", validation_error_metric,
-          " ('", names(obj$i_min)[validation_error_metric], "')."
+          ".\nChoosing the closest index option: ", loss_func,
+          " ('", names(obj$i_min)[loss_func], "')."
         )),
         call. = FALSE
       )
@@ -147,8 +146,8 @@ predict.cv_tf <- function(obj,
   lambda_choice <- match.arg(lambda_choice)
 
   i_opt <- case_when(
-    lambda_choice == "lambda_min" ~ obj$i_min[validation_error_metric],
-    lambda_choice == "lambda_1se" ~ obj$i_1se[validation_error_metric]
+    lambda_choice == "lambda_min" ~ obj$i_min[loss_func],
+    lambda_choice == "lambda_1se" ~ obj$i_1se[loss_func]
   )
 
   names(i_opt) <- NULL
@@ -167,10 +166,10 @@ predict.cv_tf <- function(obj,
       tf_estimate = tf_estimate,
       lambdas = obj$lambdas,
       edfs = obj$edfs,
-      validation_error_metric = validation_error_metric,
-      validation_error_func = obj$validation_error_funcs[[validation_error_metric]],
-      validation_errors = obj$validation_errors[[validation_error_metric]],
-      se_validation_errors = obj$se_validation_errors[[validation_error_metric]],
+      loss_func = loss_func,
+      validation_error_func = obj$validation_error_funcs[[loss_func]],
+      validation_errors = obj$validation_errors[[loss_func]],
+      se_validation_errors = obj$se_validation_errors[[loss_func]],
       lambda_opt = obj$lambdas[i_opt],
       edf_opt = obj$edfs[i_opt],
       i_opt = i_opt,
@@ -183,7 +182,7 @@ predict.cv_tf <- function(obj,
 
 
 #' @importFrom dplyr case_when tibble
-#' @importFrom magrittr %>%
+#' @importFrom magrittr %<>% %>%
 #' @rdname predict_trendfilter
 #' @export
 predict.sure_tf <- function(obj,

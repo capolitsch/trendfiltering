@@ -12,10 +12,11 @@ sure_trendfilter(x, y, weights, k = 2L, nlambdas = 250L, optimization_params)
 
 \item{y}{Vector of observed values for the output variable.}
 
-\item{weights}{Weights for the observed outputs, defined as the reciprocal
-variance of the additive noise that contaminates the signal in \code{y}.
-When the noise is expected to have equal variance for all observations,
-\code{weights} can be passed as a scalar. Otherwise, \code{weights} must be a vector
+\item{weights}{(Optional) Weights for the observed outputs, defined as the
+reciprocal variance of the additive noise that contaminates the output
+signal. When the noise is expected to have an equal variance,
+\mjseqn{\sigma^2}, for all observations, a scalar can be passed to \code{weights},
+namely \verb{weights = }\mjseqn{1/\sigma^2}. Otherwise, \code{weights} must be a vector
 with the same length as \code{x} and \code{y}.}
 
 \item{k}{Degree of the polynomials that make up the piecewise-polynomial
@@ -25,10 +26,10 @@ disallowed since their smoothness is indistinguishable from \code{k = 2} and
 their use can lead to instability in the convex optimization.}
 
 \item{nlambdas}{Number of hyperparameter values to test during validation.
-Defaults to \code{nlambdas = 250}. The hyperparameter grid is dynamically
-constructed to span the full model space lying between a single polynomial
-solution (i.e. a power law) and an interpolating solution, with \code{nlambdas}
-controlling the granularity of the hyperparameter grid.}
+Defaults to \code{nlambdas = 250}. The hyperparameter grid is internally
+constructed to span the full trend filtering model space lying by a global
+polynomial solution (i.e. a power law) and an interpolating solution, with
+\code{nlambdas} controlling the granularity of the model space that is}
 
 \item{optimization_params}{(Optional) A named list of parameter values to be
 passed to the trend filtering ADMM algorithm of
@@ -119,7 +120,7 @@ functions that operate on the \code{sure_trendfilter()} output.}
 \description{
 For every candidate hyperparameter value, compute an unbiased estimate of the
 trend filtering model's predictive mean-squared error. See the details
-section for when you should use \code{\link[=sure_trendfilter]{sure_trendfilter()}} versus
+section for guidelines on when \code{\link[=sure_trendfilter]{sure_trendfilter()}} should be used versus
 \code{\link[=cv_trendfilter]{cv_trendfilter()}}.
 }
 \details{
