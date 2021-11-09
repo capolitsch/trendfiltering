@@ -1,18 +1,20 @@
-#' Optimize the trend filtering hyperparameter by V-fold cross validation
+#' Optimize the trend filtering hyperparameter by \emph{V}-fold cross validation
 #'
-#' For every candidate hyperparameter value, estimate the corresponding trend
-#' filtering model's out-of-sample error by V-fold cross validation. Four
-#' commonly-used types of error --- MSE, WMSE, MAE, WMAE --- are all evaluated
-#' and returned, and the user has the option to pass additional error
-#' functionals to be evaluated. See the details section for when you should use
-#' [cv_trendfilter()] versus [`sure_trendfilter()`].
+#' \loadmathjax For every candidate hyperparameter value, estimate the trend
+#' filtering model's out-of-sample error by \emph{V}-fold cross validation. CV
+#' error curves are returned for four of the most common regression loss
+#' metrics, as well as observation-weighted versions. Custom loss functions may
+#' also be passed to the `loss_funcs` argument. See the details section for
+#' definitions of each loss function, and for guidelines on when
+#' [cv_trendfilter()] should be used versus [`sure_trendfilter()`].
 #'
 #' @param x Vector of observed values for the input variable.
 #' @param y Vector of observed values for the output variable.
-#' @param weights Weights for the observed outputs, defined as the reciprocal
-#' variance of the additive noise that contaminates the signal in `y`.
-#' When the noise is expected to have equal variance for all observations,
-#' `weights` can be passed as a scalar. Otherwise, `weights` must be a vector
+#' @param weights (Optional) Weights for the observed outputs, defined as the
+#' reciprocal variance of the additive noise that contaminates the output
+#' signal. When the noise is expected to have an equal variance,
+#' \mjseqn{\sigma^2}, for all observations, a scalar can be passed to `weights`,
+#' namely `weights = `\mjseqn{1/\sigma^2}. Otherwise, `weights` must be a vector
 #' with the same length as `x` and `y`.
 #' @param k Degree of the polynomials that make up the piecewise-polynomial
 #' trend filtering estimate. Defaults to `k = 2` (i.e. a piecewise quadratic
@@ -20,35 +22,37 @@
 #' disallowed since their smoothness is indistinguishable from `k = 2` and
 #' their use can lead to instability in the convex optimization.
 #' @param nlambdas Number of hyperparameter values to test during validation.
-#' Defaults to `nlambdas = 250`. The hyperparameter grid is dynamically
-#' constructed to span the full model space lying between a single polynomial
-#' solution (i.e. a power law) and an interpolating solution, with `nlambdas`
-#' controlling the granularity of the hyperparameter grid.
-#' @param V Number of folds that the data are partitioned into for the V-fold
-#' cross validation. Defaults to `V = 10`.
-#' @param custom_error_funcs (Optional) A named list of one or more functions,
-#' with each defining an error functional to evaluate on held-out folds during
-#' cross validation. Mean-squared error (MSE) and mean absolute error (MAE) are
-#' both evaluated automatically, as well as weighted versions of each (with
-#' reciprocal variances as weights) --- WMSE and WMAE. Therefore, the user does
-#' not need to pass anything to `custom_error_funcs` unless they want to define
-#' a validation error metric other than MSE, MAE, WMSE, and WMAE.
+#' Defaults to `nlambdas = 250`. The hyperparameter grid is internally
+#' constructed to span the full trend filtering model space lying by a global
+#' polynomial solution (i.e. a power law) and an interpolating solution, with
+#' `nlambdas` controlling the granularity of the model space that is
+#' @param V Number of folds that the data are partitioned into for the
+#' \emph{V}-fold cross validation. Defaults to `V = 10`.
+#' @param loss_funcs (Optional) A named list of one or more functions, with each
+#' defining a loss function to evaluate on held-out data during cross
+#' validation. See the details section below for the common loss functions that
+#' are automatically computed. The user need only use the `loss_funcs` argument
+#' if they wish to evaluate cross validation error using a loss function other
+#' than those defined below.
 #'
-#' In such a case, each function in the named list passed to
-#' `custom_error_funcs` should take three vector arguments --- `y`,
-#' `tf_estimate`, and `weights` --- and return a single scalar value for the
-#' validation error. For example, if I also wanted to define a validation
-#' error curve from the weighted median of the absolute errors, I could pass the
-#' following list to `custom_error_funcs`:
+#' In such a case, each function in the named list passed to `loss_funcs`
+#' should take three vector arguments --- `y`, `tf_estimate`, and `weights` ---
+#' and return a single scalar value for the validation error. For example, if I
+#' wanted to produce a CV error curve from a weighted median of absolute errors,
+#' I could pass the following list to `loss_funcs`:
 #' ```{r, eval = FALSE}
-#' list(MedAE = function(tf_estimate, y, weights) {
-#'                matrixStats::weightedMedian(abs(tf_estimate - y), weights)
-#'              }
-#'     )
+#' MedAE <- function(tf_estimate, y, weights) {
+#'   matrixStats::weightedMedian(abs(tf_estimate - y), sqrt(weights))
+#' }
+#'
+#' list(MedAE = MedAE)
 #' ```
 #' @param mc_cores Multi-core computing using the
 #' [`parallel`][`parallel::parallel-package`] R package: The number of cores to
-#' utilize. Defaults to the number of cores detected, minus four.
+#' utilize. Defaults to the number of cross validation folds, `mc_cores = V`.
+#' If the value passed to `mc_cores` exceeds the number of cores detected on
+#' the machine, `mc_cores` is internally updated to
+#' `mc_cores = parallel::detectCores()`.
 #' @param optimization_params (Optional) A named list of parameter values to be
 #' passed to the trend filtering ADMM algorithm of
 #' [Ramdas and Tibshirani (2016)](
@@ -106,28 +110,46 @@
 #' filtering analysis on that scale. See the [`sure_trendfilter()`] examples for
 #' a case when the inputs are evenly sampled on the `log10(x)` scale.
 #'
-#' The validation error functionals that we automatically compute CV curves for
-#' are formally defined below.
-#'
-#' \loadmathjax
-#' \mjsdeqn{MSE(\lambda) = \frac{1}{n}
+#' \enumerate{
+#' \item Mean-squared error: \mjsdeqn{\text{MSE}(\lambda) = \frac{1}{n}
 #' \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2}
-#' \mjsdeqn{MAE(\lambda) = \frac{1}{n}
-#' \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|}
-#' \mjsdeqn{WMSE(\lambda) = \sum_{i=1}^{n}
-#' |Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
-#' \mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n}
+#' \item Weighted mean-squared error: \mjsdeqn{\text{WMSE}(\lambda)
+#' = \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
+#' \item Mean absolute deviations error: \mjsdeqn{\text{MAE}(\lambda) =
+#' \frac{1}{n} \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|}
+#' \item Weighted mean absolute deviations error:
+#' \mjsdeqn{\text{WMAE}(\lambda) = \sum_{i=1}^{n}
 #' |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
+#' \item Huber error: \mjsdeqn{\text{Huber}(\lambda) =
+#' \frac{1}{n}\sum_{i=1}^{n}L_{\delta}(Y_i; \lambda)}
+#' \mjsdeqn{\text{where}\;\;\;\;L_{\delta}(Y_i; \lambda) = \cases{
+#' |Y_i - \hat{f}(x_i; \lambda)|^2, &
+#' $|Y_i - \hat{f}(x_i; \lambda)| \leq \delta$ \cr
+#' 2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, &
+#' $|Y_i - \hat{f}(x_i; \lambda)| > \delta$}}
+#' \item Weighted Huber error: \mjsdeqn{\text{wHuber}(\lambda) =
+#' \sum_{i=1}^{n}L_{\delta}(Y_i; \lambda)}
+#' \mjsdeqn{\text{where}\;\;\;\;L_{\delta}(Y_i; \lambda) = \cases{
+#' |Y_i - \hat{f}(x_i; \lambda)|^2, &
+#' $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
+#' 2\delta|Y_i - \hat{f}(x_i; \lambda)| -
+#' \delta^2, & $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta$}}
+#' \item Mean-squared logarithmic error: \mjsdeqn{\text{MSLE}(\lambda) =
+#' \frac{1}{n}\sum_{i=1}^{n}
+#' \left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|}
+#' \item Weighted mean-squared logarithmic error: \mjsdeqn{\text{MSLE}(\lambda)
+#' = \frac{1}{n}\sum_{i=1}^{n}
+#' \left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|\log(w_i + 1)}
+#' }
 #' where \mjseqn{w_i:=} `weights[i]`.
 #'
-#' If constant weights are passed, or if nothing is passed, then the weighted
-#' and unweighted counterparts are equivalent.
+#' If constant weights are passed, or if nothing is passed, then a weighted loss
+#' function is equivalent to its unweighted counterpart.
 #'
-#' Briefly stated, weighting the validation error metric (with reciprocal
-#' variances) helps prevent the error from being dominated by the model's
-#' (in)accuracy on a (potentially very small) subset of the data that have
-#' high variance; and absolute error is less sensitive to outliers than squared
-#' error.
+#' Briefly stated, weighting the validation loss helps prevent it
+#' from being dominated by the model's performance on a small subset of
+#' difficult-to-predict observations; and absolute error is less
+#' sensitive to outliers than squared error.
 #'
 #' @return An object of class `'cv_tf'`. This is a list with the following
 #' elements:
@@ -135,19 +157,19 @@
 #' \item{lambdas}{Vector of candidate hyperparameter values (always returned in
 #' descending order).}
 #' \item{edfs}{Number of effective degrees of freedom in the trend filtering
-#' estimator, for every hyperparameter value in `lambdas`.}
-#' \item{validation_errors}{A named list of vectors, with each representing the
-#' cross validation error curve for some definition of error. The first 4
-#' vectors of the list correspond to WMAE, WMSE, MAE, MSE. If any custom
-#' error functionals were passed to `custom_error_funcs`, their cross validation
-#' curves will follow the first 4.}
-#' \item{se_validation_errors}{Named list of estimated standard errors for each
-#' of the cross validation error curves in `validation_errors`.}
+#' estimator, for every candidate hyperparameter value in `lambdas`.}
+#' \item{cv_errors}{A named list of vectors, with each representing the
+#' cross validation error curve for a given loss function. The first 8
+#' vectors of the list correspond to MAE, WMAE, MSE, WMSE. If any custom
+#' loss functions were passed to `loss_funcs`, their cross validation
+#' curves will follow the first 8.}
+#' \item{se_cv_errors}{Named list of estimated standard errors for each
+#' of the cross validation error curves in `cv_errors`.}
 #' \item{lambda_min}{A named vector with length equal to
-#' `length(validation_errors)`, containing the hyperparameter value that
+#' `length(cv_errors)`, containing the hyperparameter value that
 #' minimizes the cross validation error curve, for every type validation error.}
 #' \item{lambda_1se}{A named vector with length equal to
-#' `length(validation_errors)`, containing the "1-standard-error rule"
+#' `length(cv_errors)`, containing the "1-standard-error rule"
 #' hyperparameter, for every type validation error. The "1-standard-error rule"
 #' hyparameter is the largest hyperparameter value (corresponding to the
 #' smoothest trend filtering estimate) that has a cross validation error
@@ -156,21 +178,21 @@
 #' approximately equal performance, it may be wise to opt for the simpler model,
 #' i.e. the model with fewer effective degrees of freedom.}
 #' \item{edf_min}{A named vector with length equal to
-#' `length(validation_errors)`, containing the number of effective degrees of
+#' `length(cv_errors)`, containing the number of effective degrees of
 #' freedom in the trend filtering estimator that minimizes the cross validation
 #' error curve, for every type of validation error.}
 #' \item{edf_1se}{A named vector with length equal to
-#' `length(validation_errors)`, containing the number of effective degrees of
+#' `length(cv_errors)`, containing the number of effective degrees of
 #' freedom in the "1-standard-error rule" trend filtering estimator, for every
 #' type of validation error.}
 #' \item{i_min}{A named vector with length equal to
-#' `length(validation_errors)`, containing the index of `lambdas` that minimizes
+#' `length(cv_errors)`, containing the index of `lambdas` that minimizes
 #' the CV error curve, for every type of validation error.}
 #' \item{i_1se}{A named vector with length equal to
-#' `length(validation_errors)`, containing the index of `lambdas` that
+#' `length(cv_errors)`, containing the index of `lambdas` that
 #' gives the "1-standard-error rule" hyperparameter value, for every
 #' type of validation error.}
-#' \item{validation_error_funcs}{A named list of functions that define the
+#' \item{cv_loss_funcs}{A named list of functions that define the
 #' types of error that were evaluated during cross validation.}
 #' \item{cost_functional}{The relative change in the cost functional over the
 #' ADMM algorithm's final iteration, for every candidate hyperparameter in
@@ -224,12 +246,12 @@
 #'     thinning = TRUE
 #'   )
 #' )
-#' @importFrom dplyr mutate arrange case_when group_split bind_rows
 #' @importFrom glmgen trendfilter trendfilter.control.list
-#' @importFrom parallel mclapply detectCores
-#' @importFrom matrixStats rowSds
+#' @importFrom dplyr mutate arrange case_when group_split bind_rows
 #' @importFrom magrittr %$% %>% %<>%
 #' @importFrom tidyr tibble drop_na
+#' @importFrom parallel mclapply detectCores
+#' @importFrom matrixStats rowSds
 #' @importFrom stats median sd
 cv_trendfilter <- function(x,
                            y,
@@ -237,56 +259,72 @@ cv_trendfilter <- function(x,
                            k = 2L,
                            nlambdas = 250L,
                            V = 10L,
-                           mc_cores = parallel::detectCores() - 4,
-                           custom_error_funcs,
+                           mc_cores = V,
+                           loss_funcs,
                            optimization_params) {
-  stopifnot(mc_cores >= 1)
-  if (missing(x) || is.null(x)) stop("x must be passed.")
-  if (missing(y) || is.null(y)) stop("y must be passed.")
-  if (length(x) != length(y)) stop("x and y must have equal length.")
-  if (length(y) < k + 2) stop("Must have >= k + 2 observations.")
-  if (k < 0 || k != round(k)) stop("k must be a nonnegative integer.")
-  if (k > 2) {
-    stop("k > 2 are algorithmically unstable and do not improve upon k = 2.")
+  if (missing(x) || is.null(x)) stop("`x` must be passed.")
+  if (missing(y) || is.null(y)) stop("`y` must be passed.")
+  if (length(x) != length(y)) stop("`x` and `y` must have equal length.")
+  if (k < 0L || k != round(k)) stop("`k` must be a nonnegative integer.")
+  if (length(y) < k + 2) {
+    stop("Insufficient data. Must have `length(y) >= k + 2`.")
   }
+
+  if (k > 2L) {
+    stop(
+      "Polynomial choices `k > 2` can be algorithmically unstable and their
+       performance does not improve upon `k = 2`."
+    )
+  }
+
   if (V < 2 || V != round(V)) {
     stop("V must be an integer between 2 and length(x).")
   }
 
-  if (!missing(weights)) {
-    if (!(length(weights) %in% c(1, length(y)))) {
-      stop(
-        "If passed, weights must be numerically-valued with length(weights) = 1
-        or the same length as x and y."
-      )
-    }
-    if (!(class(weights) %in% c("numeric", "integer"))) {
-      stop(
-        "If passed, weights must be numerically-valued with length(weights) = 1
-        or the same length as x and y."
-      )
-    }
+  if (V > 10L) {
+    warning(
+      "V-fold cross validation with `V > 10` is strongly discouraged for
+       trend filtering analyses. `V = 10` is the optimal choice for V-fold
+       cross validation in the sense that it yields the best estimates of a
+       model's out-of-sample error. And larger choices of `V`, such as
+       `V = length(x)` (a.k.a. leave-one-out cross validation), do not have
+       their usual computational benefits with trend filtering since it is a
+       nonlinear smoother, and the efficiency of LOOCV relies on linearity
+       in the regression estimator.",
+      call. = FALSE
+    )
+  }
+
+  if (missing(weights)) weights <- rep_len(1, length(y))
+  if (length(weights) == 1) weights <- rep_len(weights, length(y))
+
+  if (!(class(weights) %in% c("numeric", "integer"))) {
+    stop(
+      "If passed, weights must be a numeric vector with the same length as `x`
+       and `y`, or `length(weights) = 1` when the noise is believed to be
+       homoskedasatic (i.e. constant variance)."
+    )
   }
 
   if (nlambdas < 0 || nlambdas != round(nlambdas)) {
-    stop("nlambdas must be a positive integer")
+    stop("`nlambdas` must be a positive integer.")
   } else {
     nlambdas <- nlambdas %>% as.integer()
   }
 
+  mc_cores <- max(c(1, floor(mc_cores)))
+  mc_cores <- min(c(detectCores(), V, mc_cores))
+
   if (mc_cores < V & mc_cores < detectCores() / 2) {
     warning(
-      paste0(
-        "Your machine has ", detectCores(), " cores available. ",
-        "Setting `mc_cores = V` can speed up computation."
-      )
+      paste(
+        "Your machine has", detectCores(), "cores, but you've only configured",
+        "`cv_trendfilter()`\nto use", mc_cores, "of them. Letting",
+        "`mc_cores = V` can significantly speed up the cross\nvalidation."
+      ),
+      call. = FALSE, immediate. = TRUE
     )
   }
-
-  if (mc_cores > detectCores()) mc_cores <- detectCores()
-  mc_cores <- min(floor(mc_cores), V)
-  if (missing(weights)) weights <- rep(1, length(y))
-  if (length(weights) == 1) weights <- rep(weights, length(y))
 
   x %<>% as.double()
   y %<>% as.double()
@@ -299,41 +337,58 @@ cv_trendfilter <- function(x,
     filter(weights > 0) %>%
     drop_na()
 
-  if (missing(custom_error_funcs)) {
-    validation_error_funcs <- list(
-      WMAE = WMAE, WMSE = WMSE,
-      MAE = MAE, MSE = MSE
+  if (missing(loss_funcs)) {
+    cv_loss_funcs <- list(
+      MAE = MAE,
+      WMAE = WMAE,
+      MSE = MSE,
+      WMSE = WMSE,
+      Huber = Huber,
+      wHuber = wHuber,
+      MSLE = MSLE,
+      WMSLE = WMSLE
     )
   } else {
-    if (class(custom_error_funcs) == "function") {
-      stop("Please pass your validation error function within a named list.")
+    if (class(loss_funcs) == "function") {
+      stop("Custom error function(s) must be passed within a named list.")
     }
 
-    if (class(custom_error_funcs) != "list") {
-      stop("Please pass your validation error function(s) within a named list.")
+    if (class(loss_funcs) != "list") {
+      stop("Custom error function(s) must be passed within a named list.")
     }
 
-    if (class(custom_error_funcs) == "list") {
-      if (is.null(names(custom_error_funcs)) |
-        any(names(custom_error_funcs) == "")) {
-        stop(paste0(
-          "Please name each of the functions in your custom_error_funcs ",
-          "list."
-        ))
+    if (class(loss_funcs) == "list") {
+      if (is.null(names(loss_funcs)) ||
+        any(names(loss_funcs) == "")) {
+        stop(
+          "Please name each of the functions in your `loss_funcs` list."
+        )
       }
 
-      for (X in 1:length(list)) {
+      for (X in 1:length(loss_funcs)) {
         if (!all(c("y", "tf_estimate", "weights") %in%
-          names(formals(validation_error_funcs[[X]])))) {
+          names(formals(loss_funcs[[X]])))) {
           stop(paste0(
-            "Incorrect input argument structure for function ",
-            "validation_error_funcs[[", X, "]]."
+            "Incorrect input argument structure for the function ",
+            "`loss_funcs[[", X, "]]`.\n Each custom error function ",
+            "should have vector input arguments `y`, `tf_estimate`,\n",
+            "`weights`, and then compute and return a scalar value for the ",
+            "validation error."
           ))
         }
       }
-      validation_error_funcs <- c(
-        list(WMAE = WMAE, WMSE = WMSE, MAE = MAE, MSE = MSE),
-        custom_error_funcs
+      cv_loss_funcs <- c(
+        list(
+          MAE = MAE,
+          WMAE = WMAE,
+          MSE = MSE,
+          WMSE = WMSE,
+          Huber = Huber,
+          wHuber = wHuber,
+          MSLE = MSLE,
+          WMSLE = WMSLE
+        ),
+        loss_funcs
       )
     }
   }
@@ -374,13 +429,13 @@ cv_trendfilter <- function(x,
     k = k,
     thinning = thinning,
     admm_params = admm_params,
-    validation_error_funcs = validation_error_funcs,
+    cv_loss_funcs = cv_loss_funcs,
     y_scale = y_scale,
     mc.cores = mc_cores
   )
 
   cv_error_mats <- lapply(
-    X = 1:length(validation_error_funcs),
+    X = 1:length(cv_loss_funcs),
     FUN = function(X) {
       lapply(
         1:length(cv_errors),
@@ -391,7 +446,7 @@ cv_trendfilter <- function(x,
     }
   )
 
-  validation_errors <- lapply(
+  cv_errors <- lapply(
     1:length(cv_error_mats),
     FUN = function(X) {
       cv_error_mats[[X]] %>%
@@ -401,27 +456,27 @@ cv_trendfilter <- function(x,
   )
 
   i_min <- lapply(
-    1:length(validation_errors),
+    1:length(cv_errors),
     FUN = function(X) {
-      validation_errors[[X]] %>%
+      cv_errors[[X]] %>%
         which.min() %>%
         min()
     }
   ) %>% unlist()
 
-  se_validation_errors <- lapply(
-    1:length(validation_errors),
+  se_cv_errors <- lapply(
+    1:length(cv_errors),
     FUN = function(X) {
       rowSds(cv_error_mats[[X]]) / sqrt(V) %>% as.double()
     }
   )
 
   i_1se <- lapply(
-    X = 1:length(validation_errors),
+    X = 1:length(cv_errors),
     FUN = function(X) {
       which(
-        validation_errors[[X]] <= validation_errors[[X]][i_min[X]] +
-          se_validation_errors[[X]][i_min[X]]
+        cv_errors[[X]] <= cv_errors[[X]][i_min[X]] +
+          se_cv_errors[[X]][i_min[X]]
       ) %>% min()
     }
   ) %>% unlist()
@@ -442,14 +497,14 @@ cv_trendfilter <- function(x,
   edf_min <- out$df[i_min] %>% as.integer()
   edf_1se <- out$df[i_1se] %>% as.integer()
 
-  names(lambda_min) <- names(validation_error_funcs)
-  names(lambda_1se) <- names(validation_error_funcs)
-  names(edf_min) <- names(validation_error_funcs)
-  names(edf_1se) <- names(validation_error_funcs)
-  names(validation_errors) <- names(validation_error_funcs)
-  names(i_min) <- names(validation_error_funcs)
-  names(se_validation_errors) <- names(validation_error_funcs)
-  names(i_1se) <- names(validation_error_funcs)
+  names(lambda_min) <- names(cv_loss_funcs)
+  names(lambda_1se) <- names(cv_loss_funcs)
+  names(edf_min) <- names(cv_loss_funcs)
+  names(edf_1se) <- names(cv_loss_funcs)
+  names(cv_errors) <- names(cv_loss_funcs)
+  names(i_min) <- names(cv_loss_funcs)
+  names(se_cv_errors) <- names(cv_loss_funcs)
+  names(i_1se) <- names(cv_loss_funcs)
 
   tf_model <- structure(
     list(
@@ -471,15 +526,15 @@ cv_trendfilter <- function(x,
     list(
       lambdas = lambdas,
       edfs = out$df %>% as.integer(),
-      validation_errors = validation_errors,
-      se_validation_errors = se_validation_errors,
+      cv_errors = cv_errors,
+      se_cv_errors = se_cv_errors,
       lambda_min = lambda_min,
       lambda_1se = lambda_1se,
       edf_min = edf_min,
       edf_1se = edf_1se,
       i_min = i_min,
       i_1se = i_1se,
-      validation_error_funcs = validation_error_funcs,
+      cv_loss_funcs = cv_loss_funcs,
       cost_functional = out$obj[nrow(out$obj), ],
       n_iter = out$iter %>% as.integer(),
       V = V,
@@ -498,7 +553,7 @@ validate_trendfilter <- function(validation_index,
                                  k,
                                  thinning,
                                  admm_params,
-                                 validation_error_funcs,
+                                 cv_loss_funcs,
                                  y_scale) {
   data_train <- data_folded[-validation_index] %>% bind_rows()
   data_validate <- data_folded[[validation_index]]
@@ -521,12 +576,12 @@ validate_trendfilter <- function(validation_index,
     suppressWarnings()
 
   lapply(
-    X = 1:length(validation_error_funcs),
+    X = 1:length(cv_loss_funcs),
     FUN = function(X) {
       apply(
         tf_validate_preds * y_scale,
         2,
-        validation_error_funcs[[X]],
+        cv_loss_funcs[[X]],
         y = data_validate$y * y_scale,
         weights = data_validate$weights / y_scale^2
       ) %>%
@@ -539,18 +594,50 @@ validate_trendfilter <- function(validation_index,
 
 # Functions for common validation error functionals
 
-MSE <- function(tf_estimate, y, weights) {
-  mean((tf_estimate - y)^2)
-}
-
 MAE <- function(tf_estimate, y, weights) {
   mean(abs(tf_estimate - y))
+}
+
+WMAE <- function(tf_estimate, y, weights) {
+  sum(abs(tf_estimate - y) * sqrt(weights) / sum(sqrt(weights)))
+}
+
+MSE <- function(tf_estimate, y, weights) {
+  mean((tf_estimate - y)^2)
 }
 
 WMSE <- function(tf_estimate, y, weights) {
   sum((tf_estimate - y)^2 * weights / sum(weights))
 }
 
-WMAE <- function(tf_estimate, y, weights) {
-  sum(abs(tf_estimate - y) * sqrt(weights) / sum(sqrt(weights)))
+Huber <- function(tf_estimate, y, weights, delta = 3) {
+  ifelse(
+    abs(y - tf_estimate) <= delta,
+    MSE(tf_estimate, y, weights),
+    2 * delta * abs(y - tf_estimate) - delta^2
+  )
+}
+
+wHuber <- function(tf_estimate, y, weights, delta = 3) {
+  ifelse(
+    abs(y - tf_estimate) * sqrt(weights) <= delta,
+    WMSE(tf_estimate, y, weights),
+    2 * delta * abs(y - tf_estimate) * sqrt(weights) - delta^2
+  )
+}
+
+MSLE <- function(tf_estimate, y, weights) {
+  offset <- min(c(tf_estimate, y, 0))
+  mean((log(tf_estimate - offset + 1) - log(y - offset + 1))^2)
+}
+
+WMSLE <- function(tf_estimate, y, weights) {
+  offset <- min(c(tf_estimate, y))
+  if (offset < 0) {
+    weighted.mean(
+      2 * log((tf_estimate - offset + 1) / (y - offset + 1)), log(weights + 1)
+    )
+  } else {
+    weighted.mean(2 * log((tf_estimate + 1) / (y + 1)), log(weights + 1))
+  }
 }

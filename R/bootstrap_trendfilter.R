@@ -141,8 +141,11 @@ bootstrap_trendfilter <- function(obj,
                                   B = 100L,
                                   mc_cores = parallel::detectCores() - 4) {
   stopifnot(any(class(obj) == "pred_tf"))
+  stopifnot(B >= 20)
   bootstrap_algorithm <- match.arg(bootstrap_algorithm)
-  stopifnot(B >= 10)
+
+  mc_cores <- max(c(1, floor(mc_cores)))
+  mc_cores <- min(c(detectCores(), B, mc_cores))
 
   if (mc_cores < detectCores() / 2) {
     warning(
@@ -153,10 +156,6 @@ bootstrap_trendfilter <- function(obj,
       call. = FALSE
     )
   }
-
-  if (mc_cores > detectCores()) mc_cores <- detectCores()
-  if (mc_cores < 1) mc_cores <- 1
-  mc_cores <- min(floor(mc_cores), B)
 
   if (bootstrap_algorithm != "nonparametric") {
     obj$tf_model$data_scaled %<>% mutate(

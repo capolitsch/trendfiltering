@@ -43,7 +43,7 @@ reference:
   - title: "Bootstrap"
   - contents:
       - '`bootstrap_trendfilter`'
-  - title: "Compute variability bands"
+  - title: "Variability bands"
   - contents:
       - '`vbands`'
 

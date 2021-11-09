@@ -40,12 +40,14 @@
 
 
 <meta property="og:title" content="Optimize the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter" />
-<meta property="og:description" content="For every candidate hyperparameter value, estimate the corresponding trend
-filtering model's out-of-sample error by V-fold cross validation. Four
-commonly-used types of error --- MSE, WMSE, MAE, WMAE --- are all evaluated
-and returned, and the user has the option to pass additional error
-functionals to be evaluated. See the details section for when you should use
-cv_trendfilter() versus sure_trendfilter()." />
+<meta property="og:description" content="
+ For every candidate hyperparameter value, estimate the trend
+filtering model's out-of-sample error by V-fold cross validation. CV
+error curves are returned for four of the most common regression loss
+metrics, as well as observation-weighted versions. Custom loss functions may
+also be passed to the loss_funcs argument. See the details section for
+definitions of each loss function, and for guidelines on when
+cv_trendfilter() should be used versus sure_trendfilter()." />
 
 
 
@@ -116,18 +118,20 @@ cv_trendfilter() versus sure_trendfilter()." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Optimize the trend filtering hyperparameter by V-fold cross validation</h1>
+    <h1>Optimize the trend filtering hyperparameter by <em>V</em>-fold cross validation</h1>
     <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/cv_trendfilter.R'><code>R/cv_trendfilter.R</code></a></small>
     <div class="hidden name"><code>cv_trendfilter.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>For every candidate hyperparameter value, estimate the corresponding trend
-filtering model's out-of-sample error by V-fold cross validation. Four
-commonly-used types of error --- MSE, WMSE, MAE, WMAE --- are all evaluated
-and returned, and the user has the option to pass additional error
-functionals to be evaluated. See the details section for when you should use
-<code>cv_trendfilter()</code> versus <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>.</p>
+    <p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
+ For every candidate hyperparameter value, estimate the trend
+filtering model's out-of-sample error by <em>V</em>-fold cross validation. CV
+error curves are returned for four of the most common regression loss
+metrics, as well as observation-weighted versions. Custom loss functions may
+also be passed to the <code>loss_funcs</code> argument. See the details section for
+definitions of each loss function, and for guidelines on when
+<code>cv_trendfilter()</code> should be used versus <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>cv_trendfilter</span><span class='op'>(</span>
@@ -137,8 +141,8 @@ functionals to be evaluated. See the details section for when you should use
   k <span class='op'>=</span> <span class='fl'>2L</span>,
   nlambdas <span class='op'>=</span> <span class='fl'>250L</span>,
   V <span class='op'>=</span> <span class='fl'>10L</span>,
-  mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>4</span>,
-  <span class='va'>custom_error_funcs</span>,
+  mc_cores <span class='op'>=</span> <span class='va'>V</span>,
+  <span class='va'>loss_funcs</span>,
   <span class='va'>optimization_params</span>
 <span class='op'>)</span></pre>
 
@@ -155,10 +159,11 @@ functionals to be evaluated. See the details section for when you should use
     </tr>
     <tr>
       <th>weights</th>
-      <td><p>Weights for the observed outputs, defined as the reciprocal
-variance of the additive noise that contaminates the signal in <code>y</code>.
-When the noise is expected to have equal variance for all observations,
-<code>weights</code> can be passed as a scalar. Otherwise, <code>weights</code> must be a vector
+      <td><p>(Optional) Weights for the observed outputs, defined as the
+reciprocal variance of the additive noise that contaminates the output
+signal. When the noise is expected to have an equal variance,
+\(\sigma^2\), for all observations, a scalar can be passed to <code>weights</code>,
+namely <code>weights = </code>\(1/\sigma^2\). Otherwise, <code>weights</code> must be a vector
 with the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
     <tr>
@@ -172,40 +177,42 @@ their use can lead to instability in the convex optimization.</p></td>
     <tr>
       <th>nlambdas</th>
       <td><p>Number of hyperparameter values to test during validation.
-Defaults to <code>nlambdas = 250</code>. The hyperparameter grid is dynamically
-constructed to span the full model space lying between a single polynomial
-solution (i.e. a power law) and an interpolating solution, with <code>nlambdas</code>
-controlling the granularity of the hyperparameter grid.</p></td>
+Defaults to <code>nlambdas = 250</code>. The hyperparameter grid is internally
+constructed to span the full trend filtering model space lying by a global
+polynomial solution (i.e. a power law) and an interpolating solution, with
+<code>nlambdas</code> controlling the granularity of the model space that is</p></td>
     </tr>
     <tr>
       <th>V</th>
-      <td><p>Number of folds that the data are partitioned into for the V-fold
-cross validation. Defaults to <code>V = 10</code>.</p></td>
+      <td><p>Number of folds that the data are partitioned into for the
+<em>V</em>-fold cross validation. Defaults to <code>V = 10</code>.</p></td>
     </tr>
     <tr>
       <th>mc_cores</th>
       <td><p>Multi-core computing using the
 <code><a href='https://rdrr.io/r/parallel/parallel-package.html'>parallel</a></code> R package: The number of cores to
-utilize. Defaults to the number of cores detected, minus four.</p></td>
+utilize. Defaults to the number of cross validation folds, <code>mc_cores = V</code>.
+If the value passed to <code>mc_cores</code> exceeds the number of cores detected on
+the machine, <code>mc_cores</code> is internally updated to
+<code>mc_cores = parallel::detectCores()</code>.</p></td>
     </tr>
     <tr>
-      <th>custom_error_funcs</th>
-      <td><p>(Optional) A named list of one or more functions,
-with each defining an error functional to evaluate on held-out folds during
-cross validation. Mean-squared error (MSE) and mean absolute error (MAE) are
-both evaluated automatically, as well as weighted versions of each (with
-reciprocal variances as weights) --- WMSE and WMAE. Therefore, the user does
-not need to pass anything to <code>custom_error_funcs</code> unless they want to define
-a validation error metric other than MSE, MAE, WMSE, and WMAE.</p>
-<p>In such a case, each function in the named list passed to
-<code>custom_error_funcs</code> should take three vector arguments --- <code>y</code>,
-<code>tf_estimate</code>, and <code>weights</code> --- and return a single scalar value for the
-validation error. For example, if I also wanted to define a validation
-error curve from the weighted median of the absolute errors, I could pass the
-following list to <code>custom_error_funcs</code>:<div class="sourceCode r"></p><pre><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>MedAE <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>tf_estimate</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span> <span class='op'>{</span>
-               <span class='fu'>matrixStats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/matrixStats/man/weightedMedian.html'>weightedMedian</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>tf_estimate</span> <span class='op'>-</span> <span class='va'>y</span><span class='op'>)</span>, <span class='va'>weights</span><span class='op'>)</span>
-             <span class='op'>}</span>
-    <span class='op'>)</span>
+      <th>loss_funcs</th>
+      <td><p>(Optional) A named list of one or more functions, with each
+defining a loss function to evaluate on held-out data during cross
+validation. See the details section below for the common loss functions that
+are automatically computed. The user need only use the <code>loss_funcs</code> argument
+if they wish to evaluate cross validation error using a loss function other
+than those defined below.</p>
+<p>In such a case, each function in the named list passed to <code>loss_funcs</code>
+should take three vector arguments --- <code>y</code>, <code>tf_estimate</code>, and <code>weights</code> ---
+and return a single scalar value for the validation error. For example, if I
+wanted to produce a CV error curve from a weighted median of absolute errors,
+I could pass the following list to <code>loss_funcs</code>:<div class="sourceCode r"></p><pre><span class='va'>MedAE</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>tf_estimate</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'>matrixStats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/matrixStats/man/weightedMedian.html'>weightedMedian</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>tf_estimate</span> <span class='op'>-</span> <span class='va'>y</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>weights</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>MedAE <span class='op'>=</span> <span class='va'>MedAE</span><span class='op'>)</span>
 </pre><p></div></p></td>
     </tr>
     <tr>
@@ -258,19 +265,19 @@ elements:</p><dl>
 <dt>lambdas</dt><dd><p>Vector of candidate hyperparameter values (always returned in
 descending order).</p></dd>
 <dt>edfs</dt><dd><p>Number of effective degrees of freedom in the trend filtering
-estimator, for every hyperparameter value in <code>lambdas</code>.</p></dd>
-<dt>validation_errors</dt><dd><p>A named list of vectors, with each representing the
-cross validation error curve for some definition of error. The first 4
-vectors of the list correspond to WMAE, WMSE, MAE, MSE. If any custom
-error functionals were passed to <code>custom_error_funcs</code>, their cross validation
-curves will follow the first 4.</p></dd>
-<dt>se_validation_errors</dt><dd><p>Named list of estimated standard errors for each
-of the cross validation error curves in <code>validation_errors</code>.</p></dd>
+estimator, for every candidate hyperparameter value in <code>lambdas</code>.</p></dd>
+<dt>cv_errors</dt><dd><p>A named list of vectors, with each representing the
+cross validation error curve for a given loss function. The first 8
+vectors of the list correspond to MAE, WMAE, MSE, WMSE. If any custom
+loss functions were passed to <code>loss_funcs</code>, their cross validation
+curves will follow the first 8.</p></dd>
+<dt>se_cv_errors</dt><dd><p>Named list of estimated standard errors for each
+of the cross validation error curves in <code>cv_errors</code>.</p></dd>
 <dt>lambda_min</dt><dd><p>A named vector with length equal to
-<code><a href='https://rdrr.io/r/base/length.html'>length(validation_errors)</a></code>, containing the hyperparameter value that
+<code><a href='https://rdrr.io/r/base/length.html'>length(cv_errors)</a></code>, containing the hyperparameter value that
 minimizes the cross validation error curve, for every type validation error.</p></dd>
 <dt>lambda_1se</dt><dd><p>A named vector with length equal to
-<code><a href='https://rdrr.io/r/base/length.html'>length(validation_errors)</a></code>, containing the "1-standard-error rule"
+<code><a href='https://rdrr.io/r/base/length.html'>length(cv_errors)</a></code>, containing the "1-standard-error rule"
 hyperparameter, for every type validation error. The "1-standard-error rule"
 hyparameter is the largest hyperparameter value (corresponding to the
 smoothest trend filtering estimate) that has a cross validation error
@@ -279,21 +286,21 @@ an Occam's razor-esque heuristic. That is, given two models with
 approximately equal performance, it may be wise to opt for the simpler model,
 i.e. the model with fewer effective degrees of freedom.</p></dd>
 <dt>edf_min</dt><dd><p>A named vector with length equal to
-<code><a href='https://rdrr.io/r/base/length.html'>length(validation_errors)</a></code>, containing the number of effective degrees of
+<code><a href='https://rdrr.io/r/base/length.html'>length(cv_errors)</a></code>, containing the number of effective degrees of
 freedom in the trend filtering estimator that minimizes the cross validation
 error curve, for every type of validation error.</p></dd>
 <dt>edf_1se</dt><dd><p>A named vector with length equal to
-<code><a href='https://rdrr.io/r/base/length.html'>length(validation_errors)</a></code>, containing the number of effective degrees of
+<code><a href='https://rdrr.io/r/base/length.html'>length(cv_errors)</a></code>, containing the number of effective degrees of
 freedom in the "1-standard-error rule" trend filtering estimator, for every
 type of validation error.</p></dd>
 <dt>i_min</dt><dd><p>A named vector with length equal to
-<code><a href='https://rdrr.io/r/base/length.html'>length(validation_errors)</a></code>, containing the index of <code>lambdas</code> that minimizes
+<code><a href='https://rdrr.io/r/base/length.html'>length(cv_errors)</a></code>, containing the index of <code>lambdas</code> that minimizes
 the CV error curve, for every type of validation error.</p></dd>
 <dt>i_1se</dt><dd><p>A named vector with length equal to
-<code><a href='https://rdrr.io/r/base/length.html'>length(validation_errors)</a></code>, containing the index of <code>lambdas</code> that
+<code><a href='https://rdrr.io/r/base/length.html'>length(cv_errors)</a></code>, containing the index of <code>lambdas</code> that
 gives the "1-standard-error rule" hyperparameter value, for every
 type of validation error.</p></dd>
-<dt>validation_error_funcs</dt><dd><p>A named list of functions that define the
+<dt>cv_loss_funcs</dt><dd><p>A named list of functions that define the
 types of error that were evaluated during cross validation.</p></dd>
 <dt>cost_functional</dt><dd><p>The relative change in the cost functional over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
@@ -328,26 +335,43 @@ be evenly sampled. When the inputs are evenly sampled on a transformed scale,
 we recommend transforming to that scale and carrying out the full trend
 filtering analysis on that scale. See the <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> examples for
 a case when the inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p>
-<p>The validation error functionals that we automatically compute CV curves for
-are formally defined below.</p>
-<p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
-
-\[MSE(\lambda) = \frac{1}{n}
-\sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2\]
-\[MAE(\lambda) = \frac{1}{n}
-\sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|\]
-\[WMSE(\lambda) = \sum_{i=1}^{n}
-|Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}\]
-\[WMAE(\lambda) = \sum_{i=1}^{n}
-|Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}\]
-where \(w_i:=\) <code>weights[i]</code>.</p>
-<p>If constant weights are passed, or if nothing is passed, then the weighted
-and unweighted counterparts are equivalent.</p>
-<p>Briefly stated, weighting the validation error metric (with reciprocal
-variances) helps prevent the error from being dominated by the model's
-(in)accuracy on a (potentially very small) subset of the data that have
-high variance; and absolute error is less sensitive to outliers than squared
-error.</p>
+<ol>
+<li><p>Mean-squared error: \[\text{MSE}(\lambda) = \frac{1}{n}
+\sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2\]</p></li>
+<li><p>Weighted mean-squared error: \[\text{WMSE}(\lambda)
+= \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}\]</p></li>
+<li><p>Mean absolute deviations error: \[\text{MAE}(\lambda) =
+\frac{1}{n} \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|\]</p></li>
+<li><p>Weighted mean absolute deviations error:
+\[\text{WMAE}(\lambda) = \sum_{i=1}^{n}
+|Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}\]</p></li>
+<li><p>Huber error: \[\text{Huber}(\lambda) =
+\frac{1}{n}\sum_{i=1}^{n}L_{\delta}(Y_i; \lambda)\]
+\[\text{where}\;\;\;\;L_{\delta}(Y_i; \lambda) = \cases{
+|Y_i - \hat{f}(x_i; \lambda)|^2, &
+$|Y_i - \hat{f}(x_i; \lambda)| \leq \delta$ \cr
+2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, &
+$|Y_i - \hat{f}(x_i; \lambda)| > \delta$}\]</p></li>
+<li><p>Weighted Huber error: \[\text{wHuber}(\lambda) =
+\sum_{i=1}^{n}L_{\delta}(Y_i; \lambda)\]
+\[\text{where}\;\;\;\;L_{\delta}(Y_i; \lambda) = \cases{
+|Y_i - \hat{f}(x_i; \lambda)|^2, &
+$|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
+2\delta|Y_i - \hat{f}(x_i; \lambda)| -
+\delta^2, & $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta$}\]</p></li>
+<li><p>Mean-squared logarithmic error: \[\text{MSLE}(\lambda) =
+\frac{1}{n}\sum_{i=1}^{n}
+\left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|\]</p></li>
+<li><p>Weighted mean-squared logarithmic error: \[\text{MSLE}(\lambda)
+= \frac{1}{n}\sum_{i=1}^{n}
+\left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|\log(w_i + 1)\]</p></li>
+</ol><p>where \(w_i:=\) <code>weights[i]</code>.</p>
+<p>If constant weights are passed, or if nothing is passed, then a weighted loss
+function is equivalent to its unweighted counterpart.</p>
+<p>Briefly stated, weighting the validation loss helps prevent it
+from being dominated by the model's performance on a small subset of
+difficult-to-predict observations; and absolute error is less
+sensitive to outliers than squared error.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p><b>Companion references</b></p><ol>

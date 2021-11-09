@@ -2,7 +2,7 @@
 % Please edit documentation in R/cv_trendfilter.R
 \name{cv_trendfilter}
 \alias{cv_trendfilter}
-\title{Optimize the trend filtering hyperparameter by V-fold cross validation}
+\title{Optimize the trend filtering hyperparameter by \emph{V}-fold cross validation}
 \usage{
 cv_trendfilter(
   x,
@@ -11,8 +11,8 @@ cv_trendfilter(
   k = 2L,
   nlambdas = 250L,
   V = 10L,
-  mc_cores = parallel::detectCores() - 4,
-  custom_error_funcs,
+  mc_cores = V,
+  loss_funcs,
   optimization_params
 )
 }
@@ -21,10 +21,11 @@ cv_trendfilter(
 
 \item{y}{Vector of observed values for the output variable.}
 
-\item{weights}{Weights for the observed outputs, defined as the reciprocal
-variance of the additive noise that contaminates the signal in \code{y}.
-When the noise is expected to have equal variance for all observations,
-\code{weights} can be passed as a scalar. Otherwise, \code{weights} must be a vector
+\item{weights}{(Optional) Weights for the observed outputs, defined as the
+reciprocal variance of the additive noise that contaminates the output
+signal. When the noise is expected to have an equal variance,
+\mjseqn{\sigma^2}, for all observations, a scalar can be passed to \code{weights},
+namely \verb{weights = }\mjseqn{1/\sigma^2}. Otherwise, \code{weights} must be a vector
 with the same length as \code{x} and \code{y}.}
 
 \item{k}{Degree of the polynomials that make up the piecewise-polynomial
@@ -34,35 +35,37 @@ disallowed since their smoothness is indistinguishable from \code{k = 2} and
 their use can lead to instability in the convex optimization.}
 
 \item{nlambdas}{Number of hyperparameter values to test during validation.
-Defaults to \code{nlambdas = 250}. The hyperparameter grid is dynamically
-constructed to span the full model space lying between a single polynomial
-solution (i.e. a power law) and an interpolating solution, with \code{nlambdas}
-controlling the granularity of the hyperparameter grid.}
+Defaults to \code{nlambdas = 250}. The hyperparameter grid is internally
+constructed to span the full trend filtering model space lying by a global
+polynomial solution (i.e. a power law) and an interpolating solution, with
+\code{nlambdas} controlling the granularity of the model space that is}
 
-\item{V}{Number of folds that the data are partitioned into for the V-fold
-cross validation. Defaults to \code{V = 10}.}
+\item{V}{Number of folds that the data are partitioned into for the
+\emph{V}-fold cross validation. Defaults to \code{V = 10}.}
 
 \item{mc_cores}{Multi-core computing using the
 \code{\link[parallel:parallel-package]{parallel}} R package: The number of cores to
-utilize. Defaults to the number of cores detected, minus four.}
+utilize. Defaults to the number of cross validation folds, \code{mc_cores = V}.
+If the value passed to \code{mc_cores} exceeds the number of cores detected on
+the machine, \code{mc_cores} is internally updated to
+\code{mc_cores = parallel::detectCores()}.}
 
-\item{custom_error_funcs}{(Optional) A named list of one or more functions,
-with each defining an error functional to evaluate on held-out folds during
-cross validation. Mean-squared error (MSE) and mean absolute error (MAE) are
-both evaluated automatically, as well as weighted versions of each (with
-reciprocal variances as weights) --- WMSE and WMAE. Therefore, the user does
-not need to pass anything to \code{custom_error_funcs} unless they want to define
-a validation error metric other than MSE, MAE, WMSE, and WMAE.
+\item{loss_funcs}{(Optional) A named list of one or more functions, with each
+defining a loss function to evaluate on held-out data during cross
+validation. See the details section below for the common loss functions that
+are automatically computed. The user need only use the \code{loss_funcs} argument
+if they wish to evaluate cross validation error using a loss function other
+than those defined below.
 
-In such a case, each function in the named list passed to
-\code{custom_error_funcs} should take three vector arguments --- \code{y},
-\code{tf_estimate}, and \code{weights} --- and return a single scalar value for the
-validation error. For example, if I also wanted to define a validation
-error curve from the weighted median of the absolute errors, I could pass the
-following list to \code{custom_error_funcs}:\if{html}{\out{<div class="sourceCode r">}}\preformatted{list(MedAE = function(tf_estimate, y, weights) \{
-               matrixStats::weightedMedian(abs(tf_estimate - y), weights)
-             \}
-    )
+In such a case, each function in the named list passed to \code{loss_funcs}
+should take three vector arguments --- \code{y}, \code{tf_estimate}, and \code{weights} ---
+and return a single scalar value for the validation error. For example, if I
+wanted to produce a CV error curve from a weighted median of absolute errors,
+I could pass the following list to \code{loss_funcs}:\if{html}{\out{<div class="sourceCode r">}}\preformatted{MedAE <- function(tf_estimate, y, weights) \{
+  matrixStats::weightedMedian(abs(tf_estimate - y), sqrt(weights))
+\}
+
+list(MedAE = MedAE)
 }\if{html}{\out{</div>}}}
 
 \item{optimization_params}{(Optional) A named list of parameter values to be
@@ -112,19 +115,19 @@ elements:
 \item{lambdas}{Vector of candidate hyperparameter values (always returned in
 descending order).}
 \item{edfs}{Number of effective degrees of freedom in the trend filtering
-estimator, for every hyperparameter value in \code{lambdas}.}
-\item{validation_errors}{A named list of vectors, with each representing the
-cross validation error curve for some definition of error. The first 4
-vectors of the list correspond to WMAE, WMSE, MAE, MSE. If any custom
-error functionals were passed to \code{custom_error_funcs}, their cross validation
-curves will follow the first 4.}
-\item{se_validation_errors}{Named list of estimated standard errors for each
-of the cross validation error curves in \code{validation_errors}.}
+estimator, for every candidate hyperparameter value in \code{lambdas}.}
+\item{cv_errors}{A named list of vectors, with each representing the
+cross validation error curve for a given loss function. The first 8
+vectors of the list correspond to MAE, WMAE, MSE, WMSE. If any custom
+loss functions were passed to \code{loss_funcs}, their cross validation
+curves will follow the first 8.}
+\item{se_cv_errors}{Named list of estimated standard errors for each
+of the cross validation error curves in \code{cv_errors}.}
 \item{lambda_min}{A named vector with length equal to
-\code{length(validation_errors)}, containing the hyperparameter value that
+\code{length(cv_errors)}, containing the hyperparameter value that
 minimizes the cross validation error curve, for every type validation error.}
 \item{lambda_1se}{A named vector with length equal to
-\code{length(validation_errors)}, containing the "1-standard-error rule"
+\code{length(cv_errors)}, containing the "1-standard-error rule"
 hyperparameter, for every type validation error. The "1-standard-error rule"
 hyparameter is the largest hyperparameter value (corresponding to the
 smoothest trend filtering estimate) that has a cross validation error
@@ -133,21 +136,21 @@ an Occam's razor-esque heuristic. That is, given two models with
 approximately equal performance, it may be wise to opt for the simpler model,
 i.e. the model with fewer effective degrees of freedom.}
 \item{edf_min}{A named vector with length equal to
-\code{length(validation_errors)}, containing the number of effective degrees of
+\code{length(cv_errors)}, containing the number of effective degrees of
 freedom in the trend filtering estimator that minimizes the cross validation
 error curve, for every type of validation error.}
 \item{edf_1se}{A named vector with length equal to
-\code{length(validation_errors)}, containing the number of effective degrees of
+\code{length(cv_errors)}, containing the number of effective degrees of
 freedom in the "1-standard-error rule" trend filtering estimator, for every
 type of validation error.}
 \item{i_min}{A named vector with length equal to
-\code{length(validation_errors)}, containing the index of \code{lambdas} that minimizes
+\code{length(cv_errors)}, containing the index of \code{lambdas} that minimizes
 the CV error curve, for every type of validation error.}
 \item{i_1se}{A named vector with length equal to
-\code{length(validation_errors)}, containing the index of \code{lambdas} that
+\code{length(cv_errors)}, containing the index of \code{lambdas} that
 gives the "1-standard-error rule" hyperparameter value, for every
 type of validation error.}
-\item{validation_error_funcs}{A named list of functions that define the
+\item{cv_loss_funcs}{A named list of functions that define the
 types of error that were evaluated during cross validation.}
 \item{cost_functional}{The relative change in the cost functional over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
@@ -164,12 +167,13 @@ functions that operate on the \code{cv_trendfilter()} output.}
 }
 }
 \description{
-For every candidate hyperparameter value, estimate the corresponding trend
-filtering model's out-of-sample error by V-fold cross validation. Four
-commonly-used types of error --- MSE, WMSE, MAE, WMAE --- are all evaluated
-and returned, and the user has the option to pass additional error
-functionals to be evaluated. See the details section for when you should use
-\code{\link[=cv_trendfilter]{cv_trendfilter()}} versus \code{\link[=sure_trendfilter]{sure_trendfilter()}}.
+\loadmathjax For every candidate hyperparameter value, estimate the trend
+filtering model's out-of-sample error by \emph{V}-fold cross validation. CV
+error curves are returned for four of the most common regression loss
+metrics, as well as observation-weighted versions. Custom loss functions may
+also be passed to the \code{loss_funcs} argument. See the details section for
+definitions of each loss function, and for guidelines on when
+\code{\link[=cv_trendfilter]{cv_trendfilter()}} should be used versus \code{\link[=sure_trendfilter]{sure_trendfilter()}}.
 }
 \details{
 Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} versus
@@ -188,28 +192,46 @@ we recommend transforming to that scale and carrying out the full trend
 filtering analysis on that scale. See the \code{\link[=sure_trendfilter]{sure_trendfilter()}} examples for
 a case when the inputs are evenly sampled on the \code{log10(x)} scale.
 
-The validation error functionals that we automatically compute CV curves for
-are formally defined below.
-
-\loadmathjax
-\mjsdeqn{MSE(\lambda) = \frac{1}{n}
+\enumerate{
+\item Mean-squared error: \mjsdeqn{\text{MSE}(\lambda) = \frac{1}{n}
 \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2}
-\mjsdeqn{MAE(\lambda) = \frac{1}{n}
-\sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|}
-\mjsdeqn{WMSE(\lambda) = \sum_{i=1}^{n}
-|Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
-\mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n}
+\item Weighted mean-squared error: \mjsdeqn{\text{WMSE}(\lambda)
+= \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
+\item Mean absolute deviations error: \mjsdeqn{\text{MAE}(\lambda) =
+\frac{1}{n} \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|}
+\item Weighted mean absolute deviations error:
+\mjsdeqn{\text{WMAE}(\lambda) = \sum_{i=1}^{n}
 |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
+\item Huber error: \mjsdeqn{\text{Huber}(\lambda) =
+\frac{1}{n}\sum_{i=1}^{n}L_{\delta}(Y_i; \lambda)}
+\mjsdeqn{\text{where}\;\;\;\;L_{\delta}(Y_i; \lambda) = \cases{
+|Y_i - \hat{f}(x_i; \lambda)|^2, &
+$|Y_i - \hat{f}(x_i; \lambda)| \leq \delta$ \cr
+2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, &
+$|Y_i - \hat{f}(x_i; \lambda)| > \delta$}}
+\item Weighted Huber error: \mjsdeqn{\text{wHuber}(\lambda) =
+\sum_{i=1}^{n}L_{\delta}(Y_i; \lambda)}
+\mjsdeqn{\text{where}\;\;\;\;L_{\delta}(Y_i; \lambda) = \cases{
+|Y_i - \hat{f}(x_i; \lambda)|^2, &
+$|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
+2\delta|Y_i - \hat{f}(x_i; \lambda)| -
+\delta^2, & $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta$}}
+\item Mean-squared logarithmic error: \mjsdeqn{\text{MSLE}(\lambda) =
+\frac{1}{n}\sum_{i=1}^{n}
+\left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|}
+\item Weighted mean-squared logarithmic error: \mjsdeqn{\text{MSLE}(\lambda)
+= \frac{1}{n}\sum_{i=1}^{n}
+\left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|\log(w_i + 1)}
+}
 where \mjseqn{w_i:=} \code{weights[i]}.
 
-If constant weights are passed, or if nothing is passed, then the weighted
-and unweighted counterparts are equivalent.
+If constant weights are passed, or if nothing is passed, then a weighted loss
+function is equivalent to its unweighted counterpart.
 
-Briefly stated, weighting the validation error metric (with reciprocal
-variances) helps prevent the error from being dominated by the model's
-(in)accuracy on a (potentially very small) subset of the data that have
-high variance; and absolute error is less sensitive to outliers than squared
-error.
+Briefly stated, weighting the validation loss helps prevent it
+from being dominated by the model's performance on a small subset of
+difficult-to-predict observations; and absolute error is less
+sensitive to outliers than squared error.
 }
 \examples{
 data(eclipsing_binary)
