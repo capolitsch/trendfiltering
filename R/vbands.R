@@ -48,7 +48,7 @@
 #'
 #' pred_tf <- predict(
 #'   cv_tf,
-#'   validation_error_metric = "MAE",
+#'   loss_func = "MAE",
 #'   lambda_choice = "lambda_1se",
 #'   nx_eval = 1500L
 #' )

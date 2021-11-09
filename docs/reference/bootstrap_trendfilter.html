@@ -171,12 +171,13 @@ utilize. Defaults to the number of cores detected, minus 4.</p></td>
 
     <p>An object of class '<code>bootstrap_tf</code>'. This is a list with the
 following elements</p><dl>
-<dt>x_eval</dt><dd><p></p></dd>
+<dt>x_eval</dt><dd><p>Input grid that each bootstrap trend filtering estimate was
+evaluated on.</p></dd>
 <dt>ensemble</dt><dd><p>The full trend filtering bootstrap ensemble as an
 \(n \times B\) matrix.</p></dd>
 <dt>edf_boots</dt><dd><p>Vector of the estimated number of effective degrees of
 freedom of each trend filtering bootstrap estimate. These should all be
-relatively close to <code>obj$edf_min</code>.</p></dd>
+relatively close to <code>obj$edf_opt</code>.</p></dd>
 <dt>n_iter_boots</dt><dd><p>Vector of the number of iterations taken by the ADMM
 algorithm before reaching a stopping criterion, for each bootstrap estimate.</p></dd>
 <dt>lambda_boots</dt><dd><p>Vector of the hyperparameter values used for each
@@ -273,14 +274,14 @@ Bootstrap Methods: Another Look at the Jackknife</a>.
 
 <span class='va'>pred_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
   <span class='va'>cv_tf</span>,
-  validation_error_metric <span class='op'>=</span> <span class='st'>"MAE"</span>,
+  loss_func <span class='op'>=</span> <span class='st'>"MAE"</span>,
   lambda_choice <span class='op'>=</span> <span class='st'>"lambda_1se"</span>,
   nx_eval <span class='op'>=</span> <span class='fl'>1500L</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in predict.cv_tf(cv_tf, validation_error_metric = "MAE", lambda_choice = "lambda_1se",     nx_eval = 1500L): unused argument (validation_error_metric = "MAE")</span></div><div class='input'>
+
 <span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>pred_tf</span>, <span class='st'>"nonparametric"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in stopifnot(any(class(obj) == "pred_tf")): object 'pred_tf' not found</span></div><div class='input'><span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in stopifnot(any(class(obj) == "boot_tf")): object 'boot_tf' not found</span></div><div class='input'>
+<span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
+
 
 <span class='co'># Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar</span>
 

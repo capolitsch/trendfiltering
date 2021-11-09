@@ -42,10 +42,10 @@
 <meta property="og:title" content="Evaluate an optimized trend filtering estimate — predict.cv_tf" />
 <meta property="og:description" content="Evaluate an optimized trend filtering object on a grid of input values. The
 predict function can be called on an object of class
-'cv_tf' or 'sure_tf', and the
-arguments loss_func (for 'cv_tf' objects only) and
-lambda_choice should be used to specify the desired method for optimizing
-the trend filtering hyperparameter." />
+'cv_tf' or 'sure_tf'. The
+lambda_choice argument (and the loss_func argument, for
+'cv_tf' objects) should be used to specify the
+desired method for optimizing the trend filtering hyperparameter." />
 
 
 
@@ -123,11 +123,11 @@ the trend filtering hyperparameter." />
 
     <div class="ref-description">
     <p>Evaluate an optimized trend filtering object on a grid of input values. The
-predict function can be called on an object of class
-'<code><a href='cv_trendfilter.html'>cv_tf</a></code>' or '<code><a href='sure_trendfilter.html'>sure_tf</a></code>', and the
-arguments <code>loss_func</code> (for <code>'cv_tf'</code> objects only) and
-<code>lambda_choice</code> should be used to specify the desired method for optimizing
-the trend filtering hyperparameter.</p>
+<code>predict</code> function can be called on an object of class
+'<code><a href='cv_trendfilter.html'>cv_tf</a></code>' or '<code><a href='sure_trendfilter.html'>sure_tf</a></code>'. The
+<code>lambda_choice</code> argument (and the <code>loss_func</code> argument, for
+<code><a href='cv_trendfilter.html'>'cv_tf'</a></code> objects) should be used to specify the
+desired method for optimizing the trend filtering hyperparameter.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for cv_tf</span>
@@ -152,15 +152,11 @@ the trend filtering hyperparameter.</p>
     </tr>
     <tr>
       <th>loss_func</th>
-      <td><p>(For class <code>'cv_tf'</code> only) A string or index specifying
-which cross validation error curve stored within the <code>cv_tf</code> object will be
-used to choose the trend filtering hyperparameter. The first 4 options are
-<code>"WMAE"</code>, <code>"WMSE"</code>, <code>"MAE"</code>, and <code>"MSE"</code>. Therefore, for example, one could
-select the CV curve based on mean absolute  deviations error by passing
-either <code>loss_func = "MAE"</code> or <code>loss_func = 3</code>. If the user passed custom
-error functions to <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>, then these will be available as
-additional options following the first 4, and their string designations can
-be seen by running <code><a href='https://rdrr.io/r/base/names.html'>names(obj$cv_loss_funcs)</a></code>.</p></td>
+      <td><p>(For class <code><a href='cv_trendfilter.html'>'cv_tf'</a></code> only) A string or
+index specifying which cross validation error curve stored within the
+<code><a href='cv_trendfilter.html'>'cv_tf'</a></code> object will be used to optimize the trend
+filtering hyperparameter. Run <code><a href='https://rdrr.io/r/base/names.html'>names(obj$cv_loss_funcs)</a></code> to see the
+available options. Defaults to <code>loss_func = "WMAE"</code>.</p></td>
     </tr>
     <tr>
       <th>lambda_choice</th>
@@ -191,17 +187,32 @@ estimate on. Defaults to the observed values <code>x</code> when nothing is pass
 
     <p>An object of class <code>'pred_tf'</code>. This is a list with the following
 elements:</p><dl>
-<dt>x_eval</dt><dd><p></p></dd>
-<dt>tf_estimate</dt><dd><p></p></dd>
-<dt>lambdas</dt><dd><p></p></dd>
-<dt>edfs</dt><dd><p></p></dd>
-<dt>loss_func</dt><dd><p></p></dd>
-<dt>cv_errors</dt><dd><p></p></dd>
-<dt>se_cv_errors</dt><dd><p></p></dd>
-<dt>lambda_opt</dt><dd><p></p></dd>
-<dt>edf_opt</dt><dd><p></p></dd>
-<dt>i_opt</dt><dd><p></p></dd>
-<dt>tf_model</dt><dd><p></p></dd>
+<dt>x_eval</dt><dd><p>Input grid that the optimized trend filtering estimate was
+evaluated on.</p></dd>
+<dt>tf_estimate</dt><dd><p>The optimized trend filtering estimate, evaluated at
+<code>x_eval</code>.</p></dd>
+<dt>lambdas</dt><dd><p>Vector of hyperparameter values evaluated in the grid search
+(always returned in descending order).</p></dd>
+<dt>edfs</dt><dd><p>Vector of effective degrees of freedom for all trend filtering
+estimators fit during validation.</p></dd>
+<dt>validation_errors</dt><dd><p>Vector of hyperparameter validation errors, obtained
+either via SURE or cross validation.</p></dd>
+<dt>se_validation_errors</dt><dd><p>Standard errors for <code>validation_errors</code>.</p></dd>
+<dt>V</dt><dd><p>(<code>'cv_tf'</code> only) The number of folds the data were partitioned into
+for V-fold cross validation.</p></dd>
+<dt>loss_func</dt><dd><p>(<code>'cv_tf'</code> only) A string or index designating which cross
+validation loss function was selected as the metric with respect to which the
+trend filtering hyperparameter would be optimized.</p></dd>
+<dt>cv_loss_func</dt><dd><p>(<code>'cv_tf'</code> only) A function that computes the cross
+validation loss via the method specified by <code>loss_func</code>.</p></dd>
+<dt>lambda_opt</dt><dd><p>The optimal hyperparameter value, as defined by the
+<code>lambda_choice</code> argument (as well as <code>loss_func</code>, if
+<code>class(obj) = "cv_tf"</code>).</p></dd>
+<dt>edf_opt</dt><dd><p>Number of effective degrees of freedom in the trend filtering
+estimator with hyperparameter <code>lambda_opt</code>.</p></dd>
+<dt>i_opt</dt><dd><p>The index of <code>lambda_opt</code> within <code>lambdas</code>.</p></dd>
+<dt>tf_model</dt><dd><p>A list of objects that is used internally by other functions
+that operate on the <code>'pred_tf'</code> object.</p></dd>
 
 </dl>
 

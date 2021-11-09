@@ -88,15 +88,15 @@
 #' descending order).}
 #' \item{edfs}{Number of effective degrees of freedom in the trend filtering
 #' estimator, for every hyperparameter value in `lambdas`.}
-#' \item{validation_errors}{Vector of mean-squared prediction errors estimated
+#' \item{sure_errors}{Vector of mean-squared prediction errors estimated
 #' by SURE, for every hyperparameter value in `lambdas`.}
-#' \item{se_validation_errors}{Vector of estimated standard errors for the
-#' `validation_errors`.}
+#' \item{se_sure_errors}{Vector of estimated standard errors for the
+#' `sure_errors`.}
 #' \item{lambda_min}{Hyperparameter value that minimizes the SURE validation
 #' error curve.}
 #' \item{lambda_1se}{The largest hyperparameter value (corresponding to the
 #' smoothest trend filtering estimate) that yields a SURE error within
-#' one standard error of `min(validation_errors)`. We call this the
+#' one standard error of `min(sure_errors)`. We call this the
 #' "1-standard-error rule" hyperparameter, and it serves as an Occam's
 #' razor-esque heuristic. That is, given two models with approximately equal
 #' performance (here, in terms of MSE), it may be wise to opt for the simpler
@@ -121,9 +121,9 @@
 #' outputs `y` and the trend filtering estimate, for every hyperparameter value
 #' in `lambdas`.}
 #' \item{optimisms}{SURE-estimated optimisms, i.e.
-#' `optimisms = validation_errors - training_errors`.}
+#' `optimisms = sure_errors - training_errors`.}
 #' \item{tf_model}{A list of objects that is used internally by other
-#' functions that operate on the `sure_trendfilter()` output.}
+#' functions that operate on the `'sure_tf'` object.}
 #' }
 #'
 #' @export sure_trendfilter
@@ -261,19 +261,19 @@ sure_trendfilter <- function(x,
     nrow = nrow(data_scaled)
   )
 
-  validation_errors_mat <- (squared_residuals_mat + optimisms_mat) * y_scale^2
-  validation_errors <- validation_errors_mat %>% colMeans()
-  i_min <- min(which.min(validation_errors)) %>% as.integer()
+  sure_errors_mat <- (squared_residuals_mat + optimisms_mat) * y_scale^2
+  sure_errors <- sure_errors_mat %>% colMeans()
+  i_min <- min(which.min(sure_errors)) %>% as.integer()
 
-  se_validation_errors <- replicate(
+  se_sure_errors <- replicate(
     5000,
-    validation_errors_mat[sample(1:nrow(data_scaled), replace = TRUE), ] %>%
+    sure_errors_mat[sample(1:nrow(data_scaled), replace = TRUE), ] %>%
       colMeans()
   ) %>%
     rowSds()
 
   i_1se <- which(
-    validation_errors <= validation_errors[i_min] + se_validation_errors[i_min]
+    sure_errors <= sure_errors[i_min] + se_sure_errors[i_min]
   ) %>% min()
 
   tf_model <- structure(
@@ -296,8 +296,8 @@ sure_trendfilter <- function(x,
     list(
       lambdas = lambdas,
       edfs = out$df %>% as.integer(),
-      validation_errors = validation_errors,
-      se_validation_errors = se_validation_errors,
+      sure_errors = sure_errors,
+      se_sure_errors = se_sure_errors,
       lambda_min = lambdas[i_min],
       lambda_1se = lambdas[i_1se],
       edf_min = out$df[i_min] %>% as.integer(),

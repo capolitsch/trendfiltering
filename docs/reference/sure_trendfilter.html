@@ -218,15 +218,15 @@ elements:</p><dl>
 descending order).</p></dd>
 <dt>edfs</dt><dd><p>Number of effective degrees of freedom in the trend filtering
 estimator, for every hyperparameter value in <code>lambdas</code>.</p></dd>
-<dt>validation_errors</dt><dd><p>Vector of mean-squared prediction errors estimated
+<dt>sure_errors</dt><dd><p>Vector of mean-squared prediction errors estimated
 by SURE, for every hyperparameter value in <code>lambdas</code>.</p></dd>
-<dt>se_validation_errors</dt><dd><p>Vector of estimated standard errors for the
-<code>validation_errors</code>.</p></dd>
+<dt>se_sure_errors</dt><dd><p>Vector of estimated standard errors for the
+<code>sure_errors</code>.</p></dd>
 <dt>lambda_min</dt><dd><p>Hyperparameter value that minimizes the SURE validation
 error curve.</p></dd>
 <dt>lambda_1se</dt><dd><p>The largest hyperparameter value (corresponding to the
 smoothest trend filtering estimate) that yields a SURE error within
-one standard error of <code><a href='https://rdrr.io/r/base/Extremes.html'>min(validation_errors)</a></code>. We call this the
+one standard error of <code><a href='https://rdrr.io/r/base/Extremes.html'>min(sure_errors)</a></code>. We call this the
 "1-standard-error rule" hyperparameter, and it serves as an Occam's
 razor-esque heuristic. That is, given two models with approximately equal
 performance (here, in terms of MSE), it may be wise to opt for the simpler
@@ -251,9 +251,9 @@ converged to satisfactory precision.</p></dd>
 outputs <code>y</code> and the trend filtering estimate, for every hyperparameter value
 in <code>lambdas</code>.</p></dd>
 <dt>optimisms</dt><dd><p>SURE-estimated optimisms, i.e.
-<code>optimisms = validation_errors - training_errors</code>.</p></dd>
+<code>optimisms = sure_errors - training_errors</code>.</p></dd>
 <dt>tf_model</dt><dd><p>A list of objects that is used internally by other
-functions that operate on the <code>sure_trendfilter()</code> output.</p></dd>
+functions that operate on the <code>'sure_tf'</code> object.</p></dd>
 
 </dl>
 

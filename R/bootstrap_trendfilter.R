@@ -40,12 +40,13 @@
 #' @return An object of class '`bootstrap_tf`'. This is a list with the
 #' following elements
 #' \describe{
-#' \item{x_eval}{}
+#' \item{x_eval}{Input grid that each bootstrap trend filtering estimate was
+#' evaluated on.}
 #' \item{ensemble}{The full trend filtering bootstrap ensemble as an
 #' \mjseqn{n \times B} matrix.}
 #' \item{edf_boots}{Vector of the estimated number of effective degrees of
 #' freedom of each trend filtering bootstrap estimate. These should all be
-#' relatively close to `obj$edf_min`.}
+#' relatively close to `obj$edf_opt`.}
 #' \item{n_iter_boots}{Vector of the number of iterations taken by the ADMM
 #' algorithm before reaching a stopping criterion, for each bootstrap estimate.}
 #' \item{lambda_boots}{Vector of the hyperparameter values used for each
@@ -111,7 +112,7 @@
 #'
 #' pred_tf <- predict(
 #'   cv_tf,
-#'   validation_error_metric = "MAE",
+#'   loss_func = "MAE",
 #'   lambda_choice = "lambda_1se",
 #'   nx_eval = 1500L
 #' )
