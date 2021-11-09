@@ -53,11 +53,11 @@ the machine, \code{mc_cores} is internally updated to
 
 \item{loss_funcs}{(Optional) A named list of one or more functions, with each
 defining a loss function that will give rise to its own CV error curve. Mean
-absolute deviations error (MAE), mean-squared error (MSE), Huber loss,
-mean-squared logarithmic error (MSLE), as well as observation-weighted
-versions of each, are all computed internally and returned. Therefore, the
-\code{loss_funcs} argument need only be used to define loss functions that are not
-among these common choices.
+absolute deviations error (MAE), mean-squared error (MSE), log-cosh error,
+Huber loss, mean-squared logarithmic error (MSLE), as well as
+observation-weighted versions of all except MSLE, are all computed internally
+and returned. Therefore, the \code{loss_funcs} argument need only be used to
+define loss functions that are not among these common choices.
 
 Each function within the named list passed to \code{loss_funcs} should take three
 vector arguments --- \code{y}, \code{tf_estimate}, and \code{weights} --- and return a
@@ -123,10 +123,11 @@ descending order).}
 \item{edfs}{Number of effective degrees of freedom in the trend filtering
 estimator, for every candidate hyperparameter value in \code{lambdas}.}
 \item{cv_errors}{A named list of vectors, with each representing the
-cross validation error curve for a given loss function. The first 8
-vectors of the list correspond to MAE, WMAE, MSE, WMSE, Huber loss, weighted
-Huber loss, MSLE, and WMSLE. If any custom loss functions were passed to
-\code{loss_funcs}, their cross validation curves will follow the first 8.}
+cross validation error curve for a given loss function. The first 9
+vectors of the list correspond to MAE, WMAE, MSE, WMSE, log-cosh error,
+weighted log-cosh error, Huber loss, weighted Huber loss, and MSLE. If any
+custom loss functions were passed to \code{loss_funcs}, their cross validation
+curves will follow the first 9.}
 \item{se_cv_errors}{Standard errors for each of the cross validation error
 curves in \code{cv_errors}, within a named list of the same structure.}
 \item{lambda_min}{A named vector with length equal to \code{length(cv_errors)},
@@ -200,40 +201,39 @@ validation and their CV error curves are returned within the \code{cv_errors}
 list of the \code{'cv_tf'} output object.
 
 \enumerate{
-\item Mean-squared error: \mjsdeqn{\text{MSE}(\lambda) = \frac{1}{n}
-\sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2}
-\item Weighted mean-squared error: \mjsdeqn{\text{WMSE}(\lambda)
-= \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
 \item Mean absolute deviations error: \mjsdeqn{\text{MAE}(\lambda) =
 \frac{1}{n} \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|}
 \item Weighted mean absolute deviations error:
 \mjsdeqn{\text{WMAE}(\lambda) = \sum_{i=1}^{n}
 |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-\item Huber error: \mjsdeqn{\text{Huber}(\lambda) =
+\item Mean-squared error: \mjsdeqn{\text{MSE}(\lambda) = \frac{1}{n}
+\sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2}
+\item Weighted mean-squared error: \mjsdeqn{\text{WMSE}(\lambda)
+= \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
+\item log-cosh error: \mjsdeqn{\text{logcosh}(\lambda) = \frac{1}{n}
+\sum_{i=1}^{n} \log\left(\cosh\left(Y_i - \hat{f}(x_i; \lambda)\right)\right)}
+\item Weighted log-cosh error: \mjsdeqn{\text{wlogcosh}(\lambda) =
+\sum_{i=1}^{n}
+\log\left(\cosh\left((Y_i - \hat{f}(x_i; \lambda))\sqrt{w_i}\right)\right)}
+\item Huber loss: \mjsdeqn{\text{Huber}(\lambda) =
 \frac{1}{n}\sum_{i=1}^{n}L_{\delta}(Y_i; \lambda)}
 \mjsdeqn{\text{where}\;\;\;\;L_{\delta}(Y_i; \lambda) = \cases{
 |Y_i - \hat{f}(x_i; \lambda)|^2, &
 $|Y_i - \hat{f}(x_i; \lambda)| \leq \delta$ \cr
 2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, &
 $|Y_i - \hat{f}(x_i; \lambda)| > \delta$}}
-\item Weighted Huber error: \mjsdeqn{\text{wHuber}(\lambda) =
+\item Weighted Huber loss: \mjsdeqn{\text{wHuber}(\lambda) =
 \sum_{i=1}^{n}L_{\delta}(Y_i; \lambda)}
 \mjsdeqn{\text{where}\;\;\;\;L_{\delta}(Y_i; \lambda) = \cases{
-|Y_i - \hat{f}(x_i; \lambda)|^2, &
+|Y_i - \hat{f}(x_i; \lambda)|^2w_i, &
 $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
-2\delta|Y_i - \hat{f}(x_i; \lambda)| -
+2\delta|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} -
 \delta^2, & $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta$}}
 \item Mean-squared logarithmic error: \mjsdeqn{\text{MSLE}(\lambda) =
 \frac{1}{n}\sum_{i=1}^{n}
 \left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|}
-\item Weighted mean-squared logarithmic error: \mjsdeqn{\text{MSLE}(\lambda)
-= \frac{1}{n}\sum_{i=1}^{n}
-\left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|\log(w_i + 1)}
 }
 where \mjseqn{w_i:=} \code{weights[i]}.
-
-If constant weights are passed, or if nothing is passed, then a weighted loss
-function is equivalent to its unweighted counterpart.
 }
 \examples{
 data(eclipsing_binary)

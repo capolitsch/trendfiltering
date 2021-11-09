@@ -49,8 +49,8 @@
 #' \item{lambdas}{}
 #' \item{edfs}{}
 #' \item{loss_func}{}
-#' \item{validation_errors}{}
-#' \item{se_validation_errors}{}
+#' \item{cv_errors}{}
+#' \item{se_cv_errors}{}
 #' \item{lambda_opt}{}
 #' \item{edf_opt}{}
 #' \item{i_opt}{}
@@ -96,7 +96,7 @@ predict.cv_tf <- function(obj,
   )
 
   if (is.character(loss_func)) {
-    stopifnot(loss_func %in% names(obj$validation_errors))
+    stopifnot(loss_func %in% names(obj$cv_errors))
   }
 
   if (is.double(loss_func) | is.integer(loss_func)) {
@@ -167,9 +167,9 @@ predict.cv_tf <- function(obj,
       lambdas = obj$lambdas,
       edfs = obj$edfs,
       loss_func = loss_func,
-      validation_error_func = obj$validation_error_funcs[[loss_func]],
-      validation_errors = obj$validation_errors[[loss_func]],
-      se_validation_errors = obj$se_validation_errors[[loss_func]],
+      cv_loss_func = obj$cv_loss_funcs[[loss_func]],
+      cv_errors = obj$cv_errors[[loss_func]],
+      se_cv_errors = obj$se_cv_errors[[loss_func]],
       lambda_opt = obj$lambdas[i_opt],
       edf_opt = obj$edfs[i_opt],
       i_opt = i_opt,

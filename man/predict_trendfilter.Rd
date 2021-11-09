@@ -56,8 +56,8 @@ elements:
 \item{lambdas}{}
 \item{edfs}{}
 \item{loss_func}{}
-\item{validation_errors}{}
-\item{se_validation_errors}{}
+\item{cv_errors}{}
+\item{se_cv_errors}{}
 \item{lambda_opt}{}
 \item{edf_opt}{}
 \item{i_opt}{}
