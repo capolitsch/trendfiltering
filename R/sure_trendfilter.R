@@ -260,19 +260,19 @@ sure_trendfilter <- function(x,
     nrow = nrow(data_scaled)
   )
 
-  sure_errors_mat <- (squared_residuals_mat + optimisms_mat) * y_scale^2
-  sure_errors <- sure_errors_mat %>% colMeans()
-  i_min <- min(which.min(sure_errors)) %>% as.integer()
+  errors_mat <- (squared_residuals_mat + optimisms_mat) * y_scale^2
+  errors <- errors_mat %>% colMeans()
+  i_min <- min(which.min(errors)) %>% as.integer()
 
-  se_sure_errors <- replicate(
+  se_errors <- replicate(
     5000,
-    sure_errors_mat[sample(1:nrow(data_scaled), replace = TRUE), ] %>%
+    errors_mat[sample(1:nrow(data_scaled), replace = TRUE), ] %>%
       colMeans()
   ) %>%
     rowSds()
 
   i_1se <- which(
-    sure_errors <= sure_errors[i_min] + se_sure_errors[i_min]
+    errors <= errors[i_min] + se_errors[i_min]
   ) %>% min()
 
   tf_model <- structure(
@@ -295,8 +295,8 @@ sure_trendfilter <- function(x,
     list(
       lambdas = lambdas,
       edfs = out$df %>% as.integer(),
-      errors = sure_errors,
-      se_errors = se_sure_errors,
+      errors = errors,
+      se_errors = se_errors,
       lambda_min = lambdas[i_min],
       lambda_1se = lambdas[i_1se],
       edf_min = out$df[i_min] %>% as.integer(),

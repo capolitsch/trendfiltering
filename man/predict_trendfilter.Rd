@@ -19,9 +19,9 @@
 \item{obj}{An object of class '\code{\link[=cv_trendfilter]{cv_tf}}' or
 '\code{\link[=sure_trendfilter]{sure_tf}}'.}
 
-\item{loss_func}{(For class \code{\link[=cv_trendfilter]{'cv_tf'}} only) A string or
+\item{loss_func}{(For class '\code{\link[=cv_trendfilter]{cv_tf}}' only) A string or
 index specifying which cross validation error curve stored within the
-\code{\link[=cv_trendfilter]{'cv_tf'}} object will be used to optimize the trend
+'\code{\link[=cv_trendfilter]{cv_tf}}' object will be used to optimize the trend
 filtering hyperparameter. Run \code{names(obj$loss_funcs)} to see the available
 options. Defaults to \code{loss_func = "WMAE"}.}
 
@@ -44,7 +44,7 @@ estimate on. Defaults to the observed values \code{x} when nothing is passed.}
 \code{x_eval = seq(min(x), max(x), length = nx_eval)}.}
 }
 \value{
-An object of class \code{'pred_tf'}. This is a list with the following
+An object of class '\code{pred_tf}'. This is a list with the following
 elements:
 \describe{
 \item{x_eval}{Input grid that the optimized trend filtering estimate was
@@ -58,7 +58,7 @@ estimators fit during validation.}
 \item{errors}{Vector of hyperparameter validation errors, obtained either via
 SURE or cross validation.}
 \item{se_errors}{Standard errors for \code{errors}.}
-\item{loss_func}{(\code{'cv_tf'} only) A string or index designating which cross
+\item{loss_func}{('\code{cv_tf}' only) A string or index designating which cross
 validation loss function was selected as the metric with respect to which the
 trend filtering hyperparameter would be optimized.}
 \item{lambda_opt}{The optimal hyperparameter value, as defined by
@@ -67,7 +67,7 @@ trend filtering hyperparameter would be optimized.}
 estimator with hyperparameter \code{lambda_opt}.}
 \item{i_opt}{The index of \code{lambda_opt} within \code{lambdas}.}
 \item{tf_model}{A list of objects that is used internally by other functions
-that operate on the \code{'pred_tf'} object.}
+that operate on the '\code{pred_tf}' object.}
 }
 }
 \description{
@@ -75,7 +75,7 @@ Evaluate an optimized trend filtering object on a grid of input values. The
 \code{predict} function can be called on an object of class
 '\code{\link[=cv_trendfilter]{cv_tf}}' or '\code{\link[=sure_trendfilter]{sure_tf}}'. The
 \code{lambda_choice} argument (and the \code{loss_func} argument, for
-\code{\link[=cv_trendfilter]{'cv_tf'}} objects) should be used to specify the
+'\code{\link[=cv_trendfilter]{cv_tf}}' objects) should be used to specify the
 desired method for optimizing the trend filtering hyperparameter.
 }
 \details{

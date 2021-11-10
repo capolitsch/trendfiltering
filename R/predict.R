@@ -4,14 +4,14 @@
 #' `predict` function can be called on an object of class
 #' '[`cv_tf`][cv_trendfilter()]' or '[`sure_tf`][sure_trendfilter()]'. The
 #' `lambda_choice` argument (and the `loss_func` argument, for
-#' [`'cv_tf'`][cv_trendfilter()] objects) should be used to specify the
+#' '[`cv_tf`][cv_trendfilter()]' objects) should be used to specify the
 #' desired method for optimizing the trend filtering hyperparameter.
 #'
 #' @param obj An object of class '[`cv_tf`][cv_trendfilter()]' or
 #' '[`sure_tf`][sure_trendfilter()]'.
-#' @param loss_func (For class [`'cv_tf'`][cv_trendfilter()] only) A string or
+#' @param loss_func (For class '[`cv_tf`][cv_trendfilter()]' only) A string or
 #' index specifying which cross validation error curve stored within the
-#' [`'cv_tf'`][cv_trendfilter()] object will be used to optimize the trend
+#' '[`cv_tf`][cv_trendfilter()]' object will be used to optimize the trend
 #' filtering hyperparameter. Run `names(obj$loss_funcs)` to see the available
 #' options. Defaults to `loss_func = "WMAE"`.
 #' @param lambda_choice One of `c("lambda_min", "lambda_1se")`. The choice of
@@ -37,7 +37,7 @@
 #' https://web.stanford.edu/~hastie/Papers/ESLII.pdf) for more details on the
 #' "one-standard-error rule".
 #'
-#' @return An object of class `'pred_tf'`. This is a list with the following
+#' @return An object of class '`pred_tf`'. This is a list with the following
 #' elements:
 #' \describe{
 #' \item{x_eval}{Input grid that the optimized trend filtering estimate was
@@ -51,7 +51,7 @@
 #' \item{errors}{Vector of hyperparameter validation errors, obtained either via
 #' SURE or cross validation.}
 #' \item{se_errors}{Standard errors for `errors`.}
-#' \item{loss_func}{(`'cv_tf'` only) A string or index designating which cross
+#' \item{loss_func}{('`cv_tf`' only) A string or index designating which cross
 #' validation loss function was selected as the metric with respect to which the
 #' trend filtering hyperparameter would be optimized.}
 #' \item{lambda_opt}{The optimal hyperparameter value, as defined by
@@ -60,7 +60,7 @@
 #' estimator with hyperparameter `lambda_opt`.}
 #' \item{i_opt}{The index of `lambda_opt` within `lambdas`.}
 #' \item{tf_model}{A list of objects that is used internally by other functions
-#' that operate on the `'pred_tf'` object.}
+#' that operate on the '`pred_tf`' object.}
 #' }
 #'
 #' @rdname predict_trendfilter
@@ -90,7 +90,7 @@
 #' )
 #' @importFrom dplyr case_when tibble
 #' @importFrom magrittr %<>% %>%
-#' @export predict.cv_tf
+#' @export
 predict.cv_tf <- function(obj,
                           loss_func = "WMAE",
                           lambda_choice = c("lambda_min", "lambda_1se"),
@@ -188,7 +188,7 @@ predict.cv_tf <- function(obj,
 #' @importFrom dplyr case_when tibble
 #' @importFrom magrittr %<>% %>%
 #' @rdname predict_trendfilter
-#' @export predict.sure_tf
+#' @export
 predict.sure_tf <- function(obj,
                             lambda_choice = c("lambda_min", "lambda_1se"),
                             x_eval,

@@ -328,7 +328,7 @@ cv_trendfilter <- function(x,
   }
 
   if (missing(loss_funcs)) {
-    cv_loss_funcs <- list(
+    loss_funcs <- list(
       MAE = MAE,
       WMAE = WMAE,
       MSE = MSE,
@@ -368,7 +368,7 @@ cv_trendfilter <- function(x,
           ))
         }
       }
-      cv_loss_funcs <- c(
+      loss_funcs <- c(
         list(
           MAE = MAE,
           WMAE = WMAE,
@@ -423,7 +423,6 @@ cv_trendfilter <- function(x,
     fold_ids <- sample(rep_len(1:V, nrow(data_scaled)))
   } else {
     stopifnot(length(fold_ids) == length(x))
-
     fold_ids <- as.integer(fold_ids)
     if (!all.equal(sort(unique(fold_ids)), 1:V)) {
       stop(
@@ -456,7 +455,7 @@ cv_trendfilter <- function(x,
 
   lambdas <- get_lambdas(nlambdas, data_scaled, k, thinning, admm_params)
 
-  cv_errors <- mclapply(
+  cv_out <- mclapply(
     1:V,
     FUN = validate_trendfilter,
     data_folded = data_folded,
@@ -464,55 +463,55 @@ cv_trendfilter <- function(x,
     k = k,
     thinning = thinning,
     admm_params = admm_params,
-    cv_loss_funcs = cv_loss_funcs,
+    loss_funcs = loss_funcs,
     y_scale = y_scale,
     mc.cores = mc_cores
   )
 
-  cv_error_mats <- lapply(
-    X = 1:length(cv_loss_funcs),
+  cv_loss_mats <- lapply(
+    X = 1:length(loss_funcs),
     FUN = function(X) {
       lapply(
-        1:length(cv_errors),
-        FUN = function(itr) cv_errors[[itr]][[X]]
+        1:length(cv_out),
+        FUN = function(itr) cv_out[[itr]][[X]]
       ) %>%
         unlist() %>%
         matrix(ncol = V)
     }
   )
 
-  cv_errors <- lapply(
-    1:length(cv_error_mats),
+  errors <- lapply(
+    1:length(cv_loss_mats),
     FUN = function(X) {
-      cv_error_mats[[X]] %>%
+      cv_loss_mats[[X]] %>%
         rowMeans() %>%
         as.double()
     }
   )
 
   i_min <- lapply(
-    1:length(cv_errors),
+    1:length(errors),
     FUN = function(X) {
-      cv_errors[[X]] %>%
+      errors[[X]] %>%
         which.min() %>%
         min()
     }
   ) %>% unlist()
 
-  se_cv_errors <- lapply(
-    1:length(cv_errors),
+  se_errors <- lapply(
+    1:length(errors),
     FUN = function(X) {
-      rowSds(cv_error_mats[[X]]) / sqrt(V) %>%
+      rowSds(cv_loss_mats[[X]]) / sqrt(V) %>%
         as.double()
     }
   )
 
   i_1se <- lapply(
-    X = 1:length(cv_errors),
+    X = 1:length(errors),
     FUN = function(X) {
       which(
-        cv_errors[[X]] <= cv_errors[[X]][i_min[X]] +
-          se_cv_errors[[X]][i_min[X]]
+        errors[[X]] <= errors[[X]][i_min[X]] +
+          se_errors[[X]][i_min[X]]
       ) %>% min()
     }
   ) %>% unlist()
@@ -533,14 +532,14 @@ cv_trendfilter <- function(x,
   edf_min <- out$df[i_min] %>% as.integer()
   edf_1se <- out$df[i_1se] %>% as.integer()
 
-  names(lambda_min) <- names(cv_loss_funcs)
-  names(lambda_1se) <- names(cv_loss_funcs)
-  names(edf_min) <- names(cv_loss_funcs)
-  names(edf_1se) <- names(cv_loss_funcs)
-  names(cv_errors) <- names(cv_loss_funcs)
-  names(i_min) <- names(cv_loss_funcs)
-  names(se_cv_errors) <- names(cv_loss_funcs)
-  names(i_1se) <- names(cv_loss_funcs)
+  names(lambda_min) <- names(loss_funcs)
+  names(lambda_1se) <- names(loss_funcs)
+  names(edf_min) <- names(loss_funcs)
+  names(edf_1se) <- names(loss_funcs)
+  names(errors) <- names(loss_funcs)
+  names(i_min) <- names(loss_funcs)
+  names(se_errors) <- names(loss_funcs)
+  names(i_1se) <- names(loss_funcs)
 
   tf_model <- structure(
     list(
@@ -562,15 +561,15 @@ cv_trendfilter <- function(x,
     list(
       lambdas = lambdas,
       edfs = out$df %>% as.integer(),
-      errors = cv_errors,
-      se_errors = se_cv_errors,
+      errors = errors,
+      se_errors = se_errors,
       lambda_min = lambda_min,
       lambda_1se = lambda_1se,
       edf_min = edf_min,
       edf_1se = edf_1se,
       i_min = i_min,
       i_1se = i_1se,
-      loss_funcs = cv_loss_funcs,
+      loss_funcs = loss_funcs,
       cost_functional = out$obj[nrow(out$obj), ],
       n_iter = out$iter %>% as.integer(),
       V = V,
@@ -589,7 +588,7 @@ validate_trendfilter <- function(validation_index,
                                  k,
                                  thinning,
                                  admm_params,
-                                 cv_loss_funcs,
+                                 loss_funcs,
                                  y_scale) {
   data_train <- data_folded[-validation_index] %>% bind_rows()
   data_validate <- data_folded[[validation_index]]
@@ -612,12 +611,12 @@ validate_trendfilter <- function(validation_index,
     suppressWarnings()
 
   lapply(
-    X = 1:length(cv_loss_funcs),
+    X = 1:length(loss_funcs),
     FUN = function(X) {
       apply(
         tf_validate_preds * y_scale,
         2,
-        cv_loss_funcs[[X]],
+        loss_funcs[[X]],
         y = data_validate$y * y_scale,
         weights = data_validate$weights / y_scale^2
       ) %>%
