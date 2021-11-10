@@ -2,7 +2,7 @@
 % Please edit documentation in R/bootstrap_trendfilter.R
 \name{bootstrap_trendfilter}
 \alias{bootstrap_trendfilter}
-\title{Construct pointwise variability bands via a bootstrap}
+\title{Construct pointwise variability bands via a tailored bootstrap algorithm}
 \usage{
 bootstrap_trendfilter(
   obj,
@@ -61,8 +61,8 @@ for the \code{bootstrap_algorithm} argument are shown in the table below. See
 \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for more details.\tabular{ll}{
    Scenario \tab Uncertainty quantification \cr
    \code{x} is unevenly sampled \tab \code{bootstrap_algorithm = "nonparametric"} \cr
-   \code{x} is evenly sampled and reciprocal variances are available \tab \code{bootstrap_algorithm = "parametric"} \cr
-   \code{x} is evenly sampled and reciprocal variances are not available \tab \code{bootstrap_algorithm = "wild"} \cr
+   \code{x} is evenly sampled and measurement variances for \code{y} are available \tab \code{bootstrap_algorithm = "parametric"} \cr
+   \code{x} is evenly sampled and measurement variances for \code{y} are not available \tab \code{bootstrap_algorithm = "wild"} \cr
 }
 
 

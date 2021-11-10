@@ -1,4 +1,4 @@
-#' Construct pointwise variability bands via a bootstrap
+#' Construct pointwise variability bands via a tailored bootstrap algorithm
 #'
 #' \loadmathjax Generate a bootstrap ensemble of trend filtering estimates in
 #' order to quantify the uncertainty in the optimized estimate. One of three
@@ -24,11 +24,11 @@
 #' [Politsch et al. (2020a)](
 #' https://academic.oup.com/mnras/article/492/3/4005/5704413) for more details.
 #'
-#' | Scenario                                                         |        Uncertainty quantification      |
-#' | :---                                                             |                   :---                 |
-#' | `x` is unevenly sampled                                          | `bootstrap_algorithm = "nonparametric"`|
-#' | `x` is evenly sampled and reciprocal variances are available     | `bootstrap_algorithm = "parametric"`   |
-#' | `x` is evenly sampled and reciprocal variances are not available | `bootstrap_algorithm = "wild"`         |
+#' | Scenario                                                                  |        Uncertainty quantification      |
+#' | :---                                                                      |                   :---                 |
+#' | `x` is unevenly sampled                                                   | `bootstrap_algorithm = "nonparametric"`|
+#' | `x` is evenly sampled and measurement variances for `y` are available     | `bootstrap_algorithm = "parametric"`   |
+#' | `x` is evenly sampled and measurement variances for `y` are not available | `bootstrap_algorithm = "wild"`         |
 #'
 #' For our purposes, an evenly sampled data set with some discarded pixels
 #' (either sporadically or in large consecutive chunks) is still considered to
