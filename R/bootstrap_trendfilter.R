@@ -61,28 +61,26 @@
 #' \bold{Companion references}
 #' \enumerate{
 #' \item{Politsch et al. (2020a).
-#' \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-#' Trend filtering – I. A modern statistical tool for time-domain astronomy and
-#' astronomical spectroscopy}. \emph{MNRAS}, 492(3), p. 4005-4018.} \cr
+#' [Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy](https://academic.oup.com/mnras/article/492/3/4005/5704413).
+#' \emph{MNRAS}, 492(3), p. 4005-4018.} \cr
 #' \item{Politsch et al. (2020b).
-#' \href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
-#' Trend Filtering – II. Denoising astronomical signals with varying degrees of
-#' smoothness}. \emph{MNRAS}, 492(3), p. 4019-4032.}}
+#' [Trend Filtering – II. Denoising astronomical signals with varying degrees of smoothness](
+#' https://academic.oup.com/mnras/article/492/3/4019/5704414). \emph{MNRAS},
+#' 492(3), p. 4019-4032.}}
 #'
 #' \bold{The Bootstrap and variations}
 #' \enumerate{
 #' \item{Efron and Tibshirani (1986).
-#' \href{https://projecteuclid.org/journals/statistical-science/volume-1/issue-1/Bootstrap-Methods-for-Standard-Errors-Confidence-Intervals-and-Other-Measures/10.1214/ss/1177013815.full}{
-#' Bootstrap Methods for Standard Errors, Confidence Intervals, and Other
-#' Measures of Statistical Accuracy}.
+#' [Bootstrap Methods for Standard Errors, Confidence Intervals, and Other Measures of Statistical Accuracy](
+#' https://projecteuclid.org/journals/statistical-science/volume-1/issue-1/Bootstrap-Methods-for-Standard-Errors-Confidence-Intervals-and-Other-Measures/10.1214/ss/1177013815.full).
 #' \emph{Statistical Science}, 1(1), p. 54-75.} \cr
 #' \item{Mammen (1993).
-#' \href{https://projecteuclid.org/journals/annals-of-statistics/volume-21/issue-1/Bootstrap-and-Wild-Bootstrap-for-High-Dimensional-Linear-Models/10.1214/aos/1176349025.full}{
-#' Bootstrap and Wild Bootstrap for High Dimensional Linear Models}. \emph{The
-#' Annals of Statistics}, 21(1), p. 255-285.} \cr
+#' [Bootstrap and Wild Bootstrap for High Dimensional Linear Models](
+#' https://projecteuclid.org/journals/annals-of-statistics/volume-21/issue-1/Bootstrap-and-Wild-Bootstrap-for-High-Dimensional-Linear-Models/10.1214/aos/1176349025.full).
+#' \emph{The Annals of Statistics}, 21(1), p. 255-285.} \cr
 #' \item{Efron (1979).
-#' \href{https://projecteuclid.org/journals/annals-of-statistics/volume-7/issue-1/Bootstrap-Methods-Another-Look-at-the-Jackknife/10.1214/aos/1176344552.full}{
-#' Bootstrap Methods: Another Look at the Jackknife}.
+#' [Bootstrap Methods: Another Look at the Jackknife](
+#' https://projecteuclid.org/journals/annals-of-statistics/volume-7/issue-1/Bootstrap-Methods-Another-Look-at-the-Jackknife/10.1214/aos/1176344552.full).
 #' \emph{The Annals of Statistics}, 7(1), p. 1-26.}}
 #'
 #' @seealso [cv_trendfilter()], [sure_trendfilter()]

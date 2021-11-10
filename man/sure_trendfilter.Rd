@@ -41,7 +41,7 @@ be made, one can do so without any technical understanding of the ADMM
 algorithm. In particular, the four parameter descriptions below should serve
 as sufficient working knowledge.
 \describe{
-\item{obj_tol}{A stopping threshold for the ADMM algorithm. If the relative
+\item{\code{obj_tol}}{A stopping threshold for the ADMM algorithm. If the relative
 change in the algorithm's cost functional between two consecutive steps is
 less than \code{obj_tol}, the algorithm terminates. The algorithm's termination
 can also result from it reaching the maximum tolerable iterations set
@@ -50,15 +50,15 @@ by the \code{max_iter} parameter (see below). The \code{obj_tol} parameter defau
 \code{sure_trendfilter()} output, gives the relative change in the trend filtering
 cost functional over the algorithm's final iteration, for every candidate
 hyperparameter value.}
-\item{max_iter}{Maximum number of ADMM iterations that we will tolerate.
+\item{\code{max_iter}}{Maximum number of ADMM iterations that we will tolerate.
 Defaults to \code{max_iter = length(y)}. The actual number of iterations performed
 by the algorithm, for every candidate hyperparameter value, is returned in
 the \code{n_iter} vector, within the \code{sure_trendfilter()} output. If any of the
 elements of \code{n_iter} are equal to \code{max_iter}, the tolerance defined by
 \code{obj_tol} has not been attained and \code{max_iter} may need to be increased.}
-\item{thinning}{Logical. If \code{thinning = TRUE}, then the data are preprocessed
-so that a smaller data set is used to fit the trend filtering estimate, which
-will ease the ADMM algorithm's convergence. This can be
+\item{\code{thinning}}{Logical. If \code{thinning = TRUE}, then the data are
+preprocessed so that a smaller data set is used to fit the trend filtering
+estimate, which will ease the ADMM algorithm's convergence. This can be
 very useful when a signal is so well-sampled that very little additional
 information / predictive accuracy is gained by fitting the trend filtering
 estimate on the full data set, compared to some subset of it. See the
@@ -66,7 +66,7 @@ estimate on the full data set, compared to some subset of it. See the
 is passed to \code{thinning}, the algorithm will automatically detect whether
 thinning should be applied. This preprocessing procedure is controlled by the
 \code{x_tol} parameter below.}
-\item{x_tol}{Controls the automatic detection of when thinning should be
+\item{\code{x_tol}}{Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size \code{x_tol} and find at least two
 elements of \code{x} that fall into the same bin, then the data is thinned.
 }}}
@@ -75,44 +75,44 @@ elements of \code{x} that fall into the same bin, then the data is thinned.
 An object of class \code{'sure_tf'}. This is a list with the following
 elements:
 \describe{
-\item{lambdas}{Vector of candidate hyperparameter values (always returned in
-descending order).}
-\item{edfs}{Number of effective degrees of freedom in the trend filtering
+\item{\code{lambdas}}{Vector of candidate hyperparameter values (always returned
+in descending order).}
+\item{\code{edfs}}{Number of effective degrees of freedom in the trend filtering
 estimator, for every hyperparameter value in \code{lambdas}.}
-\item{errors}{Vector of mean-squared prediction errors estimated by SURE, for
-every hyperparameter value in \code{lambdas}.}
-\item{se_errors}{Vector of estimated standard errors for the \code{errors}.}
-\item{lambda_min}{Hyperparameter value that minimizes the SURE validation
+\item{\code{errors}}{Vector of mean-squared prediction errors estimated by SURE,
+for every hyperparameter value in \code{lambdas}.}
+\item{\code{se_errors}}{Vector of estimated standard errors for the \code{errors}.}
+\item{\code{lambda_min}}{Hyperparameter value that minimizes the SURE validation
 error curve.}
-\item{lambda_1se}{The largest hyperparameter value (corresponding to the
+\item{\code{lambda_1se}}{The largest hyperparameter value (corresponding to the
 smoothest trend filtering estimate) that yields a SURE error within
 one standard error of \code{min(errors)}. We call this the
 "1-standard-error rule" hyperparameter, and it serves as an Occam's
 razor-esque heuristic. That is, given two models with approximately equal
 performance (here, in terms of MSE), it may be wise to opt for the simpler
 model, i.e. the model with fewer effective degrees of freedom.}
-\item{edf_min}{Number of effective degrees of freedom in the minimum-SURE
+\item{\code{edf_min}}{Number of effective degrees of freedom in the minimum-SURE
 trend filtering estimator.}
-\item{edf_1se}{Number of effective degrees of freedom in the 1-stand-error
+\item{\code{edf_1se}}{Number of effective degrees of freedom in the 1-stand-error
 rule trend filtering estimator.}
-\item{i_min}{Index of \code{lambdas} that minimizes the SURE error curve.}
-\item{i_1se}{Index of \code{lambdas} that gives the 1-standard-error rule
+\item{\code{i_min}}{Index of \code{lambdas} that minimizes the SURE error curve.}
+\item{\code{i_1se}}{Index of \code{lambdas} that gives the 1-standard-error rule
 hyperparameter.}
-\item{cost_functional}{The relative change in the cost functional over the
+\item{\code{cost_functional}}{The relative change in the cost functional over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 \code{lambdas}.}
-\item{n_iter}{Total number of iterations taken by the ADMM algorithm, for
+\item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
 every candidate hyperparameter in \code{lambdas}. If an element of \code{n_iter}
 is exactly equal to \code{max_iter}, then the ADMM algorithm stopped before
 reaching the tolerance set by \code{obj_tol}. In these cases, you may need
 to increase \code{max_iter} to ensure the trend filtering solution has
 converged to satisfactory precision.}
-\item{training_errors}{In-sample mean-squared error between the observed
+\item{\code{training_errors}}{In-sample mean-squared error between the observed
 outputs \code{y} and the trend filtering estimate, for every hyperparameter value
 in \code{lambdas}.}
-\item{optimisms}{SURE-estimated optimisms, i.e.
+\item{\code{optimisms}}{SURE-estimated optimisms, i.e.
 \code{optimisms = errors - training_errors}.}
-\item{tf_model}{A list of objects that is used internally by other
+\item{\code{tf_model}}{A list of objects that is used internally by other
 functions that operate on the \code{'sure_tf'} object.}
 }
 }
@@ -149,36 +149,31 @@ sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
 \bold{Companion references}
 \enumerate{
 \item{Politsch et al. (2020a).
-\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-Trend filtering – I. A modern statistical tool for time-domain astronomy and
-astronomical spectroscopy}. \emph{MNRAS}, 492(3), p. 4005-4018.} \cr
+\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy}. \emph{MNRAS},
+492(3), p. 4005-4018.} \cr
 \item{Politsch et al. (2020b).
-\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
-Trend Filtering – II. Denoising astronomical signals with varying degrees of
-smoothness}. \emph{MNRAS}, 492(3), p. 4019-4032.}}
+\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{Trend Filtering – II. Denoising astronomical signals with varying degrees of smoothness}. \emph{MNRAS},
+492(3), p. 4019-4032.}}
 
 \bold{Stein's unbiased risk estimate}
 \enumerate{
 \item{Tibshirani and Wasserman (2015).
-\href{http://www.stat.cmu.edu/~larry/=sml/stein.pdf}{Stein’s Unbiased Risk
-Estimate}. \emph{36-702: Statistical Machine Learning course notes}
+\href{http://www.stat.cmu.edu/~larry/=sml/stein.pdf}{Stein’s Unbiased Risk Estimate}.
+\emph{36-702: Statistical Machine Learning course notes}
 (Carnegie Mellon University).} \cr
 \item{Efron (2014).
-\href{https://www.tandfonline.com/doi/abs/10.1198/016214504000000692}{
-The Estimation of Prediction Error: Covariance Penalties
-and Cross-Validation}. \emph{Journal of the American Statistical
-Association}. 99(467), p. 619-632.} \cr
+\href{https://www.tandfonline.com/doi/abs/10.1198/016214504000000692}{The Estimation of Prediction Error: Covariance Penalties and Cross-Validation}.
+\emph{Journal of the American Statistical Association}. 99(467),
+p. 619-632.} \cr
 \item{Stein (1981).
-\href{https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full}{
-Estimation of the Mean of a Multivariate Normal Distribution}.
+\href{https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full}{Estimation of the Mean of a Multivariate Normal Distribution}.
 \emph{The Annals of Statistics}. 9(6), p. 1135-1151.}}
 
 \bold{Effective degrees of freedom for trend filtering}
 \enumerate{
 \item{Tibshirani and Taylor (2012)}.
-\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{
-Degrees of freedom in lasso problems}. \emph{The Annals of Statistics},
-40(2), p. 1198-1232.}
+\href{https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full}{Degrees of freedom in lasso problems}.
+\emph{The Annals of Statistics}, 40(2), p. 1198-1232.}
 }
 \seealso{
 \code{\link[=cv_trendfilter]{cv_trendfilter()}}, \code{\link[=bootstrap_trendfilter]{bootstrap_trendfilter()}}

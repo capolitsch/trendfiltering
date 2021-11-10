@@ -69,13 +69,11 @@ bands <- vbands(boot_tf)
 \references{
 \enumerate{
 \item{Politsch et al. (2020a).
-\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{
-Trend filtering – I. A modern statistical tool for time-domain astronomy and
-astronomical spectroscopy}. \emph{MNRAS}, 492(3), p. 4005-4018.} \cr
+\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy}. \emph{MNRAS},
+492(3), p. 4005-4018.} \cr
 \item{Politsch et al. (2020b).
-\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{
-Trend Filtering – II. Denoising astronomical signals with varying degrees of
-smoothness}. \emph{MNRAS}, 492(3), p. 4019-4032.}}
+\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{Trend Filtering – II. Denoising astronomical signals with varying degrees of smoothness}. \emph{MNRAS},
+492(3), p. 4019-4032.}}
 }
 \seealso{
 \code{\link[=bootstrap_trendfilter]{bootstrap_trendfilter()}}

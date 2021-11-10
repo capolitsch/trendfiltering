@@ -234,7 +234,7 @@ parameter choices will almost always suffice, but when adjustments do need to
 be made, one can do so without any technical understanding of the ADMM
 algorithm. In particular, the four parameter descriptions below should serve
 as sufficient working knowledge.</p><dl>
-<dt>obj_tol</dt><dd><p>A stopping threshold for the ADMM algorithm. If the relative
+<dt><code>obj_tol</code></dt><dd><p>A stopping threshold for the ADMM algorithm. If the relative
 change in the algorithm's cost functional between two consecutive steps is
 less than <code>obj_tol</code>, the algorithm terminates. The algorithm's termination
 can also result from it reaching the maximum tolerable iterations set
@@ -243,15 +243,15 @@ by the <code>max_iter</code> parameter (see below). The <code>obj_tol</code> par
 <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> output, gives the relative change in the trend filtering
 cost functional over the algorithm's final iteration, for every candidate
 hyperparameter value.</p></dd>
-<dt>max_iter</dt><dd><p>Maximum number of ADMM iterations that we will tolerate.
+<dt><code>max_iter</code></dt><dd><p>Maximum number of ADMM iterations that we will tolerate.
 Defaults to <code>max_iter = length(y)</code>. The actual number of iterations performed
 by the algorithm, for every candidate hyperparameter value, is returned in
 the <code>n_iter</code> vector, within the <code>cv_trendfilter()</code> output. If any of the
 elements of <code>n_iter</code> are equal to <code>max_iter</code>, the tolerance defined by
 <code>obj_tol</code> has not been attained and <code>max_iter</code> may need to be increased.</p></dd>
-<dt>thinning</dt><dd><p>Logical. If <code>thinning = TRUE</code>, then the data are preprocessed
-so that a smaller data set is used to fit the trend filtering estimate, which
-will ease the ADMM algorithm's convergence. This can be
+<dt><code>thinning</code></dt><dd><p>Logical. If <code>thinning = TRUE</code>, then the data are
+preprocessed so that a smaller data set is used to fit the trend filtering
+estimate, which will ease the ADMM algorithm's convergence. This can be
 very useful when a signal is so well-sampled that very little additional
 information / predictive accuracy is gained by fitting the trend filtering
 estimate on the full data set, compared to some subset of it. See the
@@ -259,7 +259,7 @@ estimate on the full data set, compared to some subset of it. See the
 is passed to <code>thinning</code>, the algorithm will automatically detect whether
 thinning should be applied. This preprocessing procedure is controlled by the
 <code>x_tol</code> parameter below.</p></dd>
-<dt>x_tol</dt><dd><p>Controls the automatic detection of when thinning should be
+<dt><code>x_tol</code></dt><dd><p>Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size <code>x_tol</code> and find at least two
 elements of <code>x</code> that fall into the same bin, then the data is thinned.</p></dd>
 </dl></td>
@@ -270,22 +270,22 @@ elements of <code>x</code> that fall into the same bin, then the data is thinned
 
     <p>An object of class <code>'cv_tf'</code>. This is a list with the following
 elements:</p><dl>
-<dt>lambdas</dt><dd><p>Vector of candidate hyperparameter values (always returned in
-descending order).</p></dd>
-<dt>edfs</dt><dd><p>Number of effective degrees of freedom in the trend filtering
+<dt><code>lambdas</code></dt><dd><p>Vector of candidate hyperparameter values (always returned
+in descending order).</p></dd>
+<dt><code>edfs</code></dt><dd><p>Number of effective degrees of freedom in the trend filtering
 estimator, for every candidate hyperparameter value in <code>lambdas</code>.</p></dd>
-<dt>errors</dt><dd><p>A named list of vectors, with each representing the
+<dt><code>errors</code></dt><dd><p>A named list of vectors, with each representing the
 cross validation error curve for a given loss function. The first 9
 vectors of the list correspond to MAE, WMAE, MSE, WMSE, log-cosh error,
 weighted log-cosh error, Huber loss, weighted Huber loss, and MSLE. If any
 custom loss functions were passed to <code>loss_funcs</code>, their cross validation
 curves will follow the first 9.</p></dd>
-<dt>se_errors</dt><dd><p>Standard errors for each of the cross validation error
+<dt><code>se_errors</code></dt><dd><p>Standard errors for each of the cross validation error
 curves in <code>errors</code>, within a named list of the same structure.</p></dd>
-<dt>lambda_min</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
+<dt><code>lambda_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the hyperparameter value that minimizes the cross validation error
 curve, for every loss function.</p></dd>
-<dt>lambda_1se</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
+<dt><code>lambda_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the "1-standard-error rule" hyperparameter, for every loss
 function. The "1-standard-error rule" hyparameter is the largest
 hyperparameter value (corresponding to the smoothest trend filtering
@@ -293,33 +293,34 @@ estimate) that has a CV error within one standard error of the minimum CV
 error. It serves as an Occam's razor-like heuristic. That is, given two
 models with approximately equal performance, it may be wise to opt for the
 simpler model, i.e. the model with fewer effective degrees of freedom.</p></dd>
-<dt>edf_min</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
+<dt><code>edf_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the number of effective degrees of freedom in the trend filtering
 estimator that minimizes the CV error curve, for every loss function.</p></dd>
-<dt>edf_1se</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
+<dt><code>edf_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the number of effective degrees of freedom in the
 "1-standard-error rule" trend filtering estimator, for every type of
 validation error.</p></dd>
-<dt>i_min</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
+<dt><code>i_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the index of <code>lambdas</code> that yields the minimum of the CV error
 curve, for every loss function.</p></dd>
-<dt>i_1se</dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
+<dt><code>i_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the index of <code>lambdas</code> that gives the "1-standard-error rule"
 hyperparameter value, for every loss function.</p></dd>
-<dt>loss_funcs</dt><dd><p>A named list of functions that defines all loss functions
+<dt><code>loss_funcs</code></dt><dd><p>A named list of functions that defines all loss functions
 evaluated during cross validation.</p></dd>
-<dt>cost_functional</dt><dd><p>The relative change in the cost functional over the
+<dt><code>cost_functional</code></dt><dd><p>The relative change in the cost functional over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 <code>lambdas</code>.</p></dd>
-<dt>n_iter</dt><dd><p>Total number of iterations taken by the ADMM algorithm, for
+<dt><code>n_iter</code></dt><dd><p>Total number of iterations taken by the ADMM algorithm, for
 every candidate hyperparameter in <code>lambdas</code>. If an element of <code>n_iter</code>
 is exactly equal to the value set by <code>optimization_params$max_iter</code>, then the
 ADMM algorithm stopped before reaching the tolerance set by <code>obj_tol</code>. In
 these situations, you may need to increase <code>max_iter</code> to ensure the trend
 filtering solution has converged with satisfactory precision.</p></dd>
-<dt>V</dt><dd><p>The number of folds the data were split into for cross validation.</p></dd>
-<dt>tf_model</dt><dd><p>A list of objects that is used internally by other functions
-that operate on the <code>cv_trendfilter()</code> output.</p></dd>
+<dt><code>V</code></dt><dd><p>The number of folds the data were split into for cross
+validation.</p></dd>
+<dt><code>tf_model</code></dt><dd><p>A list of objects that is used internally by other
+functions that operate on the <code>cv_trendfilter()</code> output.</p></dd>
 
 </dl>
 
@@ -381,21 +382,16 @@ $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
 
     <p><b>Companion references</b></p><ol>
 <li><p>Politsch et al. (2020a).
-<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>
-Trend filtering – I. A modern statistical tool for time-domain astronomy and
-astronomical spectroscopy</a>. <em>MNRAS</em>, 492(3), p. 4005-4018. <br /></p></li>
+<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy</a>. <em>MNRAS</em>, 492(3), p. 4005-4018. <br /></p></li>
 <li><p>Politsch et al. (2020b).
-<a href='https://academic.oup.com/mnras/article/492/3/4019/5704414'>
-Trend Filtering – II. Denoising astronomical signals with varying degrees of
-smoothness</a>. <em>MNRAS</em>, 492(3), p. 4019-4032.</p></li>
+<a href='https://academic.oup.com/mnras/article/492/3/4019/5704414'>Trend Filtering – II. Denoising astronomical signals with varying degrees of smoothness</a>. <em>MNRAS</em>,
+492(3), p. 4019-4032.</p></li>
 </ol>
 
 <p><b>Cross validation</b></p><ol>
 <li><p>Hastie, Tibshirani, and Friedman (2009).
-<a href='https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf'>
-The Elements of Statistical Learning: Data Mining, Inference, and
-Prediction</a>. 2nd edition. Springer Series in Statistics. (See Sections 7.10
-and 7.12)</p></li>
+<a href='https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf'>The Elements of Statistical Learning: Data Mining, Inference, and Prediction</a>.
+2nd edition. Springer Series in Statistics. (See Sections 7.10 and 7.12)</p></li>
 </ol>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
