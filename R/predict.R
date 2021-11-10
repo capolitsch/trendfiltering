@@ -90,7 +90,7 @@
 #' )
 #' @importFrom dplyr case_when tibble
 #' @importFrom magrittr %<>% %>%
-#' @export
+#' @export predict.cv_tf
 predict.cv_tf <- function(obj,
                           loss_func = "WMAE",
                           lambda_choice = c("lambda_min", "lambda_1se"),
@@ -188,7 +188,7 @@ predict.cv_tf <- function(obj,
 #' @importFrom dplyr case_when tibble
 #' @importFrom magrittr %<>% %>%
 #' @rdname predict_trendfilter
-#' @export
+#' @export predict.sure_tf
 predict.sure_tf <- function(obj,
                             lambda_choice = c("lambda_min", "lambda_1se"),
                             x_eval,
