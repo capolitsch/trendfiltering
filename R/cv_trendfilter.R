@@ -12,8 +12,8 @@
 #' @param y Vector of observed values for the output variable.
 #' @param weights (Optional) Weights for the observed outputs, defined as the
 #' reciprocal variance of the additive noise that contaminates the output
-#' signal. When the noise is expected to have an equal variance,
-#' \mjseqn{\sigma^2}, for all observations, a scalar may be passed to `weights`,
+#' signal. When the noise is expected to have an equal variance
+#' \mjseqn{\sigma^2} for all observations, a scalar may be passed to `weights`,
 #' namely `weights = `\mjseqn{1/\sigma^2}. Otherwise, `weights` must be a vector
 #' with the same length as `x` and `y`.
 #' @param k Degree of the polynomials that make up the piecewise-polynomial
@@ -72,34 +72,35 @@
 #' change in the algorithm's cost functional between two consecutive steps is
 #' less than `obj_tol`, the algorithm terminates. The algorithm's termination
 #' can also result from it reaching the maximum tolerable iterations set
-#' by the `max_iter` parameter (see below). The `obj_tol` parameter defaults to
-#' `obj_tol = 1e-10`. The `cost_functional` vector, returned within the
-#' `sure_trendfilter()` output, gives the relative change in the trend filtering
+#' by the `max_iter` parameter below. The `obj_tol` parameter defaults to
+#' `obj_tol = 1e-10`. The `cost_functional` vector returned within the
+#' `sure_trendfilter()` output gives the relative change in the trend filtering
 #' cost functional over the algorithm's final iteration, for every candidate
 #' hyperparameter value.}
 #' \item{`max_iter`}{Maximum number of ADMM iterations that we will tolerate.
 #' Defaults to `max_iter = length(y)`. The actual number of iterations performed
 #' by the algorithm, for every candidate hyperparameter value, is returned in
-#' the `n_iter` vector, within the `cv_trendfilter()` output. If any of the
+#' the `n_iter` vector within the `sure_trendfilter()` output. If any of the
 #' elements of `n_iter` are equal to `max_iter`, the tolerance defined by
 #' `obj_tol` has not been attained and `max_iter` may need to be increased.}
 #' \item{`thinning`}{Logical. If `thinning = TRUE`, then the data are
 #' preprocessed so that a smaller data set is used to fit the trend filtering
 #' estimate, which will ease the ADMM algorithm's convergence. This can be
-#' very useful when a signal is so well-sampled that very little additional
-#' information / predictive accuracy is gained by fitting the trend filtering
-#' estimate on the full data set, compared to some subset of it. See the
-#' [`cv_trendfilter()`] examples for a case study of this nature. When nothing
-#' is passed to `thinning`, the algorithm will automatically detect whether
-#' thinning should be applied. This preprocessing procedure is controlled by the
-#' `x_tol` parameter below.}
+#' very useful when, for example, a signal is so well-sampled that very little
+#' additional information / predictive accuracy is gained by fitting the trend
+#' filtering estimate on the full data set, compared to only fitting on some
+#' subset of it. See the [`cv_trendfilter()`] examples for a case study of this
+#' nature. When nothing is passed to `thinning`, the algorithm will
+#' automatically detect whether thinning should be applied. This preprocessing
+#' procedure is controlled by the `x_tol` parameter below.}
 #' \item{`x_tol`}{Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
-#' elements of `x` that fall into the same bin, then the data is thinned.
+#' elements of `x` that fall within the same bin, then the data is thinned.
 #' }}
 #'
 #' @details Our recommendations for when to use [cv_trendfilter()] versus
-#' [sure_trendfilter()] are shown in the table below.
+#' [sure_trendfilter()] are summarized in the table below. See Section 3.5 of
+#' [Politsch et al. (2020a)](https://arxiv.org/abs/1908.07151) for more details.
 #'
 #' | Scenario                                                         |  Hyperparameter optimization  |
 #' | :---                                                             |                         :---: |
@@ -109,8 +110,8 @@
 #'
 #' For our purposes, an evenly sampled data set with some discarded pixels
 #' (either sporadically or in large consecutive chunks) is still considered to
-#' be evenly sampled. When the inputs are evenly sampled on a transformed scale,
-#' we recommend transforming to that scale and carrying out the full trend
+#' be evenly sampled. When `x` is evenly sampled on a transformed scale, we
+#' recommend transforming to that scale and carrying out the full trend
 #' filtering analysis on that scale. See the [`sure_trendfilter()`] examples for
 #' a case when the inputs are evenly sampled on the `log10(x)` scale.
 #'
@@ -161,37 +162,35 @@
 #' \item{`edfs`}{Number of effective degrees of freedom in the trend filtering
 #' estimator, for every candidate hyperparameter value in `lambdas`.}
 #' \item{`errors`}{A named list of vectors, with each representing the
-#' cross validation error curve for a given loss function. The first 9
-#' vectors of the list correspond to MAE, WMAE, MSE, WMSE, log-cosh error,
-#' weighted log-cosh error, Huber loss, weighted Huber loss, and MSLE. If any
-#' custom loss functions were passed to `loss_funcs`, their cross validation
-#' curves will follow the first 9.}
-#' \item{`se_errors`}{Standard errors for each of the cross validation error
-#' curves in `errors`, within a named list of the same structure.}
+#' CV error curve for every loss function in `loss_funcs` (see below).}
+#' \item{`se_errors`}{Standard errors for the `errors`, within a named list of
+#' the same structure.}
 #' \item{`lambda_min`}{A named vector with length equal to `length(errors)`,
-#' containing the hyperparameter value that minimizes the cross validation error
-#' curve, for every loss function.}
+#' containing the hyperparameter value that minimizes the CV error curve, for
+#' every loss function in `loss_funcs`.}
 #' \item{`lambda_1se`}{A named vector with length equal to `length(errors)`,
 #' containing the "1-standard-error rule" hyperparameter, for every loss
-#' function. The "1-standard-error rule" hyparameter is the largest
-#' hyperparameter value (corresponding to the smoothest trend filtering
-#' estimate) that has a CV error within one standard error of the minimum CV
-#' error. It serves as an Occam's razor-like heuristic. That is, given two
-#' models with approximately equal performance, it may be wise to opt for the
-#' simpler model, i.e. the model with fewer effective degrees of freedom.}
+#' function in `loss_funcs`. The "1-standard-error rule" hyperparameter is the
+#' largest hyperparameter value in `lambdas` (corresponding to the smoothest
+#' trend filtering estimate) that has a CV error within one standard error of
+#' `min(errors)`. It serves as an Occam's razor-like heuristic. More precisely,
+#' given two models with approximately equal performance (in terms of some loss
+#' function), it may be wise to opt for the simpler model, i.e. the model with
+#' the larger hyperparameter / fewer effective degrees of freedom.}
 #' \item{`edf_min`}{A named vector with length equal to `length(errors)`,
 #' containing the number of effective degrees of freedom in the trend filtering
-#' estimator that minimizes the CV error curve, for every loss function.}
+#' estimator that minimizes the CV error curve, for every loss function in
+#' `loss_funcs`.}
 #' \item{`edf_1se`}{A named vector with length equal to `length(errors)`,
 #' containing the number of effective degrees of freedom in the
-#' "1-standard-error rule" trend filtering estimator, for every type of
-#' validation error.}
+#' "1-standard-error rule" trend filtering estimator, for every loss function in
+#' `loss_funcs`.}
 #' \item{`i_min`}{A named vector with length equal to `length(errors)`,
-#' containing the index of `lambdas` that yields the minimum of the CV error
-#' curve, for every loss function.}
+#' containing the index of `lambdas` that minimizes the CV error curve, for
+#' every loss function in `loss_funcs`.}
 #' \item{`i_1se`}{A named vector with length equal to `length(errors)`,
 #' containing the index of `lambdas` that gives the "1-standard-error rule"
-#' hyperparameter value, for every loss function.}
+#' hyperparameter value, for every loss function in `loss_funcs`..}
 #' \item{`loss_funcs`}{A named list of functions that defines all loss functions
 #' evaluated during cross validation.}
 #' \item{`cost_functional`}{The relative change in the cost functional over the
@@ -199,10 +198,13 @@
 #' `lambdas`.}
 #' \item{`n_iter`}{Total number of iterations taken by the ADMM algorithm, for
 #' every candidate hyperparameter in `lambdas`. If an element of `n_iter`
-#' is exactly equal to the value set by `optimization_params$max_iter`, then the
-#' ADMM algorithm stopped before reaching the tolerance set by `obj_tol`. In
-#' these situations, you may need to increase `max_iter` to ensure the trend
-#' filtering solution has converged with satisfactory precision.}
+#' is exactly equal to `tf_model$admm_params$max_iter`, then the ADMM algorithm
+#' stopped before reaching the objective tolerance
+#' `tf_model$admm_params$obj_tol`. In these situations, you may need to increase
+#' the maximum number of tolerable iterations via the
+#' `optimization_params$max_iter` argument of `cv_trendfilter()` in order to
+#' ensure that the trend filtering solution has converged to satisfactory
+#' precision.}
 #' \item{`V`}{The number of folds the data were split into for cross
 #' validation.}
 #' \item{`tf_model`}{A list of objects that is used internally by other
@@ -216,18 +218,19 @@
 #' \enumerate{
 #' \item{Politsch et al. (2020a).
 #' [Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy](
-#' https://academic.oup.com/mnras/article/492/3/4005/5704413). \emph{MNRAS}, 492(3), p. 4005-4018.} \cr
+#' https://academic.oup.com/mnras/article/492/3/4005/5704413). \emph{MNRAS},
+#' 492(3), p. 4005-4018. [[arXiv](https://arxiv.org/abs/1908.07151)].} \cr
 #' \item{Politsch et al. (2020b).
 #' [Trend Filtering – II. Denoising astronomical signals with varying degrees of smoothness](
 #' https://academic.oup.com/mnras/article/492/3/4019/5704414). \emph{MNRAS},
-#' 492(3), p. 4019-4032.}}
+#' 492(3), p. 4019-4032. [[arXiv](https://arxiv.org/abs/2001.03552)].}}
 #'
 #' \bold{Cross validation}
 #' \enumerate{
 #' \item{Hastie, Tibshirani, and Friedman (2009).
 #' [The Elements of Statistical Learning: Data Mining, Inference, and Prediction](
 #' https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf).
-#' 2nd edition. Springer Series in Statistics. (See Sections 7.10 and 7.12)}}
+#' 2nd edition. Springer Series in Statistics. (See Sections 7.10 and 7.12).}}
 #'
 #' @seealso [sure_trendfilter()], [bootstrap_trendfilter()]
 #'
@@ -266,6 +269,7 @@ cv_trendfilter <- function(x,
   if (missing(y) || is.null(y)) stop("`y` must be passed.")
   if (length(x) != length(y)) stop("`x` and `y` must have equal length.")
   if (k < 0L || k != round(k)) stop("`k` must be a nonnegative integer.")
+
   if (length(y) < k + 2) {
     stop("Insufficient data. Must have `length(y) >= k + 2`.")
   }
@@ -278,7 +282,7 @@ cv_trendfilter <- function(x,
   }
 
   if (V < 2 || V != round(V)) {
-    stop("V must be an integer between 2 and length(x).")
+    stop("`V` must be an integer between 2 and `length(x)`.")
   }
 
   if (V > 10L) {
@@ -289,7 +293,7 @@ cv_trendfilter <- function(x,
        model's out-of-sample error. And larger choices of `V`, such as
        `V = length(x)` (a.k.a. leave-one-out cross validation), do not have
        their usual computational benefits with trend filtering since it is a
-       nonlinear smoother, and the efficiency of LOOCV relies on linearity
+       nonlinear smoother, and the speed of LOOCV relies on linearity
        in the regression estimator.",
       call. = FALSE
     )
@@ -306,10 +310,10 @@ cv_trendfilter <- function(x,
     )
   }
 
-  if (nlambdas < 0 || nlambdas != round(nlambdas)) {
-    stop("`nlambdas` must be a positive integer.")
+  if (nlambdas < 100 || nlambdas != round(nlambdas)) {
+    stop("`nlambdas` must be an integer >=100.")
   } else {
-    nlambdas <- nlambdas %>% as.integer()
+    nlambdas %<>% as.integer()
   }
 
   mc_cores <- max(c(1, floor(mc_cores)))

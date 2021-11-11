@@ -8,12 +8,12 @@
 #'
 #' @param x Vector of observed values for the input variable.
 #' @param y Vector of observed values for the output variable.
-#' @param weights (Optional) Weights for the observed outputs, defined as the
-#' reciprocal variance of the additive noise that contaminates the output
-#' signal. When the noise is expected to have an equal variance,
-#' \mjseqn{\sigma^2}, for all observations, a scalar can be passed to `weights`,
-#' namely `weights = `\mjseqn{1/\sigma^2}. Otherwise, `weights` must be a vector
-#' with the same length as `x` and `y`.
+#' @param weights Weights for the observed outputs, defined as the reciprocal
+#' variance of the additive noise that contaminates the output signal. When the
+#' noise is expected to have an equal variance \mjseqn{\sigma^2} for all
+#' observations, a scalar can be passed to `weights`, namely
+#' `weights = `\mjseqn{1/\sigma^2}. Otherwise, `weights` must be a vector with
+#' the same length as `x` and `y`.
 #' @param k Degree of the polynomials that make up the piecewise-polynomial
 #' trend filtering estimate. Defaults to `k = 2` (i.e. a piecewise quadratic
 #' estimate). Must be one of `k = 0,1,2`. Higher order polynomials are
@@ -21,9 +21,9 @@
 #' their use can lead to instability in the convex optimization.
 #' @param nlambdas Number of hyperparameter values to test during validation.
 #' Defaults to `nlambdas = 250`. The hyperparameter grid is internally
-#' constructed to span the full trend filtering model space lying by a global
-#' polynomial solution (i.e. a power law) and an interpolating solution, with
-#' `nlambdas` controlling the granularity of the model space that is
+#' constructed to span the full trend filtering model space (which is bookended
+#' by a global polynomial solution and an interpolating solution), with
+#' `nlambdas` controlling the granularity of the hyperparameter grid.
 #' @param optimization_params (Optional) A named list of parameter values to be
 #' passed to the trend filtering ADMM algorithm of
 #' [Ramdas and Tibshirani (2016)](
@@ -39,34 +39,35 @@
 #' change in the algorithm's cost functional between two consecutive steps is
 #' less than `obj_tol`, the algorithm terminates. The algorithm's termination
 #' can also result from it reaching the maximum tolerable iterations set
-#' by the `max_iter` parameter (see below). The `obj_tol` parameter defaults to
-#' `obj_tol = 1e-10`. The `cost_functional` vector, returned within the
-#' `sure_trendfilter()` output, gives the relative change in the trend filtering
+#' by the `max_iter` parameter below. The `obj_tol` parameter defaults to
+#' `obj_tol = 1e-10`. The `cost_functional` vector returned within the
+#' `sure_trendfilter()` output gives the relative change in the trend filtering
 #' cost functional over the algorithm's final iteration, for every candidate
 #' hyperparameter value.}
 #' \item{`max_iter`}{Maximum number of ADMM iterations that we will tolerate.
 #' Defaults to `max_iter = length(y)`. The actual number of iterations performed
 #' by the algorithm, for every candidate hyperparameter value, is returned in
-#' the `n_iter` vector, within the `sure_trendfilter()` output. If any of the
+#' the `n_iter` vector within the `sure_trendfilter()` output. If any of the
 #' elements of `n_iter` are equal to `max_iter`, the tolerance defined by
 #' `obj_tol` has not been attained and `max_iter` may need to be increased.}
 #' \item{`thinning`}{Logical. If `thinning = TRUE`, then the data are
 #' preprocessed so that a smaller data set is used to fit the trend filtering
 #' estimate, which will ease the ADMM algorithm's convergence. This can be
-#' very useful when a signal is so well-sampled that very little additional
-#' information / predictive accuracy is gained by fitting the trend filtering
-#' estimate on the full data set, compared to some subset of it. See the
-#' [`cv_trendfilter()`] examples for a case study of this nature. When nothing
-#' is passed to `thinning`, the algorithm will automatically detect whether
-#' thinning should be applied. This preprocessing procedure is controlled by the
-#' `x_tol` parameter below.}
+#' very useful when, for example, a signal is so well-sampled that very little
+#' additional information / predictive accuracy is gained by fitting the trend
+#' filtering estimate on the full data set, compared to only fitting on some
+#' subset of it. See the [`cv_trendfilter()`] examples for a case study of this
+#' nature. When nothing is passed to `thinning`, the algorithm will
+#' automatically detect whether thinning should be applied. This preprocessing
+#' procedure is controlled by the `x_tol` parameter below.}
 #' \item{`x_tol`}{Controls the automatic detection of when thinning should be
 #' applied to the data. If we make bins of size `x_tol` and find at least two
-#' elements of `x` that fall into the same bin, then the data is thinned.
+#' elements of `x` that fall within the same bin, then the data is thinned.
 #' }}
 #'
 #' @details Our recommendations for when to use [cv_trendfilter()] versus
-#' [sure_trendfilter()] are shown in the table below.
+#' [sure_trendfilter()] are summarized in the table below. See Section 3.5 of
+#' [Politsch et al. (2020a)](https://arxiv.org/abs/1908.07151) for more details.
 #'
 #' | Scenario                                                         |  Hyperparameter optimization  |
 #' | :---                                                             |                         :---: |
@@ -76,8 +77,8 @@
 #'
 #' For our purposes, an evenly sampled data set with some discarded pixels
 #' (either sporadically or in large consecutive chunks) is still considered to
-#' be evenly sampled. When the inputs are evenly sampled on a transformed scale,
-#' we recommend transforming to that scale and carrying out the full trend
+#' be evenly sampled. When `x` is evenly sampled on a transformed scale, we
+#' recommend transforming to that scale and carrying out the full trend
 #' filtering analysis on that scale. See the example below for a case when the
 #' inputs are evenly sampled on the `log10(x)` scale.
 #'
@@ -91,38 +92,41 @@
 #' \item{`errors`}{Vector of mean-squared prediction errors estimated by SURE,
 #' for every hyperparameter value in `lambdas`.}
 #' \item{`se_errors`}{Vector of estimated standard errors for the `errors`.}
-#' \item{`lambda_min`}{Hyperparameter value that minimizes the SURE validation
-#' error curve.}
-#' \item{`lambda_1se`}{The largest hyperparameter value (corresponding to the
-#' smoothest trend filtering estimate) that yields a SURE error within
-#' one standard error of `min(errors)`. We call this the
+#' \item{`lambda_min`}{Hyperparameter value in `lambdas` that minimizes the SURE
+#' validation error curve.}
+#' \item{`lambda_1se`}{The largest hyperparameter value in `lambdas`
+#' (corresponding to the smoothest trend filtering estimate) that has a SURE
+#' error within one standard error of `min(errors)`. We call this the
 #' "1-standard-error rule" hyperparameter, and it serves as an Occam's
-#' razor-esque heuristic. That is, given two models with approximately equal
-#' performance (here, in terms of MSE), it may be wise to opt for the simpler
-#' model, i.e. the model with fewer effective degrees of freedom.}
-#' \item{`edf_min`}{Number of effective degrees of freedom in the minimum-SURE
-#' trend filtering estimator.}
-#' \item{`edf_1se`}{Number of effective degrees of freedom in the 1-stand-error
-#' rule trend filtering estimator.}
-#' \item{`i_min`}{Index of `lambdas` that minimizes the SURE error curve.}
-#' \item{`i_1se`}{Index of `lambdas` that gives the 1-standard-error rule
-#' hyperparameter.}
+#' razor-esque heuristic. More precisely, given two models with approximately
+#' equal performance (here, in terms of predictive MSE), it may be wise to opt
+#' for the simpler model, i.e. the model with the larger hyperparameter / fewer
+#' effective degrees of freedom.}
+#' \item{`edf_min`}{Number of effective degrees of freedom in the trend
+#' filtering estimator with hyperparameter `lambda_min`.}
+#' \item{`edf_1se`}{Number of effective degrees of freedom in the  trend
+#' filtering estimator with hyperparameter `lambda_1se`.}
+#' \item{`i_min`}{Index of `lambdas` that gives `lambda_min`.}
+#' \item{`i_1se`}{Index of `lambdas` that gives `lambda_1se`.}
 #' \item{`cost_functional`}{The relative change in the cost functional over the
 #' ADMM algorithm's final iteration, for every candidate hyperparameter in
 #' `lambdas`.}
 #' \item{`n_iter`}{Total number of iterations taken by the ADMM algorithm, for
 #' every candidate hyperparameter in `lambdas`. If an element of `n_iter`
-#' is exactly equal to `max_iter`, then the ADMM algorithm stopped before
-#' reaching the tolerance set by `obj_tol`. In these cases, you may need
-#' to increase `max_iter` to ensure the trend filtering solution has
-#' converged to satisfactory precision.}
-#' \item{`training_errors`}{In-sample mean-squared error between the observed
-#' outputs `y` and the trend filtering estimate, for every hyperparameter value
-#' in `lambdas`.}
+#' is exactly equal to `tf_model$admm_params$max_iter`, then the ADMM algorithm
+#' stopped before reaching the objective tolerance
+#' `tf_model$admm_params$obj_tol`. In these situations, you may need to increase
+#' the maximum number of tolerable iterations via the
+#' `optimization_params$max_iter` argument of `sure_trendfilter()` in order to
+#' ensure that the trend filtering solution has converged to satisfactory
+#' precision.}
+#' \item{`training_errors`}{The "in-sample" MSE between the observed outputs `y`
+#' and the trend filtering estimate, for every hyperparameter value in
+#' `lambdas`.}
 #' \item{`optimisms`}{SURE-estimated optimisms, i.e.
 #' `optimisms = errors - training_errors`.}
 #' \item{`tf_model`}{A list of objects that is used internally by other
-#' functions that operate on the `'sure_tf'` object.}
+#' functions that operate on the `sure_trendfilter()` output.}
 #' }
 #'
 #' @export sure_trendfilter
@@ -133,11 +137,11 @@
 #' \item{Politsch et al. (2020a).
 #' [Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy](
 #' https://academic.oup.com/mnras/article/492/3/4005/5704413). \emph{MNRAS},
-#' 492(3), p. 4005-4018.} \cr
+#' 492(3), p. 4005-4018. [[arXiv](https://arxiv.org/abs/1908.07151)].} \cr
 #' \item{Politsch et al. (2020b).
 #' [Trend Filtering – II. Denoising astronomical signals with varying degrees of smoothness](
 #' https://academic.oup.com/mnras/article/492/3/4019/5704414). \emph{MNRAS},
-#' 492(3), p. 4019-4032.}}
+#' 492(3), p. 4019-4032. [[arXiv](https://arxiv.org/abs/2001.03552)].}}
 #'
 #' \bold{Stein's unbiased risk estimate}
 #' \enumerate{
@@ -182,33 +186,50 @@ sure_trendfilter <- function(x,
                              k = 2L,
                              nlambdas = 250L,
                              optimization_params) {
-  if (missing(x) || is.null(x)) stop("x must be passed.")
-  if (missing(y) || is.null(y)) stop("y must be passed.")
-  if (length(x) != length(y)) stop("x and y must have equal length.")
-  if (length(y) < k + 2) stop("Must have >= k + 2 observations.")
-  if (k < 0 || k != round(k)) stop("k must be a nonnegative integer.")
+  if (missing(x) || is.null(x)) stop("`x` must be passed.")
+  if (missing(y) || is.null(y)) stop("`y` must be passed.")
+  if (length(x) != length(y)) stop("`x` and `y` must have equal length.")
+  if (k < 0L || k != round(k)) stop("`k` must be a nonnegative integer.")
 
-  if (k > 2) {
-    stop("k > 2 are algorithmically unstable and do not improve upon k = 2.")
+  if (length(y) < k + 2) {
+    stop("Insufficient data. Must have `length(y) >= k + 2`.")
+  }
+
+  if (k > 2L) {
+    stop(
+      "Polynomial choices `k > 2` can be algorithmically unstable and their
+       performance does not improve upon `k = 2`."
+    )
   }
 
   if (nlambdas < 100 || nlambdas != round(nlambdas)) {
-    stop("nlambdas must be an integer >=100")
+    stop("`nlambdas` must be an integer >=100.")
   } else {
     nlambdas %<>% as.integer()
   }
 
   if (missing(weights) || !(class(weights) %in% c("numeric", "integer"))) {
-    stop("weights must be passed to use sure_trendfilter.")
+    stop("As of now, `weights` must be passed to use `sure_trendfilter()`.")
   }
 
   if (!(length(weights) %in% c(1, length(y)))) {
     stop(
-      "weights must either have length 1 or length(y) to use sure_trendfilter()."
+      paste(
+        "`weights` must either have length 1 or `length(y)` to use",
+        "`sure_trendfilter()`."
+      )
     )
   }
 
-  if (length(weights) == 1) weights <- rep(weights, length(x))
+  if (length(weights) == 1) weights <- rep_len(weights, length(y))
+
+  if (!(class(weights) %in% c("numeric", "integer"))) {
+    stop(
+      "`weights` must be a numeric vector with the same length as `x`
+       and `y`, or `length(weights) = 1` when the noise is believed to be
+       homoskedasatic (i.e. constant variance)."
+    )
+  }
 
   x %<>% as.double()
   y %<>% as.double()
@@ -245,7 +266,7 @@ sure_trendfilter <- function(x,
 
   lambdas <- get_lambdas(nlambdas, data_scaled, k, thinning, admm_params)
 
-  out <- trendfilter(
+  fit <- trendfilter(
     x = data_scaled$x,
     y = data_scaled$y,
     weights = data_scaled$weights,
@@ -255,9 +276,9 @@ sure_trendfilter <- function(x,
     control = admm_params
   )
 
-  squared_residuals_mat <- (out$beta - data_scaled$y)^2
+  squared_residuals_mat <- (fit$beta - data_scaled$y)^2
   optimisms_mat <- 2 / (data_scaled$weights * nrow(data_scaled)) * matrix(
-    rep(out$df, each = nrow(data_scaled)),
+    rep(fit$df, each = nrow(data_scaled)),
     nrow = nrow(data_scaled)
   )
 
@@ -276,15 +297,18 @@ sure_trendfilter <- function(x,
     errors <= errors[i_min] + se_errors[i_min]
   ) %>% min()
 
-  tf_model <- structure(
+  data <- structure(
     list(
-      model_fit = out,
-      x = x,
-      y = y,
-      weights = weights,
-      x_scale = x_scale,
-      y_scale = y_scale,
+      data = data,
       data_scaled = data_scaled,
+      x_scale = x_scale,
+      y_scale = y_scale
+    )
+  )
+
+  model <- structure(
+    list(
+      fit = fit,
       k = k,
       admm_params = admm_params,
       thinning = thinning
@@ -295,18 +319,19 @@ sure_trendfilter <- function(x,
   structure(
     list(
       lambdas = lambdas,
-      edfs = out$df %>% as.integer(),
+      edfs = fit$df %>% as.integer(),
       errors = errors,
       se_errors = se_errors,
       lambda_min = lambdas[i_min],
       lambda_1se = lambdas[i_1se],
-      edf_min = out$df[i_min] %>% as.integer(),
-      edf_1se = out$df[i_1se] %>% as.integer(),
+      edf_min = fit$df[i_min] %>% as.integer(),
+      edf_1se = fit$df[i_1se] %>% as.integer(),
       i_min = i_min,
       i_1se = i_1se,
-      cost_functional = out$obj[nrow(out$obj), ],
-      n_iter = out$iter %>% as.integer(),
-      tf_model = tf_model
+      cost_functional = fit$obj[nrow(fit$obj), ],
+      n_iter = fit$iter %>% as.integer(),
+      data = data,
+      model = model
     ),
     class = c("sure_tf", "list")
   )

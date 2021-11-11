@@ -24,8 +24,8 @@ cv_trendfilter(
 
 \item{weights}{(Optional) Weights for the observed outputs, defined as the
 reciprocal variance of the additive noise that contaminates the output
-signal. When the noise is expected to have an equal variance,
-\mjseqn{\sigma^2}, for all observations, a scalar may be passed to \code{weights},
+signal. When the noise is expected to have an equal variance
+\mjseqn{\sigma^2} for all observations, a scalar may be passed to \code{weights},
 namely \verb{weights = }\mjseqn{1/\sigma^2}. Otherwise, \code{weights} must be a vector
 with the same length as \code{x} and \code{y}.}
 
@@ -88,30 +88,30 @@ as sufficient working knowledge.
 change in the algorithm's cost functional between two consecutive steps is
 less than \code{obj_tol}, the algorithm terminates. The algorithm's termination
 can also result from it reaching the maximum tolerable iterations set
-by the \code{max_iter} parameter (see below). The \code{obj_tol} parameter defaults to
-\code{obj_tol = 1e-10}. The \code{cost_functional} vector, returned within the
-\code{sure_trendfilter()} output, gives the relative change in the trend filtering
+by the \code{max_iter} parameter below. The \code{obj_tol} parameter defaults to
+\code{obj_tol = 1e-10}. The \code{cost_functional} vector returned within the
+\code{sure_trendfilter()} output gives the relative change in the trend filtering
 cost functional over the algorithm's final iteration, for every candidate
 hyperparameter value.}
 \item{\code{max_iter}}{Maximum number of ADMM iterations that we will tolerate.
 Defaults to \code{max_iter = length(y)}. The actual number of iterations performed
 by the algorithm, for every candidate hyperparameter value, is returned in
-the \code{n_iter} vector, within the \code{cv_trendfilter()} output. If any of the
+the \code{n_iter} vector within the \code{sure_trendfilter()} output. If any of the
 elements of \code{n_iter} are equal to \code{max_iter}, the tolerance defined by
 \code{obj_tol} has not been attained and \code{max_iter} may need to be increased.}
 \item{\code{thinning}}{Logical. If \code{thinning = TRUE}, then the data are
 preprocessed so that a smaller data set is used to fit the trend filtering
 estimate, which will ease the ADMM algorithm's convergence. This can be
-very useful when a signal is so well-sampled that very little additional
-information / predictive accuracy is gained by fitting the trend filtering
-estimate on the full data set, compared to some subset of it. See the
-\code{\link[=cv_trendfilter]{cv_trendfilter()}} examples for a case study of this nature. When nothing
-is passed to \code{thinning}, the algorithm will automatically detect whether
-thinning should be applied. This preprocessing procedure is controlled by the
-\code{x_tol} parameter below.}
+very useful when, for example, a signal is so well-sampled that very little
+additional information / predictive accuracy is gained by fitting the trend
+filtering estimate on the full data set, compared to only fitting on some
+subset of it. See the \code{\link[=cv_trendfilter]{cv_trendfilter()}} examples for a case study of this
+nature. When nothing is passed to \code{thinning}, the algorithm will
+automatically detect whether thinning should be applied. This preprocessing
+procedure is controlled by the \code{x_tol} parameter below.}
 \item{\code{x_tol}}{Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size \code{x_tol} and find at least two
-elements of \code{x} that fall into the same bin, then the data is thinned.
+elements of \code{x} that fall within the same bin, then the data is thinned.
 }}}
 }
 \value{
@@ -123,37 +123,35 @@ in descending order).}
 \item{\code{edfs}}{Number of effective degrees of freedom in the trend filtering
 estimator, for every candidate hyperparameter value in \code{lambdas}.}
 \item{\code{errors}}{A named list of vectors, with each representing the
-cross validation error curve for a given loss function. The first 9
-vectors of the list correspond to MAE, WMAE, MSE, WMSE, log-cosh error,
-weighted log-cosh error, Huber loss, weighted Huber loss, and MSLE. If any
-custom loss functions were passed to \code{loss_funcs}, their cross validation
-curves will follow the first 9.}
-\item{\code{se_errors}}{Standard errors for each of the cross validation error
-curves in \code{errors}, within a named list of the same structure.}
+CV error curve for every loss function in \code{loss_funcs} (see below).}
+\item{\code{se_errors}}{Standard errors for the \code{errors}, within a named list of
+the same structure.}
 \item{\code{lambda_min}}{A named vector with length equal to \code{length(errors)},
-containing the hyperparameter value that minimizes the cross validation error
-curve, for every loss function.}
+containing the hyperparameter value that minimizes the CV error curve, for
+every loss function in \code{loss_funcs}.}
 \item{\code{lambda_1se}}{A named vector with length equal to \code{length(errors)},
 containing the "1-standard-error rule" hyperparameter, for every loss
-function. The "1-standard-error rule" hyparameter is the largest
-hyperparameter value (corresponding to the smoothest trend filtering
-estimate) that has a CV error within one standard error of the minimum CV
-error. It serves as an Occam's razor-like heuristic. That is, given two
-models with approximately equal performance, it may be wise to opt for the
-simpler model, i.e. the model with fewer effective degrees of freedom.}
+function in \code{loss_funcs}. The "1-standard-error rule" hyperparameter is the
+largest hyperparameter value in \code{lambdas} (corresponding to the smoothest
+trend filtering estimate) that has a CV error within one standard error of
+\code{min(errors)}. It serves as an Occam's razor-like heuristic. More precisely,
+given two models with approximately equal performance (in terms of some loss
+function), it may be wise to opt for the simpler model, i.e. the model with
+the larger hyperparameter / fewer effective degrees of freedom.}
 \item{\code{edf_min}}{A named vector with length equal to \code{length(errors)},
 containing the number of effective degrees of freedom in the trend filtering
-estimator that minimizes the CV error curve, for every loss function.}
+estimator that minimizes the CV error curve, for every loss function in
+\code{loss_funcs}.}
 \item{\code{edf_1se}}{A named vector with length equal to \code{length(errors)},
 containing the number of effective degrees of freedom in the
-"1-standard-error rule" trend filtering estimator, for every type of
-validation error.}
+"1-standard-error rule" trend filtering estimator, for every loss function in
+\code{loss_funcs}.}
 \item{\code{i_min}}{A named vector with length equal to \code{length(errors)},
-containing the index of \code{lambdas} that yields the minimum of the CV error
-curve, for every loss function.}
+containing the index of \code{lambdas} that minimizes the CV error curve, for
+every loss function in \code{loss_funcs}.}
 \item{\code{i_1se}}{A named vector with length equal to \code{length(errors)},
 containing the index of \code{lambdas} that gives the "1-standard-error rule"
-hyperparameter value, for every loss function.}
+hyperparameter value, for every loss function in \code{loss_funcs}..}
 \item{\code{loss_funcs}}{A named list of functions that defines all loss functions
 evaluated during cross validation.}
 \item{\code{cost_functional}}{The relative change in the cost functional over the
@@ -161,10 +159,13 @@ ADMM algorithm's final iteration, for every candidate hyperparameter in
 \code{lambdas}.}
 \item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
 every candidate hyperparameter in \code{lambdas}. If an element of \code{n_iter}
-is exactly equal to the value set by \code{optimization_params$max_iter}, then the
-ADMM algorithm stopped before reaching the tolerance set by \code{obj_tol}. In
-these situations, you may need to increase \code{max_iter} to ensure the trend
-filtering solution has converged with satisfactory precision.}
+is exactly equal to \code{tf_model$admm_params$max_iter}, then the ADMM algorithm
+stopped before reaching the objective tolerance
+\code{tf_model$admm_params$obj_tol}. In these situations, you may need to increase
+the maximum number of tolerable iterations via the
+\code{optimization_params$max_iter} argument of \code{cv_trendfilter()} in order to
+ensure that the trend filtering solution has converged to satisfactory
+precision.}
 \item{\code{V}}{The number of folds the data were split into for cross
 validation.}
 \item{\code{tf_model}}{A list of objects that is used internally by other
@@ -182,7 +183,8 @@ definitions of the internal loss functions, and for guidelines on when
 }
 \details{
 Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} versus
-\code{\link[=sure_trendfilter]{sure_trendfilter()}} are shown in the table below.\tabular{lc}{
+\code{\link[=sure_trendfilter]{sure_trendfilter()}} are summarized in the table below. See Section 3.5 of
+\href{https://arxiv.org/abs/1908.07151}{Politsch et al. (2020a)} for more details.\tabular{lc}{
    Scenario \tab Hyperparameter optimization \cr
    \code{x} is unevenly sampled \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
    \code{x} is evenly sampled and reciprocal variances are not available \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
@@ -192,8 +194,8 @@ Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter(
 
 For our purposes, an evenly sampled data set with some discarded pixels
 (either sporadically or in large consecutive chunks) is still considered to
-be evenly sampled. When the inputs are evenly sampled on a transformed scale,
-we recommend transforming to that scale and carrying out the full trend
+be evenly sampled. When \code{x} is evenly sampled on a transformed scale, we
+recommend transforming to that scale and carrying out the full trend
 filtering analysis on that scale. See the \code{\link[=sure_trendfilter]{sure_trendfilter()}} examples for
 a case when the inputs are evenly sampled on the \code{log10(x)} scale.
 
@@ -255,16 +257,17 @@ cv_tf <- cv_trendfilter(
 \bold{Companion references}
 \enumerate{
 \item{Politsch et al. (2020a).
-\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy}. \emph{MNRAS}, 492(3), p. 4005-4018.} \cr
+\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy}. \emph{MNRAS},
+492(3), p. 4005-4018. [\href{https://arxiv.org/abs/1908.07151}{arXiv}].} \cr
 \item{Politsch et al. (2020b).
 \href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{Trend Filtering – II. Denoising astronomical signals with varying degrees of smoothness}. \emph{MNRAS},
-492(3), p. 4019-4032.}}
+492(3), p. 4019-4032. [\href{https://arxiv.org/abs/2001.03552}{arXiv}].}}
 
 \bold{Cross validation}
 \enumerate{
 \item{Hastie, Tibshirani, and Friedman (2009).
 \href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{The Elements of Statistical Learning: Data Mining, Inference, and Prediction}.
-2nd edition. Springer Series in Statistics. (See Sections 7.10 and 7.12)}}
+2nd edition. Springer Series in Statistics. (See Sections 7.10 and 7.12).}}
 }
 \seealso{
 \code{\link[=sure_trendfilter]{sure_trendfilter()}}, \code{\link[=bootstrap_trendfilter]{bootstrap_trendfilter()}}

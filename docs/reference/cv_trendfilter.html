@@ -8,12 +8,20 @@
 
 <title>Optimize the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter • trendfiltering</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
-
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -48,6 +56,7 @@ metrics, as well as observation-weighted versions. Custom loss functions may
 also be passed to the loss_funcs argument. See the details section for
 definitions of the internal loss functions, and for guidelines on when
 cv_trendfilter() should be used versus sure_trendfilter()." />
+<meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
 
 
@@ -88,7 +97,7 @@ cv_trendfilter() should be used versus sure_trendfilter()." />
         <li>
   <a href="../index.html">
     <span class="fas fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li>
@@ -102,16 +111,16 @@ cv_trendfilter() should be used versus sure_trendfilter()." />
         <li>
   <a href="https://github.com/capolitsch/trendfiltering">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
-      
+
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header>
 
@@ -162,8 +171,8 @@ definitions of the internal loss functions, and for guidelines on when
       <th>weights</th>
       <td><p>(Optional) Weights for the observed outputs, defined as the
 reciprocal variance of the additive noise that contaminates the output
-signal. When the noise is expected to have an equal variance,
-\(\sigma^2\), for all observations, a scalar may be passed to <code>weights</code>,
+signal. When the noise is expected to have an equal variance
+\(\sigma^2\) for all observations, a scalar may be passed to <code>weights</code>,
 namely <code>weights = </code>\(1/\sigma^2\). Otherwise, <code>weights</code> must be a vector
 with the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
@@ -238,30 +247,30 @@ as sufficient working knowledge.</p><dl>
 change in the algorithm's cost functional between two consecutive steps is
 less than <code>obj_tol</code>, the algorithm terminates. The algorithm's termination
 can also result from it reaching the maximum tolerable iterations set
-by the <code>max_iter</code> parameter (see below). The <code>obj_tol</code> parameter defaults to
-<code>obj_tol = 1e-10</code>. The <code>cost_functional</code> vector, returned within the
-<code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> output, gives the relative change in the trend filtering
+by the <code>max_iter</code> parameter below. The <code>obj_tol</code> parameter defaults to
+<code>obj_tol = 1e-10</code>. The <code>cost_functional</code> vector returned within the
+<code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> output gives the relative change in the trend filtering
 cost functional over the algorithm's final iteration, for every candidate
 hyperparameter value.</p></dd>
 <dt><code>max_iter</code></dt><dd><p>Maximum number of ADMM iterations that we will tolerate.
 Defaults to <code>max_iter = length(y)</code>. The actual number of iterations performed
 by the algorithm, for every candidate hyperparameter value, is returned in
-the <code>n_iter</code> vector, within the <code>cv_trendfilter()</code> output. If any of the
+the <code>n_iter</code> vector within the <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> output. If any of the
 elements of <code>n_iter</code> are equal to <code>max_iter</code>, the tolerance defined by
 <code>obj_tol</code> has not been attained and <code>max_iter</code> may need to be increased.</p></dd>
 <dt><code>thinning</code></dt><dd><p>Logical. If <code>thinning = TRUE</code>, then the data are
 preprocessed so that a smaller data set is used to fit the trend filtering
 estimate, which will ease the ADMM algorithm's convergence. This can be
-very useful when a signal is so well-sampled that very little additional
-information / predictive accuracy is gained by fitting the trend filtering
-estimate on the full data set, compared to some subset of it. See the
-<code>cv_trendfilter()</code> examples for a case study of this nature. When nothing
-is passed to <code>thinning</code>, the algorithm will automatically detect whether
-thinning should be applied. This preprocessing procedure is controlled by the
-<code>x_tol</code> parameter below.</p></dd>
+very useful when, for example, a signal is so well-sampled that very little
+additional information / predictive accuracy is gained by fitting the trend
+filtering estimate on the full data set, compared to only fitting on some
+subset of it. See the <code>cv_trendfilter()</code> examples for a case study of this
+nature. When nothing is passed to <code>thinning</code>, the algorithm will
+automatically detect whether thinning should be applied. This preprocessing
+procedure is controlled by the <code>x_tol</code> parameter below.</p></dd>
 <dt><code>x_tol</code></dt><dd><p>Controls the automatic detection of when thinning should be
 applied to the data. If we make bins of size <code>x_tol</code> and find at least two
-elements of <code>x</code> that fall into the same bin, then the data is thinned.</p></dd>
+elements of <code>x</code> that fall within the same bin, then the data is thinned.</p></dd>
 </dl></td>
     </tr>
     </table>
@@ -275,37 +284,35 @@ in descending order).</p></dd>
 <dt><code>edfs</code></dt><dd><p>Number of effective degrees of freedom in the trend filtering
 estimator, for every candidate hyperparameter value in <code>lambdas</code>.</p></dd>
 <dt><code>errors</code></dt><dd><p>A named list of vectors, with each representing the
-cross validation error curve for a given loss function. The first 9
-vectors of the list correspond to MAE, WMAE, MSE, WMSE, log-cosh error,
-weighted log-cosh error, Huber loss, weighted Huber loss, and MSLE. If any
-custom loss functions were passed to <code>loss_funcs</code>, their cross validation
-curves will follow the first 9.</p></dd>
-<dt><code>se_errors</code></dt><dd><p>Standard errors for each of the cross validation error
-curves in <code>errors</code>, within a named list of the same structure.</p></dd>
+CV error curve for every loss function in <code>loss_funcs</code> (see below).</p></dd>
+<dt><code>se_errors</code></dt><dd><p>Standard errors for the <code>errors</code>, within a named list of
+the same structure.</p></dd>
 <dt><code>lambda_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
-containing the hyperparameter value that minimizes the cross validation error
-curve, for every loss function.</p></dd>
+containing the hyperparameter value that minimizes the CV error curve, for
+every loss function in <code>loss_funcs</code>.</p></dd>
 <dt><code>lambda_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the "1-standard-error rule" hyperparameter, for every loss
-function. The "1-standard-error rule" hyparameter is the largest
-hyperparameter value (corresponding to the smoothest trend filtering
-estimate) that has a CV error within one standard error of the minimum CV
-error. It serves as an Occam's razor-like heuristic. That is, given two
-models with approximately equal performance, it may be wise to opt for the
-simpler model, i.e. the model with fewer effective degrees of freedom.</p></dd>
+function in <code>loss_funcs</code>. The "1-standard-error rule" hyperparameter is the
+largest hyperparameter value in <code>lambdas</code> (corresponding to the smoothest
+trend filtering estimate) that has a CV error within one standard error of
+<code><a href='https://rdrr.io/r/base/Extremes.html'>min(errors)</a></code>. It serves as an Occam's razor-like heuristic. More precisely,
+given two models with approximately equal performance (in terms of some loss
+function), it may be wise to opt for the simpler model, i.e. the model with
+the larger hyperparameter / fewer effective degrees of freedom.</p></dd>
 <dt><code>edf_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the number of effective degrees of freedom in the trend filtering
-estimator that minimizes the CV error curve, for every loss function.</p></dd>
+estimator that minimizes the CV error curve, for every loss function in
+<code>loss_funcs</code>.</p></dd>
 <dt><code>edf_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the number of effective degrees of freedom in the
-"1-standard-error rule" trend filtering estimator, for every type of
-validation error.</p></dd>
+"1-standard-error rule" trend filtering estimator, for every loss function in
+<code>loss_funcs</code>.</p></dd>
 <dt><code>i_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
-containing the index of <code>lambdas</code> that yields the minimum of the CV error
-curve, for every loss function.</p></dd>
+containing the index of <code>lambdas</code> that minimizes the CV error curve, for
+every loss function in <code>loss_funcs</code>.</p></dd>
 <dt><code>i_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the index of <code>lambdas</code> that gives the "1-standard-error rule"
-hyperparameter value, for every loss function.</p></dd>
+hyperparameter value, for every loss function in <code>loss_funcs</code>..</p></dd>
 <dt><code>loss_funcs</code></dt><dd><p>A named list of functions that defines all loss functions
 evaluated during cross validation.</p></dd>
 <dt><code>cost_functional</code></dt><dd><p>The relative change in the cost functional over the
@@ -313,10 +320,13 @@ ADMM algorithm's final iteration, for every candidate hyperparameter in
 <code>lambdas</code>.</p></dd>
 <dt><code>n_iter</code></dt><dd><p>Total number of iterations taken by the ADMM algorithm, for
 every candidate hyperparameter in <code>lambdas</code>. If an element of <code>n_iter</code>
-is exactly equal to the value set by <code>optimization_params$max_iter</code>, then the
-ADMM algorithm stopped before reaching the tolerance set by <code>obj_tol</code>. In
-these situations, you may need to increase <code>max_iter</code> to ensure the trend
-filtering solution has converged with satisfactory precision.</p></dd>
+is exactly equal to <code>tf_model$admm_params$max_iter</code>, then the ADMM algorithm
+stopped before reaching the objective tolerance
+<code>tf_model$admm_params$obj_tol</code>. In these situations, you may need to increase
+the maximum number of tolerable iterations via the
+<code>optimization_params$max_iter</code> argument of <code>cv_trendfilter()</code> in order to
+ensure that the trend filtering solution has converged to satisfactory
+precision.</p></dd>
 <dt><code>V</code></dt><dd><p>The number of folds the data were split into for cross
 validation.</p></dd>
 <dt><code>tf_model</code></dt><dd><p>A list of objects that is used internally by other
@@ -327,7 +337,8 @@ functions that operate on the <code>cv_trendfilter()</code> output.</p></dd>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Our recommendations for when to use <code>cv_trendfilter()</code> versus
-<code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> are shown in the table below.</p><table class='table'>
+<code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> are summarized in the table below. See Section 3.5 of
+<a href='https://arxiv.org/abs/1908.07151'>Politsch et al. (2020a)</a> for more details.</p><table class='table'>
 <tr><td>Scenario</td><td>Hyperparameter optimization</td></tr>
 <tr><td><code>x</code> is unevenly sampled</td><td><code>cv_trendfilter()</code></td></tr>
 <tr><td><code>x</code> is evenly sampled and reciprocal variances are not available</td><td><code>cv_trendfilter()</code></td></tr>
@@ -338,8 +349,8 @@ functions that operate on the <code>cv_trendfilter()</code> output.</p></dd>
 
 <p>For our purposes, an evenly sampled data set with some discarded pixels
 (either sporadically or in large consecutive chunks) is still considered to
-be evenly sampled. When the inputs are evenly sampled on a transformed scale,
-we recommend transforming to that scale and carrying out the full trend
+be evenly sampled. When <code>x</code> is evenly sampled on a transformed scale, we
+recommend transforming to that scale and carrying out the full trend
 filtering analysis on that scale. See the <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> examples for
 a case when the inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p>
 <p>The following loss functions are automatically computed during cross
@@ -382,16 +393,17 @@ $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
 
     <p><b>Companion references</b></p><ol>
 <li><p>Politsch et al. (2020a).
-<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy</a>. <em>MNRAS</em>, 492(3), p. 4005-4018. <br /></p></li>
+<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy</a>. <em>MNRAS</em>,
+492(3), p. 4005-4018. [<a href='https://arxiv.org/abs/1908.07151'>arXiv</a>]. <br /></p></li>
 <li><p>Politsch et al. (2020b).
 <a href='https://academic.oup.com/mnras/article/492/3/4019/5704414'>Trend Filtering – II. Denoising astronomical signals with varying degrees of smoothness</a>. <em>MNRAS</em>,
-492(3), p. 4019-4032.</p></li>
+492(3), p. 4019-4032. [<a href='https://arxiv.org/abs/2001.03552'>arXiv</a>].</p></li>
 </ol>
 
 <p><b>Cross validation</b></p><ol>
 <li><p>Hastie, Tibshirani, and Friedman (2009).
 <a href='https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf'>The Elements of Statistical Learning: Data Mining, Inference, and Prediction</a>.
-2nd edition. Springer Series in Statistics. (See Sections 7.10 and 7.12)</p></li>
+2nd edition. Springer Series in Statistics. (See Sections 7.10 and 7.12).</p></li>
 </ol>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
@@ -442,7 +454,7 @@ $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
       </footer>
    </div>
 
-  
+
 
 
   </body>

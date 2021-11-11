@@ -61,12 +61,13 @@
 #' \bold{Companion references}
 #' \enumerate{
 #' \item{Politsch et al. (2020a).
-#' [Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy](https://academic.oup.com/mnras/article/492/3/4005/5704413).
-#' \emph{MNRAS}, 492(3), p. 4005-4018.} \cr
+#' [Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical spectroscopy](
+#' https://academic.oup.com/mnras/article/492/3/4005/5704413). \emph{MNRAS},
+#' 492(3), p. 4005-4018. [[arXiv](https://arxiv.org/abs/1908.07151)].} \cr
 #' \item{Politsch et al. (2020b).
 #' [Trend Filtering – II. Denoising astronomical signals with varying degrees of smoothness](
 #' https://academic.oup.com/mnras/article/492/3/4019/5704414). \emph{MNRAS},
-#' 492(3), p. 4019-4032.}}
+#' 492(3), p. 4019-4032. [[arXiv](https://arxiv.org/abs/2001.03552)].}}
 #'
 #' \bold{The Bootstrap and variations}
 #' \enumerate{
