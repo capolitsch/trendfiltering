@@ -1,4 +1,4 @@
-# trendfiltering R package
+# trendfiltering R package <a href="https://capolitsch.github.io/trendfiltering/"><img src="man/figures/logo.svg" align="right" width="120px"/></a>
 
 ### [Package website](https://capolitsch.github.io/trendfiltering/)
 
