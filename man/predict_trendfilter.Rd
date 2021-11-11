@@ -107,6 +107,23 @@ pred_tf <- predict(
   nx_eval = 1500L
 )
 }
+\references{
+\bold{Companion references}
+\enumerate{
+\item{Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
+for time-domain astronomy and astronomical spectroscopy. \emph{MNRAS},
+492(3), p. 4005-4018.
+[\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Publisher}]
+[\href{https://arxiv.org/abs/1908.07151}{arXiv}]
+[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].} \cr
+\item{Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
+signals with varying degrees of smoothness.
+https://academic.oup.com/mnras/article/492/3/4019/5704414. \emph{MNRAS},
+492(3), p. 4019-4032.
+[\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Publisher}]
+[\href{https://arxiv.org/abs/2001.03552}{arXiv}]
+[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].}}
+}
 \seealso{
 \code{\link[=cv_trendfilter]{cv_trendfilter()}}, \code{\link[=sure_trendfilter]{sure_trendfilter()}}
 }

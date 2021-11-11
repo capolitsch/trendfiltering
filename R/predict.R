@@ -63,6 +63,23 @@
 #' that operate on the '`pred_tf`' object.}
 #' }
 #'
+#' @references
+#' \bold{Companion references}
+#' \enumerate{
+#' \item{Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
+#' for time-domain astronomy and astronomical spectroscopy. \emph{MNRAS},
+#' 492(3), p. 4005-4018.
+#' [[Publisher](https://academic.oup.com/mnras/article/492/3/4005/5704413)]
+#' [[arXiv](https://arxiv.org/abs/1908.07151)]
+#' [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].} \cr
+#' \item{Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
+#' signals with varying degrees of smoothness.
+#' https://academic.oup.com/mnras/article/492/3/4019/5704414. \emph{MNRAS},
+#' 492(3), p. 4019-4032.
+#' [[Publisher](https://academic.oup.com/mnras/article/492/3/4005/5704413)]
+#' [[arXiv](https://arxiv.org/abs/2001.03552)]
+#' [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].}}
+#'
 #' @rdname predict_trendfilter
 #'
 #' @seealso [cv_trendfilter()], [sure_trendfilter()]
