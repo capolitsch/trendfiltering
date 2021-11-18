@@ -282,7 +282,8 @@ bootstrap_parallel <- function(b, obj, sampler) {
 #' data frame.
 
 
-#' @importFrom dplyr %>% mutate n
+#' @importFrom dplyr mutate n
+#' @importFrom magrittr %>%
 #' @importFrom stats rnorm
 #' @noRd
 parametric_sampler <- function(data) {

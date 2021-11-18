@@ -1,6 +1,7 @@
 #' Utility functions for experts only
 #' @useDynLib glmgen tf_R
 #' @importFrom dplyr last
+#' @importFrom magrittr %>%
 #' @noRd
 make_lambda_grid_edf_spacing <- function(x,
                                          y,
@@ -65,7 +66,8 @@ make_lambda_grid_edf_spacing <- function(x,
 }
 
 
-#' @importFrom dplyr last %>%
+#' @importFrom dplyr last
+#' @importFrom magrittr %>%
 #' @importFrom stats approx
 #' @noRd
 get_lambdas <- function(nlambdas, data, k, thinning, admm_params) {
