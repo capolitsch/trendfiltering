@@ -40,7 +40,7 @@
 #' data(eclipsing_binary)
 #' head(EB)
 #'
-#' cv_tf <- cv_trendfilter(
+#' cv_tf <- cv.trendfilter(
 #'   x = EB$phase,
 #'   y = EB$flux,
 #'   weights = 1 / EB$std_err^2,
@@ -58,7 +58,7 @@
 #'   nx_eval = 1500L
 #' )
 #'
-#' boot_tf <- bootstrap_trendfilter(pred_tf, "nonparametric")
+#' boot_tf <- bootstrap.trendfilter(pred_tf, "nonparametric")
 #' bands <- vbands(boot_tf)
 #'
 #'
@@ -67,10 +67,10 @@
 #' data(quasar_spectrum)
 #' head(spec)
 #'
-#' sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+#' sure_tf <- sure.trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
 #' pred_tf <- predict(sure_tf)
 #'
-#' boot_tf <- bootstrap_trendfilter(pred_tf, "parametric")
+#' boot_tf <- bootstrap.trendfilter(pred_tf, "parametric")
 #' bands <- vbands(boot_tf)
 #' @importFrom dplyr tibble
 #' @export

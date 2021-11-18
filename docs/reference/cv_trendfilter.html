@@ -50,11 +50,11 @@
 <meta property="og:description" content="
  For every candidate hyperparameter value, estimate the trend
 filtering model's out-of-sample error by V-fold cross validation. CV
-error curves are returned for four of the most common regression loss
-metrics, as well as observation-weighted versions. Custom loss functions may
-also be passed to the loss_funcs argument. See the details section for
-definitions of the internal loss functions, and for guidelines on when
-cv_trendfilter() should be used versus sure_trendfilter()." />
+error curves are returned for many common regression loss functions. Custom
+loss functions may also be passed via the loss_funcs argument. See the
+details section for definitions of the internal loss functions, and for
+guidelines on when cv_trendfilter() should be used versus
+sure_trendfilter()." />
 <meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
 
@@ -135,11 +135,11 @@ cv_trendfilter() should be used versus sure_trendfilter()." />
     <p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
  For every candidate hyperparameter value, estimate the trend
 filtering model's out-of-sample error by <em>V</em>-fold cross validation. CV
-error curves are returned for four of the most common regression loss
-metrics, as well as observation-weighted versions. Custom loss functions may
-also be passed to the <code>loss_funcs</code> argument. See the details section for
-definitions of the internal loss functions, and for guidelines on when
-<code>cv_trendfilter()</code> should be used versus <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>.</p>
+error curves are returned for many common regression loss functions. Custom
+loss functions may also be passed via the <code>loss_funcs</code> argument. See the
+details section for definitions of the internal loss functions, and for
+guidelines on when <code>cv_trendfilter()</code> should be used versus
+<code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>cv_trendfilter</span><span class='op'>(</span>
@@ -201,24 +201,24 @@ cross validation. Defaults to <code>V = 10</code>.</p></td>
       <td><p>Multi-core computing using the
 <code><a href='https://rdrr.io/r/parallel/parallel-package.html'>parallel</a></code> R package: The number of cores to
 utilize. Defaults to the number of cross validation folds, <code>mc_cores = V</code>.
-If the value passed to <code>mc_cores</code> exceeds the number of cores available on
-the machine, <code>mc_cores</code> is internally updated to
-<code>mc_cores = parallel::detectCores()</code>.</p></td>
+If the <code>mc_cores</code> setting exceeds the number of cores available, <code>mc_cores</code>
+is internally updated to <code>mc_cores = parallel::detectCores()</code>.</p></td>
     </tr>
     <tr>
       <th>loss_funcs</th>
       <td><p>(Optional) A named list of one or more functions, with each
 defining a loss function to be evaluated on held-out folds during cross
 validation. By default, <code>cv_trendfilter()</code> will automatically compute and
-return CV error curves for 9 common regression loss functions (see the
+return CV error curves for many common regression loss functions (see the
 Details section below). Therefore, the <code>loss_funcs</code> argument need only be
-used in order to define loss functions that are not among these 9 choices.</p>
+used in order to define loss functions that are not among those already
+defined internally.</p>
 <p>When defining custom loss functions, each function within the named list
 passed to <code>loss_funcs</code> should take three vector arguments --- <code>y</code>,
 <code>tf_estimate</code>, and <code>weights</code> --- and return a single scalar value for the
-validation error. For example, if I wanted a CV error curve based on a
-weighted median of the absolute errors to be computed, I would pass the list
-below to <code>loss_funcs</code>:<div class="sourceCode r"></p><pre><span class='va'>MedAE</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>tf_estimate</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span> <span class='op'>{</span>
+validation error. For example, if I wanted to generate a CV error curve based
+on a weighted median of the trend filtering model's absolute errors, I would
+pass the list below to <code>loss_funcs</code>:<div class="sourceCode r"></p><pre><span class='va'>MedAE</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>tf_estimate</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='fu'>matrixStats</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/matrixStats/man/weightedMedian.html'>weightedMedian</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>tf_estimate</span> <span class='op'>-</span> <span class='va'>y</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>weights</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
 
@@ -229,7 +229,7 @@ below to <code>loss_funcs</code>:<div class="sourceCode r"></p><pre><span class=
       <th>fold_ids</th>
       <td><p>(Optional) An integer vector defining a custom partition of
 the data for cross validation. <code>fold_ids</code> must have the same length as <code>x</code>
-and <code>y</code>, and only contain values in the set <code>1:V</code>.</p></td>
+and <code>y</code>, and only contain the integer values <code>1</code>, ..., <code>V</code>.</p></td>
     </tr>
     <tr>
       <th>optimization_params</th>
@@ -239,9 +239,9 @@ passed to the trend filtering ADMM algorithm of
 the <code>glmgen</code> R package. See the <code><a href='https://rdrr.io/pkg/glmgen/man/trendfilter.control.list.html'>glmgen::trendfilter.control.list()</a></code>
 documentation for a full list of the algorithm's parameters. The default
 parameter choices will almost always suffice, but when adjustments do need to
-be made, one can do so without any technical understanding of the ADMM
-algorithm. In particular, the four parameter descriptions below should serve
-as sufficient working knowledge.</p><dl>
+be made, one need not have any technical understanding of the ADMM algorithm
+in order to do so. In particular, the four parameter descriptions below
+should serve as sufficient working knowledge.</p><dl>
 <dt><code>obj_tol</code></dt><dd><p>A stopping threshold for the ADMM algorithm. If the relative
 change in the algorithm's cost functional between two consecutive steps is
 less than <code>obj_tol</code>, the algorithm terminates. The algorithm's termination
@@ -276,7 +276,7 @@ elements of <code>x</code> that fall within the same bin, then the data is thinn
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>'cv_tf'</code>. This is a list with the following
+    <p>An object of class '<code>cv_tf</code>'. This is a list with the following
 elements:</p><dl>
 <dt><code>lambdas</code></dt><dd><p>Vector of candidate hyperparameter values (always returned
 in descending order).</p></dd>
@@ -292,12 +292,12 @@ every loss function in <code>loss_funcs</code>.</p></dd>
 <dt><code>lambda_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the "1-standard-error rule" hyperparameter, for every loss
 function in <code>loss_funcs</code>. The "1-standard-error rule" hyperparameter is the
-largest hyperparameter value in <code>lambdas</code> (corresponding to the smoothest
-trend filtering estimate) that has a CV error within one standard error of
-<code><a href='https://rdrr.io/r/base/Extremes.html'>min(errors)</a></code>. It serves as an Occam's razor-like heuristic. More precisely,
-given two models with approximately equal performance (in terms of some loss
-function), it may be wise to opt for the simpler model, i.e. the model with
-the larger hyperparameter / fewer effective degrees of freedom.</p></dd>
+largest hyperparameter value in <code>lambdas</code> that has a CV error within one
+standard error of <code><a href='https://rdrr.io/r/base/Extremes.html'>min(errors)</a></code>. It serves as an Occam's razor-like
+heuristic. More precisely, given two models with approximately equal
+performance (in terms of some loss function), it may be wise to opt for the
+simpler model, i.e. the model with the larger hyperparameter value / fewer
+effective degrees of freedom.</p></dd>
 <dt><code>edf_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the number of effective degrees of freedom in the trend filtering
 estimator that minimizes the CV error curve, for every loss function in
@@ -311,25 +311,29 @@ containing the index of <code>lambdas</code> that minimizes the CV error curve, 
 every loss function in <code>loss_funcs</code>.</p></dd>
 <dt><code>i_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
 containing the index of <code>lambdas</code> that gives the "1-standard-error rule"
-hyperparameter value, for every loss function in <code>loss_funcs</code>..</p></dd>
-<dt><code>loss_funcs</code></dt><dd><p>A named list of functions that defines all loss functions
-evaluated during cross validation.</p></dd>
+hyperparameter value, for every loss function in <code>loss_funcs</code>.</p></dd>
 <dt><code>cost_functional</code></dt><dd><p>The relative change in the cost functional over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 <code>lambdas</code>.</p></dd>
 <dt><code>n_iter</code></dt><dd><p>Total number of iterations taken by the ADMM algorithm, for
 every candidate hyperparameter in <code>lambdas</code>. If an element of <code>n_iter</code>
-is exactly equal to <code>tf_model$admm_params$max_iter</code>, then the ADMM algorithm
-stopped before reaching the objective tolerance
-<code>tf_model$admm_params$obj_tol</code>. In these situations, you may need to increase
+is exactly equal to <code>model$admm_params$max_iter</code> (see below), then the ADMM
+algorithm stopped before reaching the objective tolerance
+<code>model$admm_params$obj_tol</code>. In these situations, you may need to increase
 the maximum number of tolerable iterations via the
 <code>optimization_params$max_iter</code> argument of <code>cv_trendfilter()</code> in order to
-ensure that the trend filtering solution has converged to satisfactory
-precision.</p></dd>
+ensure that the ADMM solution has converged to satisfactory precision.</p></dd>
+<dt><code>loss_funcs</code></dt><dd><p>A named list of functions that defines all loss functions
+evaluated during cross validation.</p></dd>
 <dt><code>V</code></dt><dd><p>The number of folds the data were split into for cross
 validation.</p></dd>
-<dt><code>tf_model</code></dt><dd><p>A list of objects that is used internally by other
-functions that operate on the <code>cv_trendfilter()</code> output.</p></dd>
+<dt><code>x</code></dt><dd><p>Vector of observed values for the input variable.</p></dd>
+<dt><code>y</code></dt><dd><p>Vector of observed values for the output variable (if originally
+present, observations with <code><a href='https://rdrr.io/r/base/NA.html'>is.na(y)</a></code> or <code>weights == 0</code> are dropped).</p></dd>
+<dt><code>weights</code></dt><dd><p>Vector of weights for the observed outputs.</p></dd>
+<dt><code>model</code></dt><dd><p>A list containing the trend filtering model fit object, the
+ADMM parameter settings, and other modeling objects that are useful to pass
+along to functions that operate on the <code>cv_trendfilter()</code> output.</p></dd>
 
 </dl>
 
@@ -340,8 +344,8 @@ functions that operate on the <code>cv_trendfilter()</code> output.</p></dd>
 <a href='https://arxiv.org/abs/1908.07151'>Politsch et al. (2020a)</a> for more details.</p><table class='table'>
 <tr><td>Scenario</td><td>Hyperparameter optimization</td></tr>
 <tr><td><code>x</code> is unevenly sampled</td><td><code>cv_trendfilter()</code></td></tr>
-<tr><td><code>x</code> is evenly sampled and reciprocal variances are not available</td><td><code>cv_trendfilter()</code></td></tr>
-<tr><td><code>x</code> is evenly sampled and reciprocal variances are available</td><td><code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code></td></tr>
+<tr><td><code>x</code> is evenly sampled and measurement variances for <code>y</code> are not available</td><td><code>cv_trendfilter()</code></td></tr>
+<tr><td><code>x</code> is evenly sampled and measurement variances for <code>y</code> are available</td><td><code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code></td></tr>
 </table>
 
 
@@ -354,7 +358,7 @@ filtering analysis on that scale. See the <code><a href='sure_trendfilter.html'>
 a case when the inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p>
 <p>The following loss functions are automatically computed during cross
 validation and their CV error curves are returned within the <code>errors</code>
-list of the <code>'cv_tf'</code> output object.</p>
+list of the <code>cv_trendfilter()</code> output.</p>
 <ol>
 <li><p>Mean absolute deviations error: \[\text{MAE}(\lambda) =
 \frac{1}{n} \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|\]</p></li>
@@ -365,8 +369,9 @@ list of the <code>'cv_tf'</code> output object.</p>
 \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2\]</p></li>
 <li><p>Weighted mean-squared error: \[\text{WMSE}(\lambda)
 = \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}\]</p></li>
-<li><p>log-cosh error: \[\text{logcosh}(\lambda) = \frac{1}{n}
-\sum_{i=1}^{n} \log\left(\cosh\left(Y_i - \hat{f}(x_i; \lambda)\right)\right)\]</p></li>
+<li><p>log-cosh error: \[\text{logcosh}(\lambda) =
+\frac{1}{n}\sum_{i=1}^{n}
+\log\left(\cosh\left(Y_i - \hat{f}(x_i; \lambda)\right)\right)\]</p></li>
 <li><p>Weighted log-cosh error: \[\text{wlogcosh}(\lambda) =
 \sum_{i=1}^{n}
 \log\left(\cosh\left((Y_i - \hat{f}(x_i; \lambda))\sqrt{w_i}\right)\right)\]</p></li>
@@ -395,26 +400,26 @@ $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
 for time-domain astronomy and astronomical spectroscopy. <em>MNRAS</em>,
 492(3), p. 4005-4018.
 [<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Publisher</a>]
-[<a href='https://arxiv.org/abs/1908.07151'>arXiv</a>]
-[<a href='https://capolitsch.github.io/trendfiltering/authors.html'>BibTeX</a>]. <br /></p></li>
+[<a href='https://arxiv.org/abs/1908.07151'>arXiv</a>]. <br /></p></li>
 <li><p>Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
 signals with varying degrees of smoothness.
 https://academic.oup.com/mnras/article/492/3/4019/5704414. <em>MNRAS</em>,
 492(3), p. 4019-4032.
 [<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Publisher</a>]
-[<a href='https://arxiv.org/abs/2001.03552'>arXiv</a>]
-[<a href='https://capolitsch.github.io/trendfiltering/authors.html'>BibTeX</a>].</p></li>
+[<a href='https://arxiv.org/abs/2001.03552'>arXiv</a>].</p></li>
 </ol>
 
 <p><b>Cross validation</b></p><ol>
-<li><p>Hastie, Tibshirani, and Friedman (2009).
-<a href='https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf'>The Elements of Statistical Learning: Data Mining, Inference, and Prediction</a>.
-2nd edition. Springer Series in Statistics. (See Sections 7.10 and 7.12).</p></li>
+<li><p>Hastie, Tibshirani, and Friedman (2009). The Elements of Statistical
+Learning: Data Mining, Inference, and Prediction. 2nd edition. Springer
+Series in Statistics.
+[<a href='https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf'>Link</a>]
+(See Sections 7.10 and 7.12).</p></li>
 </ol>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>, <code><a href='bootstrap_trendfilter.html'>bootstrap_trendfilter()</a></code></p></div>
+    <div class='dont-index'><p><code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>eclipsing_binary</span><span class='op'>)</span>
@@ -438,7 +443,7 @@ https://academic.oup.com/mnras/article/492/3/4019/5704414. <em>MNRAS</em>,
     thinning <span class='op'>=</span> <span class='cn'>TRUE</span>
   <span class='op'>)</span>
 <span class='op'>)</span>
-</div></pre>
+</div><div class='output co'>#&gt; <span class='error'>Error in structure(list(fit = fit, k = k, admm_params = admm_params, thinning = thinning,     data_scaled = data_scaled, x_scale = x_scale, y_scale = y_scale),     class = c("tf_model", "list")): object 'fit' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

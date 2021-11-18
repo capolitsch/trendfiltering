@@ -192,28 +192,28 @@ bootstrap_trendfilter <- function(obj,
     X = 1:B,
     FUN = function(X) par_out[[X]][["tf_estimate"]]
   ) %>%
-    unlist() %>%
+    unlist(labels = FALSE) %>%
     matrix(nrow = length(obj$x_eval))
 
   edf_boots <- lapply(
     X = 1:B,
     FUN = function(X) par_out[[X]][["edf"]]
   ) %>%
-    unlist() %>%
+    unlist(labels = FALSE) %>%
     as.integer()
 
   n_iter_boots <- lapply(
     X = 1:B,
     FUN = function(X) par_out[[X]][["n_iter"]]
   ) %>%
-    unlist() %>%
+    unlist(labels = FALSE) %>%
     as.integer()
 
   lambda_boots <- lapply(
     X = 1:B,
     FUN = function(X) par_out[[X]][["lambda"]]
   ) %>%
-    unlist()
+    unlist(labels = FALSE)
 
   structure(
     list(

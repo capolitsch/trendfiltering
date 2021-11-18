@@ -3,7 +3,10 @@ Package: trendfiltering
 Title: The state-of-the-art method for denoising 1D signals
 Version: 0.2.0
 Authors@R: 
-    person("Collin A.", "Politsch", , "collinpolitsch@gmail.com", role = c("aut", "cre"),
+    person(given = "Collin A.", 
+           family = "Politsch", 
+           email = "collinpolitsch@gmail.com",
+           role = c("aut", "cre"), 
            comment = c(ORCID = "0000-0003-3727-9167"))
 Description: A suite of tools for denoising one-dimensional signals with trend 
     filtering. Optimizing the hyparameter via Stein's unbiased risk estimate or 
@@ -26,7 +29,7 @@ Imports:
 RdMacros: 
     mathjaxr
 Remotes:
-    glmgen/glmgen/R_pkg/glmgen@master
+    capolitsch/glmgen/R_pkg/glmgen@main
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

@@ -155,7 +155,7 @@ section for guidelines on when <code>sure_trendfilter()</code> should be used ve
       <td><p>Weights for the observed outputs, defined as the reciprocal
 variance of the additive noise that contaminates the output signal. When the
 noise is expected to have an equal variance \(\sigma^2\) for all
-observations, a scalar can be passed to <code>weights</code>, namely
+observations, a scalar may be passed to <code>weights</code>, namely
 <code>weights = </code>\(1/\sigma^2\). Otherwise, <code>weights</code> must be a vector with
 the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
@@ -183,9 +183,9 @@ passed to the trend filtering ADMM algorithm of
 the <code>glmgen</code> R package. See the <code><a href='https://rdrr.io/pkg/glmgen/man/trendfilter.control.list.html'>glmgen::trendfilter.control.list()</a></code>
 documentation for a full list of the algorithm's parameters. The default
 parameter choices will almost always suffice, but when adjustments do need to
-be made, one can do so without any technical understanding of the ADMM
-algorithm. In particular, the four parameter descriptions below should serve
-as sufficient working knowledge.</p><dl>
+be made, one need not have any technical understanding of the ADMM algorithm
+in order to do so. In particular, the four parameter descriptions below
+should serve as sufficient working knowledge.</p><dl>
 <dt><code>obj_tol</code></dt><dd><p>A stopping threshold for the ADMM algorithm. If the relative
 change in the algorithm's cost functional between two consecutive steps is
 less than <code>obj_tol</code>, the algorithm terminates. The algorithm's termination
@@ -231,14 +231,13 @@ for every hyperparameter value in <code>lambdas</code>.</p></dd>
 <dt><code>se_errors</code></dt><dd><p>Vector of estimated standard errors for the <code>errors</code>.</p></dd>
 <dt><code>lambda_min</code></dt><dd><p>Hyperparameter value in <code>lambdas</code> that minimizes the SURE
 validation error curve.</p></dd>
-<dt><code>lambda_1se</code></dt><dd><p>The largest hyperparameter value in <code>lambdas</code>
-(corresponding to the smoothest trend filtering estimate) that has a SURE
-error within one standard error of <code><a href='https://rdrr.io/r/base/Extremes.html'>min(errors)</a></code>. We call this the
+<dt><code>lambda_1se</code></dt><dd><p>The largest hyperparameter value in <code>lambdas</code> that has a
+SURE error within one standard error of <code><a href='https://rdrr.io/r/base/Extremes.html'>min(errors)</a></code>. We call this the
 "1-standard-error rule" hyperparameter, and it serves as an Occam's
 razor-esque heuristic. More precisely, given two models with approximately
 equal performance (here, in terms of predictive MSE), it may be wise to opt
-for the simpler model, i.e. the model with the larger hyperparameter / fewer
-effective degrees of freedom.</p></dd>
+for the simpler model, i.e. the model with the larger hyperparameter value /
+fewer effective degrees of freedom.</p></dd>
 <dt><code>edf_min</code></dt><dd><p>Number of effective degrees of freedom in the trend
 filtering estimator with hyperparameter <code>lambda_min</code>.</p></dd>
 <dt><code>edf_1se</code></dt><dd><p>Number of effective degrees of freedom in the  trend
@@ -250,32 +249,36 @@ ADMM algorithm's final iteration, for every candidate hyperparameter in
 <code>lambdas</code>.</p></dd>
 <dt><code>n_iter</code></dt><dd><p>Total number of iterations taken by the ADMM algorithm, for
 every candidate hyperparameter in <code>lambdas</code>. If an element of <code>n_iter</code>
-is exactly equal to <code>tf_model$admm_params$max_iter</code>, then the ADMM algorithm
-stopped before reaching the objective tolerance
-<code>tf_model$admm_params$obj_tol</code>. In these situations, you may need to increase
+is exactly equal to <code>model$admm_params$max_iter</code> (see below), then the ADMM
+algorithm stopped before reaching the objective tolerance
+<code>model$admm_params$obj_tol</code>. In these situations, you may need to increase
 the maximum number of tolerable iterations via the
 <code>optimization_params$max_iter</code> argument of <code>sure_trendfilter()</code> in order to
-ensure that the trend filtering solution has converged to satisfactory
-precision.</p></dd>
+ensure that the ADMM solution has converged to satisfactory precision.</p></dd>
 <dt><code>training_errors</code></dt><dd><p>The "in-sample" MSE between the observed outputs <code>y</code>
 and the trend filtering estimate, for every hyperparameter value in
 <code>lambdas</code>.</p></dd>
 <dt><code>optimisms</code></dt><dd><p>SURE-estimated optimisms, i.e.
 <code>optimisms = errors - training_errors</code>.</p></dd>
-<dt><code>tf_model</code></dt><dd><p>A list of objects that is used internally by other
-functions that operate on the <code>sure_trendfilter()</code> output.</p></dd>
+<dt><code>x</code></dt><dd><p>Vector of observed values for the input variable.</p></dd>
+<dt><code>y</code></dt><dd><p>Vector of observed values for the output variable (if originally
+present, observations with <code><a href='https://rdrr.io/r/base/NA.html'>is.na(y)</a></code> or <code>weights == 0</code> are dropped).</p></dd>
+<dt><code>weights</code></dt><dd><p>Vector of weights for the observed outputs.</p></dd>
+<dt><code>model</code></dt><dd><p>A list containing the trend filtering model fit object, the
+ADMM parameter settings, and other modeling objects that are useful to pass
+along to functions that operate on the <code>sure_trendfilter()</code> output.</p></dd>
 
 </dl>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Our recommendations for when to use <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code> versus
-<code>sure_trendfilter()</code> are summarized in the table below. See Section 3.5 of
+    <p>Our recommendations for when to use <code>sure_trendfilter()</code> versus
+<code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code> are summarized in the table below. See Section 3.5 of
 <a href='https://arxiv.org/abs/1908.07151'>Politsch et al. (2020a)</a> for more details.</p><table class='table'>
 <tr><td>Scenario</td><td>Hyperparameter optimization</td></tr>
 <tr><td><code>x</code> is unevenly sampled</td><td><code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code></td></tr>
-<tr><td><code>x</code> is evenly sampled and reciprocal variances are not available</td><td><code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code></td></tr>
-<tr><td><code>x</code> is evenly sampled and reciprocal variances are available</td><td><code>sure_trendfilter()</code></td></tr>
+<tr><td><code>x</code> is evenly sampled and measurement variances for <code>y</code> are not available</td><td><code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code></td></tr>
+<tr><td><code>x</code> is evenly sampled and measurement variances for <code>y</code> are available</td><td><code>sure_trendfilter()</code></td></tr>
 </table>
 
 
@@ -293,40 +296,37 @@ inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'
 for time-domain astronomy and astronomical spectroscopy. <em>MNRAS</em>,
 492(3), p. 4005-4018.
 [<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Publisher</a>]
-[<a href='https://arxiv.org/abs/1908.07151'>arXiv</a>]
-[<a href='https://capolitsch.github.io/trendfiltering/authors.html'>BibTeX</a>]. <br /></p></li>
+[<a href='https://arxiv.org/abs/1908.07151'>arXiv</a>]. <br /></p></li>
 <li><p>Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
 signals with varying degrees of smoothness.
 https://academic.oup.com/mnras/article/492/3/4019/5704414. <em>MNRAS</em>,
 492(3), p. 4019-4032.
 [<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Publisher</a>]
-[<a href='https://arxiv.org/abs/2001.03552'>arXiv</a>]
-[<a href='https://capolitsch.github.io/trendfiltering/authors.html'>BibTeX</a>].</p></li>
+[<a href='https://arxiv.org/abs/2001.03552'>arXiv</a>].</p></li>
 </ol>
 
 <p><b>Stein's unbiased risk estimate</b></p><ol>
-<li><p>Tibshirani and Wasserman (2015).
-<a href='http://www.stat.cmu.edu/~larry/=sml/stein.pdf'>Stein’s Unbiased Risk Estimate</a>.
-<em>36-702: Statistical Machine Learning course notes</em>
-(Carnegie Mellon University). <br /></p></li>
-<li><p>Efron (2014).
-<a href='https://www.tandfonline.com/doi/abs/10.1198/016214504000000692'>The Estimation of Prediction Error: Covariance Penalties and Cross-Validation</a>.
-<em>Journal of the American Statistical Association</em>. 99(467),
-p. 619-632. <br /></p></li>
-<li><p>Stein (1981).
-<a href='https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full'>Estimation of the Mean of a Multivariate Normal Distribution</a>.
-<em>The Annals of Statistics</em>. 9(6), p. 1135-1151.</p></li>
+<li><p>Tibshirani and Wasserman (2015). Stein’s Unbiased Risk Estimate.
+<em>36-702: Statistical Machine Learning course notes</em> (Carnegie Mellon
+University). [<a href='http://www.stat.cmu.edu/~larry/=sml/stein.pdf'>Link</a>]. <br /></p></li>
+<li><p>Efron (2014). The Estimation of Prediction Error: Covariance Penalties
+and Cross-Validation. <em>Journal of the American Statistical Association</em>.
+99(467), p. 619-632.
+[<a href='https://www.tandfonline.com/doi/abs/10.1198/016214504000000692'>Publisher</a>] <br /></p></li>
+<li><p>Stein (1981). Estimation of the Mean of a Multivariate Normal
+Distribution. <em>The Annals of Statistics</em>. 9(6), p. 1135-1151.
+[<a href='https://projecteuclid.org/journals/annals-of-statistics/volume-9/issue-6/Estimation-of-the-Mean-of-a-Multivariate-Normal-Distribution/10.1214/aos/1176345632.full'>Publisher</a>].</p></li>
 </ol>
 
 <p><b>Effective degrees of freedom for trend filtering</b></p><ol>
-<li><p>Tibshirani and Taylor (2012).
-<a href='https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full'>Degrees of freedom in lasso problems</a>.
-<em>The Annals of Statistics</em>, 40(2), p. 1198-1232.</p></li>
+<li><p>Tibshirani and Taylor (2012). Degrees of freedom in lasso problems.
+<em>The Annals of Statistics</em>, 40(2), p. 1198-1232.
+[<a href='https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full'>Publisher</a>].</p></li>
 </ol>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>, <code><a href='bootstrap_trendfilter.html'>bootstrap_trendfilter()</a></code></p></div>
+    <div class='dont-index'><p><code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>quasar_spectrum</span><span class='op'>)</span>
