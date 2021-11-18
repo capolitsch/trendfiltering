@@ -135,7 +135,6 @@
 #'
 #' boot_tf <- bootstrap_trendfilter(pred_tf, "parametric")
 #' bands <- vbands(boot_tf)
-#' @importFrom glmgen trendfilter
 #' @importFrom dplyr case_when mutate
 #' @importFrom magrittr %>% %<>%
 #' @importFrom parallel mclapply detectCores
@@ -231,7 +230,6 @@ bootstrap_trendfilter <- function(obj,
 
 #' @noRd
 #' @importFrom dplyr case_when
-#' @importFrom glmgen trendfilter
 bootstrap_parallel <- function(b, obj, sampler) {
   data <- sampler(obj$tf_model$data_scaled)
   lambdas <- obj$lambdas[max(obj$i_opt - 10, 1):min(obj$i_opt + 10)]

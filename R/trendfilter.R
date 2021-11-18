@@ -5,12 +5,12 @@
 #' @param y
 #'   Vector of observed values for the output variable.
 #' @param weights
-#'   (Optional) Weights for the observed outputs, defined as the inverse
-#'   variance of the additive noise that contaminates the output signal. When
-#'   the noise is expected to have an equal variance \mjseqn{\sigma^2} for all
-#'   observations, a scalar may be passed to `weights`, i.e.
-#'   `weights = `\mjseqn{1/\sigma^2}. Otherwise, `weights` must be a vector with
-#'   the same length as `x` and `y`.
+#'   (Optional) Weights for the observed output measurements. The weights are
+#'   defined as the inverse variance of the additive noise that contaminates the
+#'   observed output signal. When the noise is expected to have an equal
+#'   variance \mjseqn{\sigma^2} for all observations, a scalar may be passed to
+#'   `weights`, i.e. `weights = `\mjseqn{1/\sigma^2}. Otherwise, `weights` must
+#'   be a vector with the same length as `x` and `y`.
 #' @param lambdas
 #'   Vector of one or more hyperparameter values to fit a model for.
 #' @param k
@@ -38,14 +38,13 @@
 #'   defined by `obj_tol` has not been attained and `max_iter` may need to be
 #'   increased.
 #' @param mc_cores
-#'   Number of cores to utilize for parallelized efficiency. Defaults to the
-#'   number of cores detected, minus 4.
+#'   Number of cores to utilize for parallel computing. Defaults to the number
+#'   of cores detected, minus 4.
 #' @param ...
 #'   Additional named arguments. Currently unused.
 #'
-#' @return An object of class `'trendfilter'` and subclass `'trendfiltering'`
-#' (in order to distinguish it from `'trendfilter'` objects in the `glmgen` R
-#' package). This is a list with the following elements:
+#' @return An object of class `'trendfilter'`. This is a list with the following
+#' elements:
 #'
 #' 1. `x`
 #' 2. `y`
@@ -78,8 +77,8 @@ trendfilter <- function(x,
                         weights = NULL,
                         lambdas,
                         k = 2L,
-                        obj_tol = NULL,
-                        max_iter = NULL,
+                        obj_tol = 1e-10,
+                        max_iter = length(y),
                         mc_cores = parallel::detectCores() - 4,
                         ...) {
   tf_call <- match.call()

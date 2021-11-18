@@ -11,6 +11,23 @@
 
 A suite of tools for denoising one-dimensional signals with trend filtering. Optimizing the hyparameter via Stein's unbiased risk estimate or V-fold cross validation with a customizable loss function, and one-standard-error rules. Relaxed trend filtering, and various bootstrap algorithms for uncertainty quantification.
 }
+\section{References}{
+
+\enumerate{
+\item Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
+for time-domain astronomy and astronomical spectroscopy. \emph{MNRAS}, 492(3),
+p. 4005-4018.
+[\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Publisher}]
+[\href{https://arxiv.org/abs/1908.07151}{arXiv}]
+[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].
+\item Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
+signals with varying degrees of smoothness. \emph{MNRAS}, 492(3), p. 4019-4032.
+[\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{Publisher}]
+[\href{https://arxiv.org/abs/2001.03552}{arXiv}]
+[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].
+}
+}
+
 \section{Trend filtering with Stein's unbiased risk estimate}{
 
 
@@ -63,21 +80,6 @@ estimate can be constructed, e.g. see \href{https://link.springer.com/book/10.10
 \href{https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf}{Hastie, Tibshirani, Friedman (2009)}.
 }
 
-\references{
-\enumerate{
-\item Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
-for time-domain astronomy and astronomical spectroscopy. \emph{MNRAS}, 492(3),
-p. 4005-4018.
-[\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Publisher}]
-[\href{https://arxiv.org/abs/1908.07151}{arXiv}]
-[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].
-\item Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
-signals with varying degrees of smoothness. \emph{MNRAS}, 492(3), p. 4019-4032.
-[\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{Publisher}]
-[\href{https://arxiv.org/abs/2001.03552}{arXiv}]
-[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].
-}
-}
 \seealso{
 Useful links:
 \itemize{

@@ -10,8 +10,8 @@ trendfilter(
   weights = NULL,
   lambdas,
   k = 2L,
-  obj_tol = NULL,
-  max_iter = NULL,
+  obj_tol = 1e-10,
+  max_iter = length(y),
   mc_cores = parallel::detectCores() - 4,
   ...
 )
@@ -21,12 +21,12 @@ trendfilter(
 
 \item{y}{Vector of observed values for the output variable.}
 
-\item{weights}{(Optional) Weights for the observed outputs, defined as the inverse
-variance of the additive noise that contaminates the output signal. When
-the noise is expected to have an equal variance \mjseqn{\sigma^2} for all
-observations, a scalar may be passed to \code{weights}, i.e.
-\verb{weights = }\mjseqn{1/\sigma^2}. Otherwise, \code{weights} must be a vector with
-the same length as \code{x} and \code{y}.}
+\item{weights}{(Optional) Weights for the observed output measurements. The weights are
+defined as the inverse variance of the additive noise that contaminates the
+observed output signal. When the noise is expected to have an equal
+variance \mjseqn{\sigma^2} for all observations, a scalar may be passed to
+\code{weights}, i.e. \verb{weights = }\mjseqn{1/\sigma^2}. Otherwise, \code{weights} must
+be a vector with the same length as \code{x} and \code{y}.}
 
 \item{lambdas}{Vector of one or more hyperparameter values to fit a model for.}
 
@@ -54,15 +54,14 @@ of the elements of \code{n_iter} are equal to \code{max_iter}, the tolerance
 defined by \code{obj_tol} has not been attained and \code{max_iter} may need to be
 increased.}
 
-\item{mc_cores}{Number of cores to utilize for parallelized efficiency. Defaults to the
-number of cores detected, minus 4.}
+\item{mc_cores}{Number of cores to utilize for parallel computing. Defaults to the number
+of cores detected, minus 4.}
 
 \item{...}{Additional named arguments. Currently unused.}
 }
 \value{
-An object of class \code{'trendfilter'} and subclass \code{'trendfiltering'}
-(in order to distinguish it from \code{'trendfilter'} objects in the \code{glmgen} R
-package). This is a list with the following elements:
+An object of class \code{'trendfilter'}. This is a list with the following
+elements:
 \enumerate{
 \item \code{x}
 \item \code{y}

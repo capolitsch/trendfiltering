@@ -65,23 +65,22 @@ make_lambda_grid_edf_spacing <- function(x,
 }
 
 
-#' @importFrom glmgen trendfilter
 #' @importFrom dplyr last %>%
 #' @importFrom stats approx
 #' @noRd
 get_lambdas <- function(nlambdas, data, k, thinning, admm_params) {
   nlambdas_start <- ifelse(nlambdas >= 150, 100, 50)
 
-  out <- trendfilter(
-    x = data$x,
-    y = data$y,
-    weights = data$weights,
-    lambda.min.ratio = 1e-16,
-    nlambda = nlambdas_start,
-    k = k,
-    thinning = thinning,
-    control = admm_params
-  )
+  #out <- trendfilter(
+  #  x = data$x,
+  #  y = data$y,
+  #  weights = data$weights,
+  #  lambda.min.ratio = 1e-16,
+  #  nlambda = nlambdas_start,
+  #  k = k,
+  #  thinning = thinning,
+  #  control = admm_params
+  #)
 
   lambdas_start <- out$lambda
   edfs_start <- out$df
