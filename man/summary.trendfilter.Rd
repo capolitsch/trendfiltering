@@ -7,7 +7,7 @@
 \method{summary}{trendfilter}(obj)
 }
 \arguments{
-\item{obj}{Object of class \code{trendfilter}.}
+\item{obj}{Object of class \code{\link[=trendfilter]{trendfilter}}.}
 }
 \description{
 Summarize a trendfilter object

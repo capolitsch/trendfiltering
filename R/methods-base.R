@@ -1,7 +1,7 @@
 #' Print the output of a trendfilter object
 #'
 #' @param obj
-#'   Object of class `trendfilter`.
+#'   Object of class [`trendfilter`][trendfilter()].
 #'
 #' @export
 print.trendfilter <- function(obj) {
@@ -17,7 +17,7 @@ print.trendfilter <- function(obj) {
 #' Summarize a trendfilter object
 #'
 #' @param obj
-#'   Object of class `trendfilter`.
+#'   Object of class [`trendfilter`][trendfilter()].
 #'
 #' @export
 summary.trendfilter <- function(obj) {
@@ -34,7 +34,7 @@ summary.trendfilter <- function(obj) {
 #' Print the output of a trendfilter summary object
 #'
 #' @param obj
-#'   Object of class `trendfilter`.
+#'   Object of class [`trendfilter`][trendfilter()].
 #'
 #' @export
 print.summary.trendfilter <- function(obj) {

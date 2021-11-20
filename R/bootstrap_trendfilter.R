@@ -1,34 +1,37 @@
 #' Construct pointwise variability bands via a tailored bootstrap algorithm
 #'
-#' \loadmathjax Generate a bootstrap ensemble of trend filtering estimates in
-#' order to quantify the uncertainty in the optimized estimate. One of three
-#' possible bootstrap algorithms should be chosen according to the criteria in
-#' the details section below. See [Politsch et al. (2020a)](
+#' Generate a bootstrap ensemble of trend filtering estimates in order to
+#' quantify the uncertainty in the optimized estimate. One of three possible
+#' bootstrap algorithms should be chosen according to the criteria in the
+#' details section below. See [Politsch et al. (2020a)](
 #' https://academic.oup.com/mnras/article/492/3/4005/5704413) for the technical
-#' details of each bootstrap algorithm. Pointwise variability bands are then
-#' obtained by passing the `bootstrap_trendfilter()` output and a desired level
-#' (e.g. `level = 0.95`) to [`vbands()`].
+#' description of each bootstrap algorithm. Pointwise variability bands are then
+#' obtained by passing the '`bootstrap_trendfilter`' object to [`vbands()`],
+#' along with the desired level (e.g. `level = 0.95`) .
 #'
-#' @param obj An object of class '[`pred_tf`][predict_trendfilter()]'.
-#' @param bootstrap_algorithm A string specifying which variation of the
-#' bootstrap to use. One of `c("nonparametric", "parametric", "wild")`. See
-#' details section below for when each option is appropriate.
-#' @param B The number of bootstrap samples used to estimate the pointwise
-#' variability bands. Defaults to `B = 100L`.
-#' @param mc_cores Multi-core computing using the
-#' [`parallel`][`parallel::parallel-package`] package: The number of cores to
-#' utilize. Defaults to the number of cores detected, minus 4.
+#' @param obj
+#'   An object of class '[`pred_tf`][predict_trendfilter()]'.
+#' @param algorithm
+#'   A string specifying which variation of the bootstrap to use. One of
+#'   `c("nonparametric", "parametric", "wild")`. See Details section below for
+#'   guidelines on when each choice should be used.
+#' @param B
+#'   The number of bootstrap samples used to estimate the pointwise variability
+#'   bands. Defaults to `B = 100L`.
+#' @param mc_cores
+#'   Number of cores to utilize for parallel computing. Defaults to the number
+#'   of cores detected, minus 4.
 #'
 #' @details Our recommendations for when to use each of the possible settings
-#' for the `bootstrap_algorithm` argument are shown in the table below. See
+#' for the `algorithm` argument are shown in the table below. See
 #' [Politsch et al. (2020a)](
 #' https://academic.oup.com/mnras/article/492/3/4005/5704413) for more details.
 #'
-#' | Scenario                                                                  |        Uncertainty quantification      |
-#' | :---                                                                      |                   :---                 |
-#' | `x` is unevenly sampled                                                   | `bootstrap_algorithm = "nonparametric"`|
-#' | `x` is evenly sampled and measurement variances for `y` are available     | `bootstrap_algorithm = "parametric"`   |
-#' | `x` is evenly sampled and measurement variances for `y` are not available | `bootstrap_algorithm = "wild"`         |
+#' | Scenario                                                                  |  Uncertainty quantification  |
+#' | :---                                                                      |                   :---       |
+#' | `x` is unevenly sampled                                                   | `algorithm = "nonparametric"`|
+#' | `x` is evenly sampled and measurement variances for `y` are available     | `algorithm = "parametric"`   |
+#' | `x` is evenly sampled and measurement variances for `y` are not available | `algorithm = "wild"`         |
 #'
 #' For our purposes, an evenly sampled data set with some discarded pixels
 #' (either sporadically or in large consecutive chunks) is still considered to
@@ -37,13 +40,13 @@
 #' filtering analysis on that scale. See Example 2 below for a case when the
 #' inputs are evenly sampled on the `log10(x)` scale.
 #'
-#' @return An object of class '`bootstrap_tf`'. This is a list with the
-#' following elements
+#' @return An object of class '`bootstrap_trendfilter`' and subclass
+#' '[`trendfilter`][trendfilter()]'. This is a list with the following elements:
 #' \describe{
 #' \item{x_eval}{Input grid that each bootstrap trend filtering estimate was
 #' evaluated on.}
-#' \item{ensemble}{The full trend filtering bootstrap ensemble as an
-#' \mjseqn{n \times B} matrix.}
+#' \item{ensemble}{The full trend filtering bootstrap ensemble as a matrix with
+#' `length(x_eval)` rows and `B` columns.}
 #' \item{edf_boots}{Vector of the estimated number of effective degrees of
 #' freedom of each trend filtering bootstrap estimate. These should all be
 #' relatively close to `obj$edf_opt`.}
@@ -53,41 +56,22 @@
 #' bootstrap fit. In general, these are not all equal because our bootstrap
 #' implementation instead seeks to hold the number of effective degrees of
 #' freedom constant across all bootstrap estimates.}
-#' \item{bootstrap_algorithm}{A string specifying which variation of the
-#' bootstrap was used to generate the ensemble.}
+#' \item{algorithm}{A string specifying which variation of the bootstrap was
+#' used to generate the ensemble.}
 #' }
 #'
 #' @references
-#' \bold{Companion references}
-#' \enumerate{
-#' \item{Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
-#' for time-domain astronomy and astronomical spectroscopy. \emph{MNRAS},
-#' 492(3), p. 4005-4018.
-#' [[Publisher](https://academic.oup.com/mnras/article/492/3/4005/5704413)]
-#' [[arXiv](https://arxiv.org/abs/1908.07151)]
-#' [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].} \cr
-#' \item{Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
-#' signals with varying degrees of smoothness.
-#' https://academic.oup.com/mnras/article/492/3/4019/5704414. \emph{MNRAS},
-#' 492(3), p. 4019-4032.
-#' [[Publisher](https://academic.oup.com/mnras/article/492/3/4005/5704413)]
-#' [[arXiv](https://arxiv.org/abs/2001.03552)]
-#' [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].}}
-#'
-#' \bold{The Bootstrap and variations}
-#' \enumerate{
-#' \item{Efron and Tibshirani (1986).
-#' [Bootstrap Methods for Standard Errors, Confidence Intervals, and Other Measures of Statistical Accuracy](
-#' https://projecteuclid.org/journals/statistical-science/volume-1/issue-1/Bootstrap-Methods-for-Standard-Errors-Confidence-Intervals-and-Other-Measures/10.1214/ss/1177013815.full).
-#' \emph{Statistical Science}, 1(1), p. 54-75.} \cr
-#' \item{Mammen (1993).
-#' [Bootstrap and Wild Bootstrap for High Dimensional Linear Models](
-#' https://projecteuclid.org/journals/annals-of-statistics/volume-21/issue-1/Bootstrap-and-Wild-Bootstrap-for-High-Dimensional-Linear-Models/10.1214/aos/1176349025.full).
-#' \emph{The Annals of Statistics}, 21(1), p. 255-285.} \cr
-#' \item{Efron (1979).
-#' [Bootstrap Methods: Another Look at the Jackknife](
-#' https://projecteuclid.org/journals/annals-of-statistics/volume-7/issue-1/Bootstrap-Methods-Another-Look-at-the-Jackknife/10.1214/aos/1176344552.full).
-#' \emph{The Annals of Statistics}, 7(1), p. 1-26.}}
+#' 1. Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
+#'    for time-domain astronomy and astronomical spectroscopy. *MNRAS*, 492(3),
+#'    p. 4005-4018.
+#'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4005/5704413)]
+#'    [[arXiv](https://arxiv.org/abs/1908.07151)]
+#'    [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].
+#' 2. Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
+#'    signals with varying degrees of smoothness. *MNRAS*, 492(3), p. 4019-4032.
+#'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4019/5704414)]
+#'    [[arXiv](https://arxiv.org/abs/2001.03552)]
+#'    [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].
 #'
 #' @seealso [cv_trendfilter()], [sure_trendfilter()]
 #'
@@ -135,21 +119,18 @@
 #'
 #' boot_tf <- bootstrap_trendfilter(pred_tf, "parametric")
 #' bands <- vbands(boot_tf)
+#'
 #' @importFrom dplyr case_when mutate
 #' @importFrom magrittr %>% %<>%
 #' @importFrom parallel mclapply detectCores
-#' @rdname bootstrap_trendfilter
 #' @export
 bootstrap_trendfilter <- function(obj,
-                                  bootstrap_algorithm = c("nonparametric", "parametric", "wild"),
+                                  algorithm = NULL,
                                   B = 100L,
                                   mc_cores = parallel::detectCores() - 4) {
-  stopifnot(any(class(obj) == "pred_tf"))
   stopifnot(B >= 20)
-  bootstrap_algorithm <- match.arg(bootstrap_algorithm)
 
-  mc_cores <- max(c(1, floor(mc_cores)))
-  mc_cores <- min(c(detectCores(), B, mc_cores))
+  mc_cores <- min(c(detectCores(), B, max(c(1, floor(mc_cores)))))
 
   if (mc_cores < detectCores() / 2) {
     warning(
@@ -161,7 +142,7 @@ bootstrap_trendfilter <- function(obj,
     )
   }
 
-  if (bootstrap_algorithm != "nonparametric") {
+  if (algorithm != "nonparametric") {
     obj$tf_model$data_scaled %<>% mutate(
       fitted_values = glmgen:::predict.trendfilter(
         obj$tf_model$model_fit,
@@ -174,9 +155,9 @@ bootstrap_trendfilter <- function(obj,
   }
 
   sampler <- case_when(
-    bootstrap_algorithm == "nonparametric" ~ list(nonparametric_resampler),
-    bootstrap_algorithm == "parametric" ~ list(parametric_sampler),
-    bootstrap_algorithm == "wild" ~ list(wild_sampler)
+    algorithm == "nonparametric" ~ list(nonparametric_resampler),
+    algorithm == "parametric" ~ list(parametric_sampler),
+    algorithm == "wild" ~ list(wild_sampler)
   )[[1]]
 
   par_out <- mclapply(
@@ -214,16 +195,18 @@ bootstrap_trendfilter <- function(obj,
   ) %>%
     unlist(labels = FALSE)
 
-  structure(
-    list(
-      x_eval = obj$x_eval,
-      ensemble = ensemble,
-      edf_boots = edf_boots,
-      n_iter_boots = n_iter_boots,
-      lambda_boots = lambda_boots,
-      bootstrap_algorithm = bootstrap_algorithm
-    ),
-    class = c("boot_tf", "list")
+  invisible(
+    structure(
+      list(
+        x_eval = obj$x_eval,
+        ensemble = ensemble,
+        edf_boots = edf_boots,
+        n_iter_boots = n_iter_boots,
+        lambda_boots = lambda_boots,
+        algorithm = algorithm
+      ),
+      class = c("bootstrap_trendfilter", "trendfiltering", "list")
+    )
   )
 }
 
@@ -234,15 +217,15 @@ bootstrap_parallel <- function(b, obj, sampler) {
   data <- sampler(obj$tf_model$data_scaled)
   lambdas <- obj$lambdas[max(obj$i_opt - 10, 1):min(obj$i_opt + 10)]
 
-  tf_fit <- trendfilter(
-    x = data$x,
-    y = data$y,
-    weights = data$weights,
-    k = obj$tf_model$k,
-    lambda = lambdas,
-    thinning = obj$tf_model$thinning,
-    control = obj$tf_model$admm_params
-  )
+  #tf_fit <- trendfilter(
+  #  x = data$x,
+  #  y = data$y,
+  #  weights = data$weights,
+  #  k = obj$tf_model$k,
+  #  lambda = lambdas,
+  #  thinning = obj$tf_model$thinning,
+  #  control = obj$tf_model$admm_params
+  #)
 
   i_min <- which.min(abs(tf_fit$df - obj$edf_opt))
   edf <- tf_fit$df[i_min]
@@ -253,20 +236,22 @@ bootstrap_parallel <- function(b, obj, sampler) {
     return(bootstrap_parallel(1, obj, sampler))
   }
 
-  tf_estimate <- as.numeric(
-    glmgen:::predict.trendfilter(
-      object = tf_fit,
-      x.new = obj$x_eval / obj$tf_model$x_scale,
-      lambda = lambda
-    )
-  ) * obj$tf_model$y_scale
+  #tf_estimate <- as.numeric(
+  #  glmgen:::predict.trendfilter(
+  #    object = tf_fit,
+  #    x.new = obj$x_eval / obj$tf_model$x_scale,
+  #    lambda = lambda
+  #  )
+  #) * obj$tf_model$y_scale
 
-  list(
-    tf_estimate = tf_estimate,
-    edf = edf,
-    n_iter = n_iter,
-    lambda = lambda
-  )
+  #list(
+  #  tf_estimate = tf_estimate,
+  #  edf = edf,
+  #  n_iter = n_iter,
+  #  lambda = lambda
+  #)
+
+  print("Hello, World!")
 }
 
 
@@ -274,34 +259,33 @@ bootstrap_parallel <- function(b, obj, sampler) {
 
 #' Bootstrap sampling/resampling functions
 #'
-#' @param data Tibble / data frame with minimal column set: `x` and `y` (for all
-#' samplers), `weights` and `fitted.values` (for `parametric.sampler`), and
+#' @param df A tibble or data frame with minimal column set: `x` and `y` (for
+#' all samplers), `weights` and `fitted.values` (for `parametric.sampler`), and
 #' `residuals` (for `wild.sampler`).
 #'
-#' @return Bootstrap sample returned in the same format as the input tibble /
-#' data frame.
+#' @return Bootstrap sample returned in the same format as `df`.
 
 
 #' @importFrom dplyr mutate n
 #' @importFrom magrittr %>%
 #' @importFrom stats rnorm
 #' @noRd
-parametric_sampler <- function(data) {
-  data %>% mutate(y = fitted_values + rnorm(n = n(), sd = 1 / sqrt(weights)))
+parametric_sampler <- function(df) {
+  df %>% mutate(y = fitted_values + rnorm(n = n(), sd = 1 / sqrt(weights)))
 }
 
 
 #' @importFrom dplyr %>% slice_sample n
 #' @noRd
-nonparametric_resampler <- function(data) {
-  data %>% slice_sample(n = nrow(data), replace = TRUE)
+nonparametric_resampler <- function(df) {
+  df %>% slice_sample(n = nrow(df), replace = TRUE)
 }
 
 
 #' @importFrom dplyr %>% mutate n
 #' @noRd
-wild_sampler <- function(data) {
-  data %>% mutate(y = fitted_values + residuals *
+wild_sampler <- function(df) {
+  df %>% mutate(y = fitted_values + residuals *
     sample(
       x = c(
         (1 + sqrt(5)) / 2,

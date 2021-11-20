@@ -6,7 +6,7 @@
 \usage{
 bootstrap_trendfilter(
   obj,
-  bootstrap_algorithm = c("nonparametric", "parametric", "wild"),
+  algorithm = NULL,
   B = 100L,
   mc_cores = parallel::detectCores() - 4
 )
@@ -14,25 +14,24 @@ bootstrap_trendfilter(
 \arguments{
 \item{obj}{An object of class '\code{\link[=predict_trendfilter]{pred_tf}}'.}
 
-\item{bootstrap_algorithm}{A string specifying which variation of the
-bootstrap to use. One of \code{c("nonparametric", "parametric", "wild")}. See
-details section below for when each option is appropriate.}
+\item{algorithm}{A string specifying which variation of the bootstrap to use. One of
+\code{c("nonparametric", "parametric", "wild")}. See Details section below for
+guidelines on when each choice should be used.}
 
-\item{B}{The number of bootstrap samples used to estimate the pointwise
-variability bands. Defaults to \code{B = 100L}.}
+\item{B}{The number of bootstrap samples used to estimate the pointwise variability
+bands. Defaults to \code{B = 100L}.}
 
-\item{mc_cores}{Multi-core computing using the
-\code{\link[parallel:parallel-package]{parallel}} package: The number of cores to
-utilize. Defaults to the number of cores detected, minus 4.}
+\item{mc_cores}{Number of cores to utilize for parallel computing. Defaults to the number
+of cores detected, minus 4.}
 }
 \value{
-An object of class '\code{bootstrap_tf}'. This is a list with the
-following elements
+An object of class '\code{bootstrap_trendfilter}' and subclass
+'\code{\link[=trendfilter]{trendfilter}}'. This is a list with the following elements:
 \describe{
 \item{x_eval}{Input grid that each bootstrap trend filtering estimate was
 evaluated on.}
-\item{ensemble}{The full trend filtering bootstrap ensemble as an
-\mjseqn{n \times B} matrix.}
+\item{ensemble}{The full trend filtering bootstrap ensemble as a matrix with
+\code{length(x_eval)} rows and \code{B} columns.}
 \item{edf_boots}{Vector of the estimated number of effective degrees of
 freedom of each trend filtering bootstrap estimate. These should all be
 relatively close to \code{obj$edf_opt}.}
@@ -42,27 +41,27 @@ algorithm before reaching a stopping criterion, for each bootstrap estimate.}
 bootstrap fit. In general, these are not all equal because our bootstrap
 implementation instead seeks to hold the number of effective degrees of
 freedom constant across all bootstrap estimates.}
-\item{bootstrap_algorithm}{A string specifying which variation of the
-bootstrap was used to generate the ensemble.}
+\item{algorithm}{A string specifying which variation of the bootstrap was
+used to generate the ensemble.}
 }
 }
 \description{
-\loadmathjax Generate a bootstrap ensemble of trend filtering estimates in
-order to quantify the uncertainty in the optimized estimate. One of three
-possible bootstrap algorithms should be chosen according to the criteria in
-the details section below. See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for the technical
-details of each bootstrap algorithm. Pointwise variability bands are then
-obtained by passing the \code{bootstrap_trendfilter()} output and a desired level
-(e.g. \code{level = 0.95}) to \code{\link[=vbands]{vbands()}}.
+Generate a bootstrap ensemble of trend filtering estimates in order to
+quantify the uncertainty in the optimized estimate. One of three possible
+bootstrap algorithms should be chosen according to the criteria in the
+details section below. See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for the technical
+description of each bootstrap algorithm. Pointwise variability bands are then
+obtained by passing the '\code{bootstrap_trendfilter}' object to \code{\link[=vbands]{vbands()}},
+along with the desired level (e.g. \code{level = 0.95}) .
 }
 \details{
 Our recommendations for when to use each of the possible settings
-for the \code{bootstrap_algorithm} argument are shown in the table below. See
+for the \code{algorithm} argument are shown in the table below. See
 \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for more details.\tabular{ll}{
    Scenario \tab Uncertainty quantification \cr
-   \code{x} is unevenly sampled \tab \code{bootstrap_algorithm = "nonparametric"} \cr
-   \code{x} is evenly sampled and measurement variances for \code{y} are available \tab \code{bootstrap_algorithm = "parametric"} \cr
-   \code{x} is evenly sampled and measurement variances for \code{y} are not available \tab \code{bootstrap_algorithm = "wild"} \cr
+   \code{x} is unevenly sampled \tab \code{algorithm = "nonparametric"} \cr
+   \code{x} is evenly sampled and measurement variances for \code{y} are available \tab \code{algorithm = "parametric"} \cr
+   \code{x} is evenly sampled and measurement variances for \code{y} are not available \tab \code{algorithm = "wild"} \cr
 }
 
 
@@ -117,35 +116,22 @@ pred_tf <- predict(sure_tf)
 
 boot_tf <- bootstrap_trendfilter(pred_tf, "parametric")
 bands <- vbands(boot_tf)
+
 }
 \references{
-\bold{Companion references}
 \enumerate{
-\item{Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
-for time-domain astronomy and astronomical spectroscopy. \emph{MNRAS},
-492(3), p. 4005-4018.
+\item Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
+for time-domain astronomy and astronomical spectroscopy. \emph{MNRAS}, 492(3),
+p. 4005-4018.
 [\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Publisher}]
 [\href{https://arxiv.org/abs/1908.07151}{arXiv}]
-[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].} \cr
-\item{Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
-signals with varying degrees of smoothness.
-https://academic.oup.com/mnras/article/492/3/4019/5704414. \emph{MNRAS},
-492(3), p. 4019-4032.
-[\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Publisher}]
+[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].
+\item Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
+signals with varying degrees of smoothness. \emph{MNRAS}, 492(3), p. 4019-4032.
+[\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{Publisher}]
 [\href{https://arxiv.org/abs/2001.03552}{arXiv}]
-[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].}}
-
-\bold{The Bootstrap and variations}
-\enumerate{
-\item{Efron and Tibshirani (1986).
-\href{https://projecteuclid.org/journals/statistical-science/volume-1/issue-1/Bootstrap-Methods-for-Standard-Errors-Confidence-Intervals-and-Other-Measures/10.1214/ss/1177013815.full}{Bootstrap Methods for Standard Errors, Confidence Intervals, and Other Measures of Statistical Accuracy}.
-\emph{Statistical Science}, 1(1), p. 54-75.} \cr
-\item{Mammen (1993).
-\href{https://projecteuclid.org/journals/annals-of-statistics/volume-21/issue-1/Bootstrap-and-Wild-Bootstrap-for-High-Dimensional-Linear-Models/10.1214/aos/1176349025.full}{Bootstrap and Wild Bootstrap for High Dimensional Linear Models}.
-\emph{The Annals of Statistics}, 21(1), p. 255-285.} \cr
-\item{Efron (1979).
-\href{https://projecteuclid.org/journals/annals-of-statistics/volume-7/issue-1/Bootstrap-Methods-Another-Look-at-the-Jackknife/10.1214/aos/1176344552.full}{Bootstrap Methods: Another Look at the Jackknife}.
-\emph{The Annals of Statistics}, 7(1), p. 1-26.}}
+[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].
+}
 }
 \seealso{
 \code{\link[=cv_trendfilter]{cv_trendfilter()}}, \code{\link[=sure_trendfilter]{sure_trendfilter()}}

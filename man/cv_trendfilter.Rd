@@ -38,7 +38,7 @@ controlling the granularity of the hyperparameter grid.}
 validation. Must be at least 2 and no greater than 10. Defaults to
 \code{V = 10}.}
 
-\item{mc_cores}{Number of cores to utilize for parallelized efficiency. Defaults to
+\item{mc_cores}{Number of cores to utilize for parallel computing. Defaults to
 \code{mc_cores = V}.}
 
 \item{user_loss_funcs}{(Optional) A named list of one or more functions, with each defining a loss
@@ -116,8 +116,8 @@ along to functions that operate on the \code{cv_trendfilter()} output.}
 \description{
 \loadmathjax For every candidate hyperparameter value, estimate the trend
 filtering model's out-of-sample error by \mjseqn{V}-fold cross validation.
-Many common regression loss functions are defined internally and a cross
-validation curve is returned for each. Custom loss functions may also be
+Many common regression loss functions are defined internally, and each
+returns its own cross validation curve. Custom loss functions may also be
 passed via the \code{user_loss_funcs} argument. See the \emph{Loss functions} section
 below for definitions of the internal loss functions, and for guidelines on
 when \code{\link[=cv_trendfilter]{cv_trendfilter()}} should be used versus \code{\link[=sure_trendfilter]{sure_trendfilter()}}. The

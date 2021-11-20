@@ -2,8 +2,8 @@
 #'
 #' \loadmathjax For every candidate hyperparameter value, estimate the trend
 #' filtering model's out-of-sample error by \mjseqn{V}-fold cross validation.
-#' Many common regression loss functions are defined internally and a cross
-#' validation curve is returned for each. Custom loss functions may also be
+#' Many common regression loss functions are defined internally, and each
+#' returns its own cross validation curve. Custom loss functions may also be
 #' passed via the `user_loss_funcs` argument. See the *Loss functions* section
 #' below for definitions of the internal loss functions, and for guidelines on
 #' when [`cv_trendfilter()`] should be used versus [`sure_trendfilter()`]. The
@@ -41,7 +41,7 @@
 #'   cross validation. `fold_ids` must have the same length as `x` and `y`, and
 #'   only contain integer values `1`, ..., `V` designating the fold assignments.
 #' @param mc_cores
-#'   Number of cores to utilize for parallelized efficiency. Defaults to
+#'   Number of cores to utilize for parallel computing. Defaults to
 #'   `mc_cores = V`.
 #' @param ... Additional named arguments to pass to [`trendfilter()`].
 #'

@@ -1,7 +1,7 @@
 #' @keywords internal
 #' @aliases trendfiltering
 #'
-#' @section References:
+#' @references:
 #' 1. Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
 #'    for time-domain astronomy and astronomical spectroscopy. *MNRAS*, 492(3),
 #'    p. 4005-4018.
@@ -67,4 +67,6 @@
 #'   https://link.springer.com/book/10.1007/978-0-387-21736-9) or
 #'   [Hastie, Tibshirani, Friedman (2009)](
 #'   https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf).
-"_PACKAGE"
+#'
+#' @useDynLib glmgen, .registration = TRUE
+NULL
