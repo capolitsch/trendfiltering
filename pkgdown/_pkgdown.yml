@@ -32,20 +32,35 @@ development:
   mode: release
 
 reference:
+  - title: "Fit a model"
+  - contents:
+    - '`trendfilter`'
+    - '`.trendfilter`'
   - title: "Hyperparameter Optimization"
   - contents:
       - '`cv_trendfilter`'
       - '`sure_trendfilter`'
-  - title: "Predict"
-  - contents:
-      - '`predict.cv_tf`'
-      - '`predict.sure_tf`'
   - title: "Bootstrap"
   - contents:
       - '`bootstrap_trendfilter`'
-  - title: "Variability bands"
-  - contents:
       - '`vbands`'
+  - title: "stats methods"
+  - contents:
+      - '`predict.trendfilter`'
+      - '`predict.cv_trendfilter`'
+      - '`predict.sure_trendfilter`'
+      - '`fitted.trendfilter`'
+      - '`residuals.trendfilter`'
+      - '`coef.trendfilter`'
+  - title: "Summary methods"
+  - contents:
+      - '`summary.trendfilter`'
+      - '`print.trendfilter`'
+      - '`print.summary.trendfilter`'
+  - title: "Data sets"
+  - contents:
+      - '`eclipsing_binary`'
+      - '`quasar_spectrum`'
 
 navbar:
   structure:

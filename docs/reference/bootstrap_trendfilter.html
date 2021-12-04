@@ -47,14 +47,12 @@
 
 
 <meta property="og:title" content="Construct pointwise variability bands via a tailored bootstrap algorithm — bootstrap_trendfilter" />
-<meta property="og:description" content="
- Generate a bootstrap ensemble of trend filtering estimates in
-order to quantify the uncertainty in the optimized estimate. One of three
-possible bootstrap algorithms should be chosen according to the criteria in
-the details section below. See Politsch et al. (2020a) for the technical
-details of each bootstrap algorithm. Pointwise variability bands are then
-obtained by passing the bootstrap_trendfilter() output and a desired level
-(e.g. level = 0.95) to vbands()." />
+<meta property="og:description" content="Generate a bootstrap ensemble of trend filtering estimates in order to
+quantify the uncertainty in the optimized estimate. One of three possible
+bootstrap algorithms should be chosen according to the criteria in the
+Details section below. Pointwise variability bands are then obtained by
+passing the 'bootstrap_trendfilter' object to vbands(), along with the
+desired level (e.g. level = 0.95) ." />
 <meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
 
@@ -132,19 +130,17 @@ obtained by passing the bootstrap_trendfilter() output and a desired level
     </div>
 
     <div class="ref-description">
-    <p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
- Generate a bootstrap ensemble of trend filtering estimates in
-order to quantify the uncertainty in the optimized estimate. One of three
-possible bootstrap algorithms should be chosen according to the criteria in
-the details section below. See <a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Politsch et al. (2020a)</a> for the technical
-details of each bootstrap algorithm. Pointwise variability bands are then
-obtained by passing the <code>bootstrap_trendfilter()</code> output and a desired level
-(e.g. <code>level = 0.95</code>) to <code><a href='vbands.html'>vbands()</a></code>.</p>
+    <p>Generate a bootstrap ensemble of trend filtering estimates in order to
+quantify the uncertainty in the optimized estimate. One of three possible
+bootstrap algorithms should be chosen according to the criteria in the
+Details section below. Pointwise variability bands are then obtained by
+passing the '<code>bootstrap_trendfilter</code>' object to <code><a href='vbands.html'>vbands()</a></code>, along with the
+desired level (e.g. <code>level = 0.95</code>) .</p>
     </div>
 
     <pre class="usage"><span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span>
   <span class='va'>obj</span>,
-  bootstrap_algorithm <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"nonparametric"</span>, <span class='st'>"parametric"</span>, <span class='st'>"wild"</span><span class='op'>)</span>,
+  algorithm <span class='op'>=</span> <span class='cn'>NULL</span>,
   B <span class='op'>=</span> <span class='fl'>100L</span>,
   mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>4</span>
 <span class='op'>)</span></pre>
@@ -154,35 +150,35 @@ obtained by passing the <code>bootstrap_trendfilter()</code> output and a desire
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>obj</th>
-      <td><p>An object of class '<code>pred_tf</code>'.</p></td>
+      <td><p>An object of class '<code><a href='cv_trendfilter.html'>cv_trendfilter</a></code>' or
+'<code><a href='sure_trendfilter.html'>sure_trendfilter</a></code>'.</p></td>
     </tr>
     <tr>
-      <th>bootstrap_algorithm</th>
-      <td><p>A string specifying which variation of the
-bootstrap to use. One of <code><a href='https://rdrr.io/r/base/c.html'>c("nonparametric", "parametric", "wild")</a></code>. See
-details section below for when each option is appropriate.</p></td>
+      <th>algorithm</th>
+      <td><p>A string specifying which variation of the bootstrap to use. One of
+<code><a href='https://rdrr.io/r/base/c.html'>c("nonparametric", "parametric", "wild")</a></code>. See Details section below for
+guidelines on when each choice should be used.</p></td>
     </tr>
     <tr>
       <th>B</th>
-      <td><p>The number of bootstrap samples used to estimate the pointwise
-variability bands. Defaults to <code>B = 100L</code>.</p></td>
+      <td><p>The number of bootstrap samples used to estimate the pointwise variability
+bands. Defaults to <code>B = 100L</code>.</p></td>
     </tr>
     <tr>
       <th>mc_cores</th>
-      <td><p>Multi-core computing using the
-<code><a href='https://rdrr.io/r/parallel/parallel-package.html'>parallel</a></code> package: The number of cores to
-utilize. Defaults to the number of cores detected, minus 4.</p></td>
+      <td><p>Number of cores to utilize for parallel computing. Defaults to the number
+of cores detected, minus 4.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class '<code>bootstrap_tf</code>'. This is a list with the
-following elements</p><dl>
+    <p>An object of class '<code>bootstrap_trendfilter</code>' and subclass
+'<code><a href='trendfilter.html'>trendfilter</a></code>'. This is a list with the following elements:</p><dl>
 <dt>x_eval</dt><dd><p>Input grid that each bootstrap trend filtering estimate was
 evaluated on.</p></dd>
-<dt>ensemble</dt><dd><p>The full trend filtering bootstrap ensemble as an
-\(n \times B\) matrix.</p></dd>
+<dt>ensemble</dt><dd><p>The full trend filtering bootstrap ensemble as a matrix with
+<code><a href='https://rdrr.io/r/base/length.html'>length(x_eval)</a></code> rows and <code>B</code> columns.</p></dd>
 <dt>edf_boots</dt><dd><p>Vector of the estimated number of effective degrees of
 freedom of each trend filtering bootstrap estimate. These should all be
 relatively close to <code>obj$edf_opt</code>.</p></dd>
@@ -192,20 +188,20 @@ algorithm before reaching a stopping criterion, for each bootstrap estimate.</p>
 bootstrap fit. In general, these are not all equal because our bootstrap
 implementation instead seeks to hold the number of effective degrees of
 freedom constant across all bootstrap estimates.</p></dd>
-<dt>bootstrap_algorithm</dt><dd><p>A string specifying which variation of the
-bootstrap was used to generate the ensemble.</p></dd>
+<dt>algorithm</dt><dd><p>A string specifying which variation of the bootstrap was
+used to generate the ensemble.</p></dd>
 
 </dl>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Our recommendations for when to use each of the possible settings
-for the <code>bootstrap_algorithm</code> argument are shown in the table below. See
+for the <code>algorithm</code> argument are shown in the table below. See
 <a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Politsch et al. (2020a)</a> for more details.</p><table class='table'>
 <tr><td>Scenario</td><td>Uncertainty quantification</td></tr>
-<tr><td><code>x</code> is unevenly sampled</td><td><code>bootstrap_algorithm = "nonparametric"</code></td></tr>
-<tr><td><code>x</code> is evenly sampled and measurement variances for <code>y</code> are available</td><td><code>bootstrap_algorithm = "parametric"</code></td></tr>
-<tr><td><code>x</code> is evenly sampled and measurement variances for <code>y</code> are not available</td><td><code>bootstrap_algorithm = "wild"</code></td></tr>
+<tr><td><code>x</code> is unevenly sampled</td><td><code>algorithm = "nonparametric"</code></td></tr>
+<tr><td><code>x</code> is evenly sampled and measurement variances for <code>y</code> are available</td><td><code>algorithm = "parametric"</code></td></tr>
+<tr><td><code>x</code> is evenly sampled and measurement variances for <code>y</code> are not available</td><td><code>algorithm = "wild"</code></td></tr>
 </table>
 
 
@@ -218,32 +214,17 @@ filtering analysis on that scale. See Example 2 below for a case when the
 inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p><b>Companion references</b></p><ol>
+    
+<ol>
 <li><p>Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
-for time-domain astronomy and astronomical spectroscopy. <em>MNRAS</em>,
-492(3), p. 4005-4018.
+for time-domain astronomy and astronomical spectroscopy. <em>MNRAS</em>, 492(3),
+p. 4005-4018.
 [<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Publisher</a>]
-[<a href='https://arxiv.org/abs/1908.07151'>arXiv</a>]
-[<a href='https://capolitsch.github.io/trendfiltering/authors.html'>BibTeX</a>]. <br /></p></li>
+[<a href='https://arxiv.org/abs/1908.07151'>arXiv</a>].</p></li>
 <li><p>Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
-signals with varying degrees of smoothness.
-https://academic.oup.com/mnras/article/492/3/4019/5704414. <em>MNRAS</em>,
-492(3), p. 4019-4032.
-[<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Publisher</a>]
-[<a href='https://arxiv.org/abs/2001.03552'>arXiv</a>]
-[<a href='https://capolitsch.github.io/trendfiltering/authors.html'>BibTeX</a>].</p></li>
-</ol>
-
-<p><b>The Bootstrap and variations</b></p><ol>
-<li><p>Efron and Tibshirani (1986).
-<a href='https://projecteuclid.org/journals/statistical-science/volume-1/issue-1/Bootstrap-Methods-for-Standard-Errors-Confidence-Intervals-and-Other-Measures/10.1214/ss/1177013815.full'>Bootstrap Methods for Standard Errors, Confidence Intervals, and Other Measures of Statistical Accuracy</a>.
-<em>Statistical Science</em>, 1(1), p. 54-75. <br /></p></li>
-<li><p>Mammen (1993).
-<a href='https://projecteuclid.org/journals/annals-of-statistics/volume-21/issue-1/Bootstrap-and-Wild-Bootstrap-for-High-Dimensional-Linear-Models/10.1214/aos/1176349025.full'>Bootstrap and Wild Bootstrap for High Dimensional Linear Models</a>.
-<em>The Annals of Statistics</em>, 21(1), p. 255-285. <br /></p></li>
-<li><p>Efron (1979).
-<a href='https://projecteuclid.org/journals/annals-of-statistics/volume-7/issue-1/Bootstrap-Methods-Another-Look-at-the-Jackknife/10.1214/aos/1176344552.full'>Bootstrap Methods: Another Look at the Jackknife</a>.
-<em>The Annals of Statistics</em>, 7(1), p. 1-26.</p></li>
+signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032.
+[<a href='https://academic.oup.com/mnras/article/492/3/4019/5704414'>Publisher</a>]
+[<a href='https://arxiv.org/abs/2001.03552'>arXiv</a>].</p></li>
 </ol>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
@@ -261,56 +242,29 @@ https://academic.oup.com/mnras/article/492/3/4019/5704414. <em>MNRAS</em>,
 
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>eclipsing_binary</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>EB</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 6 × 3</span>
-#&gt;    phase  flux std_err
-#&gt;    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span> -<span style='color: #BB0000;'>0.499</span> 0.938  0.010<span style='text-decoration: underline;'>2</span>
-#&gt; <span style='color: #BCBCBC;'>2</span> -<span style='color: #BB0000;'>0.498</span> 0.930  0.010<span style='text-decoration: underline;'>2</span>
-#&gt; <span style='color: #BCBCBC;'>3</span> -<span style='color: #BB0000;'>0.496</span> 0.944  0.010<span style='text-decoration: underline;'>2</span>
-#&gt; <span style='color: #BCBCBC;'>4</span> -<span style='color: #BB0000;'>0.494</span> 0.963  0.010<span style='text-decoration: underline;'>2</span>
-#&gt; <span style='color: #BCBCBC;'>5</span> -<span style='color: #BB0000;'>0.494</span> 0.934  0.010<span style='text-decoration: underline;'>2</span>
-#&gt; <span style='color: #BCBCBC;'>6</span> -<span style='color: #BB0000;'>0.494</span> 0.949  0.010<span style='text-decoration: underline;'>2</span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='error'>Error in head(EB): object 'EB' not found</span></div><div class='input'>
 <span class='va'>cv_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cv_trendfilter.html'>cv_trendfilter</a></span><span class='op'>(</span>
   x <span class='op'>=</span> <span class='va'>EB</span><span class='op'>$</span><span class='va'>phase</span>,
   y <span class='op'>=</span> <span class='va'>EB</span><span class='op'>$</span><span class='va'>flux</span>,
   weights <span class='op'>=</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='va'>EB</span><span class='op'>$</span><span class='va'>std_err</span><span class='op'>^</span><span class='fl'>2</span>,
-  optimization_params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
-    max_iter <span class='op'>=</span> <span class='fl'>1e4</span>,
-    obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span>,
-    thinning <span class='op'>=</span> <span class='cn'>TRUE</span>
-  <span class='op'>)</span>
+  max_iter <span class='op'>=</span> <span class='fl'>1e4</span>,
+  obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in structure(list(fit = fit, k = k, admm_params = admm_params, thinning = thinning,     data_scaled = data_scaled, x_scale = x_scale, y_scale = y_scale),     class = c("tf_model", "list")): object 'fit' not found</span></div><div class='input'>
-<span class='va'>pred_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
-  <span class='va'>cv_tf</span>,
-  loss_func <span class='op'>=</span> <span class='st'>"MAE"</span>,
-  lambda_choice <span class='op'>=</span> <span class='st'>"lambda_1se"</span>,
-  nx_eval <span class='op'>=</span> <span class='fl'>1500L</span>
-<span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in predict(cv_tf, loss_func = "MAE", lambda_choice = "lambda_1se",     nx_eval = 1500L): object 'cv_tf' not found</span></div><div class='input'>
-<span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>pred_tf</span>, <span class='st'>"nonparametric"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in stopifnot(any(class(obj) == "pred_tf")): object 'pred_tf' not found</span></div><div class='input'><span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in stopifnot(any(class(obj) == "boot_tf")): object 'boot_tf' not found</span></div><div class='input'>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in stopifnot(is.numeric(x)): object 'EB' not found</span></div><div class='input'>
+<span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>cv_tf</span>, algorithm <span class='op'>=</span> <span class='st'>"nonparametric"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: all scheduled cores encountered errors in user code</span></div><div class='output co'>#&gt; <span class='error'>Error in unlist(., labels = FALSE): unused argument (labels = FALSE)</span></div><div class='input'><span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in apply(obj$ensemble, 1, quantile, probs = (1 - level)/2): object 'boot_tf' not found</span></div><div class='input'>
 <span class='co'># Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar</span>
 
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>quasar_spectrum</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>spec</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 6 × 3</span>
-#&gt;   log10_wavelength   flux weights
-#&gt;              <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span>             3.55  0.424  0.041<span style='text-decoration: underline;'>7</span>
-#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125 
-#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128 
-#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121 
-#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
-#&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'>
+</div><div class='output co'>#&gt; <span class='error'>Error in head(spec): object 'spec' not found</span></div><div class='input'>
 <span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sure_trendfilter.html'>sure_trendfilter</a></span><span class='op'>(</span><span class='va'>spec</span><span class='op'>$</span><span class='va'>log10_wavelength</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>flux</span>, <span class='va'>spec</span><span class='op'>$</span><span class='va'>weights</span><span class='op'>)</span>
-<span class='va'>pred_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>sure_tf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to max; returning -Inf</span></div><div class='output co'>#&gt; <span class='error'>Error in if (any(x_eval &lt; min(obj$tf_model$x) || x_eval &gt; max(obj$tf_model$x))) {    stop("x_eval should all be in range(x).")}: missing value where TRUE/FALSE needed</span></div><div class='input'>
-<span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>pred_tf</span>, <span class='st'>"parametric"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in stopifnot(any(class(obj) == "pred_tf")): object 'pred_tf' not found</span></div><div class='input'><span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in stopifnot(any(class(obj) == "boot_tf")): object 'boot_tf' not found</span></div></pre>
+</div><div class='output co'>#&gt; <span class='error'>Error in stopifnot(is.numeric(x)): object 'spec' not found</span></div><div class='input'><span class='va'>pred_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>sure_tf</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in predict(sure_tf): object 'sure_tf' not found</span></div><div class='input'>
+<span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>pred_tf</span>, algorithm <span class='op'>=</span> <span class='st'>"parametric"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in mutate(., fitted_values = glmgen:::predict.trendfilter(obj$model_obj$model_fit,     lambda = obj$lambda_opt, x.new = obj$model_obj$data_scaled$x) %&gt;%     as.double(), residuals = y - fitted_values): object 'pred_tf' not found</span></div><div class='input'><span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in apply(obj$ensemble, 1, quantile, probs = (1 - level)/2): object 'boot_tf' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -3,6 +3,7 @@
 #' @param obj
 #'   Object of class [`trendfilter`][trendfilter()].
 #'
+#' @aliases print.cv_trendfilter print.sure_trendfilter
 #' @export
 print.trendfilter <- function(obj) {
   cat("\nCall:\n")
@@ -10,7 +11,7 @@ print.trendfilter <- function(obj) {
   cat("\nOutput:\n")
   cat(paste(
     class(obj), "model with", length(obj$lambdas), "values of lambda.", "\n\n"
-    ))
+  ))
 }
 
 
@@ -19,6 +20,7 @@ print.trendfilter <- function(obj) {
 #' @param obj
 #'   Object of class [`trendfilter`][trendfilter()].
 #'
+#' @aliases summary.cv_trendfilter summary.sure_trendfilter
 #' @export
 summary.trendfilter <- function(obj) {
   df <- apply(obj$beta != 0, 2, sum)
@@ -36,6 +38,7 @@ summary.trendfilter <- function(obj) {
 #' @param obj
 #'   Object of class [`trendfilter`][trendfilter()].
 #'
+#' @aliases print.summary.cv_trendfilter print.summary.sure_trendfilter
 #' @export
 print.summary.trendfilter <- function(obj) {
   class(obj) <- "matrix"

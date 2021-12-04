@@ -12,12 +12,11 @@ sure_trendfilter(x, y, weights, nlambdas = 250L, ...)
 
 \item{y}{Vector of observed values for the output variable.}
 
-\item{weights}{(Optional) Weights for the observed outputs, defined as the reciprocal
-variance of the additive noise that contaminates the output signal. When
-the noise is expected to have an equal variance \mjseqn{\sigma^2} for all
-observations, a scalar may be passed to \code{weights}, i.e.
-\verb{weights = }\mjseqn{1/\sigma^2}. Otherwise, \code{weights} must be a vector with
-the same length as \code{x} and \code{y}.}
+\item{weights}{Weights for the observed outputs, defined as the reciprocal variance of the
+additive noise that contaminates the output signal. When the noise is
+expected to have an equal variance \mjseqn{\sigma^2} for all observations,
+a scalar may be passed to \code{weights}, i.e. \verb{weights = }\mjseqn{1/\sigma^2}.
+Otherwise, \code{weights} must be a vector with the same length as \code{x} and \code{y}.}
 
 \item{nlambdas}{Number of hyperparameter values to test during cross validation. Defaults
 to \code{nlambdas = 250}. The hyperparameter grid is internally constructed to
@@ -25,7 +24,7 @@ span the full trend filtering model space (which is bookended by a global
 polynomial solution and an interpolating solution), with \code{nlambdas}
 controlling the granularity of the hyperparameter grid.}
 
-\item{...}{Additional named arguments to pass to \code{\link[=trendfilter]{trendfilter()}}.}
+\item{...}{Additional named arguments to pass to \code{\link[=.trendfilter]{.trendfilter()}}.}
 }
 \value{
 An object of class \code{'sure_trendfilter'} and subclass \code{'trendfilter'}.
@@ -58,12 +57,12 @@ ADMM algorithm's final iteration, for every candidate hyperparameter in
 \code{lambdas}.}
 \item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
 every candidate hyperparameter in \code{lambdas}. If an element of \code{n_iter}
-is exactly equal to \code{model$admm_params$max_iter} (see below), then the ADMM
-algorithm stopped before reaching the objective tolerance
-\code{model$admm_params$obj_tol}. In these situations, you may need to increase
-the maximum number of tolerable iterations via the
-\code{optimization_params$max_iter} argument of \code{sure_trendfilter()} in order to
-ensure that the ADMM solution has converged to satisfactory precision.}
+is exactly equal to \code{model_obj$admm_params$max_iter} (see below), then the
+ADMM algorithm stopped before reaching the objective tolerance
+\code{model_obj$admm_params$obj_tol}. In these situations, you may need to
+increase the maximum number of tolerable iterations by passing a
+\code{max_iter} argument to \code{cv_trendfilter()} in order to ensure that the ADMM
+solution has converged to satisfactory precision.}
 \item{\code{training_errors}}{The "in-sample" MSE between the observed outputs \code{y}
 and the trend filtering estimate, for every hyperparameter value in
 \code{lambdas}.}
@@ -73,17 +72,18 @@ and the trend filtering estimate, for every hyperparameter value in
 \item{\code{y}}{Vector of observed values for the output variable (if originally
 present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
 \item{\code{weights}}{Vector of weights for the observed outputs.}
-\item{\code{model}}{A list containing the trend filtering model fit object, the
-ADMM parameter settings, and other modeling objects that are useful to pass
-along to functions that operate on the \code{sure_trendfilter()} output.}
+\item{\code{model_obj}}{A list containing the trend filtering model fit object,
+the ADMM parameter settings, and other modeling objects that are useful to
+pass along to functions that operate on the \code{sure_trendfilter()} output.}
 }
 }
 \description{
 For every candidate hyperparameter value, compute an unbiased estimate of the
 trend filtering model's predictive mean-squared error. See the details
 section for guidelines on when \code{\link[=sure_trendfilter]{sure_trendfilter()}} should be used versus
-\code{\link[=cv_trendfilter]{cv_trendfilter()}}. Generic functions like \code{predict()} and \code{residuals()}
-work on \code{sure_trendfilter} output.
+\code{\link[=cv_trendfilter]{cv_trendfilter()}}. Generic \code{\link[stats:stats-package]{stats}} functions such
+as \code{\link[=predict]{predict()}}, \code{\link[=fitted.values]{fitted.values()}}, \code{\link[=residuals]{residuals()}}, etc. may be called on
+the \code{\link[=sure_trendfilter]{sure_trendfilter()}} output.
 }
 \details{
 Our recommendations for when to use \code{\link[=sure_trendfilter]{sure_trendfilter()}} versus
@@ -115,12 +115,10 @@ sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
 for time-domain astronomy and astronomical spectroscopy. \emph{MNRAS}, 492(3),
 p. 4005-4018.
 [\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Publisher}]
-[\href{https://arxiv.org/abs/1908.07151}{arXiv}]
-[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].
+[\href{https://arxiv.org/abs/1908.07151}{arXiv}].
 \item Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
 signals with varying degrees of smoothness. \emph{MNRAS}, 492(3), p. 4019-4032.
 [\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{Publisher}]
-[\href{https://arxiv.org/abs/2001.03552}{arXiv}]
-[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].
+[\href{https://arxiv.org/abs/2001.03552}{arXiv}].
 }
 }

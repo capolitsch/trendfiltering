@@ -11,7 +11,7 @@ cv_trendfilter(
   nlambdas = 250L,
   V = 10L,
   mc_cores = V,
-  user_loss_funcs = NULL,
+  loss_funcs = NULL,
   fold_ids = NULL,
   ...
 )
@@ -21,12 +21,11 @@ cv_trendfilter(
 
 \item{y}{Vector of observed values for the output variable.}
 
-\item{weights}{(Optional) Weights for the observed outputs, defined as the reciprocal
-variance of the additive noise that contaminates the output signal. When
-the noise is expected to have an equal variance \mjseqn{\sigma^2} for all
-observations, a scalar may be passed to \code{weights}, i.e.
-\verb{weights = }\mjseqn{1/\sigma^2}. Otherwise, \code{weights} must be a vector with
-the same length as \code{x} and \code{y}.}
+\item{weights}{Weights for the observed outputs, defined as the reciprocal variance of the
+additive noise that contaminates the output signal. When the noise is
+expected to have an equal variance \mjseqn{\sigma^2} for all observations,
+a scalar may be passed to \code{weights}, i.e. \verb{weights = }\mjseqn{1/\sigma^2}.
+Otherwise, \code{weights} must be a vector with the same length as \code{x} and \code{y}.}
 
 \item{nlambdas}{Number of hyperparameter values to test during cross validation. Defaults
 to \code{nlambdas = 250}. The hyperparameter grid is internally constructed to
@@ -35,21 +34,20 @@ polynomial solution and an interpolating solution), with \code{nlambdas}
 controlling the granularity of the hyperparameter grid.}
 
 \item{V}{Number of folds that the data are partitioned into for V-fold cross
-validation. Must be at least 2 and no greater than 10. Defaults to
-\code{V = 10}.}
+validation. Must be at least 2 and no more than 10. Defaults to \code{V = 10}.}
 
 \item{mc_cores}{Number of cores to utilize for parallel computing. Defaults to
 \code{mc_cores = V}.}
 
-\item{user_loss_funcs}{(Optional) A named list of one or more functions, with each defining a loss
-function to be evaluated during cross validation. See the
-''Loss functions'' section below for an example.}
+\item{loss_funcs}{A named list of one or more functions, with each defining a loss function
+to be evaluated during cross validation. See the ''Loss functions'' section
+below for an example.}
 
-\item{fold_ids}{(Optional) An integer vector defining a custom partition of the data for
-cross validation. \code{fold_ids} must have the same length as \code{x} and \code{y}, and
+\item{fold_ids}{An integer vector defining a custom partition of the data for cross
+validation. \code{fold_ids} must have the same length as \code{x} and \code{y}, and
 only contain integer values \code{1}, ..., \code{V} designating the fold assignments.}
 
-\item{...}{Additional named arguments to pass to \code{\link[=trendfilter]{trendfilter()}}.}
+\item{...}{Additional named arguments to pass to \code{\link[=.trendfilter]{.trendfilter()}}.}
 }
 \value{
 An object of class \code{'cv_trendfilter'} and subclass \code{'trendfilter'}.
@@ -94,36 +92,36 @@ ADMM algorithm's final iteration, for every candidate hyperparameter in
 \code{lambdas}.}
 \item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
 every candidate hyperparameter in \code{lambdas}. If an element of \code{n_iter}
-is exactly equal to \code{model$admm_params$max_iter} (see below), then the ADMM
-algorithm stopped before reaching the objective tolerance
-\code{model$admm_params$obj_tol}. In these situations, you may need to increase
-the maximum number of tolerable iterations via the
-\code{optimization_params$max_iter} argument of \code{cv_trendfilter()} in order to
-ensure that the ADMM solution has converged to satisfactory precision.}
+is exactly equal to \code{model_obj$admm_params$max_iter} (see below), then the
+ADMM algorithm stopped before reaching the objective tolerance
+\code{model_obj$admm_params$obj_tol}. In these situations, you may need to
+increase the maximum number of tolerable iterations by passing a
+\code{max_iter} argument to \code{cv_trendfilter()} in order to ensure that the ADMM
+solution has converged to satisfactory precision.}
 \item{\code{loss_funcs}}{A named list of functions that defines all loss functions
-evaluated during cross validation.}
+--- both internal and user-passed --- evaluated during cross validation.}
 \item{\code{V}}{The number of folds the data were split into for cross
 validation.}
 \item{\code{x}}{Vector of observed values for the input variable.}
 \item{\code{y}}{Vector of observed values for the output variable (if originally
 present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
 \item{\code{weights}}{Vector of weights for the observed outputs.}
-\item{\code{model}}{A list containing the trend filtering model fit object, the
-ADMM parameter settings, and other modeling objects that are useful to pass
-along to functions that operate on the \code{cv_trendfilter()} output.}
+\item{\code{model_obj}}{A list containing the trend filtering model fit object,
+the ADMM parameter settings, and other modeling objects that are useful to
+pass along to functions that operate on the \code{cv_trendfilter()} output.}
 }
 }
 \description{
 \loadmathjax For every candidate hyperparameter value, estimate the trend
 filtering model's out-of-sample error by \mjseqn{V}-fold cross validation.
-Many common regression loss functions are defined internally, and each
-returns its own cross validation curve. Custom loss functions may also be
-passed via the \code{user_loss_funcs} argument. See the \emph{Loss functions} section
+Many common regression loss functions are defined internally, and a cross
+validation curve is returned for each. Custom loss functions may also be
+passed via the \code{loss_funcs} argument. See the \emph{Loss functions} section
 below for definitions of the internal loss functions, and for guidelines on
-when \code{\link[=cv_trendfilter]{cv_trendfilter()}} should be used versus \code{\link[=sure_trendfilter]{sure_trendfilter()}}. The
-\code{\link[=cv_trendfilter]{cv_trendfilter()}} output object is compatible with generic
-\code{\link[stats:stats-package]{stats}} functions such as \code{\link[=predict]{predict()}},
-\code{\link[=fitted.values]{fitted.values()}}, \code{\link[=residuals]{residuals()}}, etc.
+when \code{\link[=cv_trendfilter]{cv_trendfilter()}} should be used versus \code{\link[=sure_trendfilter]{sure_trendfilter()}}.
+Generic \code{\link[stats:stats-package]{stats}} functions such as \code{\link[=predict]{predict()}},
+\code{\link[=fitted.values]{fitted.values()}}, \code{\link[=residuals]{residuals()}}, etc. may be called on the
+\code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
 }
 \details{
 Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} versus
@@ -187,11 +185,11 @@ $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
 where \mjseqn{w_i:=} \code{weights[i]}.
 
 When defining custom loss functions, each function within the named list
-passed to \code{user_loss_funcs} should take three vector arguments --- \code{y},
+passed to \code{loss_funcs} should take three vector arguments --- \code{y},
 \code{tf_estimate}, and \code{weights} --- and return a single scalar value for the
-validation loss. For example, if I wanted to optimize the hyperparameter by
-minimizing an uncertainty-weighted median of the model's MAD errors, I would
-pass the list below to \code{user_loss_funcs}:\if{html}{\out{<div class="sourceCode r">}}\preformatted{MedAE <- function(tf_estimate, y, weights) \{
+validation loss. For example, if we wanted to optimize the hyperparameter by
+minimizing an uncertainty-weighted median of the model's MAD errors, we would
+pass the list below to \code{loss_funcs}:\if{html}{\out{<div class="sourceCode r">}}\preformatted{MedAE <- function(tf_estimate, y, weights) \{
   matrixStats::weightedMedian(abs(tf_estimate - y), sqrt(weights))
 \}
 
@@ -207,12 +205,7 @@ x <- eclipsing_binary$phase
 y <- eclipsing_binary$flux
 weights <- 1 / eclipsing_binary$std_err^2
 
-cv_tf <- cv_trendfilter(x, y, weights,
-  optimization_params = list(
-    max_iter = 1e4,
-    obj_tol = 1e-6
-  )
-)
+cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
 }
 \references{
 \enumerate{

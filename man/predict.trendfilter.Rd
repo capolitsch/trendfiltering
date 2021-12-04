@@ -2,6 +2,8 @@
 % Please edit documentation in R/methods-stats.R
 \name{predict.trendfilter}
 \alias{predict.trendfilter}
+\alias{predict.cv_trendfilter}
+\alias{predict.sure_trendfilter}
 \title{Get predictions from a trendfilter object}
 \usage{
 \method{predict}{trendfilter}(obj, lambdas, x_eval = NULL, zero_tol = 1e-06, ...)

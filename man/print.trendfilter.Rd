@@ -2,6 +2,8 @@
 % Please edit documentation in R/methods-base.R
 \name{print.trendfilter}
 \alias{print.trendfilter}
+\alias{print.cv_trendfilter}
+\alias{print.sure_trendfilter}
 \title{Print the output of a trendfilter object}
 \usage{
 \method{print}{trendfilter}(obj)

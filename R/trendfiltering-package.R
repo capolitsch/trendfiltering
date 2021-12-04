@@ -1,4 +1,3 @@
-#' @keywords internal
 #' @aliases trendfiltering
 #'
 #' @references:
@@ -6,20 +5,19 @@
 #'    for time-domain astronomy and astronomical spectroscopy. *MNRAS*, 492(3),
 #'    p. 4005-4018.
 #'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4005/5704413)]
-#'    [[arXiv](https://arxiv.org/abs/1908.07151)]
-#'    [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].
+#'    [[arXiv](https://arxiv.org/abs/1908.07151)].
 #' 2. Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
 #'    signals with varying degrees of smoothness. *MNRAS*, 492(3), p. 4019-4032.
 #'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4019/5704414)]
-#'    [[arXiv](https://arxiv.org/abs/2001.03552)]
-#'    [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].
+#'    [[arXiv](https://arxiv.org/abs/2001.03552)].
 #'
 #' @section Trend filtering with Stein's unbiased risk estimate:
 #'
 #'   \loadmathjax Here we describe the general motivation for optimizing a trend
 #'   filtering estimator with respect to Stein's unbiased risk estimate. See
 #'   [Politsch et al. (2020a)](
-#'   https://academic.oup.com/mnras/article/492/3/4005/5704413) for more details.
+#'   https://academic.oup.com/mnras/article/492/3/4005/5704413) for more
+#'   details.
 #'
 #'   Suppose we observe noisy measurements of an output variable of interest
 #'   (e.g. flux, magnitude, photon counts) according to the data generating
@@ -67,6 +65,4 @@
 #'   https://link.springer.com/book/10.1007/978-0-387-21736-9) or
 #'   [Hastie, Tibshirani, Friedman (2009)](
 #'   https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf).
-#'
-#' @useDynLib glmgen, .registration = TRUE
 NULL

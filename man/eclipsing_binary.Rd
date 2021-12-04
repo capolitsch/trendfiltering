@@ -5,7 +5,7 @@
 \alias{eclipsing_binary}
 \title{Phase-folded light curve of an eclipsing binary star system}
 \format{
-A tibble
+A tibble with column set \code{c("phase", "flux", "std_err")}.
 }
 \source{
 \url{http://keplerebs.villanova.edu/}
@@ -15,8 +15,9 @@ eclipsing_binary
 }
 \description{
 A binary star system's apparent brightness time series, collected by NASA's
-\href{https://www.nasa.gov/mission_pages/kepler/overview/index.html}{\strong{Kepler} mission}. The
+\href{https://www.nasa.gov/mission_pages/kepler/overview/index.html}{\emph{Kepler} mission}. The
 gravitationally-bound pair of stars in the system orbit each other with a
-period of ~1.56 Earth days. The KIC 6048106
+period of ~1.56 Earth days. The system's \emph{Kepler} identification is KIC
+6048106.
 }
 \keyword{datasets}

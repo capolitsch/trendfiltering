@@ -12,7 +12,8 @@ bootstrap_trendfilter(
 )
 }
 \arguments{
-\item{obj}{An object of class '\code{\link[=predict_trendfilter]{pred_tf}}'.}
+\item{obj}{An object of class '\code{\link[=cv_trendfilter]{cv_trendfilter}}' or
+'\code{\link[=sure_trendfilter]{sure_trendfilter}}'.}
 
 \item{algorithm}{A string specifying which variation of the bootstrap to use. One of
 \code{c("nonparametric", "parametric", "wild")}. See Details section below for
@@ -49,10 +50,9 @@ used to generate the ensemble.}
 Generate a bootstrap ensemble of trend filtering estimates in order to
 quantify the uncertainty in the optimized estimate. One of three possible
 bootstrap algorithms should be chosen according to the criteria in the
-details section below. See \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for the technical
-description of each bootstrap algorithm. Pointwise variability bands are then
-obtained by passing the '\code{bootstrap_trendfilter}' object to \code{\link[=vbands]{vbands()}},
-along with the desired level (e.g. \code{level = 0.95}) .
+Details section below. Pointwise variability bands are then obtained by
+passing the '\code{bootstrap_trendfilter}' object to \code{\link[=vbands]{vbands()}}, along with the
+desired level (e.g. \code{level = 0.95}) .
 }
 \details{
 Our recommendations for when to use each of the possible settings
@@ -88,23 +88,12 @@ cv_tf <- cv_trendfilter(
   x = EB$phase,
   y = EB$flux,
   weights = 1 / EB$std_err^2,
-  optimization_params = list(
-    max_iter = 1e4,
-    obj_tol = 1e-6,
-    thinning = TRUE
-  )
+  max_iter = 1e4,
+  obj_tol = 1e-6
 )
 
-pred_tf <- predict(
-  cv_tf,
-  loss_func = "MAE",
-  lambda_choice = "lambda_1se",
-  nx_eval = 1500L
-)
-
-boot_tf <- bootstrap_trendfilter(pred_tf, "nonparametric")
+boot_tf <- bootstrap_trendfilter(cv_tf, algorithm = "nonparametric")
 bands <- vbands(boot_tf)
-
 
 # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
 
@@ -114,9 +103,8 @@ head(spec)
 sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
 pred_tf <- predict(sure_tf)
 
-boot_tf <- bootstrap_trendfilter(pred_tf, "parametric")
+boot_tf <- bootstrap_trendfilter(pred_tf, algorithm = "parametric")
 bands <- vbands(boot_tf)
-
 }
 \references{
 \enumerate{
@@ -124,13 +112,11 @@ bands <- vbands(boot_tf)
 for time-domain astronomy and astronomical spectroscopy. \emph{MNRAS}, 492(3),
 p. 4005-4018.
 [\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Publisher}]
-[\href{https://arxiv.org/abs/1908.07151}{arXiv}]
-[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].
+[\href{https://arxiv.org/abs/1908.07151}{arXiv}].
 \item Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
 signals with varying degrees of smoothness. \emph{MNRAS}, 492(3), p. 4019-4032.
 [\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{Publisher}]
-[\href{https://arxiv.org/abs/2001.03552}{arXiv}]
-[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].
+[\href{https://arxiv.org/abs/2001.03552}{arXiv}].
 }
 }
 \seealso{

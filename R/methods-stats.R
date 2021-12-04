@@ -6,14 +6,15 @@
 #'   (Optional) Vector of lambda values to calculate coefficients at. If
 #'   missing, will use break points in the fit.
 #'
+#' @aliases coef.cv_trendfilter coef.sure_trendfilter
 #' @export
 coef.trendfilter <- function(obj, lambdas = NULL) {
   if (is.null(lambdas)) {
     return(obj$beta)
   }
 
-  # If all lambdas are equal to some computed lambda, just
-  # return coefficients from `obj$beta`
+  # If all lambdas are equal to some computed lambda, return coefficients from
+  # `obj$beta`
   if (all(!is.na(index <- match(lambdas, obj$lambdas)))) {
     return(obj$beta[, index, drop = FALSE])
   }
@@ -40,7 +41,7 @@ coef.trendfilter <- function(obj, lambdas = NULL) {
 
   betas <- obj$beta[, o2, drop = FALSE]
   beta <- t((1 - p) * t(betas[, blo, drop = FALSE]) +
-              p * t(betas[, bhi, drop = FALSE]))
+    p * t(betas[, bhi, drop = FALSE]))
   colnames(beta) <- as.character(round(lambdas, 3))
 
   beta[, order(o), drop = FALSE]
@@ -62,10 +63,11 @@ coef.trendfilter <- function(obj, lambdas = NULL) {
 #    coefficient should be rounded to zero
 #' @param ...
 #'   optional, currently unused, arguments
-#'
-#' @useDynLib glmgen tf_predict_R
+
+#' @importFrom glmgen .tf_predict
 #' @importFrom dplyr case_when tibble
 #' @importFrom magrittr %<>% %>%
+#' @aliases predict.cv_trendfilter predict.sure_trendfilter
 #' @export
 predict.trendfilter <- function(obj,
                                 lambdas,
@@ -119,22 +121,35 @@ predict.trendfilter <- function(obj,
   names(i_opt) <- NULL
   lambda <- obj$lambdas[i_opt]
   coefs <- coef(obj, lambda)
-
-  tf_pred <- .Call("tf_predict_R",
-                   sX = as.double(obj$x),
-                   sBeta = as.double(coefs),
-                   sN = length(obj$y),
-                   sK = as.integer(obj$k),
-                   sX0 = as.double(x_eval / obj$tf_model$x_scale),
-                   sN0 = length(x_eval),
-                   sNLambda = length(lambda),
-                   sFamily = 0L,
-                   sZeroTol = as.double(zero_tol),
-                   PACKAGE = "glmgen")
-
-  matrix(
-    tf_pred,
-    ncol = ncol(coefs),
-    dimnames = list(NULL, colnames(coefs))
-  ) * obj$tf_model$y_scale
 }
+
+
+#' Get fitted values from a trendfilter object
+#'
+#' @param obj
+#'   Object of class `trendfilter`.
+#' @param lambdas
+#'   (Optional) Vector of lambda values to calculate fitted values at. If
+#'   missing, will use break points in the fit.
+#'
+#' @aliases fitted.values.trendfilter fitted.values.cv_trendfilter fitted.values.sure_trendfilter fitted.cv_trendfilter fitted.sure_trendfilter
+#' @export
+fitted.trendfilter <- function(obj, lambdas = NULL) {
+
+}
+
+
+#' Get residuals from a trendfilter object
+#'
+#' @param obj
+#'   Object of class `trendfilter`.
+#' @param lambdas
+#'   (Optional) Vector of lambda values to calculate residuals at. If
+#'   missing, will use break points in the fit.
+#'
+#' @aliases residuals.cv_trendfilter residuals.sure_trendfilter resids.trendfilter resids.cv_trendfilter resids.sure_trendfilter
+#' @export
+residuals.trendfilter <- function(obj, lambdas = NULL) {
+
+}
+

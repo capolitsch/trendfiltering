@@ -1,31 +1,47 @@
-#' Utility functions for experts only
-#' @useDynLib glmgen tf_R
+#' Utility functions for internal/expert use only
+
+#' @noRd
+get_admm_params <- function(obj_tol, max_iter) {
+  list(
+    obj_tol = as.double(obj_tol),
+    max_iter = as.double(max_iter),
+    x_tol = as.double(1e-6),
+    rho = as.double(1),
+    obj_tol_newton = as.double(1e-5),
+    max_iter_newton = as.double(50),
+    alpha_ls = as.double(0.5),
+    gamma_ls = as.double(0.8),
+    max_iter_ls = as.double(30),
+    tridiag = as.double(0)
+  )
+}
+
+
+#' @importFrom glmgen .tf_fit
 #' @importFrom dplyr last
 #' @importFrom magrittr %>%
+#' @importFrom stats approx
 #' @noRd
-make_lambda_grid_edf_spacing <- function(x,
-                                         y,
-                                         weights,
-                                         admm_params,
-                                         nlambdas,
-                                         lambda_min_ratio = 1e-16,
-                                         k = 2L) {
+get_lambda_grid_edf_spacing <- function(df,
+                                        admm_params,
+                                        nlambdas,
+                                        k = 2L,
+                                        lambda_min_ratio = 1e-16) {
   nlambdas_start <- ifelse(nlambdas >= 150, 100, 50)
-  n <- length(y)
 
-  tf_out <- .Call("tf_R",
-    sX = x,
-    sY = y,
-    sW = weights,
-    sN = n,
-    sK = k,
+  .Call("tf_R",
+    sX = as.double(df$x),
+    sY = as.double(df$y),
+    sW = as.double(df$weights),
+    sN = nrow(df),
+    sK = as.integer(k),
     sFamily = 0L,
     sMethod = 0L,
     sBeta0 = NULL,
     sLamFlag = 0L,
-    sLambda = rep(0, nlambdas),
-    sNlambda = nlambdas,
-    sLambdaMinRatio = lambda_min_ratio,
+    sLambda = as.double(rep(0, nlambdas)),
+    sNlambda = as.integer(nlambdas),
+    sLambdaMinRatio = as.double(lambda_min_ratio),
     sVerbose = 0L,
     sControl = admm_params,
     PACKAGE = "glmgen"
@@ -61,63 +77,6 @@ make_lambda_grid_edf_spacing <- function(x,
   )[["y"]] %>%
     suppressWarnings() %>%
     exp() %>%
-    unique() %>%
-    sort(decreasing = TRUE)
-}
-
-
-#' @importFrom dplyr last
-#' @importFrom magrittr %>%
-#' @importFrom stats approx
-#' @noRd
-get_lambdas <- function(nlambdas, data, k, thinning, admm_params) {
-  nlambdas_start <- ifelse(nlambdas >= 150, 100, 50)
-
-  #out <- trendfilter(
-  #  x = data$x,
-  #  y = data$y,
-  #  weights = data$weights,
-  #  lambda.min.ratio = 1e-16,
-  #  nlambda = nlambdas_start,
-  #  k = k,
-  #  thinning = thinning,
-  #  control = admm_params
-  #)
-
-  lambdas_start <- out$lambda
-  edfs_start <- out$df
-
-  if (any(out$df == nrow(data))) {
-    inds <- which(out$df == nrow(data))[-1]
-    if (length(inds) > 0) {
-      lambdas_start <- lambdas_start[-inds]
-      edfs_start <- edfs_start[-inds]
-    }
-  }
-
-  if (any(out$df <= k + 2)) {
-    inds <- which(out$df <= k + 2)
-    if (length(inds) > 1) {
-      inds <- inds[-last(inds)]
-      lambdas_start <- lambdas_start[-inds]
-      edfs_start <- edfs_start[-inds]
-    }
-  }
-
-  c(
-    lambdas_start,
-    approx(
-      x = edfs_start,
-      y = log(lambdas_start),
-      xout = seq(
-        min(edfs_start),
-        max(edfs_start),
-        length = nlambdas - length(lambdas_start) + 2
-      )[-c(1, nlambdas - length(lambdas_start) + 2)]
-    )[["y"]] %>%
-      suppressWarnings() %>%
-      exp()
-  ) %>%
-    unique() %>%
-    sort(decreasing = TRUE)
+    unique.default() %>%
+    sort.default(decreasing = TRUE)
 }

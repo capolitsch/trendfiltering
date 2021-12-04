@@ -120,10 +120,11 @@
 <col class="title" />
 </colgroup>
 
+
 <tbody>
 <tr>
 <th colspan="2">
-<h2 id="section-hyperparameter" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Hyperparameter Optimization</h2>
+<h2 id="section-trendfilter" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Fit a model</h2>
 <p class="section-desc"></p>
 </th>
 </tr>
@@ -131,68 +132,204 @@
 
 <tr>
 <td>
-<p><code><a href="cv_trendfilter.html">cv_trendfilter()</a></code> </p>
+<p><code><a href="trendfilter.html">trendfilter()</a></code></p>
 </td>
-<td><p>Optimize the trend filtering hyperparameter by V-fold cross validation</p></td>
+<td>
+<p>Fit a trend filtering model (front-end function designed to optimize ease of use)</p>
+</td>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="trendfilter.html">.trendfilter()</a></code></p>
+</td>
+<td>
+<p>Fit a trend filtering model (back-end of <code>trendfilter()</code> with more options
+for expert users)</p>
+</td>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="relax_trendfilter.html">relax_trendfilter()</a></code></p>
+</td>
+<td>
+<p>Fit a "relaxed" trend filtering model by computing a weighted average of the
+standard trend filtering estimate and a sparse least-squares estimate that shares
+the same active knot set</p>
+</td>
+</tr>
+
+</tbody>
+
+
+
+<tbody>
+<tr>
+<th colspan="2">
+<h2 id="section-hyperparameter" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Optimize hyperparameter(s)</h2>
+<p class="section-desc"></p>
+</th>
+</tr>
+
+
+<tr>
+<td>
+<p><code><a href="cv_trendfilter.html">cv_trendfilter()</a></code></p>
+</td>
+<td>
+<p>Optimize the trend filtering hyperparameter by V-fold cross validation</p>
+</td>
 </tr>
 
 <tr>
 <td>
 <p><code><a href="sure_trendfilter.html">sure_trendfilter()</a></code> </p>
 </td>
-<td><p>Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
-risk estimate</p></td>
-</tr>
-
-
-
-
-<tbody>
-<tr>
-<th colspan="2">
-<h2 id="section-hyperparameter" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Predict</h2>
-<p class="section-desc"></p>
-</th>
-</tr>
-
-<tr>
 <td>
-<p><code><a href="predict_trendfilter.html">predict(<i>&lt;cv_tf&gt;</i>)</a></code>
-<code><a href="predict_trendfilter.html">predict(<i>&lt;sure_tf&gt;</i>)</a></code></p>
+<p>Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
+risk estimate</p>
 </td>
-<td><p>Evaluate an optimized trend filtering estimator</p></td>
 </tr>
+
+</tbody>
+
 
 <tbody>
 <tr>
 <th colspan="2">
-<h2 id="section-bootstrap" class="hasAnchor"><a href="#section-bootstrap" class="anchor"></a>Bootstrap</h2>
+<h2 id="section-bootstrap" class="hasAnchor"><a href="#section-bootstrap" class="anchor"></a>Compute bootstrap ensembles/uncertainties</h2>
 <p class="section-desc"></p>
 </th>
 </tr>
 
 <tr>
 <td>
-<p><code><a href="bootstrap_trendfilter.html">bootstrap_trendfilter(<i>&lt;pred_tf&gt;</i>)</a></code></p>
+<p><code><a href="bootstrap_trendfilter.html">bootstrap_trendfilter(<i>&lt;trendfilter&gt;</i>)</a></code></p>
 </td>
-<td><p>Generate an ensemble of trend filtering estimates via a bootstrap</p></td>
-</tr>
-
-
-<tbody>
-<tr>
-<th colspan="2">
-<h2 id="section-bands" class="hasAnchor"><a href="#section-bands" class="anchor"></a>Compute variability bands</h2>
-<p class="section-desc"></p>
-</th>
+<td>
+<p>Generate an ensemble of trend filtering estimates via a bootstrap</p>
+</td>
 </tr>
 
 <tr>
 <td>
-<p><code><a href="vbands.html">vbands(<i>&lt;bootstrap_tf&gt;</i>)</a></code>
+<p><code><a href="vbands.html">vbands(<i>&lt;bootstrap_trendfilter&gt;</i>)</a></code>
 </p>
 </td>
-<td><p>Compute variablity bands from the sample quantiles of the bootstrap ensemble</p></td>
+<td>
+<p>Compute variablity bands from the sample quantiles of the bootstrap ensemble</p>
+</td>
+</tr>
+
+</tbody>
+
+
+
+<tbody>
+<tr>
+<th colspan="2">
+<h2 id="section-stats" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Call <code><a href='https://rdrr.io/r/stats/stats-package.html'>stats</a></code> generics on trend filtering objects</h2>
+<p class="section-desc"></p>
+</th>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="predict.trendfilter.html">predict(<i>&lt;trendfilter&gt;</i>)</a></code></p>
+</td>
+<td><p>Evaluate a trend filtering estimator</p></td>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="fitted.trendfilter.html">fitted(<i>&lt;trendfilter&gt;</i>)</a></code></p>
+</td>
+<td><p></p></td>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="residuals.trendfilter.html">residuals(<i>&lt;trendfilter&gt;</i>)</a></code></p>
+</td>
+<td><p></p></td>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="coef.trendfilter.html">coef(<i>&lt;trendfilter&gt;</i>)</a></code></p>
+</td>
+<td><p></p></td>
+</tr>
+
+</tbody>
+
+
+<tbody>
+<tr>
+<th colspan="2">
+<h2 id="section-summary" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Summarize trend filtering objects</h2>
+<p class="section-desc"></p>
+</th>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="summary.trendfilter.html">summary(<i>&lt;trendfilter&gt;</i>)</a></code></p>
+</td>
+<td><p></p></td>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="summary.trendfilter.html">print(<i>&lt;trendfilter&gt;</i>)</a></code></p>
+</td>
+<td><p></p></td>
+</tr>
+
+</tbody>
+
+
+
+<tbody>
+<tr>
+<th colspan="2">
+<h2 id="section-plot" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Plotting</h2>
+<p class="section-desc"></p>
+</th>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="plot.trendfilter.html">plot(<i>&lt;trendfilter&gt;</i>)</a></code></p>
+</td>
+<td><p></p></td>
+</tr>
+
+
+</tbody>
+
+
+<tbody>
+<tr>
+<th colspan="2">
+<h2 id="section-data" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Data sets</h2>
+<p class="section-desc"></p>
+</th>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="eclipsing_binary.html">data(eclipsing_binary)</a></code></p>
+</td>
+<td><p></p></td>
+</tr>
+
+<tr>
+<td>
+<p><code><a href="quasar_spectrum.html">data(quasar_spectrum)</a></code></p>
+</td>
+<td><p></p></td>
 </tr>
 
 

@@ -3,14 +3,13 @@
 #' Generate a bootstrap ensemble of trend filtering estimates in order to
 #' quantify the uncertainty in the optimized estimate. One of three possible
 #' bootstrap algorithms should be chosen according to the criteria in the
-#' details section below. See [Politsch et al. (2020a)](
-#' https://academic.oup.com/mnras/article/492/3/4005/5704413) for the technical
-#' description of each bootstrap algorithm. Pointwise variability bands are then
-#' obtained by passing the '`bootstrap_trendfilter`' object to [`vbands()`],
-#' along with the desired level (e.g. `level = 0.95`) .
+#' Details section below. Pointwise variability bands are then obtained by
+#' passing the '`bootstrap_trendfilter`' object to [`vbands()`], along with the
+#' desired level (e.g. `level = 0.95`) .
 #'
 #' @param obj
-#'   An object of class '[`pred_tf`][predict_trendfilter()]'.
+#'   An object of class '[`cv_trendfilter`][cv_trendfilter()]' or
+#'   '[`sure_trendfilter`][sure_trendfilter()]'.
 #' @param algorithm
 #'   A string specifying which variation of the bootstrap to use. One of
 #'   `c("nonparametric", "parametric", "wild")`. See Details section below for
@@ -65,13 +64,11 @@
 #'    for time-domain astronomy and astronomical spectroscopy. *MNRAS*, 492(3),
 #'    p. 4005-4018.
 #'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4005/5704413)]
-#'    [[arXiv](https://arxiv.org/abs/1908.07151)]
-#'    [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].
+#'    [[arXiv](https://arxiv.org/abs/1908.07151)].
 #' 2. Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
 #'    signals with varying degrees of smoothness. *MNRAS*, 492(3), p. 4019-4032.
 #'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4019/5704414)]
-#'    [[arXiv](https://arxiv.org/abs/2001.03552)]
-#'    [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].
+#'    [[arXiv](https://arxiv.org/abs/2001.03552)].
 #'
 #' @seealso [cv_trendfilter()], [sure_trendfilter()]
 #'
@@ -91,23 +88,12 @@
 #'   x = EB$phase,
 #'   y = EB$flux,
 #'   weights = 1 / EB$std_err^2,
-#'   optimization_params = list(
-#'     max_iter = 1e4,
-#'     obj_tol = 1e-6,
-#'     thinning = TRUE
-#'   )
+#'   max_iter = 1e4,
+#'   obj_tol = 1e-6
 #' )
 #'
-#' pred_tf <- predict(
-#'   cv_tf,
-#'   loss_func = "MAE",
-#'   lambda_choice = "lambda_1se",
-#'   nx_eval = 1500L
-#' )
-#'
-#' boot_tf <- bootstrap_trendfilter(pred_tf, "nonparametric")
+#' boot_tf <- bootstrap_trendfilter(cv_tf, algorithm = "nonparametric")
 #' bands <- vbands(boot_tf)
-#'
 #'
 #' # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
 #'
@@ -117,9 +103,8 @@
 #' sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
 #' pred_tf <- predict(sure_tf)
 #'
-#' boot_tf <- bootstrap_trendfilter(pred_tf, "parametric")
+#' boot_tf <- bootstrap_trendfilter(pred_tf, algorithm = "parametric")
 #' bands <- vbands(boot_tf)
-#'
 #' @importFrom dplyr case_when mutate
 #' @importFrom magrittr %>% %<>%
 #' @importFrom parallel mclapply detectCores
@@ -143,11 +128,11 @@ bootstrap_trendfilter <- function(obj,
   }
 
   if (algorithm != "nonparametric") {
-    obj$tf_model$data_scaled %<>% mutate(
+    obj$model_obj$df_scaled %<>% mutate(
       fitted_values = glmgen:::predict.trendfilter(
-        obj$tf_model$model_fit,
+        obj$model_obj$model_fit,
         lambda = obj$lambda_opt,
-        x.new = obj$tf_model$data_scaled$x
+        x.new = obj$model_obj$data_scaled$x
       ) %>%
         as.double(),
       residuals = y - fitted_values
@@ -169,29 +154,29 @@ bootstrap_trendfilter <- function(obj,
   )
 
   ensemble <- lapply(
-    X = 1:B,
+    1:B,
     FUN = function(X) par_out[[X]][["tf_estimate"]]
   ) %>%
     unlist(labels = FALSE) %>%
     matrix(nrow = length(obj$x_eval))
 
   edf_boots <- lapply(
-    X = 1:B,
+    1:B,
     FUN = function(X) par_out[[X]][["edf"]]
   ) %>%
     unlist(labels = FALSE) %>%
     as.integer()
 
   n_iter_boots <- lapply(
-    X = 1:B,
+    1:B,
     FUN = function(X) par_out[[X]][["n_iter"]]
   ) %>%
     unlist(labels = FALSE) %>%
     as.integer()
 
-  lambda_boots <- lapply(
-    X = 1:B,
-    FUN = function(X) par_out[[X]][["lambda"]]
+  lambdas_boots <- lapply(
+    1:B,
+    FUN = function(X) par_out[[X]][["lambdas"]]
   ) %>%
     unlist(labels = FALSE)
 
@@ -205,7 +190,7 @@ bootstrap_trendfilter <- function(obj,
         lambda_boots = lambda_boots,
         algorithm = algorithm
       ),
-      class = c("bootstrap_trendfilter", "trendfiltering", "list")
+      class = c("bootstrap_trendfilter", "trendfilter", "trendfiltering")
     )
   )
 }
@@ -214,44 +199,42 @@ bootstrap_trendfilter <- function(obj,
 #' @noRd
 #' @importFrom dplyr case_when
 bootstrap_parallel <- function(b, obj, sampler) {
-  data <- sampler(obj$tf_model$data_scaled)
+  data <- sampler(obj$model_obj$data_scaled)
   lambdas <- obj$lambdas[max(obj$i_opt - 10, 1):min(obj$i_opt + 10)]
 
-  #tf_fit <- trendfilter(
-  #  x = data$x,
-  #  y = data$y,
-  #  weights = data$weights,
-  #  k = obj$tf_model$k,
-  #  lambda = lambdas,
-  #  thinning = obj$tf_model$thinning,
-  #  control = obj$tf_model$admm_params
-  #)
+  tf_fit <- .trendfilter(
+    x = data$x,
+    y = data$y,
+    weights = data$weights,
+    k = obj$model_obj$k,
+    lambdas = lambdas,
+    obj_tol = obj$model_obj$admm_params$obj_tol,
+    max_iter = obj$model_obj$admm_params$max_iter
+  )
 
   i_min <- which.min(abs(tf_fit$df - obj$edf_opt))
   edf <- tf_fit$df[i_min]
   n_iter <- tf_fit$iter[i_min]
-  lambda <- lambdas[i_min]
+  lambdas <- lambdas[i_min]
 
   if (min(abs(tf_fit$df - obj$edf_opt)) / obj$edf_opt > 0.2) {
     return(bootstrap_parallel(1, obj, sampler))
   }
 
-  #tf_estimate <- as.numeric(
+  # tf_estimate <- as.numeric(
   #  glmgen:::predict.trendfilter(
   #    object = tf_fit,
-  #    x.new = obj$x_eval / obj$tf_model$x_scale,
-  #    lambda = lambda
+  #    x.new = obj$x_eval / obj$model_obj$x_scale,
+  #    lambda = lambdas
   #  )
-  #) * obj$tf_model$y_scale
+  # ) * obj$model_obj$y_scale
 
-  #list(
+  # list(
   #  tf_estimate = tf_estimate,
   #  edf = edf,
   #  n_iter = n_iter,
-  #  lambda = lambda
-  #)
-
-  print("Hello, World!")
+  #  lambdas = lambdas
+  # )
 }
 
 
@@ -275,14 +258,16 @@ parametric_sampler <- function(df) {
 }
 
 
-#' @importFrom dplyr %>% slice_sample n
+#' @importFrom dplyr slice_sample n
+#' @importFrom magrittr %>%
 #' @noRd
 nonparametric_resampler <- function(df) {
   df %>% slice_sample(n = nrow(df), replace = TRUE)
 }
 
 
-#' @importFrom dplyr %>% mutate n
+#' @importFrom dplyr mutate n
+#' @importFrom magrittr %>%
 #' @noRd
 wild_sampler <- function(df) {
   df %>% mutate(y = fitted_values + residuals *

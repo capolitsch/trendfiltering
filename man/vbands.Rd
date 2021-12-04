@@ -7,8 +7,7 @@
 vbands(obj, level = 0.95)
 }
 \arguments{
-\item{obj}{A '\code{\link[=bootstrap_trendfilter]{bootstrap_tf}}' object, produced by
-\code{\link[=bootstrap_trendfilter]{bootstrap_trendfilter()}}.}
+\item{obj}{A '\code{\link[=bootstrap_trendfilter]{bootstrap_trendfilter}}' object.}
 
 \item{level}{The level of the pointwise variability bands. Defaults to \code{level = 0.95}.}
 }
@@ -36,11 +35,9 @@ cv_tf <- cv_trendfilter(
   x = EB$phase,
   y = EB$flux,
   weights = 1 / EB$std_err^2,
-  optimization_params = list(
-    max_iter = 1e4,
-    obj_tol = 1e-6,
-    thinning = TRUE
-  )
+  max_iter = 1e4,
+  obj_tol = 1e-6,
+  thinning = TRUE
 )
 
 pred_tf <- predict(
@@ -64,7 +61,6 @@ pred_tf <- predict(sure_tf)
 
 boot_tf <- bootstrap_trendfilter(pred_tf, "parametric")
 bands <- vbands(boot_tf)
-
 }
 \references{
 \enumerate{

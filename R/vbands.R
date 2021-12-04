@@ -5,8 +5,7 @@
 #' [`bootstrap_trendfilter()`].
 #'
 #' @param obj
-#'   A '[`bootstrap_tf`][bootstrap_trendfilter()]' object, produced by
-#'   [`bootstrap_trendfilter()`].
+#'   A '[`bootstrap_trendfilter`][bootstrap_trendfilter()]' object.
 #' @param level
 #'   The level of the pointwise variability bands. Defaults to `level = 0.95`.
 #' @return A tibble with column set `c("x","lower_band","upper_band")`.
@@ -42,11 +41,9 @@
 #'   x = EB$phase,
 #'   y = EB$flux,
 #'   weights = 1 / EB$std_err^2,
-#'   optimization_params = list(
-#'     max_iter = 1e4,
-#'     obj_tol = 1e-6,
-#'     thinning = TRUE
-#'   )
+#'   max_iter = 1e4,
+#'   obj_tol = 1e-6,
+#'   thinning = TRUE
 #' )
 #'
 #' pred_tf <- predict(
@@ -70,7 +67,6 @@
 #'
 #' boot_tf <- bootstrap_trendfilter(pred_tf, "parametric")
 #' bands <- vbands(boot_tf)
-#'
 #' @importFrom dplyr tibble
 #' @export
 vbands <- function(obj, level = 0.95) {

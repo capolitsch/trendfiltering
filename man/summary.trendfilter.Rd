@@ -2,6 +2,8 @@
 % Please edit documentation in R/methods-base.R
 \name{summary.trendfilter}
 \alias{summary.trendfilter}
+\alias{summary.cv_trendfilter}
+\alias{summary.sure_trendfilter}
 \title{Summarize a trendfilter object}
 \usage{
 \method{summary}{trendfilter}(obj)

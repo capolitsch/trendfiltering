@@ -2,6 +2,8 @@
 % Please edit documentation in R/methods-stats.R
 \name{coef.trendfilter}
 \alias{coef.trendfilter}
+\alias{coef.cv_trendfilter}
+\alias{coef.sure_trendfilter}
 \title{Get coefficients from a trendfilter object}
 \usage{
 \method{coef}{trendfilter}(obj, lambdas = NULL)
