@@ -340,46 +340,10 @@ cv_trendfilter <- function(x,
   k %<>% as.integer()
   V %<>% as.integer()
 
-  data <- tibble(x = as.double(x),
-                 y = as.double(y),
-                 weights = as.double(weights)) %>%
-    drop_na() %>%
-    arrange(x) %>%
-    filter(weights > 0)
-
-  rm(x, y, weights)
-  n <- nrow(data)
-
-  x_scale <- median(diff(data$x))
-  y_scale <- median(abs(data$y)) / 10
-
-  data_scaled <- data %>%
-    mutate(
-      x = x / x_scale,
-      y = y / y_scale,
-      weights = weights * y_scale^2
-    )
-
-  admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
-
-  if (min(diff(data_scaled$x)) <= admm_params$x_tol / x_scale) {
-    thin_params <- admm_params
-    thin_params$x_tol <- thin_params$x_tol / x_scale
-    thin_out <- .tf_thin(
-      data_scaled$x,
-      data_scaled$y,
-      data_scaled$weights,
-      k,
-      thin_params
-    )
-
-    data_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
-  }
-
   if (is.null(fold_ids)) {
     fold_ids <- sample(rep_len(1:V, n))
   } else {
-    unique_fold_ids %<>%
+    unique_fold_ids <- fold_ids %>%
       as.integer() %>%
       unique.default() %>%
       sort.int()
@@ -412,11 +376,54 @@ cv_trendfilter <- function(x,
     }
   }
 
+  data <- tibble(x = as.double(x),
+                 y = as.double(y),
+                 weights = as.double(weights),
+                 fold_id = as.integer(fold_ids)) %>%
+    drop_na() %>%
+    arrange(x) %>%
+    filter(weights > 0)
+
+  rm(x, y, weights)
+  n <- nrow(data)
+
+  x_scale <- median(diff(data$x))
+  y_scale <- median(abs(data$y)) / 10
+
+  data_scaled <- data %>%
+    mutate(
+      x = x / x_scale,
+      y = y / y_scale,
+      weights = weights * y_scale^2
+    )
+
+  admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
+  admm_params$x_tol <- admm_params$x_tol / x_scale
+
+  if (min(diff(data_scaled$x)) <= admm_params$x_tol) {
+    thin_out <- .tf_thin(
+      data_scaled$x,
+      data_scaled$y,
+      data_scaled$weights,
+      k,
+      admm_params
+    )
+
+    inds <- match(thin_out$x, data_scaled$x)
+    data_scaled <- tibble(x = thin_out$x,
+                          y = thin_out$y,
+                          weights = thin_out$w,
+                          fold_id = data_scaled$fold_id[inds])
+  }
+
   data_folded <- data_scaled %>%
-    mutate(ids = fold_ids) %>%
+    mutate(ids = fold_id) %>%
     group_split(ids, .keep = FALSE)
 
-  lambda <- get_lambda_grid_edf_spacing(data_scaled, admm_params, nlambda, k)
+  lambda <- get_lambda_grid_edf_spacing(data = data_scaled,
+                                        admm_params = admm_params,
+                                        nlambda = nlambda,
+                                        k = k)
 
   cv_out <- mclapply(
     1:V,
@@ -848,22 +855,26 @@ sure_trendfilter <- function(x,
     )
 
   admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
+  admm_params$x_tol <- admm_params$x_tol / x_scale
 
-  if (min(diff(data_scaled$x)) <= admm_params$x_tol / x_scale) {
-    thin_params <- admm_params
-    thin_params$x_tol <- thin_params$x_tol / x_scale
+  if (min(diff(data_scaled$x)) <= admm_params$x_tol) {
     thin_out <- .tf_thin(
       data_scaled$x,
       data_scaled$y,
       data_scaled$weights,
       k,
-      thin_params
+      admm_params
     )
 
     data_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
   }
 
-  lambda <- get_lambda_grid_edf_spacing(data_scaled, admm_params, nlambda, k)
+  save(data_scaled, admm_params, nlambda, file = "~/Desktop/debug.RData")
+
+  lambda <- get_lambda_grid_edf_spacing(data = data_scaled,
+                                        admm_params = admm_params,
+                                        nlambda = nlambda,
+                                        k = k)
 
   args <- c(
     list(

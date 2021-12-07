@@ -4,7 +4,7 @@
 #' @importFrom rlang %||%
 get_admm_params <- function(obj_tol = NULL, max_iter = NULL) {
   obj_tol <- obj_tol %||% 1e-10
-  max_iter <- obj_tol %||% 200
+  max_iter <- max_iter %||% 200
   list(
     obj_tol = as.double(obj_tol),
     max_iter = as.double(max_iter),
@@ -31,27 +31,26 @@ get_lambda_grid_edf_spacing <- function(data,
                                         k = 2L,
                                         lambda_min_ratio = 1e-16,
                                         ...) {
-  nlambda_start <- ifelse(nlambda >= 150, 100, 50)
+  nlambda_start <- nlambda
   n <- nrow(data)
 
   tf_out <- .tf_fit(
     data$x,
     data$y,
     data$weights,
-    k = 2L,
+    k = k,
     admm_params,
     nlambda = nlambda_start,
-    lambda_min_ratio = lambda_min_ratio,
-    ...
+    lambda_min_ratio = lambda_min_ratio
   )
 
-  nlambda_start <- tf_out$lambda
+  lambda_start <- tf_out$lambda
   edf_start <- tf_out$df
 
-  if (any(edf_start >= nrow(data) - k - 1L)) {
-    inds <- which(edf_start >= nrow(data) - k - 1L)[-1]
+  if (any(edf_start == n)) {
+    inds <- which(edf_start == n)[-1]
     if (length(inds) > 0L) {
-      nlambda_start <- nlambda_start[-inds]
+      lambda_start <- lambda_start[-inds]
       edf_start <- edf_start[-inds]
     }
   }
@@ -59,21 +58,22 @@ get_lambda_grid_edf_spacing <- function(data,
   if (any(edf_start <= k + 1L)) {
     inds <- rev(rev(which(edf_start <= k + 1L))[-1])
     if (length(inds) > 0L) {
-      nlambda_start <- nlambda_start[-inds]
+      lambda_start <- lambda_start[-inds]
       edf_start <- edf_start[-inds]
     }
   }
 
+  inds <- which(duplicated(edf_start))
+  if (length(inds) > 0) {
+    edf_start <- edf_start[-inds]
+    lambda_start <- lambda_start[-inds]
+  }
+
   approx(
     x = edf_start,
-    y = log(nlambda_start),
-    xout = seq(
-      min(edf_start),
-      max(edf_start),
-      length = nlambda - length(nlambda_start) + 2
-    )[-c(1, nlambda - length(nlambda_start) + 2)]
+    y = log(lambda_start),
+    xout = seq(min(edf_start), max(edf_start), length = nlambda)
   )[["y"]] %>%
-    suppressWarnings() %>%
     exp() %>%
     unique.default() %>%
     sort.default(decreasing = TRUE)

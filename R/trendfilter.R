@@ -156,16 +156,15 @@
     )
 
   admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
+  admm_params$x_tol <- admm_params$x_tol / x_scale
 
-  if (min(diff(data_scaled$x)) <= admm_params$x_tol / x_scale) {
-    thin_params <- admm_params
-    thin_params$x_tol <- thin_params$x_tol / x_scale
+  if (min(diff(data_scaled$x)) <= admm_params$x_tol) {
     thin_out <- .tf_thin(
       data_scaled$x,
       data_scaled$y,
       data_scaled$weights,
       k,
-      thin_params
+      admm_params
     )
 
     data_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
