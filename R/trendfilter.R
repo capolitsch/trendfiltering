@@ -175,12 +175,12 @@
   }
 
   fit <- .tf_fit(
-    data_scaled$x,
-    data_scaled$y,
-    data_scaled$weights,
-    k,
-    lambda,
-    admm_params
+    x = data_scaled$x,
+    y = data_scaled$y,
+    weights = data_scaled$weights,
+    k = k,
+    admm_params = admm_params,
+    lambda = lambda
   )
 
   invisible(

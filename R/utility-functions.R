@@ -35,13 +35,13 @@ get_lambda_grid_edf_spacing <- function(data,
   n <- nrow(data)
 
   tf_out <- .tf_fit(
-    x,
-    y,
-    weights,
+    data$x,
+    data$y,
+    data$weights,
     k = 2L,
     admm_params,
     nlambda = nlambda_start,
-    lambda_min_ratio,
+    lambda_min_ratio = lambda_min_ratio,
     ...
   )
 
