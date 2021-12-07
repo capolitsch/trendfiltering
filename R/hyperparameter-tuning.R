@@ -129,7 +129,7 @@
 #' \describe{
 #' \item{`lambda`}{Vector of candidate hyperparameter values (always returned
 #' in descending order).}
-#' \item{`edfs`}{Number of effective degrees of freedom in the trend filtering
+#' \item{`edf`}{Number of effective degrees of freedom in the trend filtering
 #' estimator, for every candidate hyperparameter value in `lambda`.}
 #' \item{`errors`}{A named list of vectors, with each representing the
 #' CV error curve for every loss function in `loss_funcs` (see below).}
@@ -180,9 +180,6 @@
 #' \item{`y`}{Vector of observed values for the output variable (if originally
 #' present, observations with `is.na(y)` or `weights == 0` are dropped).}
 #' \item{`weights`}{Vector of weights for the observed outputs.}
-#' \item{`model_obj`}{A list containing the trend filtering model fit object,
-#' the ADMM parameter settings, and other modeling objects that are useful to
-#' pass along to functions that operate on the `cv_trendfilter()` output.}
 #' }
 #'
 #' @references
@@ -704,7 +701,7 @@ get_internal_loss_funcs <- function() {
 #' \describe{
 #' \item{`lambda`}{Vector of candidate hyperparameter values (always returned
 #' in descending order).}
-#' \item{`edfs`}{Number of effective degrees of freedom in the trend filtering
+#' \item{`edf`}{Number of effective degrees of freedom in the trend filtering
 #' estimator, for every hyperparameter value in `lambda`.}
 #' \item{`errors`}{Vector of mean-squared prediction errors estimated by SURE,
 #' for every hyperparameter value in `lambda`.}
