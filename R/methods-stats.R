@@ -1,5 +1,7 @@
 #' Get predictions from a trendfilter object
 #'
+#' Get predictions from a '[`trendfilter`][`trendfilter()`]' object
+#'
 #' @param obj
 #'   An object of class/subclass '[`trendfilter`][`trendfilter()`]'.
 #' @param lambda
@@ -20,12 +22,16 @@
 #' @importFrom magrittr %<>% %>%
 #' @importFrom rlang %||%
 #' @rdname predict.trendfilter
+#' @export
 predict.trendfilter <- function(obj,
                                 lambda = NULL,
                                 x_eval = NULL,
                                 zero_tol = 1e-6,
                                 ...) {
   stopifnot(any(class(obj) == "trendfilter"))
+
+  lambda <- lambda %||% obj$lambda
+
   stopifnot(is.numeric(lambda))
   stopifnot(min(lambda) >= 0L)
 
@@ -37,7 +43,6 @@ predict.trendfilter <- function(obj,
     stop("`x_eval` should all be in `range(x)`.")
   }
 
-  lambda <- lambda %||% obj$lambda_min
   x_eval <- (x_eval %||% obj$x) / obj$x_scale
 
   fitted_values <- fitted(obj, lambda)
@@ -63,6 +68,8 @@ predict.trendfilter <- function(obj,
 #' @aliases fitted.values.sure_trendfilter fitted.values.bootstrap_trendfilter
 #' @aliases fitted.cv_trendfilter fitted.sure_trendfilter
 #' @aliases fitted.bootstrap_trendfilter
+#' @rdname fitted.trendfilter
+#' @export
 fitted.trendfilter <- function(obj, lambda = NULL, ...) {
   if (is.null(lambda)) {
     return(obj$fitted_values)
@@ -97,6 +104,8 @@ fitted.trendfilter <- function(obj, lambda = NULL, ...) {
 #' @aliases residuals.bootstrap_trendfilter resids.trendfilter
 #' @aliases resids.cv_trendfilter resids.sure_trendfilter
 #' @aliases resids.bootstrap_trendfilter
+#' @rdname residuals.trendfilter
+#' @export
 residuals.trendfilter <- function(obj, lambda = NULL, ...) {
   obj$y - fitted(obj, lambda, ...)
 }
