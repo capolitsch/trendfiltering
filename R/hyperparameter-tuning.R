@@ -166,9 +166,9 @@
 #' `lambda`.}
 #' \item{`n_iter`}{Total number of iterations taken by the ADMM algorithm, for
 #' every candidate hyperparameter in `lambda`. If an element of `n_iter`
-#' is exactly equal to `model_obj$admm_params$max_iter` (see below), then the
+#' is exactly equal to `admm_params$max_iter` (see below), then the
 #' ADMM algorithm stopped before reaching the objective tolerance
-#' `model_obj$admm_params$obj_tol`. In these situations, you may need to
+#' `admm_params$obj_tol`. In these situations, you may need to
 #' increase the maximum number of tolerable iterations by passing a
 #' `max_iter` argument to `cv_trendfilter()` in order to ensure that the ADMM
 #' solution has converged to satisfactory precision.}
@@ -244,16 +244,22 @@ cv_trendfilter <- function(x,
   }
 
   if (any(names(extra_args) == "obj_tol")) {
+    obj_tol <- extra_args$obj_tol
     stopifnot(is.numeric(obj_tol) && obj_tol > 0L && length(obj_tol) == 1L)
+  } else{
+    obj_tol <- 1e-10
   }
 
   if (any(names(extra_args) == "max_iter")) {
+    max_iter <- extra_args$max_iter
     stopifnot(is.numeric(max_iter) && max_iter == round(max_iter))
     stopifnot(length(max_iter) == 1L)
     max_iter %<>% as.integer()
+  } else{
+    max_iter <- length(y)
   }
 
-  stopifnot(is.numeric(V) && V != round(V))
+  stopifnot(is.numeric(V) && V == round(V))
   if (V < 2L || V > 10L) {
     stop("Must have `V >= 2` and `V <= 10`.", call. = FALSE)
   }
@@ -427,20 +433,17 @@ cv_trendfilter <- function(x,
     admm_params = admm_params,
     loss_funcs = loss_funcs,
     y_scale = y_scale,
-    extra.args,
+    extra_args = extra_args,
     mc.cores = mc_cores
   )
 
+  get_cv_mats <- function(cv_out, loss_func) {
+    sapply(X = seq_along(cv_out), cv_out[[X]][[loss_func]])
+  }
+
   cv_loss_mats <- lapply(
     X = seq_along(loss_funcs),
-    FUN = function(X) {
-      lapply(
-        seq_along(cv_out),
-        FUN = function(itr) cv_out[[itr]][[X]]
-      ) %>%
-        unlist() %>%
-        matrix(ncol = V)
-    }
+    FUN = function(X) get_cv_mats(cv_out, X)
   )
 
   errors <- lapply(
@@ -492,7 +495,7 @@ cv_trendfilter <- function(x,
       obj_tol = admm_params$obj_tol,
       max_iter = admm_params$max_iter
     ),
-    extra.args
+    extra_args
   )
 
   duplicated_args <- duplicated(names(args))
@@ -525,7 +528,7 @@ cv_trendfilter <- function(x,
         edf_1se = fit$edf[i_1se],
         i_min = i_min,
         i_1se = i_1se,
-        obj_func = fit$obj_fun[nrow(fit$obj_fun), ],
+        obj_func = fit$obj_fun,
         n_iter = fit$n_iter,
         status = fit$status,
         loss_funcs = loss_funcs,
@@ -553,7 +556,7 @@ validate_fold <- function(fold_id,
                           admm_params,
                           loss_funcs,
                           y_scale,
-                          extra.args) {
+                          extra_args) {
   df_train <- df_folded[-fold_id] %>% bind_rows()
   df_validate <- df_folded[[fold_id]]
 
@@ -567,7 +570,7 @@ validate_fold <- function(fold_id,
       obj_tol = admm_params$obj_tol,
       max_iter = admm_params$max_iter
     ),
-    extra.args
+    extra_args
   )
 
   duplicated_args <- duplicated(names(args))
@@ -792,13 +795,19 @@ sure_trendfilter <- function(x,
   }
 
   if (any(names(extra_args) == "obj_tol")) {
+    obj_tol <- extra_args$max_iter
     stopifnot(is.numeric(obj_tol) && obj_tol > 0L && length(obj_tol) == 1L)
+  } else{
+    obj_tol <- 1e-10
   }
 
   if (any(names(extra_args) == "max_iter")) {
+    max_iter <- extra_args$max_iter
     stopifnot(is.numeric(max_iter) && max_iter == round(max_iter))
     stopifnot(length(max_iter) == 1L)
     max_iter %<>% as.integer()
+  } else{
+    max_iter <- length(y)
   }
 
   if (missing(weights)) {
@@ -816,7 +825,6 @@ sure_trendfilter <- function(x,
     nlambda %<>% as.integer()
   }
 
-  extra_args <- list(...)
   k %<>% as.integer()
 
   df <- tibble(x = as.double(x),
@@ -868,7 +876,7 @@ sure_trendfilter <- function(x,
       obj_tol = admm_params$obj_tol,
       max_iter = admm_params$max_iter
     ),
-    extra.args
+    extra_args
   )
 
   duplicated_args <- duplicated(names(args))
@@ -878,7 +886,7 @@ sure_trendfilter <- function(x,
 
   squared_residuals_mat <- (fit$beta - df_scaled$y)^2
   optimisms_mat <- 2 / (df_scaled$weights * n) *
-    matrix(rep(fit$df, each = n), nrow = n)
+    matrix(rep(fit$edf, each = n), nrow = n)
 
   errors_mat <- (squared_residuals_mat + optimisms_mat) * y_scale^2
   errors <- colMeans(errors_mat)
@@ -909,7 +917,7 @@ sure_trendfilter <- function(x,
         edf_1se = fit$edf[i_1se],
         i_min = i_min,
         i_1se = i_1se,
-        obj_func = fit$obj_fun[nrow(fit$obj_fun), ],
+        obj_func = fit$obj_fun,
         status = fit$status,
         n_iter = fit$n_iter,
         x = df$x,

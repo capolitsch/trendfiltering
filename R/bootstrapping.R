@@ -110,6 +110,7 @@
 #' @importFrom magrittr %>% %<>%
 #' @importFrom rlang %||%
 #' @importFrom parallel mclapply detectCores
+#' @importFrom stats residuals fitted.values
 #' @export
 bootstrap_trendfilter <- function(obj,
                                   algorithm = NULL,
@@ -158,7 +159,7 @@ bootstrap_trendfilter <- function(obj,
       y = y / y_scale,
       weights = weights * y_scale^2,
       fitted_values = fitted.values(obj, lambda = lambda),
-      residuals = resids(obj, lambda = lambda)
+      residuals = residuals(obj, lambda = lambda)
     )
 
   sampler <- case_when(

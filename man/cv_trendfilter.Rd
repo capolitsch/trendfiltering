@@ -93,9 +93,9 @@ ADMM algorithm's final iteration, for every candidate hyperparameter in
 \code{lambda}.}
 \item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
 every candidate hyperparameter in \code{lambda}. If an element of \code{n_iter}
-is exactly equal to \code{model_obj$admm_params$max_iter} (see below), then the
+is exactly equal to \code{admm_params$max_iter} (see below), then the
 ADMM algorithm stopped before reaching the objective tolerance
-\code{model_obj$admm_params$obj_tol}. In these situations, you may need to
+\code{admm_params$obj_tol}. In these situations, you may need to
 increase the maximum number of tolerable iterations by passing a
 \code{max_iter} argument to \code{cv_trendfilter()} in order to ensure that the ADMM
 solution has converged to satisfactory precision.}

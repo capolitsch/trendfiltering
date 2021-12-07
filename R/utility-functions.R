@@ -1,7 +1,7 @@
 #' Utility functions for internal/expert use only
 
 #' @noRd
-get_admm_params <- function(obj_tol, max_iter) {
+get_admm_params <- function(obj_tol = 1e-10, max_iter = 500) {
   list(
     obj_tol = as.double(obj_tol),
     max_iter = as.double(max_iter),
@@ -29,7 +29,7 @@ get_lambda_grid_edf_spacing <- function(df,
                                         lambda_min_ratio = 1e-16) {
   nlambdas_start <- ifelse(nlambdas >= 150, 100, 50)
 
-  .Call("tf_R",
+  tf_out <- .Call("tf_R",
     sX = as.double(df$x),
     sY = as.double(df$y),
     sW = as.double(df$weights),
@@ -50,8 +50,8 @@ get_lambda_grid_edf_spacing <- function(df,
   lambdas_start <- tf_out$lambda
   edfs_start <- tf_out$df
 
-  if (any(edfs_start >= n - k - 1L)) {
-    inds <- which(edfs_start >= n - k - 1L)[-1]
+  if (any(edfs_start >= nrow(df) - k - 1L)) {
+    inds <- which(edfs_start >= nrow(df) - k - 1L)[-1]
     if (length(inds) > 0L) {
       lambdas_start <- lambdas_start[-inds]
       edfs_start <- edfs_start[-inds]

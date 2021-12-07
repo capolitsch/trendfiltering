@@ -182,7 +182,7 @@
         lambda = lambda,
         edf = fit$df,
         beta = fit$beta,
-        obj_func = fit$obj[nrow(fit$obj), ],
+        obj_func = fit$obj,
         status = fit$status,
         n_iter = fit$iter,
         admm_params = admm_params,

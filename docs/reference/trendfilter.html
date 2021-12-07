@@ -203,7 +203,7 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 <span class='va'>weights</span> <span class='op'>&lt;-</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='va'>eclipsing_binary</span><span class='op'>$</span><span class='va'>std_err</span><span class='op'>^</span><span class='fl'>2</span>
 
 <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'>trendfilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span>, lambda <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in .tf_fit(x, y, weights, k, lambda, admm_params): STRING_ELT() can only be applied to a 'character vector', not a 'NULL'</span></div></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

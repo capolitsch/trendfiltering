@@ -219,9 +219,9 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 <span class='va'>weights</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>weights</span>
 
 <span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sure_trendfilter.html'>sure_trendfilter</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in sure_trendfilter(x, y, weights): object 'max_iter' not found</span></div><div class='input'>
+
 <span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='bootstrap_trendfilter.html'>bootstrap_trendfilter</a></span><span class='op'>(</span><span class='va'>sure_tf</span>, <span class='st'>"parametric"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in lambda %||% obj$lambda_min: object 'sure_tf' not found</span></div><div class='input'><span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'>vbands</span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: all scheduled cores encountered errors in user code</span></div><div class='output co'>#&gt; <span class='error'>Error in unlist(., labels = FALSE): unused argument (labels = FALSE)</span></div><div class='input'><span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'>vbands</span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='error'>Error in apply(obj$ensemble, 1, quantile, probs = (1 - level)/2): object 'boot_tf' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
