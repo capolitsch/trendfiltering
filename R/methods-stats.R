@@ -26,7 +26,7 @@
 predict.trendfilter <- function(obj,
                                 lambda = NULL,
                                 x_eval = NULL,
-                                zero_tol = 1e-6,
+                                zero_tol = 1e-12,
                                 ...) {
   stopifnot(
     any(class(obj) == "trendfilter") && any(class(obj) == "trendfiltering")
