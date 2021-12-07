@@ -43,3 +43,6 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+R/unfinished-scraps.R
+R/methods-base.R

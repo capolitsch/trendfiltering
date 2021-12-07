@@ -4,7 +4,7 @@
 \alias{trendfilter}
 \title{Fit a trend filtering model}
 \usage{
-trendfilter(x, y, weights = NULL, lambda, edfs = NULL, ...)
+trendfilter(x, y, weights = NULL, lambda, edf = NULL, ...)
 }
 \arguments{
 \item{x}{Vector of observed values for the input variable.}
@@ -18,11 +18,11 @@ over all outputs, a scalar may be passed to \code{weights}, i.e.
 \verb{weights = }\mjseqn{1/\sigma^2}. Otherwise, \code{weights} must be a vector with
 the same length as \code{x} and \code{y}.}
 
-\item{lambda}{Vector of one or more hyperparameter values to fit a model for.}
+\item{lambda}{One or more hyperparameter values to fit a trend filtering estimate for.}
 
-\item{edfs}{(Not yet available) Alternative hyperparametrization for trend filtering
-model(s). Vector of the desired number of effective degrees of freedom in
-each model.}
+\item{edf}{(Not yet available) Alternative hyperparametrization for the trend
+filtering model(s). Vector of the desired number of effective degrees of
+freedom in each model.}
 
 \item{...}{Additional named arguments to pass to the internal/expert function
 \code{\link[=.trendfilter]{.trendfilter()}}.}

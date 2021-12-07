@@ -5,17 +5,25 @@
 \alias{fitted.values.trendfilter}
 \alias{fitted.values.cv_trendfilter}
 \alias{fitted.values.sure_trendfilter}
+\alias{fitted.values.bootstrap_trendfilter}
 \alias{fitted.cv_trendfilter}
 \alias{fitted.sure_trendfilter}
+\alias{fitted.bootstrap_trendfilter}
 \title{Get fitted values from a trendfilter object}
 \usage{
-\method{fitted}{trendfilter}(obj, lambdas = NULL)
+\method{fitted}{trendfilter}(obj, lambda = NULL)
 }
 \arguments{
 \item{obj}{Object of class \code{trendfilter}.}
 
-\item{lambdas}{(Optional) Vector of lambda values to calculate fitted values at. If
-missing, will use break points in the fit.}
+\item{lambda}{One or more lambda values to compute fitted values for. Defaults to
+\code{lambda = NULL}, in which case, fitted values are computed for all
+hyperparameter values in \code{obj$lambda}.}
+
+\item{zero_tol}{Threshold parameter that controls the point at which a small coefficient
+value is set to zero. Defaults to \code{zero_tol = 1e-6}.}
+
+\item{...}{Additional named arguments. Currently unused.}
 }
 \description{
 Get fitted values from a trendfilter object

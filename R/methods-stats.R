@@ -1,126 +1,89 @@
 #' Get coefficients from a trendfilter object
 #'
 #' @param obj
-#'   Object of class `trendfilter`.
-#' @param lambdas
-#'   (Optional) Vector of lambda values to calculate coefficients at. If
-#'   missing, will use break points in the fit.
+#'   Object of class/subclass '[`trendfilter`][`trendfilter()`]'.
+#' @param lambda
+#'   One of more hyperparameter values to calculate model coefficients for.
+#'   Defaults to `lambda = NULL`, in which case, model coefficients are computed
+#'   for every hyperparameter value in `obj$lambda`.
 #'
-#' @aliases coef.cv_trendfilter coef.sure_trendfilter
-#' @export
-coef.trendfilter <- function(obj, lambdas = NULL) {
-  if (is.null(lambdas)) {
+#' @aliases coef.cv_trendfilter coef.sure_trendfilter coef.bootstrap_trendfilter
+#' @aliases coefficients.cv_trendfilter coefficients.sure_trendfilter
+#' @aliases coefficients.bootstrap_trendfilter
+#' @rdname coef.trendfilter
+coef.trendfilter <- function(obj, lambda = NULL, ...) {
+  if (is.null(lambda)) {
     return(obj$beta)
   }
 
-  # If all lambdas are equal to some computed lambda, return coefficients from
-  # `obj$beta`
-  if (all(!is.na(index <- match(lambdas, obj$lambdas)))) {
-    return(obj$beta[, index, drop = FALSE])
+  stopifnot(is.numeric(lambda))
+  stopifnot(min(lambda) >= 0L)
+  if (!all(lambda %in% obj$lambda)) {
+    stop("`lambda` must only contain values in `obj$lambda`.")
   }
 
-  if (min(lambdas) < 0) stop("All specified lambda values must be nonnegative.")
-  if (min(lambdas) < min(obj$lambdas) | max(lambdas) > max(obj$lambdas)) {
-    stop("Cannot predict lambda outside the range used when fitting.")
-  }
-
-  # If here, need to interpolate `lambdas`
-  o <- order(lambdas, decreasing = TRUE)
-  o2 <- order(obj$lambdas, decreasing = TRUE)
-  lambdas <- lambdas[o]
-  knots <- obj$lambdas[o2]
-  k <- length(lambdas)
-  mat <- matrix(rep(knots, each = k), nrow = k)
-  b <- lambdas >= mat
-  blo <- max.col(b, ties.method = "first")
-  bhi <- pmax(blo - 1, 1)
-  i <- bhi == blo
-  p <- numeric(k)
-  p[i] <- 0
-  p[!i] <- ((lambdas - knots[blo]) / (knots[bhi] - knots[blo]))[!i]
-
-  betas <- obj$beta[, o2, drop = FALSE]
-  beta <- t((1 - p) * t(betas[, blo, drop = FALSE]) +
-    p * t(betas[, bhi, drop = FALSE]))
-  colnames(beta) <- as.character(round(lambdas, 3))
-
-  beta[, order(o), drop = FALSE]
+  inds <- match(lambda, obj$lambda)
+  obj$beta[, inds, drop = FALSE]
 }
 
 
 #' Get predictions from a trendfilter object
 #'
 #' @param obj
-#'   output of [`trendfilter()`]
-#' @param lambdas
-#'   vector of lambda values to calculate coefficients
-#'   at. If missing, will use break points in the fit.
+#'   An object of class/subclass '[`trendfilter`][`trendfilter()`]'.
+#' @param lambda
+#'   One or more lambda values to evaluate predictions for. Defaults to
+#'   `lambda = NULL`, in which case, predictions are computed for every model in
+#'   `obj$lambda`.
 #' @param x_eval
-#'   vector of new x points. Set to NULL (the default) to use the
-#'   original locations.
+#'   Vector of inputs where the trend filtering model(s) will be evaluated.
+#'   Defaults to `x_eval = NULL`, in which case `x_eval = obj$x`.
 #' @param zero_tol
-#'   numerical tolerance parameter, for determining whether a
-#    coefficient should be rounded to zero
+#'   Threshold parameter that controls the point at which a small coefficient
+#'   value is set to zero. Defaults to `zero_tol = 1e-6`.
 #' @param ...
-#'   optional, currently unused, arguments
+#'   Additional named arguments. Currently unused.
 
 #' @importFrom glmgen .tf_predict
 #' @importFrom dplyr case_when tibble
 #' @importFrom magrittr %<>% %>%
-#' @aliases predict.cv_trendfilter predict.sure_trendfilter
-#' @export
+#' @importFrom rlang %||%
+#' @rdname predict.trendfilter
 predict.trendfilter <- function(obj,
-                                lambdas,
+                                lambda = NULL,
                                 x_eval = NULL,
                                 zero_tol = 1e-6,
                                 ...) {
   stopifnot(any(class(obj) == "trendfilter"))
-  stopifnot(class(loss_func) %in% c("character", "numeric"))
 
-  if (is.character(loss_func)) {
-    stopifnot(loss_func %in% names(obj$errors))
-  } else {
-    if (loss_func != round(loss_func)) {
-      loss_func <- which.min(
-        abs(loss_func - 1:length(obj$i_min))
-      )
+  lambda <- lambda %||% obj$lambda
 
-      warning(
-        cat(paste0(
-          "loss_func should either be one of c('",
-          paste(names(obj$i_min), collapse = "', '"),
-          "'), or an index in 1:", length(obj$i_min),
-          ".\nChoosing the closest index option: ", loss_func,
-          " ('", names(obj$i_min)[loss_func], "')."
-        )),
-        call. = FALSE
-      )
-    }
+  stopifnot(is.numeric(lambda))
+  stopifnot(min(lambda) >= 0L)
+
+  if (!all(lambda %in% obj$lambda)) {
+    stop("`lambda` must only contain values in `obj$lambda`.")
   }
 
-  if (is.null(x_eval)) {
-    x_eval <- obj$tf_model$x %>%
-      as.double() %>%
-      sort()
-  } else {
-    if (any(x_eval < min(obj$tf_model$x) || x_eval > max(obj$tf_model$x))) {
-      stop("`x_eval` should all be in `range(x)`.")
-    }
-    x_eval %<>%
-      as.double() %>%
-      sort()
+  inds <- match(lambda, obj$lambda)
+  obj$beta[, inds, drop = FALSE]
+  x_eval <- x_eval %||% obj$tf_model$x
+
+  if (any(x_eval < min(obj$tf_model$x) || x_eval > max(obj$tf_model$x))) {
+    stop("`x_eval` should all be in `range(x)`.")
   }
 
-  extra_args <- list(...)
-
-  i_opt <- case_when(
-    lambda == "lambda_min" ~ obj$i_min[loss_func],
-    lambda == "lambda_1se" ~ obj$i_1se[loss_func]
-  )
-
-  names(i_opt) <- NULL
-  lambda <- obj$lambdas[i_opt]
-  coefs <- coef(obj, lambda)
+  .Call(".tf_predict",
+        sX = as.double(object$x),
+        sBeta = as.double(co),
+        sN = length(object$y),
+        sK = as.integer(object$k),
+        sX0 = as.double(x.new),
+        sN0 = length(x.new),
+        sNLambda = length(lambda),
+        sFamily = family_cd,
+        sZeroTol = as.double(zero_tol),
+        PACKAGE = "glmgen")
 }
 
 
@@ -128,14 +91,22 @@ predict.trendfilter <- function(obj,
 #'
 #' @param obj
 #'   Object of class `trendfilter`.
-#' @param lambdas
-#'   (Optional) Vector of lambda values to calculate fitted values at. If
-#'   missing, will use break points in the fit.
+#' @param lambda
+#'   One or more lambda values to compute fitted values for. Defaults to
+#'   `lambda = NULL`, in which case, fitted values are computed for all
+#'   hyperparameter values in `obj$lambda`.
+#' @param zero_tol
+#'   Threshold parameter that controls the point at which a small coefficient
+#'   value is set to zero. Defaults to `zero_tol = 1e-6`.
+#' @param ...
+#'   Additional named arguments. Currently unused.
 #'
-#' @aliases fitted.values.trendfilter fitted.values.cv_trendfilter fitted.values.sure_trendfilter fitted.cv_trendfilter fitted.sure_trendfilter
-#' @export
-fitted.trendfilter <- function(obj, lambdas = NULL) {
-
+#' @aliases fitted.values.trendfilter fitted.values.cv_trendfilter
+#' @aliases fitted.values.sure_trendfilter fitted.values.bootstrap_trendfilter
+#' @aliases fitted.cv_trendfilter fitted.sure_trendfilter
+#' @aliases fitted.bootstrap_trendfilter
+fitted.trendfilter <- function(obj, lambda = NULL, ...) {
+  coef.trendfilter(obj, lambda, ...)
 }
 
 
@@ -143,13 +114,20 @@ fitted.trendfilter <- function(obj, lambdas = NULL) {
 #'
 #' @param obj
 #'   Object of class `trendfilter`.
-#' @param lambdas
-#'   (Optional) Vector of lambda values to calculate residuals at. If
-#'   missing, will use break points in the fit.
+#' @param lambda
+#'   One or more lambda values to compute residuals for. Defaults to
+#'   `lambda = NULL`, in which case, residuals are computed for all
+#'   hyperparameter values in `obj$lambda`.
+#' @param zero_tol
+#'   Threshold parameter that controls the point at which a small coefficient
+#'   value is set to zero. Defaults to `zero_tol = 1e-6`.
+#' @param ...
+#'   Additional named arguments. Currently unused.
 #'
-#' @aliases residuals.cv_trendfilter residuals.sure_trendfilter resids.trendfilter resids.cv_trendfilter resids.sure_trendfilter
-#' @export
-residuals.trendfilter <- function(obj, lambdas = NULL) {
-
+#' @aliases residuals.cv_trendfilter residuals.sure_trendfilter
+#' @aliases residuals.bootstrap_trendfilter resids.trendfilter
+#' @aliases resids.cv_trendfilter resids.sure_trendfilter
+#' @aliases resids.bootstrap_trendfilter
+residuals.trendfilter <- function(obj, lambda = NULL, ...) {
+  obj$y - fitted.trendfilter(obj, lambda, ...)
 }
-

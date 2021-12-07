@@ -14,11 +14,11 @@
 #'   `weights = `\mjseqn{1/\sigma^2}. Otherwise, `weights` must be a vector
 #'   with the same length as `x` and `y`.
 #' @param lambda
-#'   Vector of one or more hyperparameter values to fit a model for.
-#' @param edfs
-#'   (Not yet available) Alternative hyperparametrization for trend filtering
-#'   model(s). Vector of the desired number of effective degrees of freedom in
-#'   each model.
+#'   One or more hyperparameter values to fit a trend filtering estimate for.
+#' @param edf
+#'   (Not yet available) Alternative hyperparametrization for the trend
+#'   filtering model(s). Vector of the desired number of effective degrees of
+#'   freedom in each model.
 #' @param k
 #'   Degree of the polynomials that make up the piecewise-polynomial trend
 #'   filtering estimate. Defaults to `k = 2` (i.e. a piecewise quadratic
@@ -64,17 +64,18 @@
                          y,
                          weights = NULL,
                          lambda,
-                         edfs = NULL,
+                         edf = NULL,
                          k = 2L,
                          obj_tol = 1e-10,
                          max_iter = length(y),
                          ...) {
   tf_call <- match.call()
+  extra_args <- list(...)
 
-  if (!is.null(edfs)) {
+  if (!is.null(edf)) {
     stop(
-      "Functionality for specifying trend filtering models via `edfs` is ",
-      "not yet available. \nPlease use `lambda`."
+      "Functionality for specifying trend filtering models via `edf` is ",
+      "not yet available. \nPlease use `lambda` instead."
     )
   }
 
@@ -116,9 +117,9 @@
   stopifnot(is.numeric(max_iter) & max_iter == round(max_iter))
   stopifnot(length(max_iter) == 1L)
 
-  extra_args <- list(...)
-
-  df <- tibble(x, y, weights) %>%
+  df <- tibble(x = as.double(x),
+               y = as.double(y),
+               weights = as.double(weights)) %>%
     arrange(x) %>%
     filter(weights > 0) %>%
     drop_na()
@@ -131,8 +132,7 @@
       x = x / x_scale,
       y = y / y_scale,
       weights = weights * y_scale^2
-    ) %>%
-    select(x, y, weights)
+    )
 
   max_iter <- max(max_iter, nrow(df), 200L)
   admm_params <- get_admm_params(obj_tol, max_iter)
@@ -152,23 +152,23 @@
     df_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
   }
 
-  tf_out <- df_scaled %$% .tf_fit(x, y, weights, lambda, admm_params, k)
+  fit <- df_scaled %$% .tf_fit(x, y, weights, k, lambda, admm_params)
 
   admm_params$x_tol <- admm_params$x_tol * x_scale
 
   invisible(
     structure(
       list(
-        x = df_scaled$x * x_scale,
-        y = df_scaled$y * y_scale,
-        weights = df_scaled$weights / y_scale^2,
+        x = df$x,
+        y = df$y,
+        weights = df$weights,
         k = k,
-        lambda = tf_out$lambda,
-        edfs = tf_out$df,
-        beta = tf_out$beta,
-        obj = tf_out$obj,
-        status = tf_out$status,
-        iter = tf_out$iter,
+        lambda = lambda,
+        edf = fit$df,
+        beta = fit$beta,
+        obj_func = fit$obj[nrow(fit$obj), ],
+        status = fit$status,
+        n_iter = fit$iter,
         admm_params = admm_params,
         call = tf_call
       ),
@@ -194,11 +194,11 @@
 #'   `weights = `\mjseqn{1/\sigma^2}. Otherwise, `weights` must be a vector with
 #'   the same length as `x` and `y`.
 #' @param lambda
-#'   Vector of one or more hyperparameter values to fit a model for.
-#' @param edfs
-#'   (Not yet available) Alternative hyperparametrization for trend filtering
-#'   model(s). Vector of the desired number of effective degrees of freedom in
-#'   each model.
+#'   One or more hyperparameter values to fit a trend filtering estimate for.
+#' @param edf
+#'   (Not yet available) Alternative hyperparametrization for the trend
+#'   filtering model(s). Vector of the desired number of effective degrees of
+#'   freedom in each model.
 #' @param ...
 #'   Additional named arguments to pass to the internal/expert function
 #'   [`.trendfilter()`].
@@ -221,13 +221,13 @@ trendfilter <- function(x,
                         y,
                         weights = NULL,
                         lambda,
-                        edfs = NULL,
+                        edf = NULL,
                         ...) {
   extra_args <- list(...)
   do.call(
     .trendfilter,
     c(
-      list(x = x, y = y, weights = weights, lambda = lambda, edfs = edfs),
+      list(x = x, y = y, weights = weights, lambda = lambda, edf = edf),
       extra_args
     )
   )

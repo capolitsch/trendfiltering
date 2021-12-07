@@ -4,18 +4,26 @@
 \alias{residuals.trendfilter}
 \alias{residuals.cv_trendfilter}
 \alias{residuals.sure_trendfilter}
+\alias{residuals.bootstrap_trendfilter}
 \alias{resids.trendfilter}
 \alias{resids.cv_trendfilter}
 \alias{resids.sure_trendfilter}
+\alias{resids.bootstrap_trendfilter}
 \title{Get residuals from a trendfilter object}
 \usage{
-\method{residuals}{trendfilter}(obj, lambdas = NULL)
+\method{residuals}{trendfilter}(obj, lambda = NULL)
 }
 \arguments{
 \item{obj}{Object of class \code{trendfilter}.}
 
-\item{lambdas}{(Optional) Vector of lambda values to calculate residuals at. If
-missing, will use break points in the fit.}
+\item{lambda}{One or more lambda values to compute residuals for. Defaults to
+\code{lambda = NULL}, in which case, residuals are computed for all
+hyperparameter values in \code{obj$lambda}.}
+
+\item{zero_tol}{Threshold parameter that controls the point at which a small coefficient
+value is set to zero. Defaults to \code{zero_tol = 1e-6}.}
+
+\item{...}{Additional named arguments. Currently unused.}
 }
 \description{
 Get residuals from a trendfilter object

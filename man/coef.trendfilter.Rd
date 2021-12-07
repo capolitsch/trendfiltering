@@ -4,15 +4,20 @@
 \alias{coef.trendfilter}
 \alias{coef.cv_trendfilter}
 \alias{coef.sure_trendfilter}
+\alias{coef.bootstrap_trendfilter}
+\alias{coefficients.cv_trendfilter}
+\alias{coefficients.sure_trendfilter}
+\alias{coefficients.bootstrap_trendfilter}
 \title{Get coefficients from a trendfilter object}
 \usage{
-\method{coef}{trendfilter}(obj, lambdas = NULL)
+\method{coef}{trendfilter}(obj, lambda = NULL)
 }
 \arguments{
-\item{obj}{Object of class \code{trendfilter}.}
+\item{obj}{Object of class/subclass '\code{\link[=trendfilter]{trendfilter}}'.}
 
-\item{lambdas}{(Optional) Vector of lambda values to calculate coefficients at. If
-missing, will use break points in the fit.}
+\item{lambda}{One of more hyperparameter values to calculate model coefficients for.
+Defaults to \code{lambda = NULL}, in which case, model coefficients are computed
+for every hyperparameter value in \code{obj$lambda}.}
 }
 \description{
 Get coefficients from a trendfilter object

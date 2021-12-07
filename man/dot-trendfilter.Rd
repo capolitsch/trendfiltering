@@ -10,7 +10,7 @@
   y,
   weights = NULL,
   lambda,
-  edfs = NULL,
+  edf = NULL,
   k = 2L,
   obj_tol = 1e-10,
   max_iter = length(y),
@@ -29,11 +29,11 @@ over all outputs, a scalar may be passed to \code{weights}, i.e.
 \verb{weights = }\mjseqn{1/\sigma^2}. Otherwise, \code{weights} must be a vector
 with the same length as \code{x} and \code{y}.}
 
-\item{lambda}{Vector of one or more hyperparameter values to fit a model for.}
+\item{lambda}{One or more hyperparameter values to fit a trend filtering estimate for.}
 
-\item{edfs}{(Not yet available) Alternative hyperparametrization for trend filtering
-model(s). Vector of the desired number of effective degrees of freedom in
-each model.}
+\item{edf}{(Not yet available) Alternative hyperparametrization for the trend
+filtering model(s). Vector of the desired number of effective degrees of
+freedom in each model.}
 
 \item{k}{Degree of the polynomials that make up the piecewise-polynomial trend
 filtering estimate. Defaults to \code{k = 2} (i.e. a piecewise quadratic
