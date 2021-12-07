@@ -247,24 +247,25 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 <span class='co'># system, with the primary eclipse occuring at `phase = 0` and the input</span>
 <span class='co'># domain ranging from -0.5 to 0.5.</span>
 
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"quasar_spectrum"</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>quasar_spectrum</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"eclipsing_binary"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>eclipsing_binary</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 6 × 3</span>
-#&gt;   log10_wavelength   flux weights
-#&gt;              <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span>             3.55  0.424  0.041<span style='text-decoration: underline;'>7</span>
-#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125 
-#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128 
-#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121 
-#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
-#&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'>
-<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>log10_wavelength</span>
-<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>flux</span>
-<span class='va'>weights</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>weights</span>
+#&gt;    phase  flux std_err
+#&gt;    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span> -<span style='color: #BB0000;'>0.499</span> 0.938  0.010<span style='text-decoration: underline;'>2</span>
+#&gt; <span style='color: #BCBCBC;'>2</span> -<span style='color: #BB0000;'>0.498</span> 0.930  0.010<span style='text-decoration: underline;'>2</span>
+#&gt; <span style='color: #BCBCBC;'>3</span> -<span style='color: #BB0000;'>0.496</span> 0.944  0.010<span style='text-decoration: underline;'>2</span>
+#&gt; <span style='color: #BCBCBC;'>4</span> -<span style='color: #BB0000;'>0.494</span> 0.963  0.010<span style='text-decoration: underline;'>2</span>
+#&gt; <span style='color: #BCBCBC;'>5</span> -<span style='color: #BB0000;'>0.494</span> 0.934  0.010<span style='text-decoration: underline;'>2</span>
+#&gt; <span style='color: #BCBCBC;'>6</span> -<span style='color: #BB0000;'>0.494</span> 0.949  0.010<span style='text-decoration: underline;'>2</span></div><div class='input'>
+<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='va'>eclipsing_binary</span><span class='op'>$</span><span class='va'>phase</span>
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='va'>eclipsing_binary</span><span class='op'>$</span><span class='va'>flux</span>
+<span class='va'>weights</span> <span class='op'>&lt;-</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='va'>eclipsing_binary</span><span class='op'>$</span><span class='va'>std_err</span><span class='op'>^</span><span class='fl'>2</span>
 
-<span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sure_trendfilter.html'>sure_trendfilter</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span>
-<span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in apply(obj$ensemble, 1, quantile, probs = (1 - level)/2): object 'boot_tf' not found</span></div><div class='input'>
+<span class='va'>cv_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cv_trendfilter.html'>cv_trendfilter</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span>, max_iter <span class='op'>=</span> <span class='fl'>1e4</span>, obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: all scheduled cores encountered errors in user code</span></div><div class='output co'>#&gt; <span class='error'>Error in match.fun(FUN): object 'X' not found</span></div><div class='input'><span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>cv_tf</span>, <span class='st'>"nonparametric"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in lambda %||% obj$lambda_min: object 'cv_tf' not found</span></div><div class='input'>
+
 <span class='co'># Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar</span>
 
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"quasar_spectrum"</span><span class='op'>)</span>
@@ -283,10 +284,8 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 <span class='va'>weights</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>weights</span>
 
 <span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sure_trendfilter.html'>sure_trendfilter</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span>
-
 <span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>sure_tf</span>, <span class='st'>"parametric"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: all scheduled cores encountered errors in user code</span></div><div class='output co'>#&gt; <span class='error'>Error in unlist(., labels = FALSE): unused argument (labels = FALSE)</span></div><div class='input'><span class='va'>bands</span> <span class='op'>&lt;-</span> <span class='fu'><a href='vbands.html'>vbands</a></span><span class='op'>(</span><span class='va'>boot_tf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in apply(obj$ensemble, 1, quantile, probs = (1 - level)/2): object 'boot_tf' not found</span></div></pre>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: all scheduled cores encountered errors in user code</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

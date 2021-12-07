@@ -4,7 +4,7 @@
 #' filtering model's out-of-sample error by \mjseqn{V}-fold cross validation.
 #' Many common regression loss functions are defined internally, and a cross
 #' validation curve is returned for each. Custom loss functions may also be
-#' passed via the `loss_funcs` argument. See the *Loss functions* section
+#' passed via the `loss_funcs` argument. See the **Loss functions** section
 #' below for definitions of the internal loss functions, and for guidelines on
 #' when [`cv_trendfilter()`] should be used versus [`sure_trendfilter()`].
 #' Generic [`stats`][stats::stats-package] functions such as [`predict()`],
@@ -63,7 +63,7 @@
 #' @section Loss functions:
 #'
 #' The following loss functions are automatically computed during cross
-#' validation and their CV error curves are returned in the `errors` list
+#' validation and their CV error curves are returned in the `error` list
 #' within the [`cv_trendfilter()`] output.
 #'
 #' 1. Mean absolute deviations error: \mjsdeqn{MAE(\lambda) =
@@ -131,34 +131,34 @@
 #' in descending order).}
 #' \item{`edf`}{Number of effective degrees of freedom in the trend filtering
 #' estimator, for every candidate hyperparameter value in `lambda`.}
-#' \item{`errors`}{A named list of vectors, with each representing the
+#' \item{`error`}{A named list of vectors, with each representing the
 #' CV error curve for every loss function in `loss_funcs` (see below).}
-#' \item{`se_errors`}{Standard errors for the `errors`, within a named list of
+#' \item{`se_error`}{Standard errors for the `error`, within a named list of
 #' the same structure.}
-#' \item{`lambda_min`}{A named vector with length equal to `length(errors)`,
+#' \item{`lambda_min`}{A named vector with length equal to `length(error)`,
 #' containing the hyperparameter value that minimizes the CV error curve, for
 #' every loss function in `loss_funcs`.}
-#' \item{`lambda_1se`}{A named vector with length equal to `length(errors)`,
+#' \item{`lambda_1se`}{A named vector with length equal to `length(error)`,
 #' containing the "1-standard-error rule" hyperparameter, for every loss
 #' function in `loss_funcs`. The "1-standard-error rule" hyperparameter is the
 #' largest hyperparameter value in `lambda` that has a CV error within one
-#' standard error of `min(errors)`. It serves as an Occam's razor-like
+#' standard error of `min(error)`. It serves as an Occam's razor-like
 #' heuristic. More precisely, given two models with approximately equal
 #' performance (in terms of some loss function), it may be wise to opt for the
 #' simpler model, i.e. the model with the larger hyperparameter value / fewer
 #' effective degrees of freedom.}
-#' \item{`edf_min`}{A named vector with length equal to `length(errors)`,
+#' \item{`edf_min`}{A named vector with length equal to `length(error)`,
 #' containing the number of effective degrees of freedom in the trend filtering
 #' estimator that minimizes the CV error curve, for every loss function in
 #' `loss_funcs`.}
-#' \item{`edf_1se`}{A named vector with length equal to `length(errors)`,
+#' \item{`edf_1se`}{A named vector with length equal to `length(error)`,
 #' containing the number of effective degrees of freedom in the
 #' "1-standard-error rule" trend filtering estimator, for every loss function in
 #' `loss_funcs`.}
-#' \item{`i_min`}{A named vector with length equal to `length(errors)`,
+#' \item{`i_min`}{A named vector with length equal to `length(error)`,
 #' containing the index of `lambda` that minimizes the CV error curve, for
 #' every loss function in `loss_funcs`.}
-#' \item{`i_1se`}{A named vector with length equal to `length(errors)`,
+#' \item{`i_1se`}{A named vector with length equal to `length(error)`,
 #' containing the index of `lambda` that gives the "1-standard-error rule"
 #' hyperparameter value, for every loss function in `loss_funcs`.}
 #' \item{`obj_func`}{The relative change in the objective function over the
@@ -443,7 +443,7 @@ cv_trendfilter <- function(x,
     FUN = function(X) get_cv_mats(cv_out, X)
   )
 
-  errors <- lapply(
+  error <- lapply(
     seq_along(cv_loss_mats),
     FUN = function(X) {
       cv_loss_mats[[X]] %>%
@@ -453,17 +453,17 @@ cv_trendfilter <- function(x,
   )
 
   i_min <- lapply(
-    seq_along(errors),
+    seq_along(error),
     FUN = function(X) {
-      errors[[X]] %>%
+      error[[X]] %>%
         which.min() %>%
         min()
     }
   ) %>%
     unlist()
 
-  se_errors <- lapply(
-    seq_along(errors),
+  se_error <- lapply(
+    seq_along(error),
     FUN = function(X) {
       rowSds(cv_loss_mats[[X]]) / sqrt(V) %>%
         as.double()
@@ -471,9 +471,9 @@ cv_trendfilter <- function(x,
   )
 
   i_1se <- lapply(
-    X = seq_along(errors),
+    X = seq_along(error),
     FUN = function(X) {
-      which(errors[[X]] <= errors[[X]][i_min[X]] + se_errors[[X]][i_min[X]]) %>%
+      which(error[[X]] <= error[[X]][i_min[X]] + se_error[[X]][i_min[X]]) %>%
         min()
     }
   ) %>%
@@ -507,9 +507,9 @@ cv_trendfilter <- function(x,
   names(lambda_1se) <- names(loss_funcs)
   names(edf_min) <- names(loss_funcs)
   names(edf_1se) <- names(loss_funcs)
-  names(errors) <- names(loss_funcs)
+  names(error) <- names(loss_funcs)
   names(i_min) <- names(loss_funcs)
-  names(se_errors) <- names(loss_funcs)
+  names(se_error) <- names(loss_funcs)
   names(i_1se) <- names(loss_funcs)
 
   invisible(
@@ -517,8 +517,8 @@ cv_trendfilter <- function(x,
       list(
         lambda = fit$lambda,
         edf = fit$edf,
-        errors = errors,
-        se_errors = se_errors,
+        error = error,
+        se_error = se_error,
         lambda_min = lambda[i_min],
         lambda_1se = lambda[i_1se],
         edf_min = fit$edf[i_min],
@@ -670,7 +670,7 @@ get_internal_loss_funcs <- function() {
 #' risk estimate
 #'
 #' For every candidate hyperparameter value, compute an unbiased estimate of the
-#' trend filtering model's predictive mean-squared error. See the *Details*
+#' trend filtering model's predictive mean-squared error. See the **Details**
 #' section for guidelines on when [`sure_trendfilter()`] should be used versus
 #' [`cv_trendfilter()`]. Generic [`stats`][stats::stats-package] functions such
 #' as [`predict()`], [`fitted.values()`], [`residuals()`], etc. may be called on
@@ -703,13 +703,13 @@ get_internal_loss_funcs <- function() {
 #' in descending order).}
 #' \item{`edf`}{Number of effective degrees of freedom in the trend filtering
 #' estimator, for every hyperparameter value in `lambda`.}
-#' \item{`errors`}{Vector of mean-squared prediction errors estimated by SURE,
+#' \item{`error`}{Vector of mean-squared prediction errors estimated by SURE,
 #' for every hyperparameter value in `lambda`.}
-#' \item{`se_errors`}{Vector of estimated standard errors for the `errors`.}
+#' \item{`se_error`}{Vector of estimated standard errors for the `error`.}
 #' \item{`lambda_min`}{Hyperparameter value in `lambda` that minimizes the SURE
 #' validation error curve.}
 #' \item{`lambda_1se`}{The largest hyperparameter value in `lambda` that has a
-#' SURE error within one standard error of `min(errors)`. We call this the
+#' SURE error within one standard error of `min(error)`. We call this the
 #' "1-standard-error rule" hyperparameter, and it serves as an Occam's
 #' razor-esque heuristic. More precisely, given two models with approximately
 #' equal performance (here, in terms of predictive MSE), it may be wise to opt
@@ -731,11 +731,11 @@ get_internal_loss_funcs <- function() {
 #' these situations, you may need to increase the maximum number of tolerable
 #' iterations by passing a `max_iter` argument to `cv_trendfilter()` in order to
 #' ensure that the ADMM solution has converged to satisfactory precision.}
-#' \item{`training_errors`}{The "in-sample" MSE between the observed outputs `y`
+#' \item{`training_error`}{The "in-sample" MSE between the observed outputs `y`
 #' and the trend filtering estimate, for every hyperparameter value in
 #' `lambda`.}
-#' \item{`optimisms`}{SURE-estimated optimisms, i.e.
-#' `optimisms = errors - training_errors`.}
+#' \item{`optimism`}{SURE-estimated optimisms, i.e.
+#' `optimism = error - training_error`.}
 #' \item{`call`}{The function call.}
 #' }
 #'
@@ -882,22 +882,22 @@ sure_trendfilter <- function(x,
   fit <- do.call(.trendfilter, args)
 
   squared_residuals_mat <- (fit$beta - df_scaled$y)^2
-  optimisms_mat <- 2 / (df_scaled$weights * n) *
+  optimism_mat <- 2 / (df_scaled$weights * n) *
     matrix(rep(fit$edf, each = n), nrow = n)
 
-  errors_mat <- (squared_residuals_mat + optimisms_mat) * y_scale^2
-  errors <- colMeans(errors_mat)
-  i_min <- min(which.min(errors)) %>% as.integer()
+  error_mat <- (squared_residuals_mat + optimism_mat) * y_scale^2
+  error <- colMeans(error_mat)
+  i_min <- min(which.min(error)) %>% as.integer()
 
-  se_errors <- replicate(
+  se_error <- replicate(
     5000,
-    errors_mat[sample.int(n, replace = TRUE), ] %>%
+    error_mat[sample.int(n, replace = TRUE), ] %>%
       colMeans()
   ) %>%
     rowSds()
 
   i_1se <- which(
-    errors <= errors[i_min] + se_errors[i_min]
+    error <= error[i_min] + se_error[i_min]
   ) %>%
     min()
 
@@ -906,8 +906,8 @@ sure_trendfilter <- function(x,
       list(
         lambda = fit$lambda,
         edf = fit$edf,
-        errors = errors,
-        se_errors = se_errors,
+        error = error,
+        se_error = se_error,
         lambda_min = lambda[i_min],
         lambda_1se = lambda[i_1se],
         edf_min = fit$edf[i_min],

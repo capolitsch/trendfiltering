@@ -56,36 +56,36 @@ as well as all elements from the '\code{\link[=trendfilter]{trendfilter}}' call.
 \describe{
 \item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
 in descending order).}
-\item{\code{edfs}}{Number of effective degrees of freedom in the trend filtering
+\item{\code{edf}}{Number of effective degrees of freedom in the trend filtering
 estimator, for every candidate hyperparameter value in \code{lambda}.}
-\item{\code{errors}}{A named list of vectors, with each representing the
+\item{\code{error}}{A named list of vectors, with each representing the
 CV error curve for every loss function in \code{loss_funcs} (see below).}
-\item{\code{se_errors}}{Standard errors for the \code{errors}, within a named list of
+\item{\code{se_error}}{Standard errors for the \code{error}, within a named list of
 the same structure.}
-\item{\code{lambda_min}}{A named vector with length equal to \code{length(errors)},
+\item{\code{lambda_min}}{A named vector with length equal to \code{length(error)},
 containing the hyperparameter value that minimizes the CV error curve, for
 every loss function in \code{loss_funcs}.}
-\item{\code{lambda_1se}}{A named vector with length equal to \code{length(errors)},
+\item{\code{lambda_1se}}{A named vector with length equal to \code{length(error)},
 containing the "1-standard-error rule" hyperparameter, for every loss
 function in \code{loss_funcs}. The "1-standard-error rule" hyperparameter is the
 largest hyperparameter value in \code{lambda} that has a CV error within one
-standard error of \code{min(errors)}. It serves as an Occam's razor-like
+standard error of \code{min(error)}. It serves as an Occam's razor-like
 heuristic. More precisely, given two models with approximately equal
 performance (in terms of some loss function), it may be wise to opt for the
 simpler model, i.e. the model with the larger hyperparameter value / fewer
 effective degrees of freedom.}
-\item{\code{edf_min}}{A named vector with length equal to \code{length(errors)},
+\item{\code{edf_min}}{A named vector with length equal to \code{length(error)},
 containing the number of effective degrees of freedom in the trend filtering
 estimator that minimizes the CV error curve, for every loss function in
 \code{loss_funcs}.}
-\item{\code{edf_1se}}{A named vector with length equal to \code{length(errors)},
+\item{\code{edf_1se}}{A named vector with length equal to \code{length(error)},
 containing the number of effective degrees of freedom in the
 "1-standard-error rule" trend filtering estimator, for every loss function in
 \code{loss_funcs}.}
-\item{\code{i_min}}{A named vector with length equal to \code{length(errors)},
+\item{\code{i_min}}{A named vector with length equal to \code{length(error)},
 containing the index of \code{lambda} that minimizes the CV error curve, for
 every loss function in \code{loss_funcs}.}
-\item{\code{i_1se}}{A named vector with length equal to \code{length(errors)},
+\item{\code{i_1se}}{A named vector with length equal to \code{length(error)},
 containing the index of \code{lambda} that gives the "1-standard-error rule"
 hyperparameter value, for every loss function in \code{loss_funcs}.}
 \item{\code{obj_func}}{The relative change in the objective function over the
@@ -107,9 +107,6 @@ validation.}
 \item{\code{y}}{Vector of observed values for the output variable (if originally
 present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
 \item{\code{weights}}{Vector of weights for the observed outputs.}
-\item{\code{model_obj}}{A list containing the trend filtering model fit object,
-the ADMM parameter settings, and other modeling objects that are useful to
-pass along to functions that operate on the \code{cv_trendfilter()} output.}
 }
 }
 \description{
@@ -117,7 +114,7 @@ pass along to functions that operate on the \code{cv_trendfilter()} output.}
 filtering model's out-of-sample error by \mjseqn{V}-fold cross validation.
 Many common regression loss functions are defined internally, and a cross
 validation curve is returned for each. Custom loss functions may also be
-passed via the \code{loss_funcs} argument. See the \emph{Loss functions} section
+passed via the \code{loss_funcs} argument. See the \strong{Loss functions} section
 below for definitions of the internal loss functions, and for guidelines on
 when \code{\link[=cv_trendfilter]{cv_trendfilter()}} should be used versus \code{\link[=sure_trendfilter]{sure_trendfilter()}}.
 Generic \code{\link[stats:stats-package]{stats}} functions such as \code{\link[=predict]{predict()}},
@@ -146,7 +143,7 @@ a case when the inputs are evenly sampled on the \code{log10(x)} scale.
 
 
 The following loss functions are automatically computed during cross
-validation and their CV error curves are returned in the \code{errors} list
+validation and their CV error curves are returned in the \code{error} list
 within the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
 \enumerate{
 \item Mean absolute deviations error: \mjsdeqn{MAE(\lambda) =

@@ -35,7 +35,7 @@ x <- eclipsing_binary$phase
 y <- eclipsing_binary$flux
 weights <- 1 / eclipsing_binary$std_err^2
 
-cv_tf <- cv_trendfilter(x, y, weights, x = EB$phase, max_iter = 1e4, obj_tol = 1e-6)
+cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
 
 boot_tf <- bootstrap_trendfilter(cv_tf, "nonparametric")
 bands <- vbands(boot_tf)
@@ -51,9 +51,7 @@ y <- quasar_spectrum$flux
 weights <- quasar_spectrum$weights
 
 sure_tf <- sure_trendfilter(x, y, weights)
-
 boot_tf <- bootstrap_trendfilter(sure_tf, "parametric")
-bands <- vbands(boot_tf)
 }
 \references{
 \enumerate{

@@ -33,15 +33,15 @@ as well as all elements from the '\code{\link[=trendfilter]{trendfilter}}' call.
 \describe{
 \item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
 in descending order).}
-\item{\code{edfs}}{Number of effective degrees of freedom in the trend filtering
+\item{\code{edf}}{Number of effective degrees of freedom in the trend filtering
 estimator, for every hyperparameter value in \code{lambda}.}
-\item{\code{errors}}{Vector of mean-squared prediction errors estimated by SURE,
+\item{\code{error}}{Vector of mean-squared prediction errors estimated by SURE,
 for every hyperparameter value in \code{lambda}.}
-\item{\code{se_errors}}{Vector of estimated standard errors for the \code{errors}.}
+\item{\code{se_error}}{Vector of estimated standard errors for the \code{error}.}
 \item{\code{lambda_min}}{Hyperparameter value in \code{lambda} that minimizes the SURE
 validation error curve.}
 \item{\code{lambda_1se}}{The largest hyperparameter value in \code{lambda} that has a
-SURE error within one standard error of \code{min(errors)}. We call this the
+SURE error within one standard error of \code{min(error)}. We call this the
 "1-standard-error rule" hyperparameter, and it serves as an Occam's
 razor-esque heuristic. More precisely, given two models with approximately
 equal performance (here, in terms of predictive MSE), it may be wise to opt
@@ -63,17 +63,17 @@ stopped before reaching the objective tolerance \code{admm_params$obj_tol}. In
 these situations, you may need to increase the maximum number of tolerable
 iterations by passing a \code{max_iter} argument to \code{cv_trendfilter()} in order to
 ensure that the ADMM solution has converged to satisfactory precision.}
-\item{\code{training_errors}}{The "in-sample" MSE between the observed outputs \code{y}
+\item{\code{training_error}}{The "in-sample" MSE between the observed outputs \code{y}
 and the trend filtering estimate, for every hyperparameter value in
 \code{lambda}.}
-\item{\code{optimisms}}{SURE-estimated optimisms, i.e.
-\code{optimisms = errors - training_errors}.}
+\item{\code{optimism}}{SURE-estimated optimisms, i.e.
+\code{optimism = error - training_error}.}
 \item{\code{call}}{The function call.}
 }
 }
 \description{
 For every candidate hyperparameter value, compute an unbiased estimate of the
-trend filtering model's predictive mean-squared error. See the \emph{Details}
+trend filtering model's predictive mean-squared error. See the \strong{Details}
 section for guidelines on when \code{\link[=sure_trendfilter]{sure_trendfilter()}} should be used versus
 \code{\link[=cv_trendfilter]{cv_trendfilter()}}. Generic \code{\link[stats:stats-package]{stats}} functions such
 as \code{\link[=predict]{predict()}}, \code{\link[=fitted.values]{fitted.values()}}, \code{\link[=residuals]{residuals()}}, etc. may be called on

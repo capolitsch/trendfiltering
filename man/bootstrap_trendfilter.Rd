@@ -86,15 +86,16 @@ inputs are evenly sampled on the \code{log10(x)} scale.
 # system, with the primary eclipse occuring at `phase = 0` and the input
 # domain ranging from -0.5 to 0.5.
 
-data("quasar_spectrum")
-head(quasar_spectrum)
+data("eclipsing_binary")
+head(eclipsing_binary)
 
-x <- quasar_spectrum$log10_wavelength
-y <- quasar_spectrum$flux
-weights <- quasar_spectrum$weights
+x <- eclipsing_binary$phase
+y <- eclipsing_binary$flux
+weights <- 1 / eclipsing_binary$std_err^2
 
-sure_tf <- sure_trendfilter(x, y, weights)
-bands <- vbands(boot_tf)
+cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
+boot_tf <- bootstrap_trendfilter(cv_tf, "nonparametric")
+
 
 # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
 
@@ -106,9 +107,7 @@ y <- quasar_spectrum$flux
 weights <- quasar_spectrum$weights
 
 sure_tf <- sure_trendfilter(x, y, weights)
-
 boot_tf <- bootstrap_trendfilter(sure_tf, "parametric")
-bands <- vbands(boot_tf)
 }
 \references{
 \enumerate{

@@ -134,7 +134,7 @@ risk estimate</h1>
 
     <div class="ref-description">
     <p>For every candidate hyperparameter value, compute an unbiased estimate of the
-trend filtering model's predictive mean-squared error. See the <em>Details</em>
+trend filtering model's predictive mean-squared error. See the <strong>Details</strong>
 section for guidelines on when <code>sure_trendfilter()</code> should be used versus
 <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>. Generic <code><a href='https://rdrr.io/r/stats/stats-package.html'>stats</a></code> functions such
 as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code>, etc. may be called on
@@ -158,8 +158,8 @@ the <code>sure_trendfilter()</code> output.</p>
       <th>weights</th>
       <td><p>Weights for the observed outputs, defined as the reciprocal variance of the
 additive noise that contaminates the output signal. When the noise is
-expected to have an equal variance <em></em>\(\sigma^2\) for all observations,
-a scalar may be passed to <code>weights</code>, i.e. <code>weights = </code><em></em>\(1/\sigma^2\).
+expected to have an equal variance \(\sigma^2\) for all observations,
+a scalar may be passed to <code>weights</code>, i.e. <code>weights = </code>\(1/\sigma^2\).
 Otherwise, <code>weights</code> must be a vector with the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
     <tr>
@@ -183,15 +183,15 @@ controlling the granularity of the hyperparameter grid.</p></td>
 as well as all elements from the '<code><a href='trendfilter.html'>trendfilter</a></code>' call.</p><dl>
 <dt><code>lambda</code></dt><dd><p>Vector of candidate hyperparameter values (always returned
 in descending order).</p></dd>
-<dt><code>edfs</code></dt><dd><p>Number of effective degrees of freedom in the trend filtering
+<dt><code>edf</code></dt><dd><p>Number of effective degrees of freedom in the trend filtering
 estimator, for every hyperparameter value in <code>lambda</code>.</p></dd>
-<dt><code>errors</code></dt><dd><p>Vector of mean-squared prediction errors estimated by SURE,
+<dt><code>error</code></dt><dd><p>Vector of mean-squared prediction errors estimated by SURE,
 for every hyperparameter value in <code>lambda</code>.</p></dd>
-<dt><code>se_errors</code></dt><dd><p>Vector of estimated standard errors for the <code>errors</code>.</p></dd>
+<dt><code>se_error</code></dt><dd><p>Vector of estimated standard errors for the <code>error</code>.</p></dd>
 <dt><code>lambda_min</code></dt><dd><p>Hyperparameter value in <code>lambda</code> that minimizes the SURE
 validation error curve.</p></dd>
 <dt><code>lambda_1se</code></dt><dd><p>The largest hyperparameter value in <code>lambda</code> that has a
-SURE error within one standard error of <code><a href='https://rdrr.io/r/base/Extremes.html'>min(errors)</a></code>. We call this the
+SURE error within one standard error of <code><a href='https://rdrr.io/r/base/Extremes.html'>min(error)</a></code>. We call this the
 "1-standard-error rule" hyperparameter, and it serves as an Occam's
 razor-esque heuristic. More precisely, given two models with approximately
 equal performance (here, in terms of predictive MSE), it may be wise to opt
@@ -213,11 +213,11 @@ stopped before reaching the objective tolerance <code>admm_params$obj_tol</code>
 these situations, you may need to increase the maximum number of tolerable
 iterations by passing a <code>max_iter</code> argument to <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code> in order to
 ensure that the ADMM solution has converged to satisfactory precision.</p></dd>
-<dt><code>training_errors</code></dt><dd><p>The "in-sample" MSE between the observed outputs <code>y</code>
+<dt><code>training_error</code></dt><dd><p>The "in-sample" MSE between the observed outputs <code>y</code>
 and the trend filtering estimate, for every hyperparameter value in
 <code>lambda</code>.</p></dd>
-<dt><code>optimisms</code></dt><dd><p>SURE-estimated optimisms, i.e.
-<code>optimisms = errors - training_errors</code>.</p></dd>
+<dt><code>optimism</code></dt><dd><p>SURE-estimated optimisms, i.e.
+<code>optimism = error - training_error</code>.</p></dd>
 <dt><code>call</code></dt><dd><p>The function call.</p></dd>
 
 </dl>

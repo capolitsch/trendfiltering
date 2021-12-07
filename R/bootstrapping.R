@@ -83,15 +83,16 @@
 #' # system, with the primary eclipse occuring at `phase = 0` and the input
 #' # domain ranging from -0.5 to 0.5.
 #'
-#' data("quasar_spectrum")
-#' head(quasar_spectrum)
+#' data("eclipsing_binary")
+#' head(eclipsing_binary)
 #'
-#' x <- quasar_spectrum$log10_wavelength
-#' y <- quasar_spectrum$flux
-#' weights <- quasar_spectrum$weights
+#' x <- eclipsing_binary$phase
+#' y <- eclipsing_binary$flux
+#' weights <- 1 / eclipsing_binary$std_err^2
 #'
-#' sure_tf <- sure_trendfilter(x, y, weights)
-#' bands <- vbands(boot_tf)
+#' cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
+#' boot_tf <- bootstrap_trendfilter(cv_tf, "nonparametric")
+#'
 #'
 #' # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
 #'
@@ -103,9 +104,8 @@
 #' weights <- quasar_spectrum$weights
 #'
 #' sure_tf <- sure_trendfilter(x, y, weights)
-#'
 #' boot_tf <- bootstrap_trendfilter(sure_tf, "parametric")
-#' bands <- vbands(boot_tf)
+
 #' @importFrom dplyr case_when mutate
 #' @importFrom magrittr %>% %<>%
 #' @importFrom rlang %||%
@@ -184,32 +184,34 @@ bootstrap_trendfilter <- function(obj,
     mc.cores = mc_cores
   )
 
+  return(par_out)
+
   ensemble <- lapply(
     1:B,
     FUN = function(X) par_out[[X]][["tf_estimate_boot"]]
   ) %>%
-    unlist(labels = FALSE) %>%
-    matrix(nrow = length(obj$x_eval))
+    unlist(use.names = FALSE) %>%
+    matrix(nrow = length(x_eval))
 
   edf_boots <- lapply(
     1:B,
     FUN = function(X) par_out[[X]][["edf_boot"]]
   ) %>%
-    unlist(labels = FALSE) %>%
+    unlist(use.names = FALSE) %>%
     as.integer()
 
   n_iter_boots <- lapply(
     1:B,
     FUN = function(X) par_out[[X]][["n_iter_boot"]]
   ) %>%
-    unlist(labels = FALSE) %>%
+    unlist(use.names = FALSE) %>%
     as.integer()
 
   lambda_boots <- lapply(
     1:B,
     FUN = function(X) par_out[[X]][["lambda_boot"]]
   ) %>%
-    unlist(labels = FALSE)
+    unlist(use.names = FALSE)
 
   invisible(
     structure(
@@ -253,8 +255,10 @@ bootstrap_parallel <- function(b, data, edf, lambda_grid, obj, sampler, x_eval) 
     )
   }
 
+  tf_estimate_boot <- predict(fit, lambda_boot, x_eval)
+
   list(
-    tf_estimate_boot = predict(fit, lambda_boot, x_eval),
+    tf_estimate_boot = tf_estimate_boot,
     edf_boot = edf_boot,
     lambda_boot = lambda_boot,
     n_iter_boot = n_iter_boot
@@ -350,7 +354,7 @@ wild_sampler <- function(data) {
 #' y <- eclipsing_binary$flux
 #' weights <- 1 / eclipsing_binary$std_err^2
 #'
-#' cv_tf <- cv_trendfilter(x, y, weights, x = EB$phase, max_iter = 1e4, obj_tol = 1e-6)
+#' cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
 #'
 #' boot_tf <- bootstrap_trendfilter(cv_tf, "nonparametric")
 #' bands <- vbands(boot_tf)
@@ -366,9 +370,7 @@ wild_sampler <- function(data) {
 #' weights <- quasar_spectrum$weights
 #'
 #' sure_tf <- sure_trendfilter(x, y, weights)
-#'
 #' boot_tf <- bootstrap_trendfilter(sure_tf, "parametric")
-#' bands <- vbands(boot_tf)
 
 #' @importFrom dplyr tibble
 #' @export

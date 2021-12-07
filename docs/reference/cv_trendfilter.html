@@ -137,10 +137,10 @@ cv_trendfilter() output." />
     <div class="ref-description">
     <p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
  For every candidate hyperparameter value, estimate the trend
-filtering model's out-of-sample error by <em></em>\(V\)-fold cross validation.
+filtering model's out-of-sample error by \(V\)-fold cross validation.
 Many common regression loss functions are defined internally, and a cross
 validation curve is returned for each. Custom loss functions may also be
-passed via the <code>loss_funcs</code> argument. See the <em>Loss functions</em> section
+passed via the <code>loss_funcs</code> argument. See the <strong>Loss functions</strong> section
 below for definitions of the internal loss functions, and for guidelines on
 when <code>cv_trendfilter()</code> should be used versus <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>.
 Generic <code><a href='https://rdrr.io/r/stats/stats-package.html'>stats</a></code> functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>,
@@ -175,8 +175,8 @@ Generic <code><a href='https://rdrr.io/r/stats/stats-package.html'>stats</a></co
       <th>weights</th>
       <td><p>Weights for the observed outputs, defined as the reciprocal variance of the
 additive noise that contaminates the output signal. When the noise is
-expected to have an equal variance <em></em>\(\sigma^2\) for all observations,
-a scalar may be passed to <code>weights</code>, i.e. <code>weights = </code><em></em>\(1/\sigma^2\).
+expected to have an equal variance \(\sigma^2\) for all observations,
+a scalar may be passed to <code>weights</code>, i.e. <code>weights = </code>\(1/\sigma^2\).
 Otherwise, <code>weights</code> must be a vector with the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
     <tr>
@@ -222,36 +222,36 @@ This is a list with the elements below,
 as well as all elements from the '<code><a href='trendfilter.html'>trendfilter</a></code>' call.</p><dl>
 <dt><code>lambda</code></dt><dd><p>Vector of candidate hyperparameter values (always returned
 in descending order).</p></dd>
-<dt><code>edfs</code></dt><dd><p>Number of effective degrees of freedom in the trend filtering
+<dt><code>edf</code></dt><dd><p>Number of effective degrees of freedom in the trend filtering
 estimator, for every candidate hyperparameter value in <code>lambda</code>.</p></dd>
-<dt><code>errors</code></dt><dd><p>A named list of vectors, with each representing the
+<dt><code>error</code></dt><dd><p>A named list of vectors, with each representing the
 CV error curve for every loss function in <code>loss_funcs</code> (see below).</p></dd>
-<dt><code>se_errors</code></dt><dd><p>Standard errors for the <code>errors</code>, within a named list of
+<dt><code>se_error</code></dt><dd><p>Standard errors for the <code>error</code>, within a named list of
 the same structure.</p></dd>
-<dt><code>lambda_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
+<dt><code>lambda_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(error)</a></code>,
 containing the hyperparameter value that minimizes the CV error curve, for
 every loss function in <code>loss_funcs</code>.</p></dd>
-<dt><code>lambda_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
+<dt><code>lambda_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(error)</a></code>,
 containing the "1-standard-error rule" hyperparameter, for every loss
 function in <code>loss_funcs</code>. The "1-standard-error rule" hyperparameter is the
 largest hyperparameter value in <code>lambda</code> that has a CV error within one
-standard error of <code><a href='https://rdrr.io/r/base/Extremes.html'>min(errors)</a></code>. It serves as an Occam's razor-like
+standard error of <code><a href='https://rdrr.io/r/base/Extremes.html'>min(error)</a></code>. It serves as an Occam's razor-like
 heuristic. More precisely, given two models with approximately equal
 performance (in terms of some loss function), it may be wise to opt for the
 simpler model, i.e. the model with the larger hyperparameter value / fewer
 effective degrees of freedom.</p></dd>
-<dt><code>edf_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
+<dt><code>edf_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(error)</a></code>,
 containing the number of effective degrees of freedom in the trend filtering
 estimator that minimizes the CV error curve, for every loss function in
 <code>loss_funcs</code>.</p></dd>
-<dt><code>edf_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
+<dt><code>edf_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(error)</a></code>,
 containing the number of effective degrees of freedom in the
 "1-standard-error rule" trend filtering estimator, for every loss function in
 <code>loss_funcs</code>.</p></dd>
-<dt><code>i_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
+<dt><code>i_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(error)</a></code>,
 containing the index of <code>lambda</code> that minimizes the CV error curve, for
 every loss function in <code>loss_funcs</code>.</p></dd>
-<dt><code>i_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(errors)</a></code>,
+<dt><code>i_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(error)</a></code>,
 containing the index of <code>lambda</code> that gives the "1-standard-error rule"
 hyperparameter value, for every loss function in <code>loss_funcs</code>.</p></dd>
 <dt><code>obj_func</code></dt><dd><p>The relative change in the objective function over the
@@ -273,9 +273,6 @@ validation.</p></dd>
 <dt><code>y</code></dt><dd><p>Vector of observed values for the output variable (if originally
 present, observations with <code><a href='https://rdrr.io/r/base/NA.html'>is.na(y)</a></code> or <code>weights == 0</code> are dropped).</p></dd>
 <dt><code>weights</code></dt><dd><p>Vector of weights for the observed outputs.</p></dd>
-<dt><code>model_obj</code></dt><dd><p>A list containing the trend filtering model fit object,
-the ADMM parameter settings, and other modeling objects that are useful to
-pass along to functions that operate on the <code>cv_trendfilter()</code> output.</p></dd>
 
 </dl>
 
@@ -304,7 +301,7 @@ a case when the inputs are evenly sampled on the <code><a href='https://rdrr.io/
 
 
 <p>The following loss functions are automatically computed during cross
-validation and their CV error curves are returned in the <code>errors</code> list
+validation and their CV error curves are returned in the <code>error</code> list
 within the <code>cv_trendfilter()</code> output.</p><ol>
 <li><p>Mean absolute deviations error: \[MAE(\lambda) =
 \frac{1}{n} \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|\]</p></li>
@@ -340,7 +337,7 @@ $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
 \left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|\]</p></li>
 </ol>
 
-<p>where <em></em>\(w_i:=\) <code>weights[i]</code>.</p>
+<p>where \(w_i:=\) <code>weights[i]</code>.</p>
 <p>When defining custom loss functions, each function within the named list
 passed to <code>loss_funcs</code> should take three vector arguments --- <code>y</code>,
 <code>tf_estimate</code>, and <code>weights</code> --- and return a single scalar value for the
