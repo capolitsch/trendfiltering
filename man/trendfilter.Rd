@@ -43,7 +43,7 @@ x <- eclipsing_binary$phase
 y <- eclipsing_binary$flux
 weights <- 1 / eclipsing_binary$std_err^2
 
-fit <- trendfilter(x, y, weights, lambda = exp(2))
+fit <- trendfilter(x, y, weights, lambda = exp(10))
 }
 \references{
 \enumerate{

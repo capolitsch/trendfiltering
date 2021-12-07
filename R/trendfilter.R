@@ -62,7 +62,7 @@
 #' fit <- .trendfilter(x,
 #'                     y,
 #'                     weights,
-#'                     lambda = exp(2),
+#'                     lambda = exp(10),
 #'                     obj_tol = 1e-6,
 #'                     max_iter = 1e4
 #' )
@@ -253,7 +253,7 @@
 #' y <- eclipsing_binary$flux
 #' weights <- 1 / eclipsing_binary$std_err^2
 #'
-#' fit <- trendfilter(x, y, weights, lambda = exp(2))
+#' fit <- trendfilter(x, y, weights, lambda = exp(10))
 
 #' @export
 trendfilter <- function(x,

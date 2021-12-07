@@ -39,8 +39,8 @@ get_lambda_grid_edf_spacing <- function(data,
     y,
     weights,
     k = 2L,
-    lambda,
     admm_params,
+    nlambda = nlambda_start,
     lambda_min_ratio,
     ...
   )

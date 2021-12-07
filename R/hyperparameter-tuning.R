@@ -829,7 +829,6 @@ sure_trendfilter <- function(x,
   }
 
   k %<>% as.integer()
-  V %<>% as.integer()
 
   data <- tibble(x = as.double(x),
                  y = as.double(y),
