@@ -252,7 +252,7 @@ cv_trendfilter <- function(x,
     stopifnot(length(max_iter) == 1L)
     max_iter %<>% as.integer()
   } else{
-    max_iter <- NULL
+    max_iter <- 0
   }
 
   stopifnot(is.numeric(V) && V == round(V))
@@ -360,10 +360,7 @@ cv_trendfilter <- function(x,
       weights = weights * y_scale^2
     )
 
-  admm_params <- get_admm_params(obj_tol, max_iter)
-  if (admm_params$max_iter < max(n, 200L)) {
-    admm_params$max_iter <- as.double(max(n, 200L))
-  }
+  admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
 
   if (min(diff(data_scaled$x)) <= admm_params$x_tol / x_scale) {
     thin_params <- admm_params
@@ -801,7 +798,7 @@ sure_trendfilter <- function(x,
     obj_tol <- extra_args$max_iter
     stopifnot(is.numeric(obj_tol) && obj_tol > 0L && length(obj_tol) == 1L)
   } else{
-    obj_tol <- 1e-10
+    obj_tol <- NULL
   }
 
   if (any(names(extra_args) == "max_iter")) {
@@ -810,7 +807,7 @@ sure_trendfilter <- function(x,
     stopifnot(length(max_iter) == 1L)
     max_iter %<>% as.integer()
   } else{
-    max_iter <- length(y)
+    max_iter <- 0
   }
 
   if (missing(weights)) {
@@ -850,10 +847,7 @@ sure_trendfilter <- function(x,
       weights = weights * y_scale^2
     )
 
-  admm_params <- get_admm_params(obj_tol, max_iter)
-  if (admm_params$max_iter < max(n, 200L)) {
-    admm_params$max_iter <- as.double(max(n, 200L))
-  }
+  admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
 
   if (min(diff(data_scaled$x)) <= admm_params$x_tol / x_scale) {
     thin_params <- admm_params

@@ -155,10 +155,7 @@
       weights = weights * y_scale^2
     )
 
-  admm_params <- get_admm_params(obj_tol, max_iter)
-  if (admm_params$max_iter < max(n, 200L)) {
-    admm_params$max_iter <- as.double(max(n, 200L))
-  }
+  admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
 
   if (min(diff(data_scaled$x)) <= admm_params$x_tol / x_scale) {
     thin_params <- admm_params
