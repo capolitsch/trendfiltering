@@ -94,7 +94,7 @@ y <- eclipsing_binary$flux
 weights <- 1 / eclipsing_binary$std_err^2
 
 cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
-boot_tf <- bootstrap_trendfilter(cv_tf, "nonparametric")
+boot_tf <- bootstrap_trendfilter(cv_tf, algorithm = "nonparametric", lambda = cv_tf$lambda_min["MAE"])
 
 
 # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
@@ -107,7 +107,7 @@ y <- quasar_spectrum$flux
 weights <- quasar_spectrum$weights
 
 sure_tf <- sure_trendfilter(x, y, weights)
-boot_tf <- bootstrap_trendfilter(sure_tf, "parametric")
+boot_tf <- bootstrap_trendfilter(sure_tf, algorithm = "parametric", lambda = sure_tf$lambda_min)
 }
 \references{
 \enumerate{

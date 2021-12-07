@@ -512,14 +512,16 @@ cv_trendfilter <- function(x,
   edf_min <- as.integer(fit$edf[i_min])
   edf_1se <- as.integer(fit$edf[i_1se])
 
-  names(lambda_min) <- names(loss_funcs)
-  names(lambda_1se) <- names(loss_funcs)
-  names(edf_min) <- names(loss_funcs)
-  names(edf_1se) <- names(loss_funcs)
-  names(error) <- names(loss_funcs)
-  names(i_min) <- names(loss_funcs)
-  names(se_error) <- names(loss_funcs)
-  names(i_1se) <- names(loss_funcs)
+  loss_func_names <- names(loss_funcs)
+
+  names(lambda_min) <- loss_func_names
+  names(lambda_1se) <- loss_func_names
+  names(edf_min) <- loss_func_names
+  names(edf_1se) <- loss_func_names
+  names(error) <- loss_func_names
+  names(se_error) <- loss_func_names
+  names(i_min) <- loss_func_names
+  names(i_1se) <- loss_func_names
 
   invisible(
     structure(
@@ -528,10 +530,10 @@ cv_trendfilter <- function(x,
         edf = fit$edf,
         error = error,
         se_error = se_error,
-        lambda_min = lambda[i_min],
-        lambda_1se = lambda[i_1se],
-        edf_min = fit$edf[i_min],
-        edf_1se = fit$edf[i_1se],
+        lambda_min = lambda_min,
+        lambda_1se = lambda_1se,
+        edf_min = edf_min,
+        edf_1se = edf_1se,
         i_min = i_min,
         i_1se = i_1se,
         obj_func = fit$obj_fun,
