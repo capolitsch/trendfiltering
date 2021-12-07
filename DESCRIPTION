@@ -1,7 +1,7 @@
 Type: Package
 Package: trendfiltering
 Title: The state-of-the-art method for denoising 1D signals
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: 
     person(given = "Collin A.", 
            family = "Politsch", 

@@ -56,7 +56,7 @@ predict.trendfilter <- function(obj,
                                 ...) {
   stopifnot(any(class(obj) == "trendfilter"))
 
-  lambda <- lambda %||% obj$lambda
+  lambda <- lambda %||% obj$lambda_min
 
   stopifnot(is.numeric(lambda))
   stopifnot(min(lambda) >= 0L)

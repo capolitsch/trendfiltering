@@ -48,6 +48,22 @@
 #'    signals with varying degrees of smoothness. *MNRAS*, 492(3), p. 4019-4032.
 #'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4019/5704414)]
 #'    [[arXiv](https://arxiv.org/abs/2001.03552)].
+#'
+#' @examples
+#' data("eclipsing_binary")
+#' head(eclipsing_binary)
+#'
+#' x <- eclipsing_binary$phase
+#' y <- eclipsing_binary$flux
+#' weights <- 1 / eclipsing_binary$std_err^2
+#'
+#' fit <- .trendfilter(x,
+#'                     y,
+#'                     weights,
+#'                     lambda = exp(2),
+#'                     obj_tol = 1e-6,
+#'                     max_iter = 1e4
+#' )
 
 #' @importFrom glmgen .tf_thin .tf_fit .tf_predict
 #' @importFrom dplyr tibble filter mutate select arrange case_when group_split
@@ -215,6 +231,16 @@
 #'    signals with varying degrees of smoothness. *MNRAS*, 492(3), p. 4019-4032.
 #'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4019/5704414)]
 #'    [[arXiv](https://arxiv.org/abs/2001.03552)].
+#'
+#' @examples
+#' data("eclipsing_binary")
+#' head(eclipsing_binary)
+#'
+#' x <- eclipsing_binary$phase
+#' y <- eclipsing_binary$flux
+#' weights <- 1 / eclipsing_binary$std_err^2
+#'
+#' fit <- trendfilter(x, y, weights, lambda = exp(2))
 
 #' @export
 trendfilter <- function(x,

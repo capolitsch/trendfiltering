@@ -8,7 +8,10 @@ bootstrap_trendfilter(
   obj,
   algorithm = NULL,
   B = 100L,
-  mc_cores = parallel::detectCores() - 4
+  x_eval = NULL,
+  lambda = NULL,
+  mc_cores = parallel::detectCores() - 4,
+  ...
 )
 }
 \arguments{
@@ -16,7 +19,7 @@ bootstrap_trendfilter(
 '\code{\link[=sure_trendfilter]{sure_trendfilter}}'.}
 
 \item{algorithm}{A string specifying which variation of the bootstrap to use. One of
-\code{c("nonparametric", "parametric", "wild")}. See Details section below for
+\code{c("nonparametric", "parametric", "wild")}. See \emph{Details} section below for
 guidelines on when each choice should be used.}
 
 \item{B}{The number of bootstrap samples used to estimate the pointwise variability
@@ -24,18 +27,20 @@ bands. Defaults to \code{B = 100L}.}
 
 \item{mc_cores}{Number of cores to utilize for parallel computing. Defaults to the number
 of cores detected, minus 4.}
+
+\item{...}{Additional named arguments. Currently unused.}
 }
 \value{
 An object of class '\code{bootstrap_trendfilter}' and subclass
-'\code{\link[=trendfilter]{trendfilter}}'. This is a list with the following elements:
+'\code{\link[=trendfilter]{trendfilter}}'. This is a list with the elements below,
+as well as all elements from \code{obj}.
 \describe{
 \item{x_eval}{Input grid that each bootstrap trend filtering estimate was
 evaluated on.}
 \item{ensemble}{The full trend filtering bootstrap ensemble as a matrix with
 \code{length(x_eval)} rows and \code{B} columns.}
 \item{edf_boots}{Vector of the estimated number of effective degrees of
-freedom of each trend filtering bootstrap estimate. These should all be
-relatively close to \code{obj$edf_opt}.}
+freedom of each trend filtering bootstrap estimate.}
 \item{n_iter_boots}{Vector of the number of iterations taken by the ADMM
 algorithm before reaching a stopping criterion, for each bootstrap estimate.}
 \item{lambda_boots}{Vector of the hyperparameter values used for each
@@ -50,7 +55,7 @@ used to generate the ensemble.}
 Generate a bootstrap ensemble of trend filtering estimates in order to
 quantify the uncertainty in the optimized estimate. One of three possible
 bootstrap algorithms should be chosen according to the criteria in the
-Details section below. Pointwise variability bands are then obtained by
+\emph{Details} section below. Pointwise variability bands are then obtained by
 passing the '\code{bootstrap_trendfilter}' object to \code{\link[=vbands]{vbands()}}, along with the
 desired level (e.g. \code{level = 0.95}) .
 }
@@ -81,29 +86,28 @@ inputs are evenly sampled on the \code{log10(x)} scale.
 # system, with the primary eclipse occuring at `phase = 0` and the input
 # domain ranging from -0.5 to 0.5.
 
-data(eclipsing_binary)
-head(EB)
+data("quasar_spectrum")
+head(quasar_spectrum)
 
-cv_tf <- cv_trendfilter(
-  x = EB$phase,
-  y = EB$flux,
-  weights = 1 / EB$std_err^2,
-  max_iter = 1e4,
-  obj_tol = 1e-6
-)
+x <- quasar_spectrum$log10_wavelength
+y <- quasar_spectrum$flux
+weights <- quasar_spectrum$weights
 
-boot_tf <- bootstrap_trendfilter(cv_tf, algorithm = "nonparametric")
+sure_tf <- sure_trendfilter(x, y, weights)
 bands <- vbands(boot_tf)
 
 # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
 
-data(quasar_spectrum)
-head(spec)
+data("quasar_spectrum")
+head(quasar_spectrum)
 
-sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
-pred_tf <- predict(sure_tf)
+x <- quasar_spectrum$log10_wavelength
+y <- quasar_spectrum$flux
+weights <- quasar_spectrum$weights
 
-boot_tf <- bootstrap_trendfilter(pred_tf, algorithm = "parametric")
+sure_tf <- sure_trendfilter(x, y, weights)
+
+boot_tf <- bootstrap_trendfilter(sure_tf, "parametric")
 bands <- vbands(boot_tf)
 }
 \references{

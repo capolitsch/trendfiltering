@@ -36,27 +36,20 @@ reference:
   - contents:
     - '`trendfilter`'
     - '`.trendfilter`'
-  - title: "Hyperparameter Optimization"
+  - title: "Optimize hyperparameter(s)"
   - contents:
       - '`cv_trendfilter`'
       - '`sure_trendfilter`'
-  - title: "Bootstrap"
+  - title: "Compute bootstrap ensembles/uncertainties"
   - contents:
       - '`bootstrap_trendfilter`'
       - '`vbands`'
-  - title: "stats methods"
+  - title: "Call stats generics on trend filtering objects"
   - contents:
       - '`predict.trendfilter`'
-      - '`predict.cv_trendfilter`'
-      - '`predict.sure_trendfilter`'
       - '`fitted.trendfilter`'
       - '`residuals.trendfilter`'
       - '`coef.trendfilter`'
-  - title: "Summary methods"
-  - contents:
-      - '`summary.trendfilter`'
-      - '`print.trendfilter`'
-      - '`print.summary.trendfilter`'
   - title: "Data sets"
   - contents:
       - '`eclipsing_binary`'

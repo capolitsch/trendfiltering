@@ -66,28 +66,28 @@
 #' validation and their CV error curves are returned in the `errors` list
 #' within the [`cv_trendfilter()`] output.
 #'
-#' 1. Mean absolute deviations error: \mjsdeqn{\text{MAE}(\lambda) =
+#' 1. Mean absolute deviations error: \mjsdeqn{MAE(\lambda) =
 #' \frac{1}{n} \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|}
 #'
 #' 2. Weighted mean absolute deviations error:
-#' \mjsdeqn{\text{WMAE}(\lambda) = \sum_{i=1}^{n}
+#' \mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n}
 #' |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
 #'
-#' 3. Mean-squared error: \mjsdeqn{\text{MSE}(\lambda) = \frac{1}{n}
+#' 3. Mean-squared error: \mjsdeqn{MSE(\lambda) = \frac{1}{n}
 #' \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2}
 #'
-#' 4. Weighted mean-squared error: \mjsdeqn{\text{WMSE}(\lambda)
+#' 4. Weighted mean-squared error: \mjsdeqn{WMSE(\lambda)
 #' = \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
 #'
-#' 5. log-cosh error: \mjsdeqn{\text{logcosh}(\lambda) =
+#' 5. log-cosh error: \mjsdeqn{logcosh(\lambda) =
 #' \frac{1}{n}\sum_{i=1}^{n}
 #' \log\left(\cosh\left(Y_i - \hat{f}(x_i; \lambda)\right)\right)}
 #'
-#' 6. Weighted log-cosh error: \mjsdeqn{\text{wlogcosh}(\lambda) =
+#' 6. Weighted log-cosh error: \mjsdeqn{wlogcosh(\lambda) =
 #' \sum_{i=1}^{n}
 #' \log\left(\cosh\left((Y_i - \hat{f}(x_i; \lambda))\sqrt{w_i}\right)\right)}
 #'
-#' 7. Huber loss: \mjsdeqn{\text{Huber}(\lambda) =
+#' 7. Huber loss: \mjsdeqn{Huber(\lambda) =
 #' \frac{1}{n}\sum_{i=1}^{n}L_{\lambda}(Y_i; \delta)}
 #' \mjsdeqn{\text{where}\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
 #' |Y_i - \hat{f}(x_i; \lambda)|^2, &
@@ -95,7 +95,7 @@
 #' 2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, &
 #' $|Y_i - \hat{f}(x_i; \lambda)| > \delta$}}
 #'
-#' 8. Weighted Huber loss: \mjsdeqn{\text{wHuber}(\lambda) =
+#' 8. Weighted Huber loss: \mjsdeqn{wHuber(\lambda) =
 #' \sum_{i=1}^{n}L_{\lambda}(Y_i; \delta)}
 #' \mjsdeqn{\text{where}\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
 #' |Y_i - \hat{f}(x_i; \lambda)|^2w_i, &
@@ -103,7 +103,7 @@
 #' 2\delta|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} -
 #' \delta^2, & $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta$}}
 #'
-#' 9. Mean-squared logarithmic error: \mjsdeqn{\text{MSLE}(\lambda) =
+#' 9. Mean-squared logarithmic error: \mjsdeqn{MSLE(\lambda) =
 #' \frac{1}{n}\sum_{i=1}^{n}
 #' \left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|}
 #'
@@ -751,10 +751,14 @@ get_internal_loss_funcs <- function() {
 #'    [[arXiv](https://arxiv.org/abs/2001.03552)].
 #'
 #' @examples
-#' data(quasar_spectrum)
-#' head(spec)
+#' data("quasar_spectrum")
+#' head(quasar_spectrum)
 #'
-#' sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+#' x <- quasar_spectrum$log10_wavelength
+#' y <- quasar_spectrum$flux
+#' weights <- quasar_spectrum$weights
+#'
+#' sure_tf <- sure_trendfilter(x, y, weights)
 #' @importFrom dplyr tibble filter mutate select arrange case_when group_split
 #' @importFrom dplyr bind_rows
 #' @importFrom tidyr drop_na

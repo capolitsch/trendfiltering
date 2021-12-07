@@ -5,7 +5,7 @@
 \title{Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
 risk estimate}
 \usage{
-sure_trendfilter(x, y, weights, nlambdas = 250L, ...)
+sure_trendfilter(x, y, weights, nlambda = 250L, ...)
 }
 \arguments{
 \item{x}{Vector of observed values for the input variable.}
@@ -18,28 +18,29 @@ expected to have an equal variance \mjseqn{\sigma^2} for all observations,
 a scalar may be passed to \code{weights}, i.e. \verb{weights = }\mjseqn{1/\sigma^2}.
 Otherwise, \code{weights} must be a vector with the same length as \code{x} and \code{y}.}
 
-\item{nlambdas}{Number of hyperparameter values to test during cross validation. Defaults
-to \code{nlambdas = 250}. The hyperparameter grid is internally constructed to
+\item{nlambda}{Number of hyperparameter values to test during cross validation. Defaults
+to \code{nlambda = 250}. The hyperparameter grid is internally constructed to
 span the full trend filtering model space (which is bookended by a global
-polynomial solution and an interpolating solution), with \code{nlambdas}
+polynomial solution and an interpolating solution), with \code{nlambda}
 controlling the granularity of the hyperparameter grid.}
 
 \item{...}{Additional named arguments to pass to \code{\link[=.trendfilter]{.trendfilter()}}.}
 }
 \value{
-An object of class \code{'sure_trendfilter'} and subclass \code{'trendfilter'}.
-This is a list with the following elements:
+An object of class '\code{sure_trendfilter}' and subclass
+'\code{\link[=trendfilter]{trendfilter}}'. This is a list with the elements below,
+as well as all elements from the '\code{\link[=trendfilter]{trendfilter}}' call.
 \describe{
-\item{\code{lambdas}}{Vector of candidate hyperparameter values (always returned
+\item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
 in descending order).}
 \item{\code{edfs}}{Number of effective degrees of freedom in the trend filtering
-estimator, for every hyperparameter value in \code{lambdas}.}
+estimator, for every hyperparameter value in \code{lambda}.}
 \item{\code{errors}}{Vector of mean-squared prediction errors estimated by SURE,
-for every hyperparameter value in \code{lambdas}.}
+for every hyperparameter value in \code{lambda}.}
 \item{\code{se_errors}}{Vector of estimated standard errors for the \code{errors}.}
-\item{\code{lambda_min}}{Hyperparameter value in \code{lambdas} that minimizes the SURE
+\item{\code{lambda_min}}{Hyperparameter value in \code{lambda} that minimizes the SURE
 validation error curve.}
-\item{\code{lambda_1se}}{The largest hyperparameter value in \code{lambdas} that has a
+\item{\code{lambda_1se}}{The largest hyperparameter value in \code{lambda} that has a
 SURE error within one standard error of \code{min(errors)}. We call this the
 "1-standard-error rule" hyperparameter, and it serves as an Occam's
 razor-esque heuristic. More precisely, given two models with approximately
@@ -50,36 +51,29 @@ fewer effective degrees of freedom.}
 filtering estimator with hyperparameter \code{lambda_min}.}
 \item{\code{edf_1se}}{Number of effective degrees of freedom in the  trend
 filtering estimator with hyperparameter \code{lambda_1se}.}
-\item{\code{i_min}}{Index of \code{lambdas} that gives \code{lambda_min}.}
-\item{\code{i_1se}}{Index of \code{lambdas} that gives \code{lambda_1se}.}
+\item{\code{i_min}}{Index of \code{lambda} that gives \code{lambda_min}.}
+\item{\code{i_1se}}{Index of \code{lambda} that gives \code{lambda_1se}.}
 \item{\code{obj_func}}{The relative change in the objective function over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
-\code{lambdas}.}
+\code{lambda}.}
 \item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
-every candidate hyperparameter in \code{lambdas}. If an element of \code{n_iter}
-is exactly equal to \code{model_obj$admm_params$max_iter} (see below), then the
-ADMM algorithm stopped before reaching the objective tolerance
-\code{model_obj$admm_params$obj_tol}. In these situations, you may need to
-increase the maximum number of tolerable iterations by passing a
-\code{max_iter} argument to \code{cv_trendfilter()} in order to ensure that the ADMM
-solution has converged to satisfactory precision.}
+every candidate hyperparameter in \code{lambda}. If an element of \code{n_iter} is
+exactly equal to \code{admm_params$max_iter} (see below), then the ADMM algorithm
+stopped before reaching the objective tolerance \code{admm_params$obj_tol}. In
+these situations, you may need to increase the maximum number of tolerable
+iterations by passing a \code{max_iter} argument to \code{cv_trendfilter()} in order to
+ensure that the ADMM solution has converged to satisfactory precision.}
 \item{\code{training_errors}}{The "in-sample" MSE between the observed outputs \code{y}
 and the trend filtering estimate, for every hyperparameter value in
-\code{lambdas}.}
+\code{lambda}.}
 \item{\code{optimisms}}{SURE-estimated optimisms, i.e.
 \code{optimisms = errors - training_errors}.}
-\item{\code{x}}{Vector of observed values for the input variable.}
-\item{\code{y}}{Vector of observed values for the output variable (if originally
-present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
-\item{\code{weights}}{Vector of weights for the observed outputs.}
-\item{\code{model_obj}}{A list containing the trend filtering model fit object,
-the ADMM parameter settings, and other modeling objects that are useful to
-pass along to functions that operate on the \code{sure_trendfilter()} output.}
+\item{\code{call}}{The function call.}
 }
 }
 \description{
 For every candidate hyperparameter value, compute an unbiased estimate of the
-trend filtering model's predictive mean-squared error. See the details
+trend filtering model's predictive mean-squared error. See the \emph{Details}
 section for guidelines on when \code{\link[=sure_trendfilter]{sure_trendfilter()}} should be used versus
 \code{\link[=cv_trendfilter]{cv_trendfilter()}}. Generic \code{\link[stats:stats-package]{stats}} functions such
 as \code{\link[=predict]{predict()}}, \code{\link[=fitted.values]{fitted.values()}}, \code{\link[=residuals]{residuals()}}, etc. may be called on
@@ -104,10 +98,14 @@ filtering analysis on that scale. See the \code{\link[=sure_trendfilter]{sure_tr
 a case when the inputs are evenly sampled on the \code{log10(x)} scale.
 }
 \examples{
-data(quasar_spectrum)
-head(spec)
+data("quasar_spectrum")
+head(quasar_spectrum)
 
-sure_tf <- sure_trendfilter(spec$log10_wavelength, spec$flux, spec$weights)
+x <- quasar_spectrum$log10_wavelength
+y <- quasar_spectrum$flux
+weights <- quasar_spectrum$weights
+
+sure_tf <- sure_trendfilter(x, y, weights)
 }
 \references{
 \enumerate{

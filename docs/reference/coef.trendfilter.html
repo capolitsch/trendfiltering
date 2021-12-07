@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trendfiltering</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -129,19 +129,20 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for trendfilter</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/coef.html'>coef</a></span><span class='op'>(</span><span class='va'>obj</span>, lambdas <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+<span class='fu'><a href='https://rdrr.io/r/stats/coef.html'>coef</a></span><span class='op'>(</span><span class='va'>obj</span>, lambda <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>obj</th>
-      <td><p>Object of class <code>trendfilter</code>.</p></td>
+      <td><p>Object of class/subclass '<code><a href='trendfilter.html'>trendfilter</a></code>'.</p></td>
     </tr>
     <tr>
-      <th>lambdas</th>
-      <td><p>(Optional) Vector of lambda values to calculate coefficients at. If
-missing, will use break points in the fit.</p></td>
+      <th>lambda</th>
+      <td><p>One of more hyperparameter values to calculate model coefficients for.
+Defaults to <code>lambda = NULL</code>, in which case, model coefficients are computed
+for every hyperparameter value in <code>obj$lambda</code>.</p></td>
     </tr>
     </table>
 

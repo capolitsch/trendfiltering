@@ -11,7 +11,7 @@
 \alias{fitted.bootstrap_trendfilter}
 \title{Get fitted values from a trendfilter object}
 \usage{
-\method{fitted}{trendfilter}(obj, lambda = NULL)
+\method{fitted}{trendfilter}(obj, lambda = NULL, ...)
 }
 \arguments{
 \item{obj}{Object of class \code{trendfilter}.}
@@ -20,10 +20,10 @@
 \code{lambda = NULL}, in which case, fitted values are computed for all
 hyperparameter values in \code{obj$lambda}.}
 
+\item{...}{Additional named arguments. Currently unused.}
+
 \item{zero_tol}{Threshold parameter that controls the point at which a small coefficient
 value is set to zero. Defaults to \code{zero_tol = 1e-6}.}
-
-\item{...}{Additional named arguments. Currently unused.}
 }
 \description{
 Get fitted values from a trendfilter object

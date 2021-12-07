@@ -10,7 +10,7 @@
 \alias{coefficients.bootstrap_trendfilter}
 \title{Get coefficients from a trendfilter object}
 \usage{
-\method{coef}{trendfilter}(obj, lambda = NULL)
+\method{coef}{trendfilter}(obj, lambda = NULL, ...)
 }
 \arguments{
 \item{obj}{Object of class/subclass '\code{\link[=trendfilter]{trendfilter}}'.}

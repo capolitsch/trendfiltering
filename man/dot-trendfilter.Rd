@@ -57,6 +57,22 @@ An object of class \code{'trendfilter'}.
 \description{
 Fit a trend filtering model.
 }
+\examples{
+data("eclipsing_binary")
+head(eclipsing_binary)
+
+x <- eclipsing_binary$phase
+y <- eclipsing_binary$flux
+weights <- 1 / eclipsing_binary$std_err^2
+
+fit <- .trendfilter(x,
+                    y,
+                    weights,
+                    lambda = exp(2),
+                    obj_tol = 1e-6,
+                    max_iter = 1e4
+)
+}
 \references{
 \enumerate{
 \item Politsch et al. (2020a). Trend filtering – I. A modern statistical tool

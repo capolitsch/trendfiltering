@@ -8,7 +8,7 @@ cv_trendfilter(
   x,
   y,
   weights = NULL,
-  nlambdas = 250L,
+  nlambda = 250L,
   V = 10L,
   mc_cores = V,
   loss_funcs = NULL,
@@ -27,10 +27,10 @@ expected to have an equal variance \mjseqn{\sigma^2} for all observations,
 a scalar may be passed to \code{weights}, i.e. \verb{weights = }\mjseqn{1/\sigma^2}.
 Otherwise, \code{weights} must be a vector with the same length as \code{x} and \code{y}.}
 
-\item{nlambdas}{Number of hyperparameter values to test during cross validation. Defaults
-to \code{nlambdas = 250}. The hyperparameter grid is internally constructed to
+\item{nlambda}{Number of hyperparameter values to test during cross validation. Defaults
+to \code{nlambda = 250}. The hyperparameter grid is internally constructed to
 span the full trend filtering model space (which is bookended by a global
-polynomial solution and an interpolating solution), with \code{nlambdas}
+polynomial solution and an interpolating solution), with \code{nlambda}
 controlling the granularity of the hyperparameter grid.}
 
 \item{V}{Number of folds that the data are partitioned into for V-fold cross
@@ -51,12 +51,13 @@ only contain integer values \code{1}, ..., \code{V} designating the fold assignm
 }
 \value{
 An object of class \code{'cv_trendfilter'} and subclass \code{'trendfilter'}.
-This is a list with the following elements:
+This is a list with the elements below,
+as well as all elements from the '\code{\link[=trendfilter]{trendfilter}}' call.
 \describe{
-\item{\code{lambdas}}{Vector of candidate hyperparameter values (always returned
+\item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
 in descending order).}
 \item{\code{edfs}}{Number of effective degrees of freedom in the trend filtering
-estimator, for every candidate hyperparameter value in \code{lambdas}.}
+estimator, for every candidate hyperparameter value in \code{lambda}.}
 \item{\code{errors}}{A named list of vectors, with each representing the
 CV error curve for every loss function in \code{loss_funcs} (see below).}
 \item{\code{se_errors}}{Standard errors for the \code{errors}, within a named list of
@@ -67,7 +68,7 @@ every loss function in \code{loss_funcs}.}
 \item{\code{lambda_1se}}{A named vector with length equal to \code{length(errors)},
 containing the "1-standard-error rule" hyperparameter, for every loss
 function in \code{loss_funcs}. The "1-standard-error rule" hyperparameter is the
-largest hyperparameter value in \code{lambdas} that has a CV error within one
+largest hyperparameter value in \code{lambda} that has a CV error within one
 standard error of \code{min(errors)}. It serves as an Occam's razor-like
 heuristic. More precisely, given two models with approximately equal
 performance (in terms of some loss function), it may be wise to opt for the
@@ -82,16 +83,16 @@ containing the number of effective degrees of freedom in the
 "1-standard-error rule" trend filtering estimator, for every loss function in
 \code{loss_funcs}.}
 \item{\code{i_min}}{A named vector with length equal to \code{length(errors)},
-containing the index of \code{lambdas} that minimizes the CV error curve, for
+containing the index of \code{lambda} that minimizes the CV error curve, for
 every loss function in \code{loss_funcs}.}
 \item{\code{i_1se}}{A named vector with length equal to \code{length(errors)},
-containing the index of \code{lambdas} that gives the "1-standard-error rule"
+containing the index of \code{lambda} that gives the "1-standard-error rule"
 hyperparameter value, for every loss function in \code{loss_funcs}.}
 \item{\code{obj_func}}{The relative change in the objective function over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
-\code{lambdas}.}
+\code{lambda}.}
 \item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
-every candidate hyperparameter in \code{lambdas}. If an element of \code{n_iter}
+every candidate hyperparameter in \code{lambda}. If an element of \code{n_iter}
 is exactly equal to \code{model_obj$admm_params$max_iter} (see below), then the
 ADMM algorithm stopped before reaching the objective tolerance
 \code{model_obj$admm_params$obj_tol}. In these situations, you may need to
@@ -148,36 +149,36 @@ The following loss functions are automatically computed during cross
 validation and their CV error curves are returned in the \code{errors} list
 within the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
 \enumerate{
-\item Mean absolute deviations error: \mjsdeqn{\text{MAE}(\lambda) =
+\item Mean absolute deviations error: \mjsdeqn{MAE(\lambda) =
 \frac{1}{n} \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|}
 \item Weighted mean absolute deviations error:
-\mjsdeqn{\text{WMAE}(\lambda) = \sum_{i=1}^{n}
+\mjsdeqn{WMAE(\lambda) = \sum_{i=1}^{n}
 |Y_i - \hat{f}(x_i; \lambda)|\frac{\sqrt{w_i}}{\sum_j\sqrt{w_j}}}
-\item Mean-squared error: \mjsdeqn{\text{MSE}(\lambda) = \frac{1}{n}
+\item Mean-squared error: \mjsdeqn{MSE(\lambda) = \frac{1}{n}
 \sum_{i=1}^{n} |Y_i - \hat{f}(x_i; \lambda)|^2}
-\item Weighted mean-squared error: \mjsdeqn{\text{WMSE}(\lambda)
+\item Weighted mean-squared error: \mjsdeqn{WMSE(\lambda)
 = \sum_{i=1}^{n}|Y_i - \hat{f}(x_i; \lambda)|^2\frac{w_i}{\sum_jw_j}}
-\item log-cosh error: \mjsdeqn{\text{logcosh}(\lambda) =
+\item log-cosh error: \mjsdeqn{logcosh(\lambda) =
 \frac{1}{n}\sum_{i=1}^{n}
 \log\left(\cosh\left(Y_i - \hat{f}(x_i; \lambda)\right)\right)}
-\item Weighted log-cosh error: \mjsdeqn{\text{wlogcosh}(\lambda) =
+\item Weighted log-cosh error: \mjsdeqn{wlogcosh(\lambda) =
 \sum_{i=1}^{n}
 \log\left(\cosh\left((Y_i - \hat{f}(x_i; \lambda))\sqrt{w_i}\right)\right)}
-\item Huber loss: \mjsdeqn{\text{Huber}(\lambda) =
+\item Huber loss: \mjsdeqn{Huber(\lambda) =
 \frac{1}{n}\sum_{i=1}^{n}L_{\lambda}(Y_i; \delta)}
 \mjsdeqn{\text{where}\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
 |Y_i - \hat{f}(x_i; \lambda)|^2, &
 $|Y_i - \hat{f}(x_i; \lambda)| \leq \delta$ \cr
 2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, &
 $|Y_i - \hat{f}(x_i; \lambda)| > \delta$}}
-\item Weighted Huber loss: \mjsdeqn{\text{wHuber}(\lambda) =
+\item Weighted Huber loss: \mjsdeqn{wHuber(\lambda) =
 \sum_{i=1}^{n}L_{\lambda}(Y_i; \delta)}
 \mjsdeqn{\text{where}\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
 |Y_i - \hat{f}(x_i; \lambda)|^2w_i, &
 $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
 2\delta|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} -
 \delta^2, & $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta$}}
-\item Mean-squared logarithmic error: \mjsdeqn{\text{MSLE}(\lambda) =
+\item Mean-squared logarithmic error: \mjsdeqn{MSLE(\lambda) =
 \frac{1}{n}\sum_{i=1}^{n}
 \left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|}
 }
