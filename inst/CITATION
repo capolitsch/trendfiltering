@@ -8,7 +8,7 @@ citEntry(entry = "Article",
          url = "https://academic.oup.com/mnras/article/492/3/4005/5704413",
          textVersion = "C. A. Politsch et al. (2020a). Trend filtering – I. A modern statistical tool for time-domain astronomy and astronomical
          spectroscopy",
-         key = "MNRAStrendfiltering1")
+         key = "Politsch_2020a")
 
 citEntry(entry = "Article",
          author = "Collin A. Politsch, Jessi Cisewski-Kehe, Rupert A.C. Croft, Larry Wasserman",
@@ -17,7 +17,7 @@ citEntry(entry = "Article",
          year = "2020",
          url = "https://academic.oup.com/mnras/article/492/3/4019/5704414",
          textVersion = "C. A. Politsch et al. (2020b). Trend filtering – II. Denoising astronomical signals with varying degrees of smoothness",
-         key = "MNRAStrendfiltering2")
+         key = "Politsch_2020b")
 
 citEntry(entry = "Misc",
          author = "Collin A. Politsch",
@@ -25,4 +25,4 @@ citEntry(entry = "Misc",
          year = "2021",
          url = "https://capolitsch.github.io/trendfiltering/",
          textVersion = "C. A. Politsch (2021). trendfiltering: The state-of-the-art method for denoising 1D signals. R package version 0.2.0.",
-         key = "trendfiltering")
+         key = "trendfilteringRpackage")

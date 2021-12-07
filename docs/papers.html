@@ -6,8 +6,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=0.96">
 <title>trendfiltering R package</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="./apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="./apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="./apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="./apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
@@ -35,45 +44,53 @@
 </head>
 
 
+
 <body data-spy="scroll" data-target="#toc">
 <div class="container template-reference-topic">
+
 <header>
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
 <div class="container">
 <div class="navbar-header">
+
 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-<span class="sr-only">Toggle navigation</span>
-<span class="icon-bar"></span>
-<span class="icon-bar"></span>
-<span class="icon-bar"></span>
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
 </button>
+
 <span class="navbar-brand">
-<a class="navbar-link" href="index.html">trendfiltering</a>
-<span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+    <a class="navbar-link" href="index.html">trendfiltering</a>
+<span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
 </span>
+
 </div>
 
 <div id="navbar" class="navbar-collapse collapse">
+
 <ul class="nav navbar-nav">
-<li>
-<a href="index.html">
-<span class="fas fa-home fa-lg"></span>
-</a>
-</li>
-<li>
-<a href="reference/index.html">Reference</a>
-</li>
-<li>
-<a href="papers.html">Papers</a>
-</li>
+    <li>
+    <a href="index.html">
+    <span class="fas fa-home fa-lg"></span>
+    </a>
+    </li>
+
+    <li>
+    <a href="reference/index.html">Reference</a>
+    </li>
+
+    <li>
+    <a href="papers.html">Papers</a>
+    </li>
 </ul>
 
 <ul class="nav navbar-nav navbar-right">
-<li>
-<a href="https://github.com/capolitsch/trendfiltering">
-<span class="fab fa-github fa-lg"></span>
-</a>
-</li>
+    <li>
+    <a href="https://github.com/capolitsch/trendfiltering">
+    <span class="fab fa-github fa-lg"></span>
+    </a>
+    </li>
 </ul>
 
 </div><!--/.nav-collapse -->
@@ -90,45 +107,76 @@ Trend filtering</h2>
 <br />
 
 <p><b><font size = "4">Companion references for this R package</font></b></p>
+
 <ol>
-<li><p>Politsch et al. (2020a).
-<a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>
-Trend filtering – I. A modern statistical tool for time-domain astronomy and
-astronomical spectroscopy</a>. <em>MNRAS</em>, 492(3), p. 4005-4018. <br /></p></li>
-<li><p>Politsch et al. (2020b).
-<a href='https://academic.oup.com/mnras/article/492/3/4019/5704414'>
-Trend Filtering – II. Denoising astronomical signals with varying degrees of
-smoothness</a>. <em>MNRAS</em>, 492(3), p. 4019-4032.</p></li>
+    <li>
+    <p>Politsch et al. (2020a).
+    Trend filtering – I. A modern statistical tool for time-domain astronomy and
+    astronomical spectroscopy. <em>MNRAS</em>, 492(3), p. 4005-4018.
+    [<a href="https://academic.oup.com/mnras/article/492/3/4005/5704413">Publisher</a>]
+    [<a href="https://arxiv.org/abs/1908.07151">arXiv</a>]
+    [<a href="authors.html">BibTeX</a>].</p>
+    </li>
+
+    <li>
+    <p>Politsch et al. (2020b).
+    Trend Filtering – II. Denoising astronomical signals with varying degrees of
+    smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032.
+    [<a href="https://academic.oup.com/mnras/article/492/3/4019/5704414">Publisher</a>]
+    [<a href="https://arxiv.org/abs/2001.03552">arXiv</a>]
+    [<a href="authors.html">BibTeX</a>].</p>
+    </li>
 </ol>
 
-<p><b><font size = "4">Trend filtering theory</font></b></p><ol>
-<li><p>Tibshirani (2014).
-<a href='https://projecteuclid.org/euclid.aos/1395234979'>Adaptive piecewise
-polynomial estimation via trend filtering</a>. <em>The Annals of Statistics</em>.
-42(1), p. 285-323. <br /></p></li>
-<li><p>Tibshirani (2020). <a href='https://arxiv.org/abs/2003.03886'>Divided
-Differences, Falling Factorials, and Discrete Splines: Another Look at Trend
-Filtering and Related Problems</a>. arXiv: 2003.03886.</p></li>
+<p><b><font size = "4">Trend filtering theory</font></b></p>
+
+<ol>
+    <li>
+    <p>Tibshirani (2014).
+    <a href='https://projecteuclid.org/euclid.aos/1395234979'>Adaptive piecewise
+    polynomial estimation via trend filtering</a>. <em>The Annals of
+    Statistics</em>. 42(1), p. 285-323.</p>
+    </li>
+
+    <li>
+    <p>Tibshirani (2020). <a href='https://arxiv.org/abs/2003.03886'>Divided
+    Differences, Falling Factorials, and Discrete Splines: Another Look at Trend
+    Filtering and Related Problems</a>. arXiv preprint.</p>
+    </li>
 </ol>
 
-<p><b><font size = "4">Optimization algorithms for trend filtering</font></b></p><ol>
-<li><p>Ramdas and Tibshirani (2016).
-<a href='https://amstat.tandfonline.com/doi/abs/10.1080/10618600.2015.1054033#.XfJpNpNKju0'>
-Fast and Flexible ADMM Algorithms for Trend Filtering</a>. <em>Journal of
-Computational and Graphical Statistics</em>, 25(3), p. 839-858. <br /></p></li>
-<li><p>Arnold, Sadhanala, and Tibshirani (2014).
-<a href='https://github.com/glmgen/glmgen'>glmgen: Fast algorithms for generalized
-lasso problems</a>. R package version 0.0.3.</p></li>
-<li><p>Taylor B. Arnold and Ryan J. Tibshirani (2020).
-<a href="https://github.com/glmgen/genlasso">genlasso: Path Algorithm for Generalized Lasso Problems</a>.
-  R package version 1.5.</p></li>
+<p><b><font size = "4">Optimization algorithms for trend filtering</font></b></p>
+
+<ol>
+    <li>
+    <p>Ramdas and Tibshirani (2016).
+    <a href='https://amstat.tandfonline.com/doi/abs/10.1080/10618600.2015.1054033#.XfJpNpNKju0'>
+    Fast and Flexible ADMM Algorithms for Trend Filtering</a>. <em>Journal of
+    Computational and Graphical Statistics</em>, 25(3), p. 839-858. <br /></p>
+    </li>
+
+    <li>
+    <p>Arnold, Sadhanala, and Tibshirani (2014).
+    <a href='https://github.com/glmgen/glmgen'>glmgen: Fast algorithms for generalized
+    lasso problems</a>. R package version 0.0.3.</p>
+    </li>
+
+    <li>
+    <p>Taylor B. Arnold and Ryan J. Tibshirani (2020).
+    <a href="https://github.com/glmgen/genlasso">genlasso: Path Algorithm for
+    Generalized Lasso Problems</a>. R package version 1.5.</p>
+    </li>
 </ol>
 
-<p><b><font size = "4">Effective degrees of freedom for trend filtering</font></b></p><ol>
-<li><p>Tibshirani and Taylor (2012).
-<a href='https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full'>
-Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
-40(2), p. 1198-1232.</p></li>
+<p><b><font size = "4">Effective degrees of freedom for trend filtering</font></b></p>
+
+<ol>
+    <li>
+    <p>Tibshirani and Taylor (2012).
+    <a href='https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-2/Degrees-of-freedom-in-lasso-problems/10.1214/12-AOS1003.full'>
+    Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
+    40(2), p. 1198-1232.</p>
+    </li>
 </ol>
 
 <br />
@@ -136,46 +184,69 @@ Degrees of freedom in lasso problems</a>. <em>The Annals of Statistics</em>,
 <h2 class="hasAnchor" id="papers2"><a class="anchor" href="#papers2"></a>
 Related topics
 </h2>
+
 <br />
 
-<p><b><font size = "4">Stein's unbiased risk estimate</font></b></p><ol>
-<li><p>Tibshirani and Wasserman (2015).
-<a href='http://www.stat.cmu.edu/~larry/=sml/stein.pdf'>Stein’s Unbiased Risk
-Estimate</a>. <em>36-702: Statistical Machine Learning course notes</em>
-(Carnegie Mellon University). <br /></p></li>
-<li><p>Efron (2014).
-<a href='https://www.tandfonline.com/doi/abs/10.1198/016214504000000692'>
-The Estimation of Prediction Error: Covariance Penalties
-and Cross-Validation</a>. <em>Journal of the American Statistical
-Association</em>. 99(467), p. 619-632. <br /></p></li>
+<p><b><font size = "4">Stein's unbiased risk estimate</font></b></p>
+
+<ol>
+    <li>
+    <p>Tibshirani and Wasserman (2015).
+    <a href='http://www.stat.cmu.edu/~larry/=sml/stein.pdf'>Stein’s Unbiased Risk
+    Estimate</a>. <em>36-702: Statistical Machine Learning course notes</em>
+    (Carnegie Mellon University). <br /></p>
+    </li>
+
+    <li>
+    <p>Efron (2014).
+    <a href='https://www.tandfonline.com/doi/abs/10.1198/016214504000000692'>
+    The Estimation of Prediction Error: Covariance Penalties
+    and Cross-Validation</a>. <em>Journal of the American Statistical
+    Association</em>. 99(467), p. 619-632. <br /></p>
+    </li>
 </ol>
 
 <p><b><font size = "4">Cross validation</font></b></p>
+
 <ol>
-<li><p>Hastie, Tibshirani, and Friedman (2009).
-<a href='https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf'>
-The Elements of Statistical Learning: Data Mining, Inference, and
-Prediction</a>. 2nd edition. Springer Series in Statistics. (See Sections 7.10
-and 7.12) <br /></p></li>
+    <li>
+    <p>Hastie, Tibshirani, and Friedman (2009).
+    <a href='https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12_toc.pdf'>
+    The Elements of Statistical Learning: Data Mining, Inference, and
+    Prediction</a>. 2nd edition. Springer Series in Statistics. (See Sections 7.10
+    and 7.12) <br /></p>
+    </li>
 </ol>
 
-<p><b><font size = "4">The Bootstrap and variations</font></b></p><ol>
-<li><p>Efron and Tibshirani (1986).
-<a href='https://projecteuclid.org/journals/statistical-science/volume-1/issue-1/Bootstrap-Methods-for-Standard-Errors-Confidence-Intervals-and-Other-Measures/10.1214/ss/1177013815.full'>
-Bootstrap Methods for Standard Errors, Confidence Intervals, and Other
-Measures of Statistical Accuracy</a>.
-<em>Statistical Science</em>, 1(1), p. 54-75. <br /></p></li>
-<li><p>Mammen (1993).
-<a href='https://projecteuclid.org/journals/annals-of-statistics/volume-21/issue-1/Bootstrap-and-Wild-Bootstrap-for-High-Dimensional-Linear-Models/10.1214/aos/1176349025.full'>
-Bootstrap and Wild Bootstrap for High Dimensional Linear Models</a>. <em>The
-Annals of Statistics</em>, 21(1), p. 255-285. <br /></p></li>
-<li><p>Efron (1979).
-<a href='https://projecteuclid.org/journals/annals-of-statistics/volume-7/issue-1/Bootstrap-Methods-Another-Look-at-the-Jackknife/10.1214/aos/1176344552.full'>
-Bootstrap Methods: Another Look at the Jackknife</a>.
-<em>The Annals of Statistics</em>, 7(1), p. 1-26.</p></li>
+<p><b><font size = "4">The Bootstrap and variations</font></b></p>
+
+<ol>
+    <li>
+    <p>Efron and Tibshirani (1986).
+    <a href='https://projecteuclid.org/journals/statistical-science/volume-1/issue-1/Bootstrap-Methods-for-Standard-Errors-Confidence-Intervals-and-Other-Measures/10.1214/ss/1177013815.full'>
+    Bootstrap Methods for Standard Errors, Confidence Intervals, and Other
+    Measures of Statistical Accuracy</a>.
+    <em>Statistical Science</em>, 1(1), p. 54-75. <br /></p>
+    </li>
+
+    <li>
+    <p>Mammen (1993).
+    <a href='https://projecteuclid.org/journals/annals-of-statistics/volume-21/issue-1/Bootstrap-and-Wild-Bootstrap-for-High-Dimensional-Linear-Models/10.1214/aos/1176349025.full'>
+    Bootstrap and Wild Bootstrap for High Dimensional Linear Models</a>. <em>The
+    Annals of Statistics</em>, 21(1), p. 255-285. <br /></p>
+    </li>
+
+    <li>
+    <p>Efron (1979).
+    <a href='https://projecteuclid.org/journals/annals-of-statistics/volume-7/issue-1/Bootstrap-Methods-Another-Look-at-the-Jackknife/10.1214/aos/1176344552.full'>
+    Bootstrap Methods: Another Look at the Jackknife</a>.
+    <em>The Annals of Statistics</em>, 7(1), p. 1-26.</p>
+    </li>
 </ol>
+
 
 <footer>
+
 <div class="copyright">
 <p>Developed by <a href='https://collinpolitsch.com/'>Collin A. Politsch, Ph.D.</a></p>
 </div>
@@ -183,8 +254,10 @@ Bootstrap Methods: Another Look at the Jackknife</a>.
 <div class="pkgdown">
 <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
+
 </footer>
 </div>
-
+</div>
+</div>
 </body>
 </html>
