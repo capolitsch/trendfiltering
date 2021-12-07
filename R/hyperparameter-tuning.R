@@ -869,8 +869,6 @@ sure_trendfilter <- function(x,
     data_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
   }
 
-  save(data_scaled, admm_params, nlambda, file = "~/Desktop/debug.RData")
-
   lambda <- get_lambda_grid_edf_spacing(data = data_scaled,
                                         admm_params = admm_params,
                                         nlambda = nlambda,
