@@ -193,7 +193,9 @@
         status = fit$status,
         n_iter = fit$iter,
         admm_params = admm_params,
-        call = tf_call
+        call = tf_call,
+        x_scale = x_scale,
+        y_scale = y_scale
       ),
       class = c("trendfilter", "trendfiltering")
     )

@@ -545,7 +545,9 @@ cv_trendfilter <- function(x,
         k = k,
         fitted_values = fit$fitted_values,
         admm_params = admm_params,
-        call = sure_call
+        call = sure_call,
+        x_scale = x_scale,
+        y_scale = y_scale
       ),
       class = c("cv_trendfilter", "trendfilter", "trendfiltering")
     )
@@ -934,7 +936,9 @@ sure_trendfilter <- function(x,
         k = k,
         fitted_values = fit$fitted_values,
         admm_params = admm_params,
-        call = sure_call
+        call = sure_call,
+        x_scale = x_scale,
+        y_scale = y_scale
       ),
       class = c("sure_trendfilter", "trendfilter", "trendfiltering")
     )

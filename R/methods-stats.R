@@ -26,10 +26,6 @@ predict.trendfilter <- function(obj,
                                 zero_tol = 1e-6,
                                 ...) {
   stopifnot(any(class(obj) == "trendfilter"))
-
-  lambda <- lambda %||% obj$lambda_min
-  x_eval <- x_eval %||% obj$x
-
   stopifnot(is.numeric(lambda))
   stopifnot(min(lambda) >= 0L)
 
@@ -37,9 +33,12 @@ predict.trendfilter <- function(obj,
     stop("`lambda` must only contain values in `obj$lambda`.")
   }
 
-  if (any(x_eval < min(obj$x) || x_eval > max(obj$x))) {
+  if (!is.null(x_eval) && (any(x_eval < min(obj$x) || x_eval > max(obj$x)))) {
     stop("`x_eval` should all be in `range(x)`.")
   }
+
+  lambda <- lambda %||% obj$lambda_min
+  x_eval <- (x_eval %||% obj$x) / obj$x_scale
 
   fitted_values <- fitted(obj, lambda)
   .tf_predict(obj, lambda, x_eval, fitted_values, zero_tol)
