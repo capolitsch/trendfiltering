@@ -26,7 +26,7 @@
 predict.trendfilter <- function(obj,
                                 lambda = NULL,
                                 x_eval = NULL,
-                                zero_tol = 1e-12,
+                                zero_tol = 1e-16,
                                 ...) {
   stopifnot(
     any(class(obj) == "trendfilter") && any(class(obj) == "trendfiltering")
@@ -51,12 +51,9 @@ predict.trendfilter <- function(obj,
     stop("`x_eval` should all be in `range(x)`.")
   }
 
-  fitted_values <- fitted(obj, lambda)
-  .tf_predict(obj,
-              lambda,
-              x_eval,
-              fitted_values,
-              zero_tol)
+  inds <- match(lambda, obj$lambda)
+  fitted_values <- obj$fitted_values[, inds, drop = FALSE]
+  .tf_predict(obj, lambda, x_eval, fitted_values, zero_tol)
 }
 
 
