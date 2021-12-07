@@ -210,12 +210,10 @@ cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
 for time-domain astronomy and astronomical spectroscopy. \emph{MNRAS}, 492(3),
 p. 4005-4018.
 [\href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Publisher}]
-[\href{https://arxiv.org/abs/1908.07151}{arXiv}]
-[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].
+[\href{https://arxiv.org/abs/1908.07151}{arXiv}].
 \item Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
 signals with varying degrees of smoothness. \emph{MNRAS}, 492(3), p. 4019-4032.
 [\href{https://academic.oup.com/mnras/article/492/3/4019/5704414}{Publisher}]
-[\href{https://arxiv.org/abs/2001.03552}{arXiv}]
-[\href{https://capolitsch.github.io/trendfiltering/authors.html}{BibTeX}].
+[\href{https://arxiv.org/abs/2001.03552}{arXiv}].
 }
 }

@@ -4,7 +4,7 @@
 \alias{predict.trendfilter}
 \title{Get predictions from a trendfilter object}
 \usage{
-\method{predict}{trendfilter}(obj, lambda = NULL, x_eval = NULL, zero_tol = 1e-12, ...)
+\method{predict}{trendfilter}(obj, lambda = NULL, x_eval = NULL, zero_tol = 1e-16, ...)
 }
 \arguments{
 \item{obj}{An object of class/subclass '\code{\link[=trendfilter]{trendfilter}}'.}

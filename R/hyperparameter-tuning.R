@@ -186,13 +186,11 @@
 #'    for time-domain astronomy and astronomical spectroscopy. *MNRAS*, 492(3),
 #'    p. 4005-4018.
 #'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4005/5704413)]
-#'    [[arXiv](https://arxiv.org/abs/1908.07151)]
-#'    [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].
+#'    [[arXiv](https://arxiv.org/abs/1908.07151)].
 #' 2. Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
 #'    signals with varying degrees of smoothness. *MNRAS*, 492(3), p. 4019-4032.
 #'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4019/5704414)]
-#'    [[arXiv](https://arxiv.org/abs/2001.03552)]
-#'    [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].
+#'    [[arXiv](https://arxiv.org/abs/2001.03552)].
 #'
 #' @examples
 #' data("eclipsing_binary")
@@ -241,6 +239,7 @@ cv_trendfilter <- function(x,
 
   if (any(names(extra_args) == "obj_tol")) {
     obj_tol <- extra_args$obj_tol
+    extra_args$obj_tol <- NULL
     stopifnot(is.numeric(obj_tol) && obj_tol > 0L && length(obj_tol) == 1L)
   } else{
     obj_tol <- NULL
@@ -248,6 +247,7 @@ cv_trendfilter <- function(x,
 
   if (any(names(extra_args) == "max_iter")) {
     max_iter <- extra_args$max_iter
+    extra_args$max_iter <- NULL
     stopifnot(is.numeric(max_iter) && max_iter == round(max_iter))
     stopifnot(length(max_iter) == 1L)
     max_iter %<>% as.integer()
@@ -441,7 +441,7 @@ cv_trendfilter <- function(x,
   get_cv_mat <- function(loss_func, V) {
     lapply(
       1:V,
-      function(X) cv_out[[X]][[loss_func]]
+      function(X) cv_out[[X]][loss_func]
     ) %>%
       unlist() %>%
       matrix(ncol = V)
@@ -543,9 +543,9 @@ cv_trendfilter <- function(x,
         y = data$y,
         weights = data$weights,
         k = k,
-        fitted_values = fit$fitted_values,
+        fitted_values = fit$fitted_values * y_scale,
         admm_params = admm_params,
-        call = sure_call,
+        call = cv_call,
         x_scale = x_scale,
         y_scale = y_scale
       ),
@@ -590,7 +590,7 @@ validate_fold <- function(fold_id,
     predict(fit, lambda = lambda, x_eval = data_validate$x)
   )
 
-  lapply(
+  out <- lapply(
     seq_along(loss_funcs),
     FUN = function(X) {
       apply(
@@ -603,6 +603,9 @@ validate_fold <- function(fold_id,
         as.double()
     }
   )
+
+  names(out) <- names(loss_funcs)
+  out
 }
 
 

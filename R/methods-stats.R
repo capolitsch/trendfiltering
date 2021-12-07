@@ -48,12 +48,18 @@ predict.trendfilter <- function(obj,
   x_eval <- x_eval %||% obj$x
 
   if (!is.null(x_eval) && (any(x_eval < min(obj$x) || x_eval > max(obj$x)))) {
-    stop("`x_eval` should all be in `range(x)`.")
+    warning("Not all elements of `x_eval` are in `range(x)`.")
   }
 
   inds <- match(lambda, obj$lambda)
   fitted_values <- obj$fitted_values[, inds, drop = FALSE]
-  .tf_predict(obj, lambda, x_eval, fitted_values, zero_tol)
+  p <- .tf_predict(obj, lambda, x_eval, fitted_values, zero_tol)
+
+  if (length(lambda) == 1) {
+    return(p)
+  } else{
+    return(matrix(p, ncol = length(lambda)))
+  }
 }
 
 
