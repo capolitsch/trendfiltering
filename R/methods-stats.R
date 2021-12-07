@@ -1,32 +1,3 @@
-#' Get coefficients from a trendfilter object
-#'
-#' @param obj
-#'   Object of class/subclass '[`trendfilter`][`trendfilter()`]'.
-#' @param lambda
-#'   One of more hyperparameter values to calculate model coefficients for.
-#'   Defaults to `lambda = NULL`, in which case, model coefficients are computed
-#'   for every hyperparameter value in `obj$lambda`.
-#'
-#' @aliases coef.cv_trendfilter coef.sure_trendfilter coef.bootstrap_trendfilter
-#' @aliases coefficients.cv_trendfilter coefficients.sure_trendfilter
-#' @aliases coefficients.bootstrap_trendfilter
-#' @rdname coef.trendfilter
-coef.trendfilter <- function(obj, lambda = NULL, ...) {
-  if (is.null(lambda)) {
-    return(obj$beta)
-  }
-
-  stopifnot(is.numeric(lambda))
-  stopifnot(min(lambda) >= 0L)
-  if (!all(lambda %in% obj$lambda)) {
-    stop("`lambda` must only contain values in `obj$lambda`.")
-  }
-
-  inds <- match(lambda, obj$lambda)
-  obj$beta[, inds, drop = FALSE]
-}
-
-
 #' Get predictions from a trendfilter object
 #'
 #' @param obj
@@ -57,6 +28,7 @@ predict.trendfilter <- function(obj,
   stopifnot(any(class(obj) == "trendfilter"))
 
   lambda <- lambda %||% obj$lambda_min
+  x_eval <- x_eval %||% obj$x
 
   stopifnot(is.numeric(lambda))
   stopifnot(min(lambda) >= 0L)
@@ -65,25 +37,12 @@ predict.trendfilter <- function(obj,
     stop("`lambda` must only contain values in `obj$lambda`.")
   }
 
-  inds <- match(lambda, obj$lambda)
-  obj$beta[, inds, drop = FALSE]
-  x_eval <- x_eval %||% obj$tf_model$x
-
-  if (any(x_eval < min(obj$tf_model$x) || x_eval > max(obj$tf_model$x))) {
+  if (any(x_eval < min(obj$x) || x_eval > max(obj$x))) {
     stop("`x_eval` should all be in `range(x)`.")
   }
 
-  .Call(".tf_predict",
-        sX = as.double(object$x),
-        sBeta = as.double(co),
-        sN = length(object$y),
-        sK = as.integer(object$k),
-        sX0 = as.double(x.new),
-        sN0 = length(x.new),
-        sNLambda = length(lambda),
-        sFamily = family_cd,
-        sZeroTol = as.double(zero_tol),
-        PACKAGE = "glmgen")
+  fitted_values <- fitted(obj, lambda)
+  .tf_predict(obj, lambda, x_eval, fitted_values, zero_tol)
 }
 
 
@@ -106,7 +65,18 @@ predict.trendfilter <- function(obj,
 #' @aliases fitted.cv_trendfilter fitted.sure_trendfilter
 #' @aliases fitted.bootstrap_trendfilter
 fitted.trendfilter <- function(obj, lambda = NULL, ...) {
-  coef.trendfilter(obj, lambda, ...)
+  if (is.null(lambda)) {
+    return(obj$fitted_values)
+  }
+
+  stopifnot(is.numeric(lambda))
+  stopifnot(min(lambda) >= 0L)
+  if (!all(lambda %in% obj$lambda)) {
+    stop("`lambda` must only contain values in `obj$lambda`.")
+  }
+
+  inds <- match(lambda, obj$lambda)
+  obj$fitted_values[, inds, drop = FALSE]
 }
 
 
@@ -129,5 +99,5 @@ fitted.trendfilter <- function(obj, lambda = NULL, ...) {
 #' @aliases resids.cv_trendfilter resids.sure_trendfilter
 #' @aliases resids.bootstrap_trendfilter
 residuals.trendfilter <- function(obj, lambda = NULL, ...) {
-  obj$y - fitted.trendfilter(obj, lambda, ...)
+  obj$y - fitted(obj, lambda, ...)
 }

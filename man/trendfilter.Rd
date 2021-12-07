@@ -31,7 +31,9 @@ freedom in each model.}
 An object of class \code{'trendfilter'}.
 }
 \description{
-Fit a trend filtering model.
+Fit a trend filtering model. Generic functions such as \code{\link[=predict]{predict()}},
+\code{\link[=fitted.values]{fitted.values()}}, and \code{\link[=residuals]{residuals()}} may be called on the
+\code{\link[=trendfilter]{trendfilter()}} output.
 }
 \examples{
 data("eclipsing_binary")

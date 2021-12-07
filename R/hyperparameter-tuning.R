@@ -7,9 +7,8 @@
 #' passed via the `loss_funcs` argument. See the **Loss functions** section
 #' below for definitions of the internal loss functions, and for guidelines on
 #' when [`cv_trendfilter()`] should be used versus [`sure_trendfilter()`].
-#' Generic [`stats`][stats::stats-package] functions such as [`predict()`],
-#' [`fitted.values()`], [`residuals()`], etc. may be called on the
-#' [`cv_trendfilter()`] output.
+#' Generic functions such as [`predict()`], [`fitted.values()`],
+#' and [`residuals()`] may be called on the [`cv_trendfilter()`] output.
 #'
 #' @param x
 #'   Vector of observed values for the input variable.
@@ -135,10 +134,10 @@
 #' CV error curve for every loss function in `loss_funcs` (see below).}
 #' \item{`se_error`}{Standard errors for the `error`, within a named list of
 #' the same structure.}
-#' \item{`lambda_min`}{A named vector with length equal to `length(error)`,
+#' \item{`lambda_min`}{A named vector with length equal to `length(lambda)`,
 #' containing the hyperparameter value that minimizes the CV error curve, for
 #' every loss function in `loss_funcs`.}
-#' \item{`lambda_1se`}{A named vector with length equal to `length(error)`,
+#' \item{`lambda_1se`}{A named vector with length equal to `length(lambda)`,
 #' containing the "1-standard-error rule" hyperparameter, for every loss
 #' function in `loss_funcs`. The "1-standard-error rule" hyperparameter is the
 #' largest hyperparameter value in `lambda` that has a CV error within one
@@ -147,18 +146,18 @@
 #' performance (in terms of some loss function), it may be wise to opt for the
 #' simpler model, i.e. the model with the larger hyperparameter value / fewer
 #' effective degrees of freedom.}
-#' \item{`edf_min`}{A named vector with length equal to `length(error)`,
+#' \item{`edf_min`}{A named vector with length equal to `length(lambda)`,
 #' containing the number of effective degrees of freedom in the trend filtering
 #' estimator that minimizes the CV error curve, for every loss function in
 #' `loss_funcs`.}
-#' \item{`edf_1se`}{A named vector with length equal to `length(error)`,
+#' \item{`edf_1se`}{A named vector with length equal to `length(lambda)`,
 #' containing the number of effective degrees of freedom in the
 #' "1-standard-error rule" trend filtering estimator, for every loss function in
 #' `loss_funcs`.}
-#' \item{`i_min`}{A named vector with length equal to `length(error)`,
+#' \item{`i_min`}{A named vector with length equal to `length(lambda)`,
 #' containing the index of `lambda` that minimizes the CV error curve, for
 #' every loss function in `loss_funcs`.}
-#' \item{`i_1se`}{A named vector with length equal to `length(error)`,
+#' \item{`i_1se`}{A named vector with length equal to `length(lambda)`,
 #' containing the index of `lambda` that gives the "1-standard-error rule"
 #' hyperparameter value, for every loss function in `loss_funcs`.}
 #' \item{`obj_func`}{The relative change in the objective function over the
@@ -206,7 +205,7 @@
 #' cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
 #' @importFrom dplyr tibble filter mutate select arrange case_when group_split
 #' @importFrom dplyr bind_rows
-#' @importFrom tidyr drop_na
+#' @importFrom tidyr drop_na expand_grid
 #' @importFrom purrr map
 #' @importFrom magrittr %>% %$% %<>%
 #' @importFrom rlang %||%
@@ -244,7 +243,7 @@ cv_trendfilter <- function(x,
     obj_tol <- extra_args$obj_tol
     stopifnot(is.numeric(obj_tol) && obj_tol > 0L && length(obj_tol) == 1L)
   } else{
-    obj_tol <- 1e-10
+    obj_tol <- NULL
   }
 
   if (any(names(extra_args) == "max_iter")) {
@@ -253,7 +252,7 @@ cv_trendfilter <- function(x,
     stopifnot(length(max_iter) == 1L)
     max_iter %<>% as.integer()
   } else{
-    max_iter <- length(y)
+    max_iter <- NULL
   }
 
   stopifnot(is.numeric(V) && V == round(V))
@@ -338,49 +337,50 @@ cv_trendfilter <- function(x,
     }
   }
 
-  x %<>% as.double()
-  y %<>% as.double()
-  weights %<>% as.double()
   k %<>% as.integer()
   V %<>% as.integer()
 
-  df <- tibble(x, y, weights) %>%
+  data <- tibble(x = as.double(x),
+                 y = as.double(y),
+                 weights = as.double(weights)) %>%
+    drop_na() %>%
     arrange(x) %>%
-    filter(weights > 0) %>%
-    drop_na()
+    filter(weights > 0)
 
-  x_scale <- median(diff(df$x))
-  y_scale <- median(abs(df$y)) / 10
+  rm(x, y, weights)
+  n <- nrow(data)
 
-  df_scaled <- df %>%
+  x_scale <- median(diff(data$x))
+  y_scale <- median(abs(data$y)) / 10
+
+  data_scaled <- data %>%
     mutate(
       x = x / x_scale,
       y = y / y_scale,
       weights = weights * y_scale^2
     )
 
-  max_iter <- max(max_iter, nrow(df), 200L)
   admm_params <- get_admm_params(obj_tol, max_iter)
+  if (admm_params$max_iter < max(n, 200L)) {
+    admm_params$max_iter <- as.double(max(n, 200L))
+  }
 
-  if (min(diff(df_scaled$x)) <= admm_params$x_tol) {
-    admm_params$x_tol <- admm_params$x_tol / x_scale
-
-    thin_out <- .Call("thin_R",
-      sX = as.double(df_scaled$x),
-      sY = as.double(df_scaled$y),
-      sW = as.double(df_scaled$weights),
-      sN = nrow(df_scaled),
-      sK = k,
-      sControl = admm_params,
-      PACKAGE = "glmgen"
+  if (min(diff(data_scaled$x)) <= admm_params$x_tol / x_scale) {
+    thin_params <- admm_params
+    thin_params$x_tol <- thin_params$x_tol / x_scale
+    thin_out <- .tf_thin(
+      data_scaled$x,
+      data_scaled$y,
+      data_scaled$weights,
+      k,
+      thin_params
     )
 
-    admm_params$x_tol <- admm_params$x_tol / x_scale
-    df_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
+    data_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
   }
 
   if (is.null(fold_ids)) {
-    fold_ids <- sample(rep_len(1:V, nrow(df_scaled)))
+    fold_ids <- sample(rep_len(1:V, n))
   } else {
     unique_fold_ids %<>%
       as.integer() %>%
@@ -396,12 +396,12 @@ cv_trendfilter <- function(x,
     counts <- table(fold_ids) %>%
       as.integer() %>%
       sort.int()
-    equal_counts <- table(rep_len(1:V, nrow(df_scaled))) %>%
+    equal_counts <- table(rep_len(1:V, n)) %>%
       as.integer() %>%
       sort.int()
 
     if (!all.equal(counts, equal_counts)) {
-      if (nrow(df_scaled) %% V == 0L) {
+      if (n %% V == 0L) {
         warning("Your cross validation folds are imbalanced.", call. = FALSE)
       } else {
         warning(
@@ -415,16 +415,16 @@ cv_trendfilter <- function(x,
     }
   }
 
-  df_folded <- df_scaled %>%
+  data_folded <- data_scaled %>%
     mutate(ids = fold_ids) %>%
     group_split(ids, .keep = FALSE)
 
-  lambda <- get_lambda_grid_edf_spacing(df_scaled, admm_params, nlambda, k)
+  lambda <- get_lambda_grid_edf_spacing(data_scaled, admm_params, nlambda, k)
 
   cv_out <- mclapply(
     1:V,
     FUN = validate_fold,
-    df_folded = df_folded,
+    data_folded = data_folded,
     lambda = lambda,
     k = k,
     admm_params = admm_params,
@@ -434,13 +434,18 @@ cv_trendfilter <- function(x,
     mc.cores = mc_cores
   )
 
-  get_cv_mats <- function(cv_out, loss_func) {
-    sapply(X = seq_along(cv_out), cv_out[[X]][[loss_func]])
+  get_cv_mat <- function(loss_func, V) {
+    lapply(
+      1:V,
+      function(X) cv_out[[X]][[loss_func]]
+    ) %>%
+      unlist() %>%
+      matrix(ncol = V)
   }
 
   cv_loss_mats <- lapply(
     X = seq_along(loss_funcs),
-    FUN = function(X) get_cv_mats(cv_out, X)
+    FUN = function(X) get_cv_mat(X, V)
   )
 
   error <- lapply(
@@ -484,9 +489,9 @@ cv_trendfilter <- function(x,
 
   args <- c(
     list(
-      x = df_scaled$x,
-      y = df_scaled$y,
-      weights = df_scaled$weights,
+      x = data_scaled$x,
+      y = data_scaled$y,
+      weights = data_scaled$weights,
       lambda = lambda,
       k = k,
       obj_tol = admm_params$obj_tol,
@@ -530,11 +535,11 @@ cv_trendfilter <- function(x,
         status = fit$status,
         loss_funcs = loss_funcs,
         V = V,
-        x = df$x,
-        y = df$y,
-        weights = df$weights,
+        x = data$x,
+        y = data$y,
+        weights = data$weights,
         k = k,
-        beta = fit$beta,
+        fitted_values = fit$fitted_values,
         admm_params = admm_params,
         call = sure_call
       ),
@@ -547,21 +552,21 @@ cv_trendfilter <- function(x,
 #' @importFrom dplyr bind_rows
 #' @importFrom magrittr %>%
 validate_fold <- function(fold_id,
-                          df_folded,
+                          data_folded,
                           lambda,
                           k,
                           admm_params,
                           loss_funcs,
                           y_scale,
                           extra_args) {
-  df_train <- df_folded[-fold_id] %>% bind_rows()
-  df_validate <- df_folded[[fold_id]]
+  data_train <- data_folded[-fold_id] %>% bind_rows()
+  data_validate <- data_folded[[fold_id]]
 
   args <- c(
     list(
-      x = df_train$x,
-      y = df_train$y,
-      weights = df_train$weights,
+      x = data_train$x,
+      y = data_train$y,
+      weights = data_train$weights,
       k = k,
       lambda = lambda,
       obj_tol = admm_params$obj_tol,
@@ -576,7 +581,7 @@ validate_fold <- function(fold_id,
   fit <- do.call(.trendfilter, args)
 
   tf_validate_preds <- suppressWarnings(
-    predict(fit, lambda = lambda, x_eval = df_validate$x)
+    predict(fit, lambda = lambda, x_eval = data_validate$x)
   )
 
   lapply(
@@ -586,8 +591,8 @@ validate_fold <- function(fold_id,
         tf_validate_preds * y_scale,
         2,
         loss_funcs[[X]],
-        y = df_validate$y * y_scale,
-        weights = df_validate$weights / y_scale^2
+        y = data_validate$y * y_scale,
+        weights = data_validate$weights / y_scale^2
       ) %>%
         as.double()
     }
@@ -672,9 +677,9 @@ get_internal_loss_funcs <- function() {
 #' For every candidate hyperparameter value, compute an unbiased estimate of the
 #' trend filtering model's predictive mean-squared error. See the **Details**
 #' section for guidelines on when [`sure_trendfilter()`] should be used versus
-#' [`cv_trendfilter()`]. Generic [`stats`][stats::stats-package] functions such
-#' as [`predict()`], [`fitted.values()`], [`residuals()`], etc. may be called on
-#' the [`sure_trendfilter()`] output.
+#' [`cv_trendfilter()`]. Generic functions such as [`predict()`],
+#' [`fitted.values()`], and [`residuals()`] may be called on the
+#' [`sure_trendfilter()`] output.
 #'
 #' @inheritParams cv_trendfilter
 #'
@@ -759,6 +764,7 @@ get_internal_loss_funcs <- function() {
 #' weights <- quasar_spectrum$weights
 #'
 #' sure_tf <- sure_trendfilter(x, y, weights)
+#' @importFrom glmgen .tf_thin .tf_fit .tf_predict
 #' @importFrom dplyr tibble filter mutate select arrange case_when group_split
 #' @importFrom dplyr bind_rows
 #' @importFrom tidyr drop_na
@@ -823,51 +829,54 @@ sure_trendfilter <- function(x,
   }
 
   k %<>% as.integer()
+  V %<>% as.integer()
 
-  df <- tibble(x = as.double(x),
-               y = as.double(y),
-               weights = as.double(weights)) %>%
+  data <- tibble(x = as.double(x),
+                 y = as.double(y),
+                 weights = as.double(weights)) %>%
+    drop_na() %>%
     arrange(x) %>%
-    filter(weights > 0) %>%
-    drop_na()
+    filter(weights > 0)
 
   rm(x, y, weights)
+  n <- nrow(data)
 
-  x_scale <- median(diff(df$x))
-  y_scale <- median(abs(df$y)) / 10
+  x_scale <- median(diff(data$x))
+  y_scale <- median(abs(data$y)) / 10
 
-  df_scaled <- df %>%
+  data_scaled <- data %>%
     mutate(
       x = x / x_scale,
       y = y / y_scale,
       weights = weights * y_scale^2
     )
 
-  max_iter <- max(max_iter, nrow(df), 200L)
   admm_params <- get_admm_params(obj_tol, max_iter)
-  admm_params$x_tol <- admm_params$x_tol / x_scale
-
-  if (min(diff(df_scaled$x)) <= admm_params$x_tol) {
-    thin_out <- .Call("thin_R",
-                      sX = as.double(df_scaled$x),
-                      sY = as.double(df_scaled$y),
-                      sW = as.double(df_scaled$weights),
-                      sN = nrow(df_scaled),
-                      sK = as.integer(k),
-                      sControl = admm_params,
-                      PACKAGE = "glmgen"
-    )
-
-    df_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
+  if (admm_params$max_iter < max(n, 200L)) {
+    admm_params$max_iter <- as.double(max(n, 200L))
   }
 
-  lambda <- get_lambda_grid_edf_spacing(df_scaled, admm_params, nlambda, k)
+  if (min(diff(data_scaled$x)) <= admm_params$x_tol / x_scale) {
+    thin_params <- admm_params
+    thin_params$x_tol <- thin_params$x_tol / x_scale
+    thin_out <- .tf_thin(
+      data_scaled$x,
+      data_scaled$y,
+      data_scaled$weights,
+      k,
+      thin_params
+    )
+
+    data_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
+  }
+
+  lambda <- get_lambda_grid_edf_spacing(data_scaled, admm_params, nlambda, k)
 
   args <- c(
     list(
-      x = df_scaled$x,
-      y = df_scaled$y,
-      weights = df_scaled$weights,
+      x = data_scaled$x,
+      y = data_scaled$y,
+      weights = data_scaled$weights,
       lambda = lambda,
       k = k,
       obj_tol = admm_params$obj_tol,
@@ -881,8 +890,8 @@ sure_trendfilter <- function(x,
 
   fit <- do.call(.trendfilter, args)
 
-  squared_residuals_mat <- (fit$beta - df_scaled$y)^2
-  optimism_mat <- 2 / (df_scaled$weights * n) *
+  squared_residuals_mat <- (fit$fitted_values - data_scaled$y)^2
+  optimism_mat <- 2 / (data_scaled$weights * n) *
     matrix(rep(fit$edf, each = n), nrow = n)
 
   error_mat <- (squared_residuals_mat + optimism_mat) * y_scale^2
@@ -917,11 +926,11 @@ sure_trendfilter <- function(x,
         obj_func = fit$obj_fun,
         status = fit$status,
         n_iter = fit$n_iter,
-        x = df$x,
-        y = df$y,
-        weights = df$weights,
+        x = data$x,
+        y = data$y,
+        weights = data$weights,
         k = k,
-        beta = fit$beta * y_scale,
+        fitted_values = fit$fitted_values,
         admm_params = admm_params,
         call = sure_call
       ),

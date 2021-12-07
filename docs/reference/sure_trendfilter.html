@@ -52,9 +52,9 @@ risk estimate — sure_trendfilter" />
 <meta property="og:description" content="For every candidate hyperparameter value, compute an unbiased estimate of the
 trend filtering model's predictive mean-squared error. See the Details
 section for guidelines on when sure_trendfilter() should be used versus
-cv_trendfilter(). Generic stats functions such
-as predict(), fitted.values(), residuals(), etc. may be called on
-the sure_trendfilter() output." />
+cv_trendfilter(). Generic functions such as predict(),
+fitted.values(), and residuals() may be called on the
+sure_trendfilter() output." />
 <meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
 
@@ -136,9 +136,9 @@ risk estimate</h1>
     <p>For every candidate hyperparameter value, compute an unbiased estimate of the
 trend filtering model's predictive mean-squared error. See the <strong>Details</strong>
 section for guidelines on when <code>sure_trendfilter()</code> should be used versus
-<code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>. Generic <code><a href='https://rdrr.io/r/stats/stats-package.html'>stats</a></code> functions such
-as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code>, etc. may be called on
-the <code>sure_trendfilter()</code> output.</p>
+<code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>. Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>,
+<code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on the
+<code>sure_trendfilter()</code> output.</p>
     </div>
 
     <pre class="usage"><span class='fu'>sure_trendfilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span>, nlambda <span class='op'>=</span> <span class='fl'>250L</span>, <span class='va'>...</span><span class='op'>)</span></pre>
@@ -158,8 +158,8 @@ the <code>sure_trendfilter()</code> output.</p>
       <th>weights</th>
       <td><p>Weights for the observed outputs, defined as the reciprocal variance of the
 additive noise that contaminates the output signal. When the noise is
-expected to have an equal variance \(\sigma^2\) for all observations,
-a scalar may be passed to <code>weights</code>, i.e. <code>weights = </code>\(1/\sigma^2\).
+expected to have an equal variance <em></em>\(\sigma^2\) for all observations,
+a scalar may be passed to <code>weights</code>, i.e. <code>weights = </code><em></em>\(1/\sigma^2\).
 Otherwise, <code>weights</code> must be a vector with the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
     <tr>
@@ -274,7 +274,7 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 <span class='va'>weights</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>weights</span>
 
 <span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'>sure_trendfilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span>
-</div></pre>
+</div><div class='output co'>#&gt; <span class='error'>Error in V %&lt;&gt;% as.integer(): object 'V' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

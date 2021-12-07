@@ -75,9 +75,9 @@ and the trend filtering estimate, for every hyperparameter value in
 For every candidate hyperparameter value, compute an unbiased estimate of the
 trend filtering model's predictive mean-squared error. See the \strong{Details}
 section for guidelines on when \code{\link[=sure_trendfilter]{sure_trendfilter()}} should be used versus
-\code{\link[=cv_trendfilter]{cv_trendfilter()}}. Generic \code{\link[stats:stats-package]{stats}} functions such
-as \code{\link[=predict]{predict()}}, \code{\link[=fitted.values]{fitted.values()}}, \code{\link[=residuals]{residuals()}}, etc. may be called on
-the \code{\link[=sure_trendfilter]{sure_trendfilter()}} output.
+\code{\link[=cv_trendfilter]{cv_trendfilter()}}. Generic functions such as \code{\link[=predict]{predict()}},
+\code{\link[=fitted.values]{fitted.values()}}, and \code{\link[=residuals]{residuals()}} may be called on the
+\code{\link[=sure_trendfilter]{sure_trendfilter()}} output.
 }
 \details{
 Our recommendations for when to use \code{\link[=sure_trendfilter]{sure_trendfilter()}} versus

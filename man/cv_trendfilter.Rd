@@ -62,10 +62,10 @@ estimator, for every candidate hyperparameter value in \code{lambda}.}
 CV error curve for every loss function in \code{loss_funcs} (see below).}
 \item{\code{se_error}}{Standard errors for the \code{error}, within a named list of
 the same structure.}
-\item{\code{lambda_min}}{A named vector with length equal to \code{length(error)},
+\item{\code{lambda_min}}{A named vector with length equal to \code{length(lambda)},
 containing the hyperparameter value that minimizes the CV error curve, for
 every loss function in \code{loss_funcs}.}
-\item{\code{lambda_1se}}{A named vector with length equal to \code{length(error)},
+\item{\code{lambda_1se}}{A named vector with length equal to \code{length(lambda)},
 containing the "1-standard-error rule" hyperparameter, for every loss
 function in \code{loss_funcs}. The "1-standard-error rule" hyperparameter is the
 largest hyperparameter value in \code{lambda} that has a CV error within one
@@ -74,18 +74,18 @@ heuristic. More precisely, given two models with approximately equal
 performance (in terms of some loss function), it may be wise to opt for the
 simpler model, i.e. the model with the larger hyperparameter value / fewer
 effective degrees of freedom.}
-\item{\code{edf_min}}{A named vector with length equal to \code{length(error)},
+\item{\code{edf_min}}{A named vector with length equal to \code{length(lambda)},
 containing the number of effective degrees of freedom in the trend filtering
 estimator that minimizes the CV error curve, for every loss function in
 \code{loss_funcs}.}
-\item{\code{edf_1se}}{A named vector with length equal to \code{length(error)},
+\item{\code{edf_1se}}{A named vector with length equal to \code{length(lambda)},
 containing the number of effective degrees of freedom in the
 "1-standard-error rule" trend filtering estimator, for every loss function in
 \code{loss_funcs}.}
-\item{\code{i_min}}{A named vector with length equal to \code{length(error)},
+\item{\code{i_min}}{A named vector with length equal to \code{length(lambda)},
 containing the index of \code{lambda} that minimizes the CV error curve, for
 every loss function in \code{loss_funcs}.}
-\item{\code{i_1se}}{A named vector with length equal to \code{length(error)},
+\item{\code{i_1se}}{A named vector with length equal to \code{length(lambda)},
 containing the index of \code{lambda} that gives the "1-standard-error rule"
 hyperparameter value, for every loss function in \code{loss_funcs}.}
 \item{\code{obj_func}}{The relative change in the objective function over the
@@ -117,9 +117,8 @@ validation curve is returned for each. Custom loss functions may also be
 passed via the \code{loss_funcs} argument. See the \strong{Loss functions} section
 below for definitions of the internal loss functions, and for guidelines on
 when \code{\link[=cv_trendfilter]{cv_trendfilter()}} should be used versus \code{\link[=sure_trendfilter]{sure_trendfilter()}}.
-Generic \code{\link[stats:stats-package]{stats}} functions such as \code{\link[=predict]{predict()}},
-\code{\link[=fitted.values]{fitted.values()}}, \code{\link[=residuals]{residuals()}}, etc. may be called on the
-\code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
+Generic functions such as \code{\link[=predict]{predict()}}, \code{\link[=fitted.values]{fitted.values()}},
+and \code{\link[=residuals]{residuals()}} may be called on the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
 }
 \details{
 Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} versus

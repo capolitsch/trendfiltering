@@ -49,7 +49,6 @@ reference:
       - '`predict.trendfilter`'
       - '`fitted.trendfilter`'
       - '`residuals.trendfilter`'
-      - '`coef.trendfilter`'
   - title: "Data sets"
   - contents:
       - '`eclipsing_binary`'

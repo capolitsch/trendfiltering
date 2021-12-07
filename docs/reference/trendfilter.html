@@ -47,7 +47,9 @@
 
 
 <meta property="og:title" content="Fit a trend filtering model — trendfilter" />
-<meta property="og:description" content="Fit a trend filtering model." />
+<meta property="og:description" content="Fit a trend filtering model. Generic functions such as predict(),
+fitted.values(), and residuals() may be called on the
+trendfilter() output." />
 <meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
 
@@ -125,7 +127,9 @@
     </div>
 
     <div class="ref-description">
-    <p>Fit a trend filtering model.</p>
+    <p>Fit a trend filtering model. Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>,
+<code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on the
+<code>trendfilter()</code> output.</p>
     </div>
 
     <pre class="usage"><span class='fu'>trendfilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, weights <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>lambda</span>, edf <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
@@ -145,9 +149,9 @@
       <th>weights</th>
       <td><p>Weights for the output measurements. Output weights are defined as the
 inverse variance of the additive noise that contaminates the output signal.
-When the noise is expected to have a constant variance \(\sigma^2\)
+When the noise is expected to have a constant variance <em></em>\(\sigma^2\)
 over all outputs, a scalar may be passed to <code>weights</code>, i.e.
-<code>weights = </code>\(1/\sigma^2\). Otherwise, <code>weights</code> must be a vector with
+<code>weights = </code><em></em>\(1/\sigma^2\). Otherwise, <code>weights</code> must be a vector with
 the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
     <tr>

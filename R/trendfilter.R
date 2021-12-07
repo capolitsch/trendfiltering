@@ -1,6 +1,8 @@
 #' Fit a trend filtering model
 #'
-#' Fit a trend filtering model.
+#' Fit a trend filtering model. Generic functions such as [`predict()`],
+#' [`fitted.values()`], and [`residuals()`] may be called on the
+#' [`.trendfilter()`] output.
 #'
 #' @param x
 #'   Vector of observed values for the input variable.
@@ -133,55 +135,64 @@
   stopifnot(is.numeric(max_iter) & max_iter == round(max_iter))
   stopifnot(length(max_iter) == 1L)
 
-  df <- tibble(x = as.double(x),
-               y = as.double(y),
-               weights = as.double(weights)) %>%
+  data <- tibble(x = as.double(x),
+                 y = as.double(y),
+                 weights = as.double(weights)) %>%
+    drop_na() %>%
     arrange(x) %>%
-    filter(weights > 0) %>%
-    drop_na()
+    filter(weights > 0)
 
-  x_scale <- median(diff(df$x))
-  y_scale <- median(abs(df$y)) / 10
+  rm(x, y, weights)
+  n <- nrow(data)
 
-  df_scaled <- df %>%
+  x_scale <- median(diff(data$x))
+  y_scale <- median(abs(data$y)) / 10
+
+  data_scaled <- data %>%
     mutate(
       x = x / x_scale,
       y = y / y_scale,
       weights = weights * y_scale^2
     )
 
-  max_iter <- max(max_iter, nrow(df), 200L)
   admm_params <- get_admm_params(obj_tol, max_iter)
-  admm_params$x_tol <- admm_params$x_tol / x_scale
-
-  if (min(diff(df_scaled$x)) <= admm_params$x_tol) {
-    thin_out <- .Call("thin_R",
-      sX = as.double(df_scaled$x),
-      sY = as.double(df_scaled$y),
-      sW = as.double(df_scaled$weights),
-      sN = nrow(df_scaled),
-      sK = as.integer(k),
-      sControl = admm_params,
-      PACKAGE = "glmgen"
-    )
-
-    df_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
+  if (admm_params$max_iter < max(n, 200L)) {
+    admm_params$max_iter <- as.double(max(n, 200L))
   }
 
-  fit <- df_scaled %$% .tf_fit(x, y, weights, k, lambda, admm_params)
+  if (min(diff(data_scaled$x)) <= admm_params$x_tol / x_scale) {
+    thin_params <- admm_params
+    thin_params$x_tol <- thin_params$x_tol / x_scale
+    thin_out <- .tf_thin(
+      data_scaled$x,
+      data_scaled$y,
+      data_scaled$weights,
+      k,
+      thin_params
+    )
 
-  admm_params$x_tol <- admm_params$x_tol * x_scale
+    data_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
+  }
+
+  fit <- .tf_fit(
+    data_scaled$x,
+    data_scaled$y,
+    data_scaled$weights,
+    k,
+    lambda,
+    admm_params
+  )
 
   invisible(
     structure(
       list(
-        x = df$x,
-        y = df$y,
-        weights = df$weights,
+        x = data$x,
+        y = data$y,
+        weights = data$weights,
         k = k,
         lambda = lambda,
         edf = fit$df,
-        beta = fit$beta,
+        fitted_values = fit$beta * y_scale,
         obj_func = fit$obj,
         status = fit$status,
         n_iter = fit$iter,
@@ -196,7 +207,9 @@
 
 #' Fit a trend filtering model
 #'
-#' Fit a trend filtering model.
+#' Fit a trend filtering model. Generic functions such as [`predict()`],
+#' [`fitted.values()`], and [`residuals()`] may be called on the
+#' [`trendfilter()`] output.
 #'
 #' @param x
 #'   Vector of observed values for the input variable.

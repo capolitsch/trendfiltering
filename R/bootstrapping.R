@@ -220,7 +220,8 @@ bootstrap_trendfilter <- function(obj,
         edf_boots = edf_boots,
         n_iter_boots = n_iter_boots,
         lambda_boots = lambda_boots,
-        lambda = lambda
+        lambda = lambda,
+        call = boot.call
       ),
       class = c("bootstrap_trendfilter", "trendfilter", "trendfiltering")
     )

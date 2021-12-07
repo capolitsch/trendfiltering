@@ -55,9 +55,8 @@ validation curve is returned for each. Custom loss functions may also be
 passed via the loss_funcs argument. See the Loss functions section
 below for definitions of the internal loss functions, and for guidelines on
 when cv_trendfilter() should be used versus sure_trendfilter().
-Generic stats functions such as predict(),
-fitted.values(), residuals(), etc. may be called on the
-cv_trendfilter() output." />
+Generic functions such as predict(), fitted.values(),
+and residuals() may be called on the cv_trendfilter() output." />
 <meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
 
@@ -137,15 +136,14 @@ cv_trendfilter() output." />
     <div class="ref-description">
     <p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
  For every candidate hyperparameter value, estimate the trend
-filtering model's out-of-sample error by \(V\)-fold cross validation.
+filtering model's out-of-sample error by <em></em>\(V\)-fold cross validation.
 Many common regression loss functions are defined internally, and a cross
 validation curve is returned for each. Custom loss functions may also be
 passed via the <code>loss_funcs</code> argument. See the <strong>Loss functions</strong> section
 below for definitions of the internal loss functions, and for guidelines on
 when <code>cv_trendfilter()</code> should be used versus <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>.
-Generic <code><a href='https://rdrr.io/r/stats/stats-package.html'>stats</a></code> functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>,
-<code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code>, etc. may be called on the
-<code>cv_trendfilter()</code> output.</p>
+Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>,
+and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on the <code>cv_trendfilter()</code> output.</p>
     </div>
 
     <pre class="usage"><span class='fu'>cv_trendfilter</span><span class='op'>(</span>
@@ -175,8 +173,8 @@ Generic <code><a href='https://rdrr.io/r/stats/stats-package.html'>stats</a></co
       <th>weights</th>
       <td><p>Weights for the observed outputs, defined as the reciprocal variance of the
 additive noise that contaminates the output signal. When the noise is
-expected to have an equal variance \(\sigma^2\) for all observations,
-a scalar may be passed to <code>weights</code>, i.e. <code>weights = </code>\(1/\sigma^2\).
+expected to have an equal variance <em></em>\(\sigma^2\) for all observations,
+a scalar may be passed to <code>weights</code>, i.e. <code>weights = </code><em></em>\(1/\sigma^2\).
 Otherwise, <code>weights</code> must be a vector with the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
     <tr>
@@ -228,10 +226,10 @@ estimator, for every candidate hyperparameter value in <code>lambda</code>.</p><
 CV error curve for every loss function in <code>loss_funcs</code> (see below).</p></dd>
 <dt><code>se_error</code></dt><dd><p>Standard errors for the <code>error</code>, within a named list of
 the same structure.</p></dd>
-<dt><code>lambda_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(error)</a></code>,
+<dt><code>lambda_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(lambda)</a></code>,
 containing the hyperparameter value that minimizes the CV error curve, for
 every loss function in <code>loss_funcs</code>.</p></dd>
-<dt><code>lambda_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(error)</a></code>,
+<dt><code>lambda_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(lambda)</a></code>,
 containing the "1-standard-error rule" hyperparameter, for every loss
 function in <code>loss_funcs</code>. The "1-standard-error rule" hyperparameter is the
 largest hyperparameter value in <code>lambda</code> that has a CV error within one
@@ -240,18 +238,18 @@ heuristic. More precisely, given two models with approximately equal
 performance (in terms of some loss function), it may be wise to opt for the
 simpler model, i.e. the model with the larger hyperparameter value / fewer
 effective degrees of freedom.</p></dd>
-<dt><code>edf_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(error)</a></code>,
+<dt><code>edf_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(lambda)</a></code>,
 containing the number of effective degrees of freedom in the trend filtering
 estimator that minimizes the CV error curve, for every loss function in
 <code>loss_funcs</code>.</p></dd>
-<dt><code>edf_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(error)</a></code>,
+<dt><code>edf_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(lambda)</a></code>,
 containing the number of effective degrees of freedom in the
 "1-standard-error rule" trend filtering estimator, for every loss function in
 <code>loss_funcs</code>.</p></dd>
-<dt><code>i_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(error)</a></code>,
+<dt><code>i_min</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(lambda)</a></code>,
 containing the index of <code>lambda</code> that minimizes the CV error curve, for
 every loss function in <code>loss_funcs</code>.</p></dd>
-<dt><code>i_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(error)</a></code>,
+<dt><code>i_1se</code></dt><dd><p>A named vector with length equal to <code><a href='https://rdrr.io/r/base/length.html'>length(lambda)</a></code>,
 containing the index of <code>lambda</code> that gives the "1-standard-error rule"
 hyperparameter value, for every loss function in <code>loss_funcs</code>.</p></dd>
 <dt><code>obj_func</code></dt><dd><p>The relative change in the objective function over the
@@ -337,7 +335,7 @@ $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
 \left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|\]</p></li>
 </ol>
 
-<p>where \(w_i:=\) <code>weights[i]</code>.</p>
+<p>where <em></em>\(w_i:=\) <code>weights[i]</code>.</p>
 <p>When defining custom loss functions, each function within the named list
 passed to <code>loss_funcs</code> should take three vector arguments --- <code>y</code>,
 <code>tf_estimate</code>, and <code>weights</code> --- and return a single scalar value for the
@@ -384,7 +382,7 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 <span class='va'>weights</span> <span class='op'>&lt;-</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='va'>eclipsing_binary</span><span class='op'>$</span><span class='va'>std_err</span><span class='op'>^</span><span class='fl'>2</span>
 
 <span class='va'>cv_tf</span> <span class='op'>&lt;-</span> <span class='fu'>cv_trendfilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span>, max_iter <span class='op'>=</span> <span class='fl'>1e4</span>, obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: all scheduled cores encountered errors in user code</span></div><div class='output co'>#&gt; <span class='error'>Error in match.fun(FUN): object 'X' not found</span></div></pre>
+</div><div class='output co'>#&gt; <span class='error'>Error in .tf_fit(x, y, weights, k = 2L, lambda, admm_params, lambda_min_ratio,     ...): object 'x' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

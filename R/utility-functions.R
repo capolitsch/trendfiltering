@@ -1,7 +1,10 @@
 #' Utility functions for internal/expert use only
 
 #' @noRd
-get_admm_params <- function(obj_tol = 1e-10, max_iter = 500) {
+#' @importFrom rlang %||%
+get_admm_params <- function(obj_tol = NULL, max_iter = NULL) {
+  obj_tol <- obj_tol %||% 1e-10
+  max_iter <- obj_tol %||% 200
   list(
     obj_tol = as.double(obj_tol),
     max_iter = as.double(max_iter),
@@ -22,56 +25,51 @@ get_admm_params <- function(obj_tol = 1e-10, max_iter = 500) {
 #' @importFrom magrittr %>%
 #' @importFrom stats approx
 #' @noRd
-get_lambda_grid_edf_spacing <- function(df,
+get_lambda_grid_edf_spacing <- function(data,
                                         admm_params,
                                         nlambda,
                                         k = 2L,
-                                        lambda_min_ratio = 1e-16) {
+                                        lambda_min_ratio = 1e-16,
+                                        ...) {
   nlambda_start <- ifelse(nlambda >= 150, 100, 50)
+  n <- nrow(data)
 
-  tf_out <- .Call("tf_R",
-    sX = as.double(df$x),
-    sY = as.double(df$y),
-    sW = as.double(df$weights),
-    sN = nrow(df),
-    sK = as.integer(k),
-    sFamily = 0L,
-    sMethod = 0L,
-    sBeta0 = NULL,
-    sLamFlag = 0L,
-    sLambda = as.double(rep(0, nlambda)),
-    sNlambda = as.integer(nlambda),
-    sLambdaMinRatio = as.double(lambda_min_ratio),
-    sVerbose = 0L,
-    sControl = admm_params,
-    PACKAGE = "glmgen"
+  tf_out <- .tf_fit(
+    x,
+    y,
+    weights,
+    k = 2L,
+    lambda,
+    admm_params,
+    lambda_min_ratio,
+    ...
   )
 
   nlambda_start <- tf_out$lambda
-  edfs_start <- tf_out$df
+  edf_start <- tf_out$df
 
-  if (any(edfs_start >= nrow(df) - k - 1L)) {
-    inds <- which(edfs_start >= nrow(df) - k - 1L)[-1]
+  if (any(edf_start >= nrow(data) - k - 1L)) {
+    inds <- which(edf_start >= nrow(data) - k - 1L)[-1]
     if (length(inds) > 0L) {
       nlambda_start <- nlambda_start[-inds]
-      edfs_start <- edfs_start[-inds]
+      edf_start <- edf_start[-inds]
     }
   }
 
-  if (any(edfs_start <= k + 1L)) {
-    inds <- rev(rev(which(edfs_start <= k + 1L))[-1])
+  if (any(edf_start <= k + 1L)) {
+    inds <- rev(rev(which(edf_start <= k + 1L))[-1])
     if (length(inds) > 0L) {
       nlambda_start <- nlambda_start[-inds]
-      edfs_start <- edfs_start[-inds]
+      edf_start <- edf_start[-inds]
     }
   }
 
   approx(
-    x = edfs_start,
+    x = edf_start,
     y = log(nlambda_start),
     xout = seq(
-      min(edfs_start),
-      max(edfs_start),
+      min(edf_start),
+      max(edf_start),
       length = nlambda - length(nlambda_start) + 2
     )[-c(1, nlambda - length(nlambda_start) + 2)]
   )[["y"]] %>%
