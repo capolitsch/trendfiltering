@@ -130,7 +130,8 @@ boot_tf <- bootstrap_trendfilter(
   obj = cv_tf,
   algorithm = "nonparametric",
   edf = cv_tf$edf_min["MAE"]
-)}
+)
+}
 
 # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
 

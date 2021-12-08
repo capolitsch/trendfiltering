@@ -127,7 +127,8 @@
 #'   obj = cv_tf,
 #'   algorithm = "nonparametric",
 #'   edf = cv_tf$edf_min["MAE"]
-#' )}
+#' )
+#' }
 #'
 #' # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
 #'
@@ -496,8 +497,13 @@ wild_sampler <- function(data) {
 #' cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
 #'
 #' \dontrun{
-#' boot_tf <- bootstrap_trendfilter(cv_tf, "nonparametric")
-#' bands <- vbands(boot_tf)}
+#' boot_tf <- bootstrap_trendfilter(
+#'   obj = cv_tf,
+#'   algorithm = "nonparametric",
+#'   edf = cv_tf$edf_min["MAE"]
+#' )
+#' bands <- vbands(boot_tf)
+#' }
 #'
 #'
 #' # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
@@ -510,7 +516,11 @@ wild_sampler <- function(data) {
 #' weights <- quasar_spectrum$weights
 #'
 #' sure_tf <- sure_trendfilter(x, y, weights)
-#' boot_tf <- bootstrap_trendfilter(sure_tf, "parametric")
+#' boot_tf <- bootstrap_trendfilter(
+#'   obj = sure_tf,
+#'   algorithm = "parametric",
+#'   edf = sure_tf$edf_min
+#' )
 #' bands <- vbands(boot_tf)
 
 #' @importFrom dplyr tibble
