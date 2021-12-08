@@ -145,7 +145,7 @@
 #'   edf = sure_tf$edf_min
 #' )
 
-#' @importFrom dplyr case_when mutate
+#' @importFrom dplyr case_when
 #' @importFrom magrittr %>% %<>%
 #' @importFrom rlang %||%
 #' @importFrom parallel mclapply detectCores
@@ -174,18 +174,18 @@ bootstrap_trendfilter <- function(obj,
   if (is.null(x_eval)) x_flag <- TRUE
   x_eval <- x_eval %||% obj$x
 
-  stopifnot(is.numeric(edf))
-  if (length(edf) > 1) {
+  stopifnot(is.numeric(edf_opt))
+  if (length(edf_opt) > 1) {
     stop("`edf` must be of length 1.")
   }
-  if (edf >= obj$k + 1 || edf <= length(obj$x) - obj$k - 1) {
+  if (edf_opt <= obj$k + 1 || edf_opt >= length(obj$x) - obj$k - 1) {
     stop(
       "`edf` must be greater than `k + 1` and less than `n - k - 1`. See ",
       "`obj$edf_min` and `obj$edf_1se` for reasonable choices."
     )
   }
 
-  if (!(edf %in% obj$edf)) {
+  if (!(lambda_opt %in% obj$lambda)) {
     stop("`edf` must be in `obj$edf`.")
   }
 
@@ -204,27 +204,43 @@ bootstrap_trendfilter <- function(obj,
 
   if (mc_cores < detectCores() / 2) {
     warning(
-      cat(paste0(
-        "Your machine has ", detectCores(), " cores.\n Consider increasing",
-        "mc_cores to speed up computation."
-      )),
-      call. = FALSE
+      "Your machine has ", detectCores(), " cores.\n Consider increasing ",
+        "`mc_cores` to speed up computation."
     )
   }
-
-  data_scaled <- tibble(
-    x = obj$x / obj$scale["x"],
-    y = obj$y / obj$scale["y"],
-    weights = obj$weights * obj$scale["y"]^2,
-    fitted_values = fitted(obj, lambda = lambda_opt),
-    residuals = residuals(obj, lambda = lambda_opt)
-  )
 
   sampler <- case_when(
     algorithm == "nonparametric" ~ list(nonparametric_resampler),
     algorithm == "parametric" ~ list(parametric_sampler),
     algorithm == "wild" ~ list(wild_sampler)
   )[[1]]
+
+  if (algorithm == "nonparametric") {
+    data_scaled <- tibble(
+      x = obj$x / obj$scale["x"],
+      y = obj$y / obj$scale["y"],
+      weights = obj$weights * obj$scale["y"]^2
+    )
+  }
+
+  if (algorithm == "parametric") {
+    data_scaled <- tibble(
+      x = obj$x / obj$scale["x"],
+      y = obj$y / obj$scale["y"],
+      weights = obj$weights * obj$scale["y"]^2,
+      fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale["y"]
+    )
+  }
+
+  if (algorithm == "wild") {
+    data_scaled <- tibble(
+      x = obj$x / obj$scale["x"],
+      y = obj$y / obj$scale["y"],
+      weights = obj$weights * obj$scale["y"]^2,
+      fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale["y"],
+      residuals = residuals(obj, lambda = lambda_opt) / obj$scale["y"]
+    )
+  }
 
   if ("edf_radius" %in% names(extra_args)) {
     edf_radius <- extra_args$edf_radius
@@ -234,7 +250,7 @@ bootstrap_trendfilter <- function(obj,
   }
 
   lambda_grid <- obj$lambda[
-    max(i_opt - edf_radius, 1):min(i_opt + edf_radius, length(obj$edf))
+    max(i_opt - edf_radius, 1):min(i_opt + edf_radius, length(obj$lambda))
   ]
 
   if ("edf_tol" %in% names(extra_args)) {
@@ -252,7 +268,7 @@ bootstrap_trendfilter <- function(obj,
   }
 
   par_args <- list(
-    data = data_scaled,
+    data_scaled = data_scaled,
     k = obj$k,
     admm_params = obj$admm_params,
     edf_opt = edf_opt,
@@ -262,7 +278,7 @@ bootstrap_trendfilter <- function(obj,
     edf_tol = edf_tol,
     zero_tol = zero_tol,
     x_flag = x_flag,
-    scale = scale
+    scale = obj$scale
   )
 
   par_out <- mclapply(
@@ -271,6 +287,8 @@ bootstrap_trendfilter <- function(obj,
     par_args = par_args,
     mc.cores = mc_cores
   )
+
+  save(par_out, file = "~/Desktop/debug.RData")
 
   ensemble <- lapply(
     1:B,
@@ -331,53 +349,52 @@ bootstrap_trendfilter <- function(obj,
 #' @importFrom mvbutils extract.named
 bootstrap_parallel <- function(b, par_args) {
   extract.named(par_args)
-  data <- sampler(data)
+  data_scaled <- sampler(data_scaled)
 
-  fit <- .tf_fit(
-    x = data$x,
-    y = data$y,
-    weights = data$weights,
+  fit <- .trendfilter(
+    x = data_scaled$x,
+    y = data_scaled$y,
+    weights = data_scaled$weights,
     k = k,
     lambda = lambda_grid,
-    admm_params = admm_params
+    obj_tol = admm_params$obj_tol,
+    max_iter = admm_params$max_iter,
+    scaling = FALSE
   )
 
-  i_min <- which.min(abs(fit$df - edf_opt))
-  edf_boot <- fit$df[i_min]
+  i_min <- which.min(abs(fit$edf - edf_opt))
+  edf_boot <- fit$edf[i_min]
 
-  if (min(abs(edf_boot - edf_opt)) / edf_opt > edf_tol) {
+  if (min(abs(edf_boot - edf_opt) / edf_opt) > edf_tol) {
     return(bootstrap_parallel(b = 1, par_args = par_args))
   }
 
   n_iter_boot <- fit$iter[i_min]
   lambda_boot <- lambda_grid[i_min]
 
-  #fit <- .trendfilter(
-  #  x = data$x,
-  #  y = data$y,
-  #  weights = data$weights,
-  #  k = k,
-  #  lambda = lambda_boot,
-  #  obj_tol = admm_params$obj_tol,
-  #  max_iter = admm_params$max_iter
-  #)
+  if (x_flag) x_eval <- NULL
 
-  #tf_estimate_boot <- predict(fit, x_eval = x_eval, zero_tol = zero_tol)
+  tf_estimate_boot <- predict(
+    fit,
+    lambda = lambda_boot,
+    x_eval = x_eval,
+    zero_tol = zero_tol
+  ) * scale["y"]
 
-  ind <- match(lambda_boot, lambda_grid)
-  fitted_values <- matrix(drop(fit$beta)[, ind], ncol = 1)
+  #ind <- match(lambda_boot, lambda_grid)
+  #fitted_values <- matrix(drop(fit$beta)[, ind], ncol = 1)
 
-  if (x_flag) {
-    tf_estimate_boot <- as.numeric(fitted_values) * obj$scale["y"]
-  } else {
-    tf_estimate_boot <- .tf_boot(
-      x = x,
-      x_eval = x_eval,
-      lambda = lambda_boot,
-      fitted_values = fitted_values,
-      zero_tol = zero_tol
-    ) * obj$scale["y"]
-  }
+  #if (x_flag) {
+  #  tf_estimate_boot <- as.numeric(fitted_values) * scale["y"]
+  #} else {
+  #  tf_estimate_boot <- .tf_boot(
+  #    x = data_scaled$x,
+  #    x_eval = x_eval / obj$scale["x"],
+  #    lambda = lambda_boot,
+  #    fitted_values = fitted_values,
+  #    zero_tol = zero_tol
+  #  ) * scale["y"]
+  #}
 
   list(
     tf_estimate_boot = tf_estimate_boot,

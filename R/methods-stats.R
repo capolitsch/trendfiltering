@@ -62,8 +62,8 @@ predict.trendfilter <- function(obj,
     return(obj$fitted_values)
   }
 
-  if (length(lambda) == 1) {
-    fitted_values <- obj$fitted_values
+  if (length(obj$lambda) == 1) {
+    fitted_values <- as.numeric(obj$fitted_values)
   } else {
     inds <- match(lambda, obj$lambda)
     fitted_values <- obj$fitted_values[, inds]
@@ -80,7 +80,7 @@ predict.trendfilter <- function(obj,
       zero_tol
     )
 
-    if (length(lambda) == 1) {
+    if (length(obj$lambda) == 1) {
       return(p)
     } else{
       return(matrix(p, ncol = length(lambda)))

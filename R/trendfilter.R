@@ -180,8 +180,20 @@
   rm(x, y, weights)
   n <- nrow(data)
 
-  x_scale <- median(diff(data$x))
-  y_scale <- median(abs(data$y)) / 10
+  if ("scaling" %in% names(extra_args)) {
+    scaling <- extra_args$scaling
+    extra_args$scaling <- NULL
+  } else {
+    scaling <- TRUE
+  }
+
+  if (!scaling) {
+    x_scale <- 1
+    y_scale <- 1
+  } else {
+    x_scale <- median(diff(data$x))
+    y_scale <- median(abs(data$y)) / 10
+  }
 
   data_scaled <- data %>%
     mutate(
