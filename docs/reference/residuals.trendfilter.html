@@ -129,7 +129,7 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for trendfilter</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span><span class='op'>(</span><span class='va'>obj</span>, lambda <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span><span class='op'>(</span><span class='va'>obj</span>, lambda <span class='op'>=</span> <span class='cn'>NULL</span>, x_eval <span class='op'>=</span> <span class='cn'>NULL</span>, zero_tol <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -145,13 +145,18 @@
 hyperparameter values in <code>obj$lambda</code>.</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Additional named arguments. Currently unused.</p></td>
+      <th>x_eval</th>
+      <td><p>Vector of inputs where the trend filtering model(s) will be evaluated.
+Defaults to <code>x_eval = NULL</code>, in which case <code>x_eval = obj$x</code>.</p></td>
     </tr>
     <tr>
       <th>zero_tol</th>
       <td><p>Threshold parameter that controls the point at which a small coefficient
 value is set to zero. Defaults to <code>zero_tol = 1e-6</code>.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Additional named arguments. Currently unused.</p></td>
     </tr>
     </table>
 

@@ -52,7 +52,7 @@ predict.trendfilter <- function(obj,
             call. = FALSE)
   }
 
-  if (length(x_eval) == obj$x) {
+  if (length(x_eval) == length(obj$x)) {
     if (all.equal(x_eval, obj$x)) {
       x_flag <- TRUE
     }

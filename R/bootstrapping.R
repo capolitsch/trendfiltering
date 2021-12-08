@@ -17,6 +17,17 @@
 #' @param B
 #'   The number of bootstrap samples used to estimate the pointwise variability
 #'   bands. Defaults to `B = 100L`.
+#' @param lambda
+#'   The hyperparameter value to use for each of the bootstrap estimates. When
+#'   `obj` is of class '[`sure_trendfilter`][sure_trendfilter()]',
+#'   `lambda = obj$lambda_min` and `lambda = obj$lambda_1se` are advisible
+#'   options. When `obj` is of class '[`cv_trendfilter`][cv_trendfilter()]',
+#'   any element of the (now vectors) `obj$lambda_min` and `obj$lambda_1se` may
+#'   be a reasonable choice.
+#' @param edf
+#'   (Not yet available) Alternative hyperparametrization for the trend
+#'   filtering model(s). The desired number of effective degrees of
+#'   freedom in each bootstrap estimate.
 #' @param mc_cores
 #'   Number of cores to utilize for parallel computing. Defaults to the number
 #'   of cores detected, minus 4.
@@ -49,6 +60,8 @@
 #' evaluated on.}
 #' \item{ensemble}{The full trend filtering bootstrap ensemble as a matrix with
 #' `length(x_eval)` rows and `B` columns.}
+#' \item{algorithm}{A string specifying which variation of the bootstrap was
+#' used to generate the ensemble.}
 #' \item{edf_boots}{Vector of the estimated number of effective degrees of
 #' freedom of each trend filtering bootstrap estimate.}
 #' \item{n_iter_boots}{Vector of the number of iterations taken by the ADMM
@@ -57,8 +70,7 @@
 #' bootstrap fit. In general, these are not all equal because our bootstrap
 #' implementation instead seeks to hold the number of effective degrees of
 #' freedom constant across all bootstrap estimates.}
-#' \item{algorithm}{A string specifying which variation of the bootstrap was
-#' used to generate the ensemble.}
+#' \item{call}{The function call.}
 #' }
 #'
 #' @references
@@ -117,6 +129,7 @@ bootstrap_trendfilter <- function(obj,
                                   B = 100L,
                                   x_eval = NULL,
                                   lambda = NULL,
+                                  edf = NULL,
                                   mc_cores = parallel::detectCores() - 4,
                                   ...) {
   stopifnot(
@@ -210,9 +223,11 @@ bootstrap_trendfilter <- function(obj,
   par_out <- mclapply(
     1:B,
     bootstrap_parallel,
-    par_args,
+    par_args = par_args,
     mc.cores = mc_cores
   )
+
+  save(par_out, file = "~/Desktop/debug.RData")
 
   ensemble <- lapply(
     1:B,
@@ -250,13 +265,13 @@ bootstrap_trendfilter <- function(obj,
         edf_boots = edf_boots,
         n_iter_boots = n_iter_boots,
         lambda_boots = lambda_boots,
+        call = boot.call,
         x = obj$x,
         y = obj$y,
-        lambda = obj$lambda,
+        lambda = lambda,
         k = obj$k,
-        fitted_values = obj$fitted_values,
-        scale = obj$scale,
-        call = boot.call
+        fitted_values = fitted(obj, lambda = lambda),
+        scale = obj$scale
       ),
       class = c("bootstrap_trendfilter", "trendfilter", "trendfiltering")
     )
@@ -268,7 +283,7 @@ bootstrap_trendfilter <- function(obj,
 #' @importFrom glmgen .tf_fit
 #' @importFrom mvbutils extract.named
 bootstrap_parallel <- function(b, par_args) {
-  extract.named(par.args)
+  extract.named(par_args)
   data <- sampler(data)
 
   fit <- .tf_fit(
@@ -284,18 +299,7 @@ bootstrap_parallel <- function(b, par_args) {
   edf_boot <- fit$df[i_min]
 
   if (min(abs(edf_boot - edf_opt)) / edf_opt > 0.1) {
-    return(
-      bootstrap_parallel(
-        b = 1,
-        data = data,
-        k = k,
-        admm_params = admm_params,
-        edf_opt = edf_opt,
-        lambda_grid = lambda_grid,
-        sampler = sampler,
-        x_eval = x_eval
-      )
-    )
+    return(bootstrap_parallel(b = 1, par_args = par_args))
   }
 
   n_iter_boot <- fit$iter[i_min]

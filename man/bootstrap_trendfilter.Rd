@@ -10,6 +10,7 @@ bootstrap_trendfilter(
   B = 100L,
   x_eval = NULL,
   lambda = NULL,
+  edf = NULL,
   mc_cores = parallel::detectCores() - 4,
   ...
 )
@@ -25,6 +26,17 @@ guidelines on when each choice should be used.}
 \item{B}{The number of bootstrap samples used to estimate the pointwise variability
 bands. Defaults to \code{B = 100L}.}
 
+\item{lambda}{The hyperparameter value to use for each of the bootstrap estimates. When
+\code{obj} is of class '\code{\link[=sure_trendfilter]{sure_trendfilter}}',
+\code{lambda = obj$lambda_min} and \code{lambda = obj$lambda_1se} are advisible
+options. When \code{obj} is of class '\code{\link[=cv_trendfilter]{cv_trendfilter}}',
+any element of the (now vectors) \code{obj$lambda_min} and \code{obj$lambda_1se} may
+be a reasonable choice.}
+
+\item{edf}{(Not yet available) Alternative hyperparametrization for the trend
+filtering model(s). The desired number of effective degrees of
+freedom in each bootstrap estimate.}
+
 \item{mc_cores}{Number of cores to utilize for parallel computing. Defaults to the number
 of cores detected, minus 4.}
 
@@ -39,6 +51,8 @@ as well as all elements from \code{obj}.
 evaluated on.}
 \item{ensemble}{The full trend filtering bootstrap ensemble as a matrix with
 \code{length(x_eval)} rows and \code{B} columns.}
+\item{algorithm}{A string specifying which variation of the bootstrap was
+used to generate the ensemble.}
 \item{edf_boots}{Vector of the estimated number of effective degrees of
 freedom of each trend filtering bootstrap estimate.}
 \item{n_iter_boots}{Vector of the number of iterations taken by the ADMM
@@ -47,8 +61,7 @@ algorithm before reaching a stopping criterion, for each bootstrap estimate.}
 bootstrap fit. In general, these are not all equal because our bootstrap
 implementation instead seeks to hold the number of effective degrees of
 freedom constant across all bootstrap estimates.}
-\item{algorithm}{A string specifying which variation of the bootstrap was
-used to generate the ensemble.}
+\item{call}{The function call.}
 }
 }
 \description{
