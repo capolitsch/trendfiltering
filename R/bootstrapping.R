@@ -289,8 +289,6 @@ bootstrap_trendfilter <- function(obj,
     mc.cores = mc_cores
   )
 
-  save(par_out, file = "~/Desktop/debug.RData")
-
   ensemble <- lapply(
     1:B,
     FUN = function(X) par_out[[X]][["tf_estimate_boot"]]
