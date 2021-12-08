@@ -149,6 +149,16 @@ for expert users)</p>
 </td>
 </tr>
 
+<tr>
+<td>
+<p><code>relax_trendfilter()</code></p>
+</td>
+<td>
+<p>Fit a "relaxed" trend filtering model by computing a weighted average of the
+standard trend filtering estimate and a sparse least-squares estimate that shares
+the same active knot set</p>
+</td>
+</tr>
 
 </tbody>
 
@@ -179,17 +189,6 @@ for expert users)</p>
 <td>
 <p>Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
 risk estimate</p>
-</td>
-</tr>
-
-<tr>
-<td>
-<p><code>relax_trendfilter()</code></p>
-</td>
-<td>
-<p> (Not yet available) Fit a "relaxed" trend filtering model by computing a weighted average of the
-standard trend filtering estimate and a sparse least-squares estimate that shares
-the same active knot set</p>
 </td>
 </tr>
 
@@ -239,23 +238,29 @@ the same active knot set</p>
 <td>
 <p><code><a href="predict.trendfilter.html">predict(<i>&lt;trendfilter&gt;</i>)</a></code></p>
 </td>
-<td><p>Evaluate a trend filtering estimate on a grid of inputs</p></td>
+<td><p>Evaluate a trend filtering estimator</p></td>
 </tr>
 
 <tr>
 <td>
 <p><code><a href="fitted.trendfilter.html">fitted(<i>&lt;trendfilter&gt;</i>)</a></code></p>
 </td>
-<td><p>Compute the fitted values of a trend filtering estimate</p></td>
+<td><p></p></td>
 </tr>
 
 <tr>
 <td>
 <p><code><a href="residuals.trendfilter.html">residuals(<i>&lt;trendfilter&gt;</i>)</a></code></p>
 </td>
-<td><p>Compute the residuals of a trend filtering estimate</p></td>
+<td><p></p></td>
 </tr>
 
+<tr>
+<td>
+<p><code><a href="coef.trendfilter.html">coef(<i>&lt;trendfilter&gt;</i>)</a></code></p>
+</td>
+<td><p></p></td>
+</tr>
 
 </tbody>
 
@@ -271,14 +276,14 @@ the same active knot set</p>
 <td>
 <p><code>summary(<i>&lt;trendfilter&gt;</i>)</code></p>
 </td>
-<td><p>Not yet available</p></td>
+<td><p></p></td>
 </tr>
 
 <tr>
 <td>
 <p><code>print(<i>&lt;trendfilter&gt;</i>)</code></p>
 </td>
-<td><p>Not yet available</p></td>
+<td><p></p></td>
 </tr>
 
 </tbody>
@@ -297,7 +302,7 @@ the same active knot set</p>
 <td>
 <p><code>plot(<i>&lt;trendfilter&gt;</i>)</code></p>
 </td>
-<td><p>Not yet available</p></td>
+<td><p></p></td>
 </tr>
 
 
@@ -316,16 +321,14 @@ the same active knot set</p>
 <td>
 <p><code><a href="eclipsing_binary.html">data(eclipsing_binary)</a></code></p>
 </td>
-<td><p>A phase-folded light curve (time series) of a binary star system, observed by
-the Kepler space telescope</p></td>
+<td><p></p></td>
 </tr>
 
 <tr>
 <td>
 <p><code><a href="quasar_spectrum.html">data(quasar_spectrum)</a></code></p>
 </td>
-<td><p>The Lyman-alpha forest range within an absorption spectrum of a distant quasar, observed by
-the Sloan Digital Sky Survey</p></td>
+<td><p></p></td>
 </tr>
 
 

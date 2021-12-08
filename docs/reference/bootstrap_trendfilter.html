@@ -94,7 +94,7 @@ desired level (e.g. level = 0.95) ." />
         <li>
   <a href="../index.html">
     <span class="fas fa-home fa-lg"></span>
-     
+
   </a>
 </li>
 <li>
@@ -108,16 +108,16 @@ desired level (e.g. level = 0.95) ." />
         <li>
   <a href="https://github.com/capolitsch/trendfiltering">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
-      
+
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header>
 
@@ -238,7 +238,7 @@ filtering analysis on that scale. See Example 2 below for a case when the
 inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    
+
 <ol>
 <li><p>Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
 for time-domain astronomy and astronomical spectroscopy. <em>MNRAS</em>, 492(3),
@@ -281,7 +281,7 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 
 <span class='va'>cv_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cv_trendfilter.html'>cv_trendfilter</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span>, max_iter <span class='op'>=</span> <span class='fl'>1e4</span>, obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span><span class='op'>)</span>
 <span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>cv_tf</span>, algorithm <span class='op'>=</span> <span class='st'>"nonparametric"</span>, lambda <span class='op'>=</span> <span class='va'>cv_tf</span><span class='op'>$</span><span class='va'>lambda_min</span><span class='op'>[</span><span class='st'>"MAE"</span><span class='op'>]</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: all scheduled cores encountered errors in user code</span></div><div class='output co'>#&gt; <span class='error'>Error in par_out[[X]][["tf_estimate_boot"]]: subscript out of bounds</span></div><div class='input'>
+
 
 <span class='co'># Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar</span>
 
@@ -291,10 +291,10 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 #&gt;   log10_wavelength   flux weights
 #&gt;              <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
 #&gt; <span style='color: #BCBCBC;'>1</span>             3.55  0.424  0.041<span style='text-decoration: underline;'>7</span>
-#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125 
-#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128 
-#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121 
-#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
+#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125
+#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128
+#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121
+#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134
 #&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'>
 <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>log10_wavelength</span>
 <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>flux</span>
@@ -302,8 +302,7 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 
 <span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sure_trendfilter.html'>sure_trendfilter</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span>
 <span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>sure_tf</span>, algorithm <span class='op'>=</span> <span class='st'>"parametric"</span>, lambda <span class='op'>=</span> <span class='va'>sure_tf</span><span class='op'>$</span><span class='va'>lambda_min</span><span class='op'>)</span>
-</div></pre>
-  </div>
+</div></pre></div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
@@ -312,22 +311,20 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 </div>
 
 
-      <footer>
-      <div class="copyright">
-  <p>Developed by Collin A. Politsch.</p>
+<footer>
+<div class="copyright">
+<p>Developed by Collin A. Politsch.</p>
 </div>
 
 <div class="pkgdown">
   <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
-      </footer>
-   </div>
-
-  
+</footer>
+</div>
 
 
-  </body>
+</body>
 </html>
 
 
