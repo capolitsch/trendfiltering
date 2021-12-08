@@ -123,7 +123,8 @@
     if (any(duplicated.default(lambda))) {
       warning(
         "Duplicated values passed to `lambda`. ",
-        "Retaining only unique values."
+        "Retaining only unique values.",
+        call. = FALSE
       )
       lambda %<>% unique.default() %>% sort.default(decreasing = TRUE)
     } else {
@@ -179,23 +180,25 @@
     lambda = lambda
   )
 
+  scale <- c(x_scale, y_scale)
+  names(scale) <- c("x","y")
+
   invisible(
     structure(
       list(
-        x = data$x,
-        y = data$y,
-        weights = data$weights,
-        k = k,
+        x = data_scaled$x * x_scale,
+        y = data_scaled$y * y_scale,
+        weights = data_scaled$weights / y_scale^2,
+        k = as.integer(k),
         lambda = lambda,
-        edf = fit$df,
-        fitted_values = fit$beta * y_scale,
-        obj_func = fit$obj,
+        edf = as.integer(fit$df),
+        fitted_values = drop(fit$beta) * y_scale,
+        obj_func = drop(fit$obj),
         status = fit$status,
-        n_iter = fit$iter,
+        n_iter = as.integer(fit$iter),
         admm_params = admm_params,
         call = tf_call,
-        x_scale = x_scale,
-        y_scale = y_scale
+        scale = scale
       ),
       class = c("trendfilter", "trendfiltering")
     )

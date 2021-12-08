@@ -11,7 +11,7 @@
 \alias{resids.bootstrap_trendfilter}
 \title{Get residuals from a trendfilter object}
 \usage{
-\method{residuals}{trendfilter}(obj, lambda = NULL, ...)
+\method{residuals}{trendfilter}(obj, lambda = NULL, x_eval = NULL, zero_tol = NULL, ...)
 }
 \arguments{
 \item{obj}{Object of class \code{trendfilter}.}
@@ -20,10 +20,13 @@
 \code{lambda = NULL}, in which case, residuals are computed for all
 hyperparameter values in \code{obj$lambda}.}
 
-\item{...}{Additional named arguments. Currently unused.}
+\item{x_eval}{Vector of inputs where the trend filtering model(s) will be evaluated.
+Defaults to \code{x_eval = NULL}, in which case \code{x_eval = obj$x}.}
 
 \item{zero_tol}{Threshold parameter that controls the point at which a small coefficient
 value is set to zero. Defaults to \code{zero_tol = 1e-6}.}
+
+\item{...}{Additional named arguments. Currently unused.}
 }
 \description{
 Get residuals from a trendfilter object

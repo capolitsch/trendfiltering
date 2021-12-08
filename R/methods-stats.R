@@ -26,13 +26,16 @@
 predict.trendfilter <- function(obj,
                                 lambda = NULL,
                                 x_eval = NULL,
-                                zero_tol = 1e-16,
+                                zero_tol = 1e-6,
                                 ...) {
   stopifnot(
     any(class(obj) == "trendfilter") && any(class(obj) == "trendfiltering")
   )
 
+  x_flag <- is.null(x_eval)
+  lambda_flag <- is.null(lambda)
   lambda <- lambda %||% obj$lambda
+  x_eval <- x_eval %||% obj$x
 
   stopifnot(is.numeric(lambda))
   stopifnot(min(lambda) >= 0L)
@@ -41,24 +44,47 @@ predict.trendfilter <- function(obj,
     stop("`lambda` must only contain values in `obj$lambda`.")
   }
 
-  if (is.null(x_eval)) {
-    return(fitted(obj, lambda))
-  }
-
-  x_eval <- x_eval %||% obj$x
+  stopifnot(is.numeric(x_eval))
+  stopifnot(any(x_eval >= min(obj$x) || x_eval <= max(obj$x)))
 
   if (!is.null(x_eval) && (any(x_eval < min(obj$x) || x_eval > max(obj$x)))) {
-    warning("Not all elements of `x_eval` are in `range(x)`.")
+    warning("One or more elements of `x_eval` are outside `range(x)`.",
+            call. = FALSE)
   }
 
-  inds <- match(lambda, obj$lambda)
-  fitted_values <- obj$fitted_values[, inds, drop = FALSE]
-  p <- .tf_predict(obj, lambda, x_eval, fitted_values, zero_tol)
+  if (length(x_eval) == obj$x) {
+    if (all.equal(x_eval, obj$x)) {
+      x_flag <- TRUE
+    }
+  }
+
+  if (x_flag & lambda_flag) {
+    return(obj$fitted_values)
+  }
 
   if (length(lambda) == 1) {
-    return(p)
-  } else{
-    return(matrix(p, ncol = length(lambda)))
+    fitted_values <- obj$fitted_values
+  } else {
+    inds <- match(lambda, obj$lambda)
+    fitted_values <- obj$fitted_values[, inds]
+  }
+
+  if (x_flag) {
+    return(fitted_values)
+  } else {
+    p <- .tf_predict(
+      obj,
+      lambda,
+      x_eval,
+      matrix(fitted_values, ncol = 1),
+      zero_tol
+    )
+
+    if (length(lambda) == 1) {
+      return(p)
+    } else{
+      return(matrix(p, ncol = length(lambda)))
+    }
   }
 }
 
@@ -95,7 +121,7 @@ fitted.trendfilter <- function(obj, lambda = NULL, ...) {
   }
 
   inds <- match(lambda, obj$lambda)
-  obj$fitted_values[, inds, drop = FALSE]
+  obj$fitted_values[, inds]
 }
 
 
@@ -107,6 +133,9 @@ fitted.trendfilter <- function(obj, lambda = NULL, ...) {
 #'   One or more lambda values to compute residuals for. Defaults to
 #'   `lambda = NULL`, in which case, residuals are computed for all
 #'   hyperparameter values in `obj$lambda`.
+#' @param x_eval
+#'   Vector of inputs where the trend filtering model(s) will be evaluated.
+#'   Defaults to `x_eval = NULL`, in which case `x_eval = obj$x`.
 #' @param zero_tol
 #'   Threshold parameter that controls the point at which a small coefficient
 #'   value is set to zero. Defaults to `zero_tol = 1e-6`.
@@ -119,6 +148,10 @@ fitted.trendfilter <- function(obj, lambda = NULL, ...) {
 #' @aliases resids.bootstrap_trendfilter
 #' @rdname residuals.trendfilter
 #' @export
-residuals.trendfilter <- function(obj, lambda = NULL, ...) {
-  obj$y - fitted(obj, lambda, ...)
+residuals.trendfilter <- function(obj,
+                                  lambda = NULL,
+                                  x_eval = NULL,
+                                  zero_tol = NULL,
+                                  ...) {
+  -(predict(obj, lambda, x_eval, zero_tol, ...) - obj$y)
 }

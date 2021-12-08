@@ -29,6 +29,7 @@ Imports:
     purrr (>= 0.3.4),
     matrixStats (>= 0.58.0),
     stats (>= 4.1.0),
+    mvbutils (>= 2.8.232),
     mathjaxr (>= 1.4-0)
 RdMacros: 
     mathjaxr

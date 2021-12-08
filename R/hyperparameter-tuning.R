@@ -389,6 +389,8 @@ cv_trendfilter <- function(x,
 
   x_scale <- median(diff(data$x))
   y_scale <- median(abs(data$y)) / 10
+  scale <- c(x_scale, y_scale)
+  names(scale) <- c("x", "y")
 
   data_scaled <- data %>%
     mutate(
@@ -504,13 +506,13 @@ cv_trendfilter <- function(x,
     extra_args
   )
 
-  duplicated_args <- duplicated(names(args))
-  if (any(duplicated_args)) args <- args[-duplicated_args]
+  duplicated_args <- which(duplicated(names(args)))
+  if (length(duplicated_args) > 0) args <- args[-duplicated_args]
 
   fit <- do.call(.trendfilter, args)
 
-  edf_min <- as.integer(fit$edf[i_min])
-  edf_1se <- as.integer(fit$edf[i_1se])
+  edf_min <- fit$edf[i_min]
+  edf_1se <- fit$edf[i_1se]
 
   loss_func_names <- names(loss_funcs)
 
@@ -526,7 +528,7 @@ cv_trendfilter <- function(x,
   invisible(
     structure(
       list(
-        lambda = fit$lambda,
+        lambda = lambda,
         edf = fit$edf,
         error = error,
         se_error = se_error,
@@ -541,15 +543,14 @@ cv_trendfilter <- function(x,
         status = fit$status,
         loss_funcs = loss_funcs,
         V = V,
-        x = data$x,
-        y = data$y,
-        weights = data$weights,
+        x = data_scaled$x * x_scale,
+        y = data_scaled$y * y_scale,
+        weights = data_scaled$weights / y_scale^2,
         k = k,
         fitted_values = fit$fitted_values * y_scale,
         admm_params = admm_params,
         call = cv_call,
-        x_scale = x_scale,
-        y_scale = y_scale
+        scale = scale
       ),
       class = c("cv_trendfilter", "trendfilter", "trendfiltering")
     )
@@ -583,8 +584,8 @@ validate_fold <- function(fold_id,
     extra_args
   )
 
-  duplicated_args <- duplicated(names(args))
-  if (any(duplicated_args)) args <- args[-duplicated_args]
+  duplicated_args <- which(duplicated(names(args)))
+  if (length(duplicated_args) > 0) args <- args[-duplicated_args]
 
   fit <- do.call(.trendfilter, args)
 
@@ -809,7 +810,8 @@ sure_trendfilter <- function(x,
   }
 
   if (any(names(extra_args) == "obj_tol")) {
-    obj_tol <- extra_args$max_iter
+    obj_tol <- extra_args$obj_tol
+    extra_args$obj_tol <- NULL
     stopifnot(is.numeric(obj_tol) && obj_tol > 0L && length(obj_tol) == 1L)
   } else{
     obj_tol <- NULL
@@ -817,6 +819,7 @@ sure_trendfilter <- function(x,
 
   if (any(names(extra_args) == "max_iter")) {
     max_iter <- extra_args$max_iter
+    extra_args$max_iter <- NULL
     stopifnot(is.numeric(max_iter) && max_iter == round(max_iter))
     stopifnot(length(max_iter) == 1L)
     max_iter %<>% as.integer()
@@ -853,6 +856,8 @@ sure_trendfilter <- function(x,
 
   x_scale <- median(diff(data$x))
   y_scale <- median(abs(data$y)) / 10
+  scale <- c(x_scale, y_scale)
+  names(scale) <- c("x","y")
 
   data_scaled <- data %>%
     mutate(
@@ -905,7 +910,7 @@ sure_trendfilter <- function(x,
 
   error_mat <- (squared_residuals_mat + optimism_mat) * y_scale^2
   error <- colMeans(error_mat)
-  i_min <- min(which.min(error)) %>% as.integer()
+  i_min <- as.integer(min(which.min(error)))
 
   se_error <- replicate(
     5000,
@@ -922,7 +927,7 @@ sure_trendfilter <- function(x,
   invisible(
     structure(
       list(
-        lambda = fit$lambda,
+        lambda = lambda,
         edf = fit$edf,
         error = error,
         se_error = se_error,
@@ -935,15 +940,14 @@ sure_trendfilter <- function(x,
         obj_func = fit$obj_fun,
         status = fit$status,
         n_iter = fit$n_iter,
-        x = data$x,
-        y = data$y,
-        weights = data$weights,
+        x = data_scaled$x * x_scale,
+        y = data_scaled$y * y_scale,
+        weights = data_scaled$weights / y_scale^2,
         k = k,
-        fitted_values = fit$fitted_values,
+        fitted_values = fit$fitted_values * y_scale,
         admm_params = admm_params,
         call = sure_call,
-        x_scale = x_scale,
-        y_scale = y_scale
+        scale = scale
       ),
       class = c("sure_trendfilter", "trendfilter", "trendfiltering")
     )

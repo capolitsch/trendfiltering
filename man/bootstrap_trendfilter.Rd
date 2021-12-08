@@ -6,7 +6,7 @@
 \usage{
 bootstrap_trendfilter(
   obj,
-  algorithm = NULL,
+  algorithm = c("nonparametric", "parametric", "wild"),
   B = 100L,
   x_eval = NULL,
   lambda = NULL,

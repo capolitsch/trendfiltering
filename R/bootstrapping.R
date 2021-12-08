@@ -113,27 +113,45 @@
 #' @importFrom stats residuals fitted.values
 #' @export
 bootstrap_trendfilter <- function(obj,
-                                  algorithm = NULL,
+                                  algorithm = c("nonparametric","parametric","wild"),
                                   B = 100L,
                                   x_eval = NULL,
                                   lambda = NULL,
                                   mc_cores = parallel::detectCores() - 4,
                                   ...) {
+  stopifnot(
+    any(class(obj) == "cv_trendfilter") || any(class(obj) == "sure_trendfilter")
+  )
   stopifnot(B >= 20)
-
-  lambda <- lambda %||% obj$lambda_min
-
-  stopifnot(is.numeric(lambda))
-  stopifnot(all(lambda >= 0L))
-
-  if (!all(lambda %in% obj$lambda)) {
-    stop("`lambda` must only contain values in `obj$lambda`.")
-  }
 
   boot.call <- match.call
   extra_args <- list(...)
+  algorithm <- match.arg(algorithm)
+  lambda <- lambda %||% obj$lambda_min["MAE"]
+  x_eval <- x_eval %||% obj$x
 
-  mc_cores <- min(c(detectCores(), B, max(c(1, floor(mc_cores)))))
+  stopifnot(is.numeric(lambda))
+  if (length(lambda) > 1) {
+    stop("`lambda` must be of length 1 for bootstrap_trendfilter().")
+  }
+  stopifnot(lambda >= 0L)
+
+  if (!(lambda %in% obj$lambda)) {
+    stop("`lambda` must be in `obj$lambda`.")
+  }
+
+  stopifnot(is.numeric(x_eval))
+  stopifnot(any(x_eval >= min(obj$x) || x_eval <= max(obj$x)))
+
+  if (!is.null(x_eval) && (any(x_eval < min(obj$x) || x_eval > max(obj$x)))) {
+    warning("One or more elements of `x_eval` are outside `range(x)`.",
+            call. = FALSE)
+  }
+
+  stopifnot(
+    is.numeric(mc_cores) && length(mc_cores) == 1 && round(mc_cores) == mc_cores
+  )
+  mc_cores <- min(detectCores(), B, max(c(1, floor(mc_cores)))) %>% as.integer()
 
   if (mc_cores < detectCores() / 2) {
     warning(
@@ -148,19 +166,13 @@ bootstrap_trendfilter <- function(obj,
   i_opt <- match(lambda, obj$lambda)
   edf_opt <- obj$edf[i_opt]
 
-  data <- tibble(x = obj$x, y = obj$y, weights = obj$weights)
-
-  x_scale <- median(diff(obj$x))
-  y_scale <- median(abs(obj$y)) / 10
-
-  data_scaled <- data %>%
-    mutate(
-      x = x / x_scale,
-      y = y / y_scale,
-      weights = weights * y_scale^2,
-      fitted_values = fitted.values(obj, lambda = lambda),
-      residuals = residuals(obj, lambda = lambda)
-    )
+  data_scaled <- tibble(
+    x = obj$x / obj$scale["x"],
+    y = obj$y / obj$scale["y"],
+    weights = obj$weights * obj$scale["y"]^2,
+    fitted_values = fitted(obj, lambda = lambda),
+    residuals = residuals(obj, lambda = lambda)
+  )
 
   sampler <- case_when(
     algorithm == "nonparametric" ~ list(nonparametric_resampler),
@@ -168,22 +180,37 @@ bootstrap_trendfilter <- function(obj,
     algorithm == "wild" ~ list(wild_sampler)
   )[[1]]
 
-  x_eval <- (x_eval %||% obj$x) / x_scale
+  if ("lambda_radius" %in% names(extra_args)) {
+    lambda_radius <- extra_args$lambda_radius
+  } else {
+    lambda_radius <- 7
+  }
 
-  lambda_grid <- obj$lambda[max(i_opt - 10, 1):min(i_opt + 10)]
+  lambda_grid <- obj$lambda[
+    max(i_opt - lambda_radius, 1):min(i_opt + lambda_radius, length(obj$lambda))
+  ]
 
-  save(B, data_scaled, edf_opt, lambda_grid, obj, sampler, x_eval, mc_cores,
-       file = "~/Desktop/debug0.RData")
+  if ("zero_tol" %in% names(extra_args)) {
+    zero_tol <- extra_args$zero_tol
+  } else {
+    zero_tol <- 1e-6
+  }
+
+  par_args <- list(
+    data = data_scaled,
+    k = obj$k,
+    admm_params = obj$admm_params,
+    edf_opt = edf_opt,
+    lambda_grid = lambda_grid,
+    sampler = sampler,
+    x_eval = x_eval / obj$scale["x"],
+    zero_tol = zero_tol
+  )
 
   par_out <- mclapply(
     1:B,
     bootstrap_parallel,
-    data = data_scaled,
-    edf = edf_opt,
-    lambda_grid = lambda_grid,
-    obj = obj,
-    sampler = sampler,
-    x_eval = x_eval,
+    par_args,
     mc.cores = mc_cores
   )
 
@@ -223,7 +250,12 @@ bootstrap_trendfilter <- function(obj,
         edf_boots = edf_boots,
         n_iter_boots = n_iter_boots,
         lambda_boots = lambda_boots,
-        lambda = lambda,
+        x = obj$x,
+        y = obj$y,
+        lambda = obj$lambda,
+        k = obj$k,
+        fitted_values = obj$fitted_values,
+        scale = obj$scale,
         call = boot.call
       ),
       class = c("bootstrap_trendfilter", "trendfilter", "trendfiltering")
@@ -233,31 +265,53 @@ bootstrap_trendfilter <- function(obj,
 
 
 #' @noRd
-bootstrap_parallel <- function(b, data, edf, lambda_grid, obj, sampler, x_eval) {
+#' @importFrom glmgen .tf_fit
+#' @importFrom mvbutils extract.named
+bootstrap_parallel <- function(b, par_args) {
+  extract.named(par.args)
   data <- sampler(data)
+
+  fit <- .tf_fit(
+    x = data$x,
+    y = data$y,
+    weights = data$weights,
+    k = k,
+    lambda = lambda_grid,
+    admm_params = admm_params
+  )
+
+  i_min <- which.min(abs(fit$df - edf_opt))
+  edf_boot <- fit$df[i_min]
+
+  if (min(abs(edf_boot - edf_opt)) / edf_opt > 0.1) {
+    return(
+      bootstrap_parallel(
+        b = 1,
+        data = data,
+        k = k,
+        admm_params = admm_params,
+        edf_opt = edf_opt,
+        lambda_grid = lambda_grid,
+        sampler = sampler,
+        x_eval = x_eval
+      )
+    )
+  }
+
+  n_iter_boot <- fit$iter[i_min]
+  lambda_boot <- lambda_grid[i_min]
 
   fit <- .trendfilter(
     x = data$x,
     y = data$y,
     weights = data$weights,
-    k = obj$k,
-    lambda = lambda_grid,
-    obj_tol = obj$admm_params$obj_tol,
-    max_iter = obj$admm_params$max_iter
+    k = k,
+    lambda = lambda_boot,
+    obj_tol = admm_params$obj_tol,
+    max_iter = admm_params$max_iter
   )
 
-  i_min <- which.min(abs(fit$edf - edf))
-  edf_boot <- fit$edf[i_min]
-  n_iter_boot <- fit$n_iter[i_min]
-  lambda_boot <- lambda_grid[i_min]
-
-  if (min(abs(edf_boot - edf)) / edf > 0.1) {
-    return(
-      bootstrap_parallel(1, data, edf, lambda_grid, obj, sampler, x_eval)
-    )
-  }
-
-  tf_estimate_boot <- predict(fit, lambda_boot, x_eval)
+  tf_estimate_boot <- predict(fit, x_eval = x_eval, zero_tol = zero_tol)
 
   list(
     tf_estimate_boot = tf_estimate_boot,
