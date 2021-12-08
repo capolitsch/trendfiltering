@@ -9,7 +9,6 @@ bootstrap_trendfilter(
   algorithm = c("nonparametric", "parametric", "wild"),
   B = 100L,
   x_eval = NULL,
-  lambda = NULL,
   edf = NULL,
   mc_cores = parallel::detectCores() - 4,
   ...
@@ -26,42 +25,60 @@ guidelines on when each choice should be used.}
 \item{B}{The number of bootstrap samples used to estimate the pointwise variability
 bands. Defaults to \code{B = 100L}.}
 
-\item{lambda}{The hyperparameter value to use for each of the bootstrap estimates. When
-\code{obj} is of class '\code{\link[=sure_trendfilter]{sure_trendfilter}}',
-\code{lambda = obj$lambda_min} and \code{lambda = obj$lambda_1se} are advisible
-options. When \code{obj} is of class '\code{\link[=cv_trendfilter]{cv_trendfilter}}',
-any element of the (now vectors) \code{obj$lambda_min} and \code{obj$lambda_1se} may
-be a reasonable choice.}
-
-\item{edf}{(Not yet available) Alternative hyperparametrization for the trend
-filtering model(s). The desired number of effective degrees of
-freedom in each bootstrap estimate.}
+\item{edf}{The desired number of effective degrees of freedom in each bootstrap
+estimate. When \code{obj} is of class
+'\code{\link[=sure_trendfilter]{sure_trendfilter}}', \code{edf = obj$edf_min} and
+\code{edf = obj$edf_1se} are advisible options. When \code{obj} is of class
+'\code{\link[=cv_trendfilter]{cv_trendfilter}}', any element of the (now vectors)
+\code{obj$edf_min} and \code{obj$edf_1se} may be a reasonable choice. Defaults to
+\code{edf = obj$edf_min["MAE"]}.}
 
 \item{mc_cores}{Number of cores to utilize for parallel computing. Defaults to the number
 of cores detected, minus 4.}
 
-\item{...}{Additional named arguments. Currently unused.}
+\item{...}{Additional named arguments. Currently only a few experimental arguments
+may be passed by experts.}
 }
 \value{
 An object of class '\code{bootstrap_trendfilter}' and subclass
 '\code{\link[=trendfilter]{trendfilter}}'. This is a list with the elements below,
 as well as all elements from \code{obj}.
 \describe{
-\item{x_eval}{Input grid that each bootstrap trend filtering estimate was
+\item{\code{x_eval}}{Input grid that each bootstrap trend filtering estimate was
 evaluated on.}
-\item{ensemble}{The full trend filtering bootstrap ensemble as a matrix with
-\code{length(x_eval)} rows and \code{B} columns.}
-\item{algorithm}{A string specifying which variation of the bootstrap was
+\item{\code{ensemble}}{The full trend filtering bootstrap ensemble as a matrix
+with \code{length(x_eval)} rows and \code{B} columns.}
+\item{\code{algorithm}}{String specifying which variation of the bootstrap was
 used to generate the ensemble.}
-\item{edf_boots}{Vector of the estimated number of effective degrees of
+\item{\code{edf_opt}}{Number of effective degrees of freedom that each bootstrap
+trend filtering fit should approximately possess in our fixed-edf bootstrap
+procedure. Determined by the \code{edf} input argument of
+\code{bootstrap_trendfilter()}.}
+\item{\code{i_opt}}{Index of \code{obj$edf} that gives \code{edf_opt}.}
+\item{\code{edf_boots}}{Vector of the estimated number of effective degrees of
 freedom of each trend filtering bootstrap estimate.}
-\item{n_iter_boots}{Vector of the number of iterations taken by the ADMM
+\item{\code{n_iter_boots}}{Vector of the number of iterations taken by the ADMM
 algorithm before reaching a stopping criterion, for each bootstrap estimate.}
-\item{lambda_boots}{Vector of the hyperparameter values used for each
+\item{\code{lambda_boots}}{Vector of the hyperparameter values used for each
 bootstrap fit. In general, these are not all equal because our bootstrap
 implementation instead seeks to hold the number of effective degrees of
 freedom constant across all bootstrap estimates.}
-\item{call}{The function call.}
+\item{\code{lambda}}{Vector of the original grid of candidate hyperparameter
+values, inherited from \code{obj}.}
+\item{\code{edf}}{Number of effective degrees of freedom in the trend filtering
+estimator, for every hyperparameter value in \code{lambda}.}
+\item{\code{fitted_values}}{Fitted values of all trend filtering point
+estimates with hyperparameter values in \code{lambda}, inherited from \code{obj}.}
+\item{\code{x}}{Vector of observed values for the input variable, inherited from
+\code{obj}.}
+\item{\code{y}}{Vector of observed values for the output variable, inherited from
+\code{obj}.}
+\item{\code{weights}}{Vector of weights for the observed outputs, inherited from
+\code{obj}.}
+\item{\code{k}}{Degree of the trend filtering point estimate (and bootstrap
+estimates), inherited from \code{obj}.}
+\item{\code{call}}{The function call.}
+\item{\code{scale}}{For internal use.}
 }
 }
 \description{
@@ -107,8 +124,13 @@ y <- eclipsing_binary$flux
 weights <- 1 / eclipsing_binary$std_err^2
 
 cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
-boot_tf <- bootstrap_trendfilter(cv_tf, algorithm = "nonparametric", lambda = cv_tf$lambda_min["MAE"])
 
+\dontrun{
+boot_tf <- bootstrap_trendfilter(
+  obj = cv_tf,
+  algorithm = "nonparametric",
+  edf = cv_tf$edf_min["MAE"]
+)}
 
 # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
 
@@ -120,7 +142,11 @@ y <- quasar_spectrum$flux
 weights <- quasar_spectrum$weights
 
 sure_tf <- sure_trendfilter(x, y, weights)
-boot_tf <- bootstrap_trendfilter(sure_tf, algorithm = "parametric", lambda = sure_tf$lambda_min)
+boot_tf <- bootstrap_trendfilter(
+  obj = sure_tf,
+  algorithm = "parametric",
+  edf = sure_tf$edf_min
+)
 }
 \references{
 \enumerate{

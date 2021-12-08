@@ -17,22 +17,20 @@
 #' @param B
 #'   The number of bootstrap samples used to estimate the pointwise variability
 #'   bands. Defaults to `B = 100L`.
-#' @param lambda
-#'   The hyperparameter value to use for each of the bootstrap estimates. When
-#'   `obj` is of class '[`sure_trendfilter`][sure_trendfilter()]',
-#'   `lambda = obj$lambda_min` and `lambda = obj$lambda_1se` are advisible
-#'   options. When `obj` is of class '[`cv_trendfilter`][cv_trendfilter()]',
-#'   any element of the (now vectors) `obj$lambda_min` and `obj$lambda_1se` may
-#'   be a reasonable choice.
 #' @param edf
-#'   (Not yet available) Alternative hyperparametrization for the trend
-#'   filtering model(s). The desired number of effective degrees of
-#'   freedom in each bootstrap estimate.
+#'   The desired number of effective degrees of freedom in each bootstrap
+#'   estimate. When `obj` is of class
+#'   '[`sure_trendfilter`][sure_trendfilter()]', `edf = obj$edf_min` and
+#'   `edf = obj$edf_1se` are advisible options. When `obj` is of class
+#'   '[`cv_trendfilter`][cv_trendfilter()]', any element of the (now vectors)
+#'   `obj$edf_min` and `obj$edf_1se` may be a reasonable choice. Defaults to
+#'   `edf = obj$edf_min["MAE"]`.
 #' @param mc_cores
 #'   Number of cores to utilize for parallel computing. Defaults to the number
 #'   of cores detected, minus 4.
 #' @param ...
-#'   Additional named arguments. Currently unused.
+#'   Additional named arguments. Currently only a few experimental arguments
+#'   may be passed by experts.
 #'
 #' @details Our recommendations for when to use each of the possible settings
 #' for the `algorithm` argument are shown in the table below. See
@@ -56,21 +54,41 @@
 #' '[`trendfilter`][trendfilter()]'. This is a list with the elements below,
 #' as well as all elements from `obj`.
 #' \describe{
-#' \item{x_eval}{Input grid that each bootstrap trend filtering estimate was
+#' \item{`x_eval`}{Input grid that each bootstrap trend filtering estimate was
 #' evaluated on.}
-#' \item{ensemble}{The full trend filtering bootstrap ensemble as a matrix with
-#' `length(x_eval)` rows and `B` columns.}
-#' \item{algorithm}{A string specifying which variation of the bootstrap was
+#' \item{`ensemble`}{The full trend filtering bootstrap ensemble as a matrix
+#' with `length(x_eval)` rows and `B` columns.}
+#' \item{`algorithm`}{String specifying which variation of the bootstrap was
 #' used to generate the ensemble.}
-#' \item{edf_boots}{Vector of the estimated number of effective degrees of
+#' \item{`edf_opt`}{Number of effective degrees of freedom that each bootstrap
+#' trend filtering fit should approximately possess in our fixed-edf bootstrap
+#' procedure. Determined by the `edf` input argument of
+#' `bootstrap_trendfilter()`.}
+#' \item{`i_opt`}{Index of `obj$edf` that gives `edf_opt`.}
+#' \item{`edf_boots`}{Vector of the estimated number of effective degrees of
 #' freedom of each trend filtering bootstrap estimate.}
-#' \item{n_iter_boots}{Vector of the number of iterations taken by the ADMM
+#' \item{`n_iter_boots`}{Vector of the number of iterations taken by the ADMM
 #' algorithm before reaching a stopping criterion, for each bootstrap estimate.}
-#' \item{lambda_boots}{Vector of the hyperparameter values used for each
+#' \item{`lambda_boots`}{Vector of the hyperparameter values used for each
 #' bootstrap fit. In general, these are not all equal because our bootstrap
 #' implementation instead seeks to hold the number of effective degrees of
 #' freedom constant across all bootstrap estimates.}
-#' \item{call}{The function call.}
+#' \item{`lambda`}{Vector of the original grid of candidate hyperparameter
+#' values, inherited from `obj`.}
+#' \item{`edf`}{Number of effective degrees of freedom in the trend filtering
+#' estimator, for every hyperparameter value in `lambda`.}
+#' \item{`fitted_values`}{Fitted values of all trend filtering point
+#' estimates with hyperparameter values in `lambda`, inherited from `obj`.}
+#' \item{`x`}{Vector of observed values for the input variable, inherited from
+#' `obj`.}
+#' \item{`y`}{Vector of observed values for the output variable, inherited from
+#' `obj`.}
+#' \item{`weights`}{Vector of weights for the observed outputs, inherited from
+#' `obj`.}
+#' \item{`k`}{Degree of the trend filtering point estimate (and bootstrap
+#' estimates), inherited from `obj`.}
+#' \item{`call`}{The function call.}
+#' \item{`scale`}{For internal use.}
 #' }
 #'
 #' @references
@@ -103,8 +121,13 @@
 #' weights <- 1 / eclipsing_binary$std_err^2
 #'
 #' cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
-#' boot_tf <- bootstrap_trendfilter(cv_tf, algorithm = "nonparametric", lambda = cv_tf$lambda_min["MAE"])
 #'
+#' \dontrun{
+#' boot_tf <- bootstrap_trendfilter(
+#'   obj = cv_tf,
+#'   algorithm = "nonparametric",
+#'   edf = cv_tf$edf_min["MAE"]
+#' )}
 #'
 #' # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
 #'
@@ -116,7 +139,11 @@
 #' weights <- quasar_spectrum$weights
 #'
 #' sure_tf <- sure_trendfilter(x, y, weights)
-#' boot_tf <- bootstrap_trendfilter(sure_tf, algorithm = "parametric", lambda = sure_tf$lambda_min)
+#' boot_tf <- bootstrap_trendfilter(
+#'   obj = sure_tf,
+#'   algorithm = "parametric",
+#'   edf = sure_tf$edf_min
+#' )
 
 #' @importFrom dplyr case_when mutate
 #' @importFrom magrittr %>% %<>%
@@ -128,29 +155,38 @@ bootstrap_trendfilter <- function(obj,
                                   algorithm = c("nonparametric","parametric","wild"),
                                   B = 100L,
                                   x_eval = NULL,
-                                  lambda = NULL,
                                   edf = NULL,
                                   mc_cores = parallel::detectCores() - 4,
                                   ...) {
+  stopifnot(any(class(obj) == "trendfiltering"))
   stopifnot(
-    any(class(obj) == "cv_trendfilter") || any(class(obj) == "sure_trendfilter")
+    any(class(obj) == "cv_trendfilter") ||
+    any(class(obj) == "sure_trendfilter")
   )
   stopifnot(B >= 20)
 
   boot.call <- match.call
   extra_args <- list(...)
   algorithm <- match.arg(algorithm)
-  lambda <- lambda %||% obj$lambda_min["MAE"]
+  edf_opt <- edf %||% obj$edf_min["MAE"]
+  i_opt <- match(edf, obj$edf)
+  lambda_opt <- obj$lambda[i_opt]
+  if (is.null(x_eval)) x_flag <- TRUE
   x_eval <- x_eval %||% obj$x
 
-  stopifnot(is.numeric(lambda))
-  if (length(lambda) > 1) {
-    stop("`lambda` must be of length 1 for bootstrap_trendfilter().")
+  stopifnot(is.numeric(edf))
+  if (length(edf) > 1) {
+    stop("`edf` must be of length 1.")
   }
-  stopifnot(lambda >= 0L)
+  if (edf >= obj$k + 1 || edf <= length(obj$x) - obj$k - 1) {
+    stop(
+      "`edf` must be greater than `k + 1` and less than `n - k - 1`. See ",
+      "`obj$edf_min` and `obj$edf_1se` for reasonable choices."
+    )
+  }
 
-  if (!(lambda %in% obj$lambda)) {
-    stop("`lambda` must be in `obj$lambda`.")
+  if (!(edf %in% obj$edf)) {
+    stop("`edf` must be in `obj$edf`.")
   }
 
   stopifnot(is.numeric(x_eval))
@@ -176,15 +212,12 @@ bootstrap_trendfilter <- function(obj,
     )
   }
 
-  i_opt <- match(lambda, obj$lambda)
-  edf_opt <- obj$edf[i_opt]
-
   data_scaled <- tibble(
     x = obj$x / obj$scale["x"],
     y = obj$y / obj$scale["y"],
     weights = obj$weights * obj$scale["y"]^2,
-    fitted_values = fitted(obj, lambda = lambda),
-    residuals = residuals(obj, lambda = lambda)
+    fitted_values = fitted(obj, lambda = lambda_opt),
+    residuals = residuals(obj, lambda = lambda_opt)
   )
 
   sampler <- case_when(
@@ -193,18 +226,27 @@ bootstrap_trendfilter <- function(obj,
     algorithm == "wild" ~ list(wild_sampler)
   )[[1]]
 
-  if ("lambda_radius" %in% names(extra_args)) {
-    lambda_radius <- extra_args$lambda_radius
+  if ("edf_radius" %in% names(extra_args)) {
+    edf_radius <- extra_args$edf_radius
+    extra_args$edf_radius <- NULL
   } else {
-    lambda_radius <- 7
+    edf_radius <- 5
   }
 
   lambda_grid <- obj$lambda[
-    max(i_opt - lambda_radius, 1):min(i_opt + lambda_radius, length(obj$lambda))
+    max(i_opt - edf_radius, 1):min(i_opt + edf_radius, length(obj$edf))
   ]
+
+  if ("edf_tol" %in% names(extra_args)) {
+    edf_tol <- extra_args$edf_tol
+    extra_args$edf_tol <- NULL
+  } else {
+    edf_tol <- 0.2
+  }
 
   if ("zero_tol" %in% names(extra_args)) {
     zero_tol <- extra_args$zero_tol
+    extra_args$zero_tol <- NULL
   } else {
     zero_tol <- 1e-6
   }
@@ -217,7 +259,10 @@ bootstrap_trendfilter <- function(obj,
     lambda_grid = lambda_grid,
     sampler = sampler,
     x_eval = x_eval / obj$scale["x"],
-    zero_tol = zero_tol
+    edf_tol = edf_tol,
+    zero_tol = zero_tol,
+    x_flag = x_flag,
+    scale = scale
   )
 
   par_out <- mclapply(
@@ -260,15 +305,19 @@ bootstrap_trendfilter <- function(obj,
         x_eval = x_eval,
         ensemble = ensemble,
         algorithm = algorithm,
+        edf_opt = edf_opt,
+        i_opt = i_opt,
         edf_boots = edf_boots,
         n_iter_boots = n_iter_boots,
         lambda_boots = lambda_boots,
-        call = boot.call,
+        lambda = obj$lambda,
+        edf = obj$edf,
+        fitted_values = obj$fitted_values,
         x = obj$x,
         y = obj$y,
-        lambda = lambda,
+        weights = obj$weights,
         k = obj$k,
-        fitted_values = fitted(obj, lambda = lambda),
+        call = boot.call,
         scale = obj$scale
       ),
       class = c("bootstrap_trendfilter", "trendfilter", "trendfiltering")
@@ -278,7 +327,7 @@ bootstrap_trendfilter <- function(obj,
 
 
 #' @noRd
-#' @importFrom glmgen .tf_fit
+#' @importFrom glmgen .tf_fit .tf_boot
 #' @importFrom mvbutils extract.named
 bootstrap_parallel <- function(b, par_args) {
   extract.named(par_args)
@@ -296,24 +345,39 @@ bootstrap_parallel <- function(b, par_args) {
   i_min <- which.min(abs(fit$df - edf_opt))
   edf_boot <- fit$df[i_min]
 
-  if (min(abs(edf_boot - edf_opt)) / edf_opt > 0.1) {
+  if (min(abs(edf_boot - edf_opt)) / edf_opt > edf_tol) {
     return(bootstrap_parallel(b = 1, par_args = par_args))
   }
 
   n_iter_boot <- fit$iter[i_min]
   lambda_boot <- lambda_grid[i_min]
 
-  fit <- .trendfilter(
-    x = data$x,
-    y = data$y,
-    weights = data$weights,
-    k = k,
-    lambda = lambda_boot,
-    obj_tol = admm_params$obj_tol,
-    max_iter = admm_params$max_iter
-  )
+  #fit <- .trendfilter(
+  #  x = data$x,
+  #  y = data$y,
+  #  weights = data$weights,
+  #  k = k,
+  #  lambda = lambda_boot,
+  #  obj_tol = admm_params$obj_tol,
+  #  max_iter = admm_params$max_iter
+  #)
 
-  tf_estimate_boot <- predict(fit, x_eval = x_eval, zero_tol = zero_tol)
+  #tf_estimate_boot <- predict(fit, x_eval = x_eval, zero_tol = zero_tol)
+
+  ind <- match(lambda_boot, lambda_grid)
+  fitted_values <- matrix(drop(fit$beta)[, ind], ncol = 1)
+
+  if (x_flag) {
+    tf_estimate_boot <- as.numeric(fitted_values) * obj$scale["y"]
+  } else {
+    tf_estimate_boot <- .tf_boot(
+      x = x,
+      x_eval = x_eval,
+      lambda = lambda_boot,
+      fitted_values = fitted_values,
+      zero_tol = zero_tol
+    ) * obj$scale["y"]
+  }
 
   list(
     tf_estimate_boot = tf_estimate_boot,
@@ -414,8 +478,9 @@ wild_sampler <- function(data) {
 #'
 #' cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
 #'
+#' \dontrun{
 #' boot_tf <- bootstrap_trendfilter(cv_tf, "nonparametric")
-#' bands <- vbands(boot_tf)
+#' bands <- vbands(boot_tf)}
 #'
 #'
 #' # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
@@ -429,6 +494,7 @@ wild_sampler <- function(data) {
 #'
 #' sure_tf <- sure_trendfilter(x, y, weights)
 #' boot_tf <- bootstrap_trendfilter(sure_tf, "parametric")
+#' bands <- vbands(boot_tf)
 
 #' @importFrom dplyr tibble
 #' @export

@@ -188,6 +188,11 @@ estimator, for every hyperparameter value in <code>lambda</code>.</p></dd>
 <dt><code>error</code></dt><dd><p>Vector of mean-squared prediction errors estimated by SURE,
 for every hyperparameter value in <code>lambda</code>.</p></dd>
 <dt><code>se_error</code></dt><dd><p>Vector of estimated standard errors for the <code>error</code>.</p></dd>
+<dt><code>training_error</code></dt><dd><p>The "in-sample" MSE between the observed outputs <code>y</code>
+and the trend filtering estimate, for every hyperparameter value in
+<code>lambda</code>.</p></dd>
+<dt><code>optimism</code></dt><dd><p>SURE-estimated optimisms, i.e.
+<code>optimism = error - training_error</code>.</p></dd>
 <dt><code>lambda_min</code></dt><dd><p>Hyperparameter value in <code>lambda</code> that minimizes the SURE
 validation error curve.</p></dd>
 <dt><code>lambda_1se</code></dt><dd><p>The largest hyperparameter value in <code>lambda</code> that has a
@@ -203,22 +208,31 @@ filtering estimator with hyperparameter <code>lambda_min</code>.</p></dd>
 filtering estimator with hyperparameter <code>lambda_1se</code>.</p></dd>
 <dt><code>i_min</code></dt><dd><p>Index of <code>lambda</code> that gives <code>lambda_min</code>.</p></dd>
 <dt><code>i_1se</code></dt><dd><p>Index of <code>lambda</code> that gives <code>lambda_1se</code>.</p></dd>
+<dt><code>fitted_values</code></dt><dd><p>The fitted values of all trend filtering estimates,
+return as a matrix with <code><a href='https://rdrr.io/r/base/length.html'>length(lambda)</a></code> columns, with <code>fitted_values[,i]</code>
+corresponding to the trend filtering estimate with hyperparameter
+<code>lambda[i]</code>.</p></dd>
+<dt><code>admm_params</code></dt><dd><p>A list of the parameter values used by the ADMM
+algorithm used to solve the trend filtering convex optimization.</p></dd>
 <dt><code>obj_func</code></dt><dd><p>The relative change in the objective function over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 <code>lambda</code>.</p></dd>
 <dt><code>n_iter</code></dt><dd><p>Total number of iterations taken by the ADMM algorithm, for
-every candidate hyperparameter in <code>lambda</code>. If an element of <code>n_iter</code> is
-exactly equal to <code>admm_params$max_iter</code> (see below), then the ADMM algorithm
-stopped before reaching the objective tolerance <code>admm_params$obj_tol</code>. In
-these situations, you may need to increase the maximum number of tolerable
-iterations by passing a <code>max_iter</code> argument to <code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code> in order to
-ensure that the ADMM solution has converged to satisfactory precision.</p></dd>
-<dt><code>training_error</code></dt><dd><p>The "in-sample" MSE between the observed outputs <code>y</code>
-and the trend filtering estimate, for every hyperparameter value in
-<code>lambda</code>.</p></dd>
-<dt><code>optimism</code></dt><dd><p>SURE-estimated optimisms, i.e.
-<code>optimism = error - training_error</code>.</p></dd>
+every candidate hyperparameter in <code>lambda</code>. If an element of <code>n_iter</code>
+is exactly equal to <code>admm_params$max_iter</code>, then the
+ADMM algorithm stopped before reaching the objective tolerance
+<code>admm_params$obj_tol</code>. In these situations, you may need to
+increase the maximum number of tolerable iterations by passing a
+<code>max_iter</code> argument to <code>sure_trendfilter()</code> in order to ensure that the ADMM
+solution has converged to satisfactory precision.</p></dd>
+<dt><code>x</code></dt><dd><p>Vector of observed values for the input variable.</p></dd>
+<dt><code>y</code></dt><dd><p>Vector of observed values for the output variable (if originally
+present, observations with <code><a href='https://rdrr.io/r/base/NA.html'>is.na(y)</a></code> or <code>weights == 0</code> are dropped).</p></dd>
+<dt><code>weights</code></dt><dd><p>Vector of weights for the observed outputs.</p></dd>
+<dt><code>k</code></dt><dd><p>Degree of the trend filtering estimates.</p></dd>
+<dt><code>status</code></dt><dd><p>For internal use. Output from the C solver.</p></dd>
 <dt><code>call</code></dt><dd><p>The function call.</p></dd>
+<dt><code>scale</code></dt><dd><p>For internal use.</p></dd>
 
 </dl>
 

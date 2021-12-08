@@ -38,7 +38,41 @@
 #' @param ...
 #'   Additional named arguments. Currently unused.
 #'
-#' @return An object of class `'trendfilter'`.
+#' @return An object of class `'trendfilter'`. This is a list with the
+#' following elements:
+#' \describe{
+#' \item{`x`}{Vector of observed values for the input variable.}
+#' \item{`y`}{Vector of observed values for the output variable (if originally
+#' present, observations with `is.na(y)` or `weights == 0` are dropped).}
+#' \item{`weights`}{Vector of weights for the observed outputs.}
+#' \item{`k`}{Degree of the trend filtering estimate.}
+#' \item{`lambda`}{Vector of candidate hyperparameter values (always returned
+#' in descending order).}
+#' \item{`edf`}{Number of effective degrees of freedom in the trend filtering
+#' estimator, for every hyperparameter value in `lambda`.}
+#' \item{`fitted_values`}{The fitted values of the trend filtering estimate(s).
+#' If `length(lambda) == 1`, fitted values for the single fit are returned as a
+#' numeric vector. Otherwise, fitted values are returned in a matrix with
+#' `length(lambda)` columns, with `fitted_values[,i]` corresponding to the trend
+#' filtering estimate with hyperparameter `lambda[i]`.
+#' }
+#' \item{`admm_params`}{A list of the parameter values used by the ADMM
+#' algorithm used to solve the trend filtering convex optimization.}
+#' \item{`obj_func`}{The relative change in the objective function over the
+#' ADMM algorithm's final iteration, for every hyperparameter value in
+#' `lambda`.}
+#' \item{`n_iter`}{Total number of iterations taken by the ADMM algorithm, for
+#' every hyperparameter value in `lambda`. If an element of `n_iter`
+#' is exactly equal to `admm_params$max_iter`, then the
+#' ADMM algorithm stopped before reaching the objective tolerance
+#' `admm_params$obj_tol`. In these situations, you may need to
+#' increase the maximum number of tolerable iterations by passing a
+#' `max_iter` argument to `cv_trendfilter()` in order to ensure that the ADMM
+#' solution has converged to satisfactory precision.}
+#' \item{`status`}{For internal use. Output from the C solver.}
+#' \item{`call`}{The function call.}
+#' \item{`scale`}{For internal use.}
+#' }
 #'
 #' @references
 #' 1. Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
@@ -193,10 +227,10 @@
         lambda = lambda,
         edf = as.integer(fit$df),
         fitted_values = drop(fit$beta) * y_scale,
-        obj_func = drop(fit$obj),
-        status = fit$status,
-        n_iter = as.integer(fit$iter),
         admm_params = admm_params,
+        obj_func = drop(fit$obj),
+        n_iter = as.integer(fit$iter),
+        status = fit$status,
         call = tf_call,
         scale = scale
       ),

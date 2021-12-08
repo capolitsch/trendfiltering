@@ -88,12 +88,19 @@ every loss function in \code{loss_funcs}.}
 \item{\code{i_1se}}{A named vector with length equal to \code{length(lambda)},
 containing the index of \code{lambda} that gives the "1-standard-error rule"
 hyperparameter value, for every loss function in \code{loss_funcs}.}
+\item{\code{fitted_values}}{The fitted values of all trend filtering estimates,
+return as a matrix with \code{length(lambda)} columns, with \code{fitted_values[,i]}
+corresponding to the trend filtering estimate with hyperparameter
+\code{lambda[i]}.
+}
+\item{\code{admm_params}}{A list of the parameter values used by the ADMM
+algorithm used to solve the trend filtering convex optimization.}
 \item{\code{obj_func}}{The relative change in the objective function over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 \code{lambda}.}
 \item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
 every candidate hyperparameter in \code{lambda}. If an element of \code{n_iter}
-is exactly equal to \code{admm_params$max_iter} (see below), then the
+is exactly equal to \code{admm_params$max_iter}, then the
 ADMM algorithm stopped before reaching the objective tolerance
 \code{admm_params$obj_tol}. In these situations, you may need to
 increase the maximum number of tolerable iterations by passing a
@@ -107,6 +114,10 @@ validation.}
 \item{\code{y}}{Vector of observed values for the output variable (if originally
 present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
 \item{\code{weights}}{Vector of weights for the observed outputs.}
+\item{\code{k}}{Degree of the trend filtering estimates.}
+\item{\code{status}}{For internal use. Output from the C solver.}
+\item{\code{call}}{The function call.}
+\item{\code{scale}}{For internal use.}
 }
 }
 \description{

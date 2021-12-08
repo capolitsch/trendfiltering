@@ -160,12 +160,19 @@
 #' \item{`i_1se`}{A named vector with length equal to `length(lambda)`,
 #' containing the index of `lambda` that gives the "1-standard-error rule"
 #' hyperparameter value, for every loss function in `loss_funcs`.}
+#' \item{`fitted_values`}{The fitted values of all trend filtering estimates,
+#' return as a matrix with `length(lambda)` columns, with `fitted_values[,i]`
+#' corresponding to the trend filtering estimate with hyperparameter
+#' `lambda[i]`.
+#' }
+#' \item{`admm_params`}{A list of the parameter values used by the ADMM
+#' algorithm used to solve the trend filtering convex optimization.}
 #' \item{`obj_func`}{The relative change in the objective function over the
 #' ADMM algorithm's final iteration, for every candidate hyperparameter in
 #' `lambda`.}
 #' \item{`n_iter`}{Total number of iterations taken by the ADMM algorithm, for
 #' every candidate hyperparameter in `lambda`. If an element of `n_iter`
-#' is exactly equal to `admm_params$max_iter` (see below), then the
+#' is exactly equal to `admm_params$max_iter`, then the
 #' ADMM algorithm stopped before reaching the objective tolerance
 #' `admm_params$obj_tol`. In these situations, you may need to
 #' increase the maximum number of tolerable iterations by passing a
@@ -179,6 +186,10 @@
 #' \item{`y`}{Vector of observed values for the output variable (if originally
 #' present, observations with `is.na(y)` or `weights == 0` are dropped).}
 #' \item{`weights`}{Vector of weights for the observed outputs.}
+#' \item{`k`}{Degree of the trend filtering estimates.}
+#' \item{`status`}{For internal use. Output from the C solver.}
+#' \item{`call`}{The function call.}
+#' \item{`scale`}{For internal use.}
 #' }
 #'
 #' @references
@@ -538,17 +549,17 @@ cv_trendfilter <- function(x,
         edf_1se = edf_1se,
         i_min = i_min,
         i_1se = i_1se,
+        fitted_values = fit$fitted_values * y_scale,
+        admm_params = admm_params,
         obj_func = fit$obj_fun,
         n_iter = fit$n_iter,
-        status = fit$status,
         loss_funcs = loss_funcs,
         V = V,
         x = data_scaled$x * x_scale,
         y = data_scaled$y * y_scale,
         weights = data_scaled$weights / y_scale^2,
         k = k,
-        fitted_values = fit$fitted_values * y_scale,
-        admm_params = admm_params,
+        status = fit$status,
         call = cv_call,
         scale = scale
       ),
@@ -723,6 +734,11 @@ get_internal_loss_funcs <- function() {
 #' \item{`error`}{Vector of mean-squared prediction errors estimated by SURE,
 #' for every hyperparameter value in `lambda`.}
 #' \item{`se_error`}{Vector of estimated standard errors for the `error`.}
+#' \item{`training_error`}{The "in-sample" MSE between the observed outputs `y`
+#' and the trend filtering estimate, for every hyperparameter value in
+#' `lambda`.}
+#' \item{`optimism`}{SURE-estimated optimisms, i.e.
+#' `optimism = error - training_error`.}
 #' \item{`lambda_min`}{Hyperparameter value in `lambda` that minimizes the SURE
 #' validation error curve.}
 #' \item{`lambda_1se`}{The largest hyperparameter value in `lambda` that has a
@@ -738,22 +754,32 @@ get_internal_loss_funcs <- function() {
 #' filtering estimator with hyperparameter `lambda_1se`.}
 #' \item{`i_min`}{Index of `lambda` that gives `lambda_min`.}
 #' \item{`i_1se`}{Index of `lambda` that gives `lambda_1se`.}
+#' \item{`fitted_values`}{The fitted values of all trend filtering estimates,
+#' return as a matrix with `length(lambda)` columns, with `fitted_values[,i]`
+#' corresponding to the trend filtering estimate with hyperparameter
+#' `lambda[i]`.
+#' }
+#' \item{`admm_params`}{A list of the parameter values used by the ADMM
+#' algorithm used to solve the trend filtering convex optimization.}
 #' \item{`obj_func`}{The relative change in the objective function over the
 #' ADMM algorithm's final iteration, for every candidate hyperparameter in
 #' `lambda`.}
 #' \item{`n_iter`}{Total number of iterations taken by the ADMM algorithm, for
-#' every candidate hyperparameter in `lambda`. If an element of `n_iter` is
-#' exactly equal to `admm_params$max_iter` (see below), then the ADMM algorithm
-#' stopped before reaching the objective tolerance `admm_params$obj_tol`. In
-#' these situations, you may need to increase the maximum number of tolerable
-#' iterations by passing a `max_iter` argument to `cv_trendfilter()` in order to
-#' ensure that the ADMM solution has converged to satisfactory precision.}
-#' \item{`training_error`}{The "in-sample" MSE between the observed outputs `y`
-#' and the trend filtering estimate, for every hyperparameter value in
-#' `lambda`.}
-#' \item{`optimism`}{SURE-estimated optimisms, i.e.
-#' `optimism = error - training_error`.}
+#' every candidate hyperparameter in `lambda`. If an element of `n_iter`
+#' is exactly equal to `admm_params$max_iter`, then the
+#' ADMM algorithm stopped before reaching the objective tolerance
+#' `admm_params$obj_tol`. In these situations, you may need to
+#' increase the maximum number of tolerable iterations by passing a
+#' `max_iter` argument to `sure_trendfilter()` in order to ensure that the ADMM
+#' solution has converged to satisfactory precision.}
+#' \item{`x`}{Vector of observed values for the input variable.}
+#' \item{`y`}{Vector of observed values for the output variable (if originally
+#' present, observations with `is.na(y)` or `weights == 0` are dropped).}
+#' \item{`weights`}{Vector of weights for the observed outputs.}
+#' \item{`k`}{Degree of the trend filtering estimates.}
+#' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
+#' \item{`scale`}{For internal use.}
 #' }
 #'
 #' @references
@@ -931,21 +957,23 @@ sure_trendfilter <- function(x,
         edf = fit$edf,
         error = error,
         se_error = se_error,
+        training_error = colMeans(squared_residuals_mat) * y_scale^2,
+        optimism = colMeans(optimism_mat) * y_scale^2,
         lambda_min = lambda[i_min],
         lambda_1se = lambda[i_1se],
         edf_min = fit$edf[i_min],
         edf_1se = fit$edf[i_1se],
         i_min = i_min,
         i_1se = i_1se,
+        fitted_values = fit$fitted_values * y_scale,
+        admm_params = admm_params,
         obj_func = fit$obj_fun,
-        status = fit$status,
         n_iter = fit$n_iter,
         x = data_scaled$x * x_scale,
         y = data_scaled$y * y_scale,
         weights = data_scaled$weights / y_scale^2,
         k = k,
-        fitted_values = fit$fitted_values * y_scale,
-        admm_params = admm_params,
+        status = fit$status,
         call = sure_call,
         scale = scale
       ),

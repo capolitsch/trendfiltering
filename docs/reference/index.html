@@ -135,7 +135,7 @@
 <p><code><a href="trendfilter.html">trendfilter()</a></code></p>
 </td>
 <td>
-<p>Fit a trend filtering model (front-end function designed to optimize ease of use)</p>
+<p>Fit a trend filtering model (front-end function focused on ease of use)</p>
 </td>
 </tr>
 
@@ -144,8 +144,8 @@
 <p><code><a href="trendfilter.html">.trendfilter()</a></code></p>
 </td>
 <td>
-<p>Fit a trend filtering model (back-end of <code>trendfilter()</code> with more options
-for expert users)</p>
+<p>Fit a trend filtering model (back-end function with more options for expert
+users)</p>
 </td>
 </tr>
 
@@ -154,24 +154,23 @@ for expert users)</p>
 <p><code>relax_trendfilter()</code></p>
 </td>
 <td>
-<p>Fit a "relaxed" trend filtering model by computing a weighted average of the
+<p><span style="color:red">(Not yet available)</span> Fit a "relaxed" trend filtering model by computing a
+weighted average of the
 standard trend filtering estimate and a sparse least-squares estimate that shares
-the same active knot set</p>
+the same active knot set. The weighted average gives rise to a second model
+hyperparameter that requires tuning.</p><br>
 </td>
 </tr>
 
 </tbody>
 
-
-
 <tbody>
 <tr>
 <th colspan="2">
 <h2 id="section-hyperparameter" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Optimize hyperparameter(s)</h2>
-<p class="section-desc"></p>
+<p class="section-desc"></p><br>
 </th>
 </tr>
-
 
 <tr>
 <td>
@@ -188,7 +187,7 @@ the same active knot set</p>
 </td>
 <td>
 <p>Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
-risk estimate</p>
+risk estimate</p><br>
 </td>
 </tr>
 
@@ -199,13 +198,14 @@ risk estimate</p>
 <tr>
 <th colspan="2">
 <h2 id="section-bootstrap" class="hasAnchor"><a href="#section-bootstrap" class="anchor"></a>Compute bootstrap ensembles/uncertainties</h2>
-<p class="section-desc"></p>
+<p class="section-desc"></p><br>
 </th>
 </tr>
 
 <tr>
 <td>
-<p><code><a href="bootstrap_trendfilter.html">bootstrap_trendfilter(<i>&lt;trendfilter&gt;</i>)</a></code></p>
+<p><code><a href="bootstrap_trendfilter.html">bootstrap_trendfilter(<i>&lt;cv_trendfilter&gt;</i>)</a></code>
+<code><a href="bootstrap_trendfilter.html">bootstrap_trendfilter(<i>&lt;sure_trendfilter&gt;</i>)</a></code></p>
 </td>
 <td>
 <p>Generate an ensemble of trend filtering estimates via a bootstrap</p>
@@ -218,7 +218,7 @@ risk estimate</p>
 </p>
 </td>
 <td>
-<p>Compute variablity bands from the sample quantiles of the bootstrap ensemble</p>
+<p>Compute variablity bands from the sample quantiles of the bootstrap ensemble</p><br>
 </td>
 </tr>
 
@@ -229,8 +229,15 @@ risk estimate</p>
 <tbody>
 <tr>
 <th colspan="2">
-<h2 id="section-stats" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Call <code><a href='https://rdrr.io/r/stats/stats-package.html'>stats</a></code> generics on trend filtering objects</h2>
+<h2 id="section-stats" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Call generic <tt>stats</tt> functions on trend filtering objects</h2>
 <p class="section-desc"></p>
+<p>Objects of class <code>'<a href="cv_trendfilter.html">cv_trendfilter</a>'</code>,
+<code>'<a href="sure_trendfilter.html">sure_trendfilter</a>'</code>,
+<code>'relax_trendfilter'</code>, and
+<code>'<a href="bootstrap_trendfilter.html">bootstrap_trendfilter</a>'</code>
+all share the base class <code>'<a href="trendfilter.html">trendfilter</a>'</code>,
+and therefore may be passed to these <tt><a href='https://rdrr.io/r/stats/stats-package.html'>stats</a></tt>
+package generic functions.</p><br>
 </th>
 </tr>
 
@@ -245,21 +252,14 @@ risk estimate</p>
 <td>
 <p><code><a href="fitted.trendfilter.html">fitted(<i>&lt;trendfilter&gt;</i>)</a></code></p>
 </td>
-<td><p></p></td>
+<td><p>Compute the fitted values of a trend filtering estimate</p></td>
 </tr>
 
 <tr>
 <td>
 <p><code><a href="residuals.trendfilter.html">residuals(<i>&lt;trendfilter&gt;</i>)</a></code></p>
 </td>
-<td><p></p></td>
-</tr>
-
-<tr>
-<td>
-<p><code><a href="coef.trendfilter.html">coef(<i>&lt;trendfilter&gt;</i>)</a></code></p>
-</td>
-<td><p></p></td>
+<td><p>Compute the residuals of a trend filtering estimate</p></td>
 </tr>
 
 </tbody>
@@ -276,14 +276,15 @@ risk estimate</p>
 <td>
 <p><code>summary(<i>&lt;trendfilter&gt;</i>)</code></p>
 </td>
-<td><p></p></td>
+<td><span style="color:red">(Not yet available)</span></p></td>
 </tr>
 
 <tr>
 <td>
 <p><code>print(<i>&lt;trendfilter&gt;</i>)</code></p>
 </td>
-<td><p></p></td>
+<td>
+<p><span style="color:red">(Not yet available)</span></p></td>
 </tr>
 
 </tbody>
@@ -302,7 +303,7 @@ risk estimate</p>
 <td>
 <p><code>plot(<i>&lt;trendfilter&gt;</i>)</code></p>
 </td>
-<td><p></p></td>
+<td><p><span style="color:red">(Not yet available)</span></p></td>
 </tr>
 
 
@@ -321,14 +322,15 @@ risk estimate</p>
 <td>
 <p><code><a href="eclipsing_binary.html">data(eclipsing_binary)</a></code></p>
 </td>
-<td><p></p></td>
+<td><p>Phase-folded light curve of an eclipsing binary star system, observed
+by the Kepler space telescope</p></td>
 </tr>
 
 <tr>
 <td>
 <p><code><a href="quasar_spectrum.html">data(quasar_spectrum)</a></code></p>
 </td>
-<td><p></p></td>
+<td><p>Lyman-&alpha; forest in the absorption spectrum of a distant quasar</p></td>
 </tr>
 
 

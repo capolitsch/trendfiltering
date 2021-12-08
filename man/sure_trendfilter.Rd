@@ -38,6 +38,11 @@ estimator, for every hyperparameter value in \code{lambda}.}
 \item{\code{error}}{Vector of mean-squared prediction errors estimated by SURE,
 for every hyperparameter value in \code{lambda}.}
 \item{\code{se_error}}{Vector of estimated standard errors for the \code{error}.}
+\item{\code{training_error}}{The "in-sample" MSE between the observed outputs \code{y}
+and the trend filtering estimate, for every hyperparameter value in
+\code{lambda}.}
+\item{\code{optimism}}{SURE-estimated optimisms, i.e.
+\code{optimism = error - training_error}.}
 \item{\code{lambda_min}}{Hyperparameter value in \code{lambda} that minimizes the SURE
 validation error curve.}
 \item{\code{lambda_1se}}{The largest hyperparameter value in \code{lambda} that has a
@@ -53,22 +58,32 @@ filtering estimator with hyperparameter \code{lambda_min}.}
 filtering estimator with hyperparameter \code{lambda_1se}.}
 \item{\code{i_min}}{Index of \code{lambda} that gives \code{lambda_min}.}
 \item{\code{i_1se}}{Index of \code{lambda} that gives \code{lambda_1se}.}
+\item{\code{fitted_values}}{The fitted values of all trend filtering estimates,
+return as a matrix with \code{length(lambda)} columns, with \code{fitted_values[,i]}
+corresponding to the trend filtering estimate with hyperparameter
+\code{lambda[i]}.
+}
+\item{\code{admm_params}}{A list of the parameter values used by the ADMM
+algorithm used to solve the trend filtering convex optimization.}
 \item{\code{obj_func}}{The relative change in the objective function over the
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 \code{lambda}.}
 \item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
-every candidate hyperparameter in \code{lambda}. If an element of \code{n_iter} is
-exactly equal to \code{admm_params$max_iter} (see below), then the ADMM algorithm
-stopped before reaching the objective tolerance \code{admm_params$obj_tol}. In
-these situations, you may need to increase the maximum number of tolerable
-iterations by passing a \code{max_iter} argument to \code{cv_trendfilter()} in order to
-ensure that the ADMM solution has converged to satisfactory precision.}
-\item{\code{training_error}}{The "in-sample" MSE between the observed outputs \code{y}
-and the trend filtering estimate, for every hyperparameter value in
-\code{lambda}.}
-\item{\code{optimism}}{SURE-estimated optimisms, i.e.
-\code{optimism = error - training_error}.}
+every candidate hyperparameter in \code{lambda}. If an element of \code{n_iter}
+is exactly equal to \code{admm_params$max_iter}, then the
+ADMM algorithm stopped before reaching the objective tolerance
+\code{admm_params$obj_tol}. In these situations, you may need to
+increase the maximum number of tolerable iterations by passing a
+\code{max_iter} argument to \code{sure_trendfilter()} in order to ensure that the ADMM
+solution has converged to satisfactory precision.}
+\item{\code{x}}{Vector of observed values for the input variable.}
+\item{\code{y}}{Vector of observed values for the output variable (if originally
+present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
+\item{\code{weights}}{Vector of weights for the observed outputs.}
+\item{\code{k}}{Degree of the trend filtering estimates.}
+\item{\code{status}}{For internal use. Output from the C solver.}
 \item{\code{call}}{The function call.}
+\item{\code{scale}}{For internal use.}
 }
 }
 \description{

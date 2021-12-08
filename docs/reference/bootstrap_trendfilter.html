@@ -94,7 +94,7 @@ desired level (e.g. level = 0.95) ." />
         <li>
   <a href="../index.html">
     <span class="fas fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -108,16 +108,16 @@ desired level (e.g. level = 0.95) ." />
         <li>
   <a href="https://github.com/capolitsch/trendfiltering">
     <span class="fab fa-github fa-lg"></span>
-
+     
   </a>
 </li>
       </ul>
-
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header>
 
@@ -143,7 +143,6 @@ desired level (e.g. <code>level = 0.95</code>) .</p>
   algorithm <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"nonparametric"</span>, <span class='st'>"parametric"</span>, <span class='st'>"wild"</span><span class='op'>)</span>,
   B <span class='op'>=</span> <span class='fl'>100L</span>,
   x_eval <span class='op'>=</span> <span class='cn'>NULL</span>,
-  lambda <span class='op'>=</span> <span class='cn'>NULL</span>,
   edf <span class='op'>=</span> <span class='cn'>NULL</span>,
   mc_cores <span class='op'>=</span> <span class='fu'>parallel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>4</span>,
   <span class='va'>...</span>
@@ -169,19 +168,14 @@ guidelines on when each choice should be used.</p></td>
 bands. Defaults to <code>B = 100L</code>.</p></td>
     </tr>
     <tr>
-      <th>lambda</th>
-      <td><p>The hyperparameter value to use for each of the bootstrap estimates. When
-<code>obj</code> is of class '<code><a href='sure_trendfilter.html'>sure_trendfilter</a></code>',
-<code>lambda = obj$lambda_min</code> and <code>lambda = obj$lambda_1se</code> are advisible
-options. When <code>obj</code> is of class '<code><a href='cv_trendfilter.html'>cv_trendfilter</a></code>',
-any element of the (now vectors) <code>obj$lambda_min</code> and <code>obj$lambda_1se</code> may
-be a reasonable choice.</p></td>
-    </tr>
-    <tr>
       <th>edf</th>
-      <td><p>(Not yet available) Alternative hyperparametrization for the trend
-filtering model(s). The desired number of effective degrees of
-freedom in each bootstrap estimate.</p></td>
+      <td><p>The desired number of effective degrees of freedom in each bootstrap
+estimate. When <code>obj</code> is of class
+'<code><a href='sure_trendfilter.html'>sure_trendfilter</a></code>', <code>edf = obj$edf_min</code> and
+<code>edf = obj$edf_1se</code> are advisible options. When <code>obj</code> is of class
+'<code><a href='cv_trendfilter.html'>cv_trendfilter</a></code>', any element of the (now vectors)
+<code>obj$edf_min</code> and <code>obj$edf_1se</code> may be a reasonable choice. Defaults to
+<code>edf = obj$edf_min["MAE"]</code>.</p></td>
     </tr>
     <tr>
       <th>mc_cores</th>
@@ -190,7 +184,8 @@ of cores detected, minus 4.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional named arguments. Currently unused.</p></td>
+      <td><p>Additional named arguments. Currently only a few experimental arguments
+may be passed by experts.</p></td>
     </tr>
     </table>
 
@@ -199,21 +194,41 @@ of cores detected, minus 4.</p></td>
     <p>An object of class '<code>bootstrap_trendfilter</code>' and subclass
 '<code><a href='trendfilter.html'>trendfilter</a></code>'. This is a list with the elements below,
 as well as all elements from <code>obj</code>.</p><dl>
-<dt>x_eval</dt><dd><p>Input grid that each bootstrap trend filtering estimate was
+<dt><code>x_eval</code></dt><dd><p>Input grid that each bootstrap trend filtering estimate was
 evaluated on.</p></dd>
-<dt>ensemble</dt><dd><p>The full trend filtering bootstrap ensemble as a matrix with
-<code><a href='https://rdrr.io/r/base/length.html'>length(x_eval)</a></code> rows and <code>B</code> columns.</p></dd>
-<dt>algorithm</dt><dd><p>A string specifying which variation of the bootstrap was
+<dt><code>ensemble</code></dt><dd><p>The full trend filtering bootstrap ensemble as a matrix
+with <code><a href='https://rdrr.io/r/base/length.html'>length(x_eval)</a></code> rows and <code>B</code> columns.</p></dd>
+<dt><code>algorithm</code></dt><dd><p>String specifying which variation of the bootstrap was
 used to generate the ensemble.</p></dd>
-<dt>edf_boots</dt><dd><p>Vector of the estimated number of effective degrees of
+<dt><code>edf_opt</code></dt><dd><p>Number of effective degrees of freedom that each bootstrap
+trend filtering fit should approximately possess in our fixed-edf bootstrap
+procedure. Determined by the <code>edf</code> input argument of
+<code>bootstrap_trendfilter()</code>.</p></dd>
+<dt><code>i_opt</code></dt><dd><p>Index of <code>obj$edf</code> that gives <code>edf_opt</code>.</p></dd>
+<dt><code>edf_boots</code></dt><dd><p>Vector of the estimated number of effective degrees of
 freedom of each trend filtering bootstrap estimate.</p></dd>
-<dt>n_iter_boots</dt><dd><p>Vector of the number of iterations taken by the ADMM
+<dt><code>n_iter_boots</code></dt><dd><p>Vector of the number of iterations taken by the ADMM
 algorithm before reaching a stopping criterion, for each bootstrap estimate.</p></dd>
-<dt>lambda_boots</dt><dd><p>Vector of the hyperparameter values used for each
+<dt><code>lambda_boots</code></dt><dd><p>Vector of the hyperparameter values used for each
 bootstrap fit. In general, these are not all equal because our bootstrap
 implementation instead seeks to hold the number of effective degrees of
 freedom constant across all bootstrap estimates.</p></dd>
-<dt>call</dt><dd><p>The function call.</p></dd>
+<dt><code>lambda</code></dt><dd><p>Vector of the original grid of candidate hyperparameter
+values, inherited from <code>obj</code>.</p></dd>
+<dt><code>edf</code></dt><dd><p>Number of effective degrees of freedom in the trend filtering
+estimator, for every hyperparameter value in <code>lambda</code>.</p></dd>
+<dt><code>fitted_values</code></dt><dd><p>Fitted values of all trend filtering point
+estimates with hyperparameter values in <code>lambda</code>, inherited from <code>obj</code>.</p></dd>
+<dt><code>x</code></dt><dd><p>Vector of observed values for the input variable, inherited from
+<code>obj</code>.</p></dd>
+<dt><code>y</code></dt><dd><p>Vector of observed values for the output variable, inherited from
+<code>obj</code>.</p></dd>
+<dt><code>weights</code></dt><dd><p>Vector of weights for the observed outputs, inherited from
+<code>obj</code>.</p></dd>
+<dt><code>k</code></dt><dd><p>Degree of the trend filtering point estimate (and bootstrap
+estimates), inherited from <code>obj</code>.</p></dd>
+<dt><code>call</code></dt><dd><p>The function call.</p></dd>
+<dt><code>scale</code></dt><dd><p>For internal use.</p></dd>
 
 </dl>
 
@@ -238,7 +253,7 @@ filtering analysis on that scale. See Example 2 below for a case when the
 inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-
+    
 <ol>
 <li><p>Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
 for time-domain astronomy and astronomical spectroscopy. <em>MNRAS</em>, 492(3),
@@ -280,8 +295,13 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 <span class='va'>weights</span> <span class='op'>&lt;-</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='va'>eclipsing_binary</span><span class='op'>$</span><span class='va'>std_err</span><span class='op'>^</span><span class='fl'>2</span>
 
 <span class='va'>cv_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cv_trendfilter.html'>cv_trendfilter</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span>, max_iter <span class='op'>=</span> <span class='fl'>1e4</span>, obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span><span class='op'>)</span>
-<span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>cv_tf</span>, algorithm <span class='op'>=</span> <span class='st'>"nonparametric"</span>, lambda <span class='op'>=</span> <span class='va'>cv_tf</span><span class='op'>$</span><span class='va'>lambda_min</span><span class='op'>[</span><span class='st'>"MAE"</span><span class='op'>]</span><span class='op'>)</span>
 
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span>
+  obj <span class='op'>=</span> <span class='va'>cv_tf</span>,
+  algorithm <span class='op'>=</span> <span class='st'>"nonparametric"</span>,
+  edf <span class='op'>=</span> <span class='va'>cv_tf</span><span class='op'>$</span><span class='va'>edf_min</span><span class='op'>[</span><span class='st'>"MAE"</span><span class='op'>]</span>
+<span class='op'>)</span><span class='op'>}</span>
 
 <span class='co'># Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar</span>
 
@@ -291,18 +311,23 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 #&gt;   log10_wavelength   flux weights
 #&gt;              <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
 #&gt; <span style='color: #BCBCBC;'>1</span>             3.55  0.424  0.041<span style='text-decoration: underline;'>7</span>
-#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125
-#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128
-#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121
-#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134
+#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125 
+#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128 
+#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121 
+#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
 #&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'>
 <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>log10_wavelength</span>
 <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>flux</span>
 <span class='va'>weights</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>weights</span>
 
 <span class='va'>sure_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='sure_trendfilter.html'>sure_trendfilter</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span><span class='op'>)</span>
-<span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span><span class='va'>sure_tf</span>, algorithm <span class='op'>=</span> <span class='st'>"parametric"</span>, lambda <span class='op'>=</span> <span class='va'>sure_tf</span><span class='op'>$</span><span class='va'>lambda_min</span><span class='op'>)</span>
-</div></pre></div>
+<span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span>
+  obj <span class='op'>=</span> <span class='va'>sure_tf</span>,
+  algorithm <span class='op'>=</span> <span class='st'>"parametric"</span>,
+  edf <span class='op'>=</span> <span class='va'>sure_tf</span><span class='op'>$</span><span class='va'>edf_min</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in bootstrap_trendfilter(obj = sure_tf, algorithm = "parametric",     edf = sure_tf$edf_min): lambda &gt;= 0L is not TRUE</span></div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
@@ -311,20 +336,22 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 </div>
 
 
-<footer>
-<div class="copyright">
-<p>Developed by Collin A. Politsch.</p>
+      <footer>
+      <div class="copyright">
+  <p>Developed by Collin A. Politsch.</p>
 </div>
 
 <div class="pkgdown">
   <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
-</footer>
-</div>
+      </footer>
+   </div>
+
+  
 
 
-</body>
+  </body>
 </html>
 
 

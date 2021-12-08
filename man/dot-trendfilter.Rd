@@ -52,7 +52,41 @@ convex optimization algorithm. Defaults to \code{max_iter = length(y)}.}
 \item{...}{Additional named arguments. Currently unused.}
 }
 \value{
-An object of class \code{'trendfilter'}.
+An object of class \code{'trendfilter'}. This is a list with the
+following elements:
+\describe{
+\item{\code{x}}{Vector of observed values for the input variable.}
+\item{\code{y}}{Vector of observed values for the output variable (if originally
+present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
+\item{\code{weights}}{Vector of weights for the observed outputs.}
+\item{\code{k}}{Degree of the trend filtering estimate.}
+\item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
+in descending order).}
+\item{\code{edf}}{Number of effective degrees of freedom in the trend filtering
+estimator, for every hyperparameter value in \code{lambda}.}
+\item{\code{fitted_values}}{The fitted values of the trend filtering estimate(s).
+If \code{length(lambda) == 1}, fitted values for the single fit are returned as a
+numeric vector. Otherwise, fitted values are returned in a matrix with
+\code{length(lambda)} columns, with \code{fitted_values[,i]} corresponding to the trend
+filtering estimate with hyperparameter \code{lambda[i]}.
+}
+\item{\code{admm_params}}{A list of the parameter values used by the ADMM
+algorithm used to solve the trend filtering convex optimization.}
+\item{\code{obj_func}}{The relative change in the objective function over the
+ADMM algorithm's final iteration, for every hyperparameter value in
+\code{lambda}.}
+\item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
+every hyperparameter value in \code{lambda}. If an element of \code{n_iter}
+is exactly equal to \code{admm_params$max_iter}, then the
+ADMM algorithm stopped before reaching the objective tolerance
+\code{admm_params$obj_tol}. In these situations, you may need to
+increase the maximum number of tolerable iterations by passing a
+\code{max_iter} argument to \code{cv_trendfilter()} in order to ensure that the ADMM
+solution has converged to satisfactory precision.}
+\item{\code{status}}{For internal use. Output from the C solver.}
+\item{\code{call}}{The function call.}
+\item{\code{scale}}{For internal use.}
+}
 }
 \description{
 Fit a trend filtering model. Generic functions such as \code{\link[=predict]{predict()}},
