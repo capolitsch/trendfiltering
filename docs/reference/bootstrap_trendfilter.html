@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Construct pointwise variability bands via a tailored bootstrap algorithm — bootstrap_trendfilter • trendfiltering</title>
+<title>Construct pointwise variability bands via a bootstrap algorithm that's
+tailored to the observed data — bootstrap_trendfilter • trendfiltering</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,13 +47,21 @@
 
 
 
-<meta property="og:title" content="Construct pointwise variability bands via a tailored bootstrap algorithm — bootstrap_trendfilter" />
+<meta property="og:title" content="Construct pointwise variability bands via a bootstrap algorithm that's
+tailored to the observed data — bootstrap_trendfilter" />
 <meta property="og:description" content="Generate a bootstrap ensemble of trend filtering estimates in order to
-quantify the uncertainty in the optimized estimate. One of three possible
-bootstrap algorithms should be chosen according to the criteria in the
-Details section below. Pointwise variability bands are then obtained by
-passing the 'bootstrap_trendfilter' object to vbands(), along with the
-desired level (e.g. level = 0.95) ." />
+quantify the uncertainty in the optimized trend filtering estimate. One of
+three possible bootstrap algorithms should be chosen according to the
+criteria summarized in the Details section below. Pointwise variability
+bands are then obtained by passing the 'bootstrap_trendfilter' object to
+vbands(), along with the desired level (e.g. level = 0.95).
+Bootstrapping trend filtering estimators tends to yield more accurate
+uncertainties when, for each bootstrap estimate, we fix the number of
+effective degrees of freedom, edf (a reparametrization of the
+hyperparameter lambda), instead of fixing lambda itself. Thus,
+bootstrap_trendfilter() has an edf argument instead of lambda. See
+the edf argument description and Examples section for guidance on how
+edf can be chosen." />
 <meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
 
@@ -94,7 +103,7 @@ desired level (e.g. level = 0.95) ." />
         <li>
   <a href="../index.html">
     <span class="fas fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -108,34 +117,42 @@ desired level (e.g. level = 0.95) ." />
         <li>
   <a href="https://github.com/capolitsch/trendfiltering">
     <span class="fab fa-github fa-lg"></span>
-
+     
   </a>
 </li>
       </ul>
-
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header>
 
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Construct pointwise variability bands via a tailored bootstrap algorithm</h1>
+    <h1>Construct pointwise variability bands via a bootstrap algorithm that's
+tailored to the observed data</h1>
     <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/bootstrapping.R'><code>R/bootstrapping.R</code></a></small>
     <div class="hidden name"><code>bootstrap_trendfilter.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Generate a bootstrap ensemble of trend filtering estimates in order to
-quantify the uncertainty in the optimized estimate. One of three possible
-bootstrap algorithms should be chosen according to the criteria in the
-<em>Details</em> section below. Pointwise variability bands are then obtained by
-passing the '<code>bootstrap_trendfilter</code>' object to <code><a href='vbands.html'>vbands()</a></code>, along with the
-desired level (e.g. <code>level = 0.95</code>) .</p>
+quantify the uncertainty in the optimized trend filtering estimate. One of
+three possible bootstrap algorithms should be chosen according to the
+criteria summarized in the <strong>Details</strong> section below. Pointwise variability
+bands are then obtained by passing the '<code>bootstrap_trendfilter</code>' object to
+<code><a href='vbands.html'>vbands()</a></code>, along with the desired level (e.g. <code>level = 0.95</code>).
+Bootstrapping trend filtering estimators tends to yield more accurate
+uncertainties when, for each bootstrap estimate, we fix the number of
+effective degrees of freedom, <code>edf</code> (a reparametrization of the
+hyperparameter <code>lambda</code>), instead of fixing <code>lambda</code> itself. Thus,
+<code>bootstrap_trendfilter()</code> has an <code>edf</code> argument instead of <code>lambda</code>. See
+the <code>edf</code> argument description and <strong>Examples</strong> section for guidance on how
+<code>edf</code> can be chosen.</p>
     </div>
 
     <pre class="usage"><span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span>
@@ -159,13 +176,14 @@ desired level (e.g. <code>level = 0.95</code>) .</p>
     <tr>
       <th>algorithm</th>
       <td><p>A string specifying which variation of the bootstrap to use. One of
-<code><a href='https://rdrr.io/r/base/c.html'>c("nonparametric", "parametric", "wild")</a></code>. See <em>Details</em> section below for
-guidelines on when each choice should be used.</p></td>
+<code><a href='https://rdrr.io/r/base/c.html'>c("nonparametric", "parametric", "wild")</a></code>. See <strong>Details</strong> section below
+for guidelines on when each choice should be used.</p></td>
     </tr>
     <tr>
       <th>B</th>
-      <td><p>The number of bootstrap samples used to estimate the pointwise variability
-bands. Defaults to <code>B = 100L</code>.</p></td>
+      <td><p>The number of bootstrap samples to be drawn to generate the trend filtering
+ensemble. Defaults to <code>B = 100L</code> (larger values encouraged if the
+computational cost is acceptable).</p></td>
     </tr>
     <tr>
       <th>edf</th>
@@ -192,8 +210,11 @@ may be passed by experts.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class '<code>bootstrap_trendfilter</code>' and subclass
-'<code><a href='trendfilter.html'>trendfilter</a></code>'. This is a list with the elements below,
-as well as all elements from <code>obj</code>.</p><dl>
+'<code><a href='trendfilter.html'>trendfilter</a></code>'. Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>,
+<code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may also be called on
+<code>bootstrap_trendfilter()</code> objects, with the same effect as if they were
+called on the <code>obj</code> argument originally passed to <code>bootstrap_trendfilter()</code>.
+A <code>bootstrap_trendfilter</code> object is a list containing the follow elements:</p><dl>
 <dt><code>x_eval</code></dt><dd><p>Input grid that each bootstrap trend filtering estimate was
 evaluated on.</p></dd>
 <dt><code>ensemble</code></dt><dd><p>The full trend filtering bootstrap ensemble as a matrix
@@ -202,11 +223,10 @@ with <code><a href='https://rdrr.io/r/base/length.html'>length(x_eval)</a></code
 used to generate the ensemble.</p></dd>
 <dt><code>edf_opt</code></dt><dd><p>Number of effective degrees of freedom that each bootstrap
 trend filtering fit should approximately possess in our fixed-edf bootstrap
-procedure. Determined by the <code>edf</code> input argument of
-<code>bootstrap_trendfilter()</code>.</p></dd>
-<dt><code>i_opt</code></dt><dd><p>Index of <code>obj$edf</code> that gives <code>edf_opt</code>.</p></dd>
+procedure. Identical to the value passed to <code>edf</code>, or its default.</p></dd>
 <dt><code>edf_boots</code></dt><dd><p>Vector of the estimated number of effective degrees of
-freedom of each trend filtering bootstrap estimate.</p></dd>
+freedom of each trend filtering bootstrap estimate. These are unlikely to
+all be exactly equal to <code>edf_opt</code>, but should be relatively close.</p></dd>
 <dt><code>n_iter_boots</code></dt><dd><p>Vector of the number of iterations taken by the ADMM
 algorithm before reaching a stopping criterion, for each bootstrap estimate.</p></dd>
 <dt><code>lambda_boots</code></dt><dd><p>Vector of the hyperparameter values used for each
@@ -253,7 +273,7 @@ filtering analysis on that scale. See Example 2 below for a case when the
 inputs are evenly sampled on the <code><a href='https://rdrr.io/r/base/Log.html'>log10(x)</a></code> scale.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-
+    
 <ol>
 <li><p>Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
 for time-domain astronomy and astronomical spectroscopy. <em>MNRAS</em>, 492(3),
@@ -310,10 +330,10 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 #&gt;   log10_wavelength   flux weights
 #&gt;              <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
 #&gt; <span style='color: #BCBCBC;'>1</span>             3.55  0.424  0.041<span style='text-decoration: underline;'>7</span>
-#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125
-#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128
-#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121
-#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134
+#&gt; <span style='color: #BCBCBC;'>2</span>             3.55 -<span style='color: #BB0000;'>2.11</span>   0.125 
+#&gt; <span style='color: #BCBCBC;'>3</span>             3.55 -<span style='color: #BB0000;'>3.78</span>   0.128 
+#&gt; <span style='color: #BCBCBC;'>4</span>             3.55  3.60   0.121 
+#&gt; <span style='color: #BCBCBC;'>5</span>             3.55 -<span style='color: #BB0000;'>4.89</span>   0.134 
 #&gt; <span style='color: #BCBCBC;'>6</span>             3.55  1.76   0.132 </div><div class='input'>
 <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>log10_wavelength</span>
 <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='va'>quasar_spectrum</span><span class='op'>$</span><span class='va'>flux</span>
@@ -347,7 +367,7 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
       </footer>
    </div>
 
-
+  
 
 
   </body>

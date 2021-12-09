@@ -24,7 +24,7 @@ hyperparameter values in \code{obj$lambda}.}
 Defaults to \code{x_eval = NULL}, in which case \code{x_eval = obj$x}.}
 
 \item{zero_tol}{Threshold parameter that controls the point at which a small coefficient
-value is set to zero. Defaults to \code{zero_tol = 1e-6}.}
+value is set to zero. Defaults to \code{zero_tol = 1e-10}.}
 
 \item{...}{Additional named arguments. Currently unused.}
 }

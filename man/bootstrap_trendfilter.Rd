@@ -2,7 +2,8 @@
 % Please edit documentation in R/bootstrapping.R
 \name{bootstrap_trendfilter}
 \alias{bootstrap_trendfilter}
-\title{Construct pointwise variability bands via a tailored bootstrap algorithm}
+\title{Construct pointwise variability bands via a bootstrap algorithm that's
+tailored to the observed data}
 \usage{
 bootstrap_trendfilter(
   obj,
@@ -22,8 +23,9 @@ bootstrap_trendfilter(
 \code{c("nonparametric", "parametric", "wild")}. See \strong{Details} section below
 for guidelines on when each choice should be used.}
 
-\item{B}{The number of bootstrap samples used to estimate the pointwise variability
-bands. Defaults to \code{B = 100L}.}
+\item{B}{The number of bootstrap samples to be drawn to generate the trend filtering
+ensemble. Defaults to \code{B = 100L} (larger values encouraged if the
+computational cost is acceptable).}
 
 \item{edf}{The desired number of effective degrees of freedom in each bootstrap
 estimate. When \code{obj} is of class
@@ -41,8 +43,11 @@ may be passed by experts.}
 }
 \value{
 An object of class '\code{bootstrap_trendfilter}' and subclass
-'\code{\link[=trendfilter]{trendfilter}}'. This is a list with the elements below,
-as well as all elements from \code{obj}.
+'\code{\link[=trendfilter]{trendfilter}}'. Generic functions such as \code{\link[=predict]{predict()}},
+\code{\link[=fitted.values]{fitted.values()}}, and \code{\link[=residuals]{residuals()}} may also be called on
+\code{bootstrap_trendfilter()} objects, with the same effect as if they were
+called on the \code{obj} argument originally passed to \code{bootstrap_trendfilter()}.
+A \code{bootstrap_trendfilter} object is a list containing the follow elements:
 \describe{
 \item{\code{x_eval}}{Input grid that each bootstrap trend filtering estimate was
 evaluated on.}
@@ -52,11 +57,10 @@ with \code{length(x_eval)} rows and \code{B} columns.}
 used to generate the ensemble.}
 \item{\code{edf_opt}}{Number of effective degrees of freedom that each bootstrap
 trend filtering fit should approximately possess in our fixed-edf bootstrap
-procedure. Determined by the \code{edf} input argument of
-\code{bootstrap_trendfilter()}.}
-\item{\code{i_opt}}{Index of \code{obj$edf} that gives \code{edf_opt}.}
+procedure. Identical to the value passed to \code{edf}, or its default.}
 \item{\code{edf_boots}}{Vector of the estimated number of effective degrees of
-freedom of each trend filtering bootstrap estimate.}
+freedom of each trend filtering bootstrap estimate. These are unlikely to
+all be exactly equal to \code{edf_opt}, but should be relatively close.}
 \item{\code{n_iter_boots}}{Vector of the number of iterations taken by the ADMM
 algorithm before reaching a stopping criterion, for each bootstrap estimate.}
 \item{\code{lambda_boots}}{Vector of the hyperparameter values used for each
@@ -83,11 +87,18 @@ estimates), inherited from \code{obj}.}
 }
 \description{
 Generate a bootstrap ensemble of trend filtering estimates in order to
-quantify the uncertainty in the optimized estimate. One of three possible
-bootstrap algorithms should be chosen according to the criteria in the
-\strong{Details} section below. Pointwise variability bands are then obtained by
-passing the '\code{bootstrap_trendfilter}' object to \code{\link[=vbands]{vbands()}}, along with the
-desired level (e.g. \code{level = 0.95}) .
+quantify the uncertainty in the optimized trend filtering estimate. One of
+three possible bootstrap algorithms should be chosen according to the
+criteria summarized in the \strong{Details} section below. Pointwise variability
+bands are then obtained by passing the '\code{bootstrap_trendfilter}' object to
+\code{\link[=vbands]{vbands()}}, along with the desired level (e.g. \code{level = 0.95}).
+Bootstrapping trend filtering estimators tends to yield more accurate
+uncertainties when, for each bootstrap estimate, we fix the number of
+effective degrees of freedom, \code{edf} (a reparametrization of the
+hyperparameter \code{lambda}), instead of fixing \code{lambda} itself. Thus,
+\code{bootstrap_trendfilter()} has an \code{edf} argument instead of \code{lambda}. See
+the \code{edf} argument description and \strong{Examples} section for guidance on how
+\code{edf} can be chosen.
 }
 \details{
 Our recommendations for when to use each of the possible settings
@@ -125,13 +136,11 @@ weights <- 1 / eclipsing_binary$std_err^2
 
 cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
 
-\dontrun{
 boot_tf <- bootstrap_trendfilter(
   obj = cv_tf,
   algorithm = "nonparametric",
   edf = cv_tf$edf_min["MAE"]
 )
-}
 
 # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
 

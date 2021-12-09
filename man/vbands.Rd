@@ -37,14 +37,12 @@ weights <- 1 / eclipsing_binary$std_err^2
 
 cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
 
-\dontrun{
 boot_tf <- bootstrap_trendfilter(
   obj = cv_tf,
   algorithm = "nonparametric",
   edf = cv_tf$edf_min["MAE"]
 )
 bands <- vbands(boot_tf)
-}
 
 
 # Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar
