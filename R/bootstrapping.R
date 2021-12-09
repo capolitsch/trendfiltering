@@ -259,7 +259,7 @@ bootstrap_trendfilter <- function(obj,
     zero_tol <- extra_args$zero_tol
     extra_args$zero_tol <- NULL
   } else {
-    zero_tol <- 1e-6
+    zero_tol <- 1e-10
   }
 
   sampler <- case_when(
