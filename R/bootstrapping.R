@@ -160,15 +160,19 @@ bootstrap_trendfilter <- function(obj,
                                   mc_cores = parallel::detectCores() - 4,
                                   ...) {
   stopifnot(any(class(obj) == "trendfiltering"))
-  stopifnot(
-    any(class(obj) == "cv_trendfilter") ||
-    any(class(obj) == "sure_trendfilter")
-  )
   stopifnot(B >= 20)
+  stopifnot(
+    any(class(obj) == "cv_trendfilter") || any(class(obj) == "sure_trendfilter")
+  )
 
   boot.call <- match.call
   extra_args <- list(...)
   algorithm <- match.arg(algorithm)
+
+  if (class(obj) == "cv_trendfilter") {
+    obj$edf_min[which.min(abs(median(obj$edf_min) - obj$edf_min))]
+    edf_opt <- edf %||% median(obj$edf_min)
+  }
   edf_opt <- edf %||% median(obj$edf_min)
   i_opt <- match(edf, obj$edf)
   lambda_opt <- obj$lambda[i_opt]
@@ -201,12 +205,18 @@ bootstrap_trendfilter <- function(obj,
   stopifnot(
     is.numeric(mc_cores) && length(mc_cores) == 1 && round(mc_cores) == mc_cores
   )
-  mc_cores <- min(detectCores(), B, max(c(1, floor(mc_cores)))) %>% as.integer()
+
+  mc_cores <- min(
+    B,
+    detectCores(),
+    max(1, floor(mc_cores))
+  ) %>%
+    as.integer()
 
   if (mc_cores < detectCores() / 2) {
     warning(
       "Your machine has ", detectCores(), " cores.\n Consider increasing ",
-        "`mc_cores` to speed up computation."
+      "`mc_cores` to speed up computation."
     )
   }
 
@@ -382,21 +392,6 @@ bootstrap_parallel <- function(b, par_args) {
     zero_tol = zero_tol
   ) * scale["y"]
 
-  #ind <- match(lambda_boot, lambda_grid)
-  #fitted_values <- matrix(drop(fit$beta)[, ind], ncol = 1)
-
-  #if (x_flag) {
-  #  tf_estimate_boot <- as.numeric(fitted_values) * scale["y"]
-  #} else {
-  #  tf_estimate_boot <- .tf_boot(
-  #    x = data_scaled$x,
-  #    x_eval = x_eval / obj$scale["x"],
-  #    lambda = lambda_boot,
-  #    fitted_values = fitted_values,
-  #    zero_tol = zero_tol
-  #  ) * scale["y"]
-  #}
-
   list(
     tf_estimate_boot = tf_estimate_boot,
     edf_boot = edf_boot,
@@ -437,17 +432,17 @@ nonparametric_resampler <- function(data) {
 #' @noRd
 wild_sampler <- function(data) {
   data %>% mutate(y = fitted_values + residuals *
-    sample(
-      x = c(
-        (1 + sqrt(5)) / 2,
-        (1 - sqrt(5)) / 2
-      ),
-      size = n(), replace = TRUE,
-      prob = c(
-        (1 + sqrt(5)) / (2 * sqrt(5)),
-        (sqrt(5) - 1) / (2 * sqrt(5))
-      )
-    ))
+                    sample(
+                      x = c(
+                        (1 + sqrt(5)) / 2,
+                        (1 - sqrt(5)) / 2
+                      ),
+                      size = n(), replace = TRUE,
+                      prob = c(
+                        (1 + sqrt(5)) / (2 * sqrt(5)),
+                        (sqrt(5) - 1) / (2 * sqrt(5))
+                      )
+                    ))
 }
 
 
