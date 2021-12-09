@@ -305,6 +305,8 @@ bootstrap_trendfilter <- function(obj,
     mc.cores = mc_cores
   )
 
+  save(par_out, file = "~/Desktop/debug.RData")
+
   ensemble <- sapply(
     1:B,
     FUN = function(X) par_out[[X]][["tf_estimate_boot"]]
@@ -381,7 +383,6 @@ bootstrap_parallel <- function(b,
 
   i_min <- which.min(abs(fit$edf - edf_opt))[1]
   edf_boot <- fit$edf[i_min]
-  stopifnot(length(edf_boot) == 1L)
 
   if ((abs(edf_opt - edf_boot) / edf_opt) > edf_tol) {
     return(
@@ -413,15 +414,13 @@ bootstrap_parallel <- function(b,
 
   tf_estimate_boot %<>% as.numeric()
   names(tf_estimate_boot) <- NULL
-  stopifnot(length(tf_estimate_boot) == 800L)
 
-  out <- list(
+  list(
     tf_estimate_boot = tf_estimate_boot,
     edf_boot = edf_boot,
     lambda_boot = lambda_boot,
     n_iter_boot = n_iter_boot
   )
-  return(out)
 }
 
 
