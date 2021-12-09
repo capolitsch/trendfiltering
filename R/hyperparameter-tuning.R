@@ -31,7 +31,7 @@
 #'   validation. Must be at least 2 and no more than 10. Defaults to `V = 10`.
 #' @param loss_funcs
 #'   A named list of one or more functions, with each defining a loss function
-#'   to be evaluated during cross validation. See the ''Loss functions'' section
+#'   to be evaluated during cross validation. See the **Loss functions** section
 #'   below for an example.
 #' @param fold_ids
 #'   An integer vector defining a custom partition of the data for cross

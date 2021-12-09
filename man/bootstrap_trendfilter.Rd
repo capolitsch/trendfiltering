@@ -19,8 +19,8 @@ bootstrap_trendfilter(
 '\code{\link[=sure_trendfilter]{sure_trendfilter}}'.}
 
 \item{algorithm}{A string specifying which variation of the bootstrap to use. One of
-\code{c("nonparametric", "parametric", "wild")}. See \emph{Details} section below for
-guidelines on when each choice should be used.}
+\code{c("nonparametric", "parametric", "wild")}. See \strong{Details} section below
+for guidelines on when each choice should be used.}
 
 \item{B}{The number of bootstrap samples used to estimate the pointwise variability
 bands. Defaults to \code{B = 100L}.}
@@ -85,7 +85,7 @@ estimates), inherited from \code{obj}.}
 Generate a bootstrap ensemble of trend filtering estimates in order to
 quantify the uncertainty in the optimized estimate. One of three possible
 bootstrap algorithms should be chosen according to the criteria in the
-\emph{Details} section below. Pointwise variability bands are then obtained by
+\strong{Details} section below. Pointwise variability bands are then obtained by
 passing the '\code{bootstrap_trendfilter}' object to \code{\link[=vbands]{vbands()}}, along with the
 desired level (e.g. \code{level = 0.95}) .
 }

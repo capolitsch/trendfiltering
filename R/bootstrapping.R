@@ -3,7 +3,7 @@
 #' Generate a bootstrap ensemble of trend filtering estimates in order to
 #' quantify the uncertainty in the optimized estimate. One of three possible
 #' bootstrap algorithms should be chosen according to the criteria in the
-#' *Details* section below. Pointwise variability bands are then obtained by
+#' **Details** section below. Pointwise variability bands are then obtained by
 #' passing the '`bootstrap_trendfilter`' object to [`vbands()`], along with the
 #' desired level (e.g. `level = 0.95`) .
 #'
@@ -12,8 +12,8 @@
 #'   '[`sure_trendfilter`][sure_trendfilter()]'.
 #' @param algorithm
 #'   A string specifying which variation of the bootstrap to use. One of
-#'   `c("nonparametric", "parametric", "wild")`. See *Details* section below for
-#'   guidelines on when each choice should be used.
+#'   `c("nonparametric", "parametric", "wild")`. See **Details** section below
+#'   for guidelines on when each choice should be used.
 #' @param B
 #'   The number of bootstrap samples used to estimate the pointwise variability
 #'   bands. Defaults to `B = 100L`.
@@ -169,7 +169,7 @@ bootstrap_trendfilter <- function(obj,
   boot.call <- match.call
   extra_args <- list(...)
   algorithm <- match.arg(algorithm)
-  edf_opt <- edf %||% obj$edf_min["MAE"]
+  edf_opt <- edf %||% median(obj$edf_min)
   i_opt <- match(edf, obj$edf)
   lambda_opt <- obj$lambda[i_opt]
   if (is.null(x_eval)) x_flag <- TRUE
@@ -179,9 +179,9 @@ bootstrap_trendfilter <- function(obj,
   if (length(edf_opt) > 1) {
     stop("`edf` must be of length 1.")
   }
-  if (edf_opt <= obj$k + 1 || edf_opt >= length(obj$x) - obj$k - 1) {
+  if (edf_opt < obj$k + 1 || edf_opt > length(obj$x)) {
     stop(
-      "`edf` must be greater than `k + 1` and less than `n - k - 1`. See ",
+      "`edf` must be greater than `k + 1` and less than `n`. See ",
       "`obj$edf_min` and `obj$edf_1se` for reasonable choices."
     )
   }
@@ -289,6 +289,8 @@ bootstrap_trendfilter <- function(obj,
     mc.cores = mc_cores
   )
 
+  save(par_out, file = "~/Desktop/debug.RData")
+
   ensemble <- lapply(
     1:B,
     FUN = function(X) par_out[[X]][["tf_estimate_boot"]]
@@ -368,7 +370,7 @@ bootstrap_parallel <- function(b, par_args) {
     return(bootstrap_parallel(b = 1, par_args = par_args))
   }
 
-  n_iter_boot <- fit$iter[i_min]
+  n_iter_boot <- fit$n_iter[i_min]
   lambda_boot <- lambda_grid[i_min]
 
   if (x_flag) x_eval <- NULL
