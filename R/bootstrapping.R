@@ -293,6 +293,7 @@ bootstrap_trendfilter <- function(obj,
     data_scaled = data_scaled,
     k = obj$k,
     admm_params = obj$admm_params,
+    edf_opt = edf_opt,
     lambda_grid = lambda_grid,
     sampler = sampler,
     x_eval = x_eval / obj$scale["x"],
@@ -301,6 +302,8 @@ bootstrap_trendfilter <- function(obj,
     scale = obj$scale,
     mc.cores = mc_cores
   )
+
+  save(par_out, file = "~/Desktop/debug.RData")
 
   ensemble <- sapply(
     1:B,
@@ -335,6 +338,8 @@ bootstrap_trendfilter <- function(obj,
         edf_1se = obj$edf_1se,
         lambda_min = obj$lambda_min,
         lambda_1se = obj$lambda_1se,
+        i_min = obj$i_min,
+        i_1se = obj$i_1se,
         edf_boots = edf_boots,
         n_iter_boots = n_iter_boots,
         lambda_boots = lambda_boots,
