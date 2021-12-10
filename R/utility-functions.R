@@ -69,12 +69,11 @@ get_lambda_grid_edf_spacing <- function(data,
     lambda_start <- lambda_start[-inds]
   }
 
-  approx(
+  exp(approx(
     x = edf_start,
     y = log(lambda_start),
     xout = seq(min(edf_start), max(edf_start), length = nlambda)
-  )[["y"]] %>%
-    exp() %>%
+  )[["y"]]) %>%
     unique.default() %>%
     sort.default(decreasing = TRUE)
 }
