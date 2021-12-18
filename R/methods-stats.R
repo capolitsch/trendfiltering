@@ -76,7 +76,7 @@ predict.trendfilter <- function(obj,
       obj = obj,
       lambda = lambda,
       x_eval = x_eval,
-      coefs = matrix(fitted_values, ncol = 1),
+      fitted_values = matrix(fitted_values, ncol = 1),
       zero_tol = zero_tol
     )
 
