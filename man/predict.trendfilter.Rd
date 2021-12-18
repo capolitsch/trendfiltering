@@ -22,5 +22,5 @@ value is set to zero. Defaults to \code{zero_tol = 1e-6}.}
 \item{...}{Additional named arguments. Currently unused.}
 }
 \description{
-Get predictions from a '\code{\link[=trendfilter]{trendfilter}}' object
+Get predictions from a '\code{\link[=trendfilter]{trendfilter}}' object.
 }

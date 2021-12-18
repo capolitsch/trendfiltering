@@ -134,7 +134,13 @@ x <- eclipsing_binary$phase
 y <- eclipsing_binary$flux
 weights <- 1 / eclipsing_binary$std_err^2
 
-cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
+cv_tf <- cv_trendfilter(
+  x = x,
+  y = y,
+  weights = weights,
+  max_iter = 1e4,
+  obj_tol = 1e-6
+)
 
 boot_tf <- bootstrap_trendfilter(
   obj = cv_tf,

@@ -50,8 +50,8 @@ only contain integer values \code{1}, ..., \code{V} designating the fold assignm
 \item{...}{Additional named arguments to pass to \code{\link[=.trendfilter]{.trendfilter()}}.}
 }
 \value{
-An object of class \code{'cv_trendfilter'} and subclass \code{'trendfilter'}.
-This is a list with the elements below,
+An object of class \code{'cv_trendfilter'} and subclass
+'\code{\link[=trendfilter]{trendfilter}}'. This is a list with the elements below,
 as well as all elements from the '\code{\link[=trendfilter]{trendfilter}}' call.
 \describe{
 \item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
@@ -213,7 +213,13 @@ x <- eclipsing_binary$phase
 y <- eclipsing_binary$flux
 weights <- 1 / eclipsing_binary$std_err^2
 
-cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
+cv_tf <- cv_trendfilter(
+  x = x,
+  y = y,
+  weights = weights,
+  max_iter = 1e4,
+  obj_tol = 1e-6
+)
 }
 \references{
 \enumerate{

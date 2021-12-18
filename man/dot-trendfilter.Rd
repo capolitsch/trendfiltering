@@ -76,13 +76,12 @@ algorithm used to solve the trend filtering convex optimization.}
 ADMM algorithm's final iteration, for every hyperparameter value in
 \code{lambda}.}
 \item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
-every hyperparameter value in \code{lambda}. If an element of \code{n_iter}
-is exactly equal to \code{admm_params$max_iter}, then the
-ADMM algorithm stopped before reaching the objective tolerance
-\code{admm_params$obj_tol}. In these situations, you may need to
-increase the maximum number of tolerable iterations by passing a
-\code{max_iter} argument to \code{cv_trendfilter()} in order to ensure that the ADMM
-solution has converged to satisfactory precision.}
+every hyperparameter value in \code{lambda}. If an element of \code{n_iter} is exactly
+equal to \code{admm_params$max_iter}, then the ADMM algorithm stopped before
+reaching the objective tolerance \code{admm_params$obj_tol}. In these situations,
+you may need to increase the maximum number of tolerable iterations by
+passing a \code{max_iter} argument to \code{cv_trendfilter()} in order to ensure that
+the ADMM solution has converged to satisfactory precision.}
 \item{\code{status}}{For internal use. Output from the C solver.}
 \item{\code{call}}{The function call.}
 \item{\code{scale}}{For internal use.}
@@ -101,12 +100,13 @@ x <- eclipsing_binary$phase
 y <- eclipsing_binary$flux
 weights <- 1 / eclipsing_binary$std_err^2
 
-fit <- .trendfilter(x,
-                    y,
-                    weights,
-                    lambda = exp(10),
-                    obj_tol = 1e-6,
-                    max_iter = 1e4
+fit <- .trendfilter(
+  x,
+  y,
+  weights,
+  lambda = exp(10),
+  obj_tol = 1e-6,
+  max_iter = 1e4
 )
 }
 \references{

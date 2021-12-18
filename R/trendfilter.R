@@ -62,13 +62,12 @@
 #' ADMM algorithm's final iteration, for every hyperparameter value in
 #' `lambda`.}
 #' \item{`n_iter`}{Total number of iterations taken by the ADMM algorithm, for
-#' every hyperparameter value in `lambda`. If an element of `n_iter`
-#' is exactly equal to `admm_params$max_iter`, then the
-#' ADMM algorithm stopped before reaching the objective tolerance
-#' `admm_params$obj_tol`. In these situations, you may need to
-#' increase the maximum number of tolerable iterations by passing a
-#' `max_iter` argument to `cv_trendfilter()` in order to ensure that the ADMM
-#' solution has converged to satisfactory precision.}
+#' every hyperparameter value in `lambda`. If an element of `n_iter` is exactly
+#' equal to `admm_params$max_iter`, then the ADMM algorithm stopped before
+#' reaching the objective tolerance `admm_params$obj_tol`. In these situations,
+#' you may need to increase the maximum number of tolerable iterations by
+#' passing a `max_iter` argument to `cv_trendfilter()` in order to ensure that
+#' the ADMM solution has converged to satisfactory precision.}
 #' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
 #' \item{`scale`}{For internal use.}
@@ -93,12 +92,13 @@
 #' y <- eclipsing_binary$flux
 #' weights <- 1 / eclipsing_binary$std_err^2
 #'
-#' fit <- .trendfilter(x,
-#'                     y,
-#'                     weights,
-#'                     lambda = exp(10),
-#'                     obj_tol = 1e-6,
-#'                     max_iter = 1e4
+#' fit <- .trendfilter(
+#'   x,
+#'   y,
+#'   weights,
+#'   lambda = exp(10),
+#'   obj_tol = 1e-6,
+#'   max_iter = 1e4
 #' )
 
 #' @importFrom glmgen .tf_thin .tf_fit .tf_predict
@@ -156,13 +156,15 @@
 
     if (any(duplicated.default(lambda))) {
       warning(
-        "Duplicated values passed to `lambda`. ",
-        "Retaining only unique values.",
+        "Duplicated values passed to `lambda`. Retaining only unique values.",
         call. = FALSE
       )
-      lambda %<>% unique.default() %>% sort.default(decreasing = TRUE)
+      lambda %<>%
+        unique.default() %>%
+        sort.default(decreasing = TRUE)
     } else {
-      lambda %<>% sort.default(decreasing = TRUE)
+      lambda %<>%
+        sort.default(decreasing = TRUE)
     }
   }
 
@@ -170,15 +172,17 @@
   stopifnot(is.numeric(max_iter) & max_iter == round(max_iter))
   stopifnot(length(max_iter) == 1L)
 
-  data <- tibble(x = as.double(x),
-                 y = as.double(y),
-                 weights = as.double(weights)) %>%
+  dat <- tibble(
+    x = as.double(x),
+    y = as.double(y),
+    weights = as.double(weights)
+  ) %>%
     drop_na() %>%
     arrange(x) %>%
     filter(weights > 0)
 
   rm(x, y, weights)
-  n <- nrow(data)
+  n <- nrow(dat)
 
   if ("scaling" %in% names(extra_args)) {
     scaling <- extra_args$scaling
@@ -191,11 +195,11 @@
     x_scale <- 1
     y_scale <- 1
   } else {
-    x_scale <- median(diff(data$x))
-    y_scale <- median(abs(data$y)) / 10
+    x_scale <- median(diff(dat$x))
+    y_scale <- median(abs(dat$y)) / 10
   }
 
-  data_scaled <- data %>%
+  dat_scaled <- dat %>%
     mutate(
       x = x / x_scale,
       y = y / y_scale,
@@ -205,22 +209,22 @@
   admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
   admm_params$x_tol <- admm_params$x_tol / x_scale
 
-  if (min(diff(data_scaled$x)) <= admm_params$x_tol) {
+  if (min(diff(dat_scaled$x)) <= admm_params$x_tol) {
     thin_out <- .tf_thin(
-      data_scaled$x,
-      data_scaled$y,
-      data_scaled$weights,
-      k,
-      admm_params
+      x = dat_scaled$x,
+      y = dat_scaled$y,
+      weights = dat_scaled$weights,
+      k = k,
+      admm_params = admm_params
     )
 
-    data_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
+    dat_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
   }
 
   fit <- .tf_fit(
-    x = data_scaled$x,
-    y = data_scaled$y,
-    weights = data_scaled$weights,
+    x = dat_scaled$x,
+    y = dat_scaled$y,
+    weights = dat_scaled$weights,
     k = k,
     admm_params = admm_params,
     lambda = lambda
@@ -232,9 +236,9 @@
   invisible(
     structure(
       list(
-        x = data_scaled$x * x_scale,
-        y = data_scaled$y * y_scale,
-        weights = data_scaled$weights / y_scale^2,
+        x = dat_scaled$x * x_scale,
+        y = dat_scaled$y * y_scale,
+        weights = dat_scaled$weights / y_scale^2,
         k = as.integer(k),
         lambda = lambda,
         edf = as.integer(fit$df),

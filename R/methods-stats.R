@@ -1,6 +1,6 @@
 #' Get predictions from a trendfilter object
 #'
-#' Get predictions from a '[`trendfilter`][`trendfilter()`]' object
+#' Get predictions from a '[`trendfilter`][`trendfilter()`]' object.
 #'
 #' @param obj
 #'   An object of class/subclass '[`trendfilter`][`trendfilter()`]'.
@@ -73,11 +73,11 @@ predict.trendfilter <- function(obj,
     return(fitted_values)
   } else {
     p <- .tf_predict(
-      obj,
-      lambda,
-      x_eval,
-      matrix(fitted_values, ncol = 1),
-      zero_tol
+      obj = obj,
+      lambda = lambda,
+      x_eval = x_eval,
+      coefs = matrix(fitted_values, ncol = 1),
+      zero_tol = zero_tol
     )
 
     if (length(obj$lambda) == 1) {
@@ -90,6 +90,8 @@ predict.trendfilter <- function(obj,
 
 
 #' Get fitted values from a trendfilter object
+#'
+#' Get fitted values from a '[`trendfilter`][`trendfilter()`]' object.
 #'
 #' @param obj
 #'   Object of class `trendfilter`.
@@ -127,6 +129,8 @@ fitted.trendfilter <- function(obj, lambda = NULL, ...) {
 
 #' Get residuals from a trendfilter object
 #'
+#' Get residuals from a '[`trendfilter`][`trendfilter()`]' object.
+#'
 #' @param obj
 #'   Object of class `trendfilter`.
 #' @param lambda
@@ -153,5 +157,5 @@ residuals.trendfilter <- function(obj,
                                   x_eval = NULL,
                                   zero_tol = NULL,
                                   ...) {
-  -(predict(obj, lambda, x_eval, zero_tol, ...) - obj$y)
+  obj$y - predict(obj, lambda, x_eval, zero_tol, ...)
 }

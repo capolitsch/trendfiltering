@@ -122,8 +122,8 @@
 #' my_loss_funcs <- list(MedAE = MedAE)
 #' ```
 #'
-#' @return An object of class `'cv_trendfilter'` and subclass `'trendfilter'`.
-#' This is a list with the elements below,
+#' @return An object of class `'cv_trendfilter'` and subclass
+#' '[`trendfilter`][`trendfilter()`]'. This is a list with the elements below,
 #' as well as all elements from the '[`trendfilter`][`trendfilter()`]' call.
 #' \describe{
 #' \item{`lambda`}{Vector of candidate hyperparameter values (always returned
@@ -211,7 +211,13 @@
 #' y <- eclipsing_binary$flux
 #' weights <- 1 / eclipsing_binary$std_err^2
 #'
-#' cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
+#' cv_tf <- cv_trendfilter(
+#'   x = x,
+#'   y = y,
+#'   weights = weights,
+#'   max_iter = 1e4,
+#'   obj_tol = 1e-6
+#' )
 #' @importFrom dplyr tibble filter mutate select arrange case_when group_split
 #' @importFrom dplyr bind_rows
 #' @importFrom tidyr drop_na expand_grid
@@ -284,7 +290,11 @@ cv_trendfilter <- function(x,
     nlambda %<>% as.integer()
   }
 
-  mc_cores <- min(c(detectCores(), V, max(c(1, floor(mc_cores)))))
+  mc_cores <- min(
+    V,
+    detectCores(),
+    max(1, floor(mc_cores))
+  )
 
   if (mc_cores < V & mc_cores < detectCores() / 2) {
     warning(
@@ -316,8 +326,8 @@ cv_trendfilter <- function(x,
         inds <- which(classes != "function")
         stop(
           paste(
-            "Element(s)", paste(inds, collapse = ", "),
-            " of `loss_funcs` are not of class 'function'."
+            "Element(s)", paste(inds, collapse = ", "), " of `loss_funcs` are ",
+            "not of class 'function'."
           ),
           call. = FALSE
         )
@@ -387,23 +397,25 @@ cv_trendfilter <- function(x,
     }
   }
 
-  data <- tibble(x = as.double(x),
-                 y = as.double(y),
-                 weights = as.double(weights),
-                 fold_id = as.integer(fold_ids)) %>%
+  dat <- tibble(
+    x = as.double(x),
+    y = as.double(y),
+    weights = as.double(weights),
+    fold_id = as.integer(fold_ids)
+  ) %>%
     drop_na() %>%
     arrange(x) %>%
     filter(weights > 0)
 
   rm(x, y, weights)
-  n <- nrow(data)
+  n <- nrow(dat)
 
-  x_scale <- median(diff(data$x))
-  y_scale <- median(abs(data$y)) / 10
+  x_scale <- median(diff(dat$x))
+  y_scale <- median(abs(dat$y)) / 10
   scale <- c(x_scale, y_scale)
   names(scale) <- c("x", "y")
 
-  data_scaled <- data %>%
+  dat_scaled <- dat %>%
     mutate(
       x = x / x_scale,
       y = y / y_scale,
@@ -413,35 +425,39 @@ cv_trendfilter <- function(x,
   admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
   admm_params$x_tol <- admm_params$x_tol / x_scale
 
-  if (min(diff(data_scaled$x)) <= admm_params$x_tol) {
+  if (min(diff(dat_scaled$x)) <= admm_params$x_tol) {
     thin_out <- .tf_thin(
-      data_scaled$x,
-      data_scaled$y,
-      data_scaled$weights,
-      k,
-      admm_params
+      x = dat_scaled$x,
+      y = dat_scaled$y,
+      weights = dat_scaled$weights,
+      k = k,
+      admm_params = admm_params
     )
 
-    inds <- match(thin_out$x, data_scaled$x)
-    data_scaled <- tibble(x = thin_out$x,
-                          y = thin_out$y,
-                          weights = thin_out$w,
-                          fold_id = data_scaled$fold_id[inds])
+    inds <- match(thin_out$x, dat_scaled$x)
+    dat_scaled <- tibble(
+      x = thin_out$x,
+      y = thin_out$y,
+      weights = thin_out$w,
+      fold_id = dat_scaled$fold_id[inds]
+    )
   }
 
-  data_folded <- data_scaled %>%
+  dat_folded <- dat_scaled %>%
     mutate(ids = fold_id) %>%
     group_split(ids, .keep = FALSE)
 
-  lambda <- get_lambda_grid_edf_spacing(data = data_scaled,
-                                        admm_params = admm_params,
-                                        nlambda = nlambda,
-                                        k = k)
+  lambda <- get_lambda_grid_edf_spacing(
+    dat = dat_scaled,
+    admm_params = admm_params,
+    nlambda = nlambda,
+    k = k
+  )
 
   cv_out <- mclapply(
     1:V,
     FUN = validate_fold,
-    data_folded = data_folded,
+    dat_folded = dat_folded,
     lambda = lambda,
     k = k,
     admm_params = admm_params,
@@ -506,9 +522,9 @@ cv_trendfilter <- function(x,
 
   args <- c(
     list(
-      x = data_scaled$x,
-      y = data_scaled$y,
-      weights = data_scaled$weights,
+      x = dat_scaled$x,
+      y = dat_scaled$y,
+      weights = dat_scaled$weights,
       lambda = lambda,
       k = k,
       obj_tol = admm_params$obj_tol,
@@ -555,9 +571,9 @@ cv_trendfilter <- function(x,
         n_iter = fit$n_iter,
         loss_funcs = loss_funcs,
         V = V,
-        x = data_scaled$x * x_scale,
-        y = data_scaled$y * y_scale,
-        weights = data_scaled$weights / y_scale^2,
+        x = dat_scaled$x * x_scale,
+        y = dat_scaled$y * y_scale,
+        weights = dat_scaled$weights / y_scale^2,
         k = k,
         status = fit$status,
         call = cv_call,
@@ -572,21 +588,21 @@ cv_trendfilter <- function(x,
 #' @importFrom dplyr bind_rows
 #' @importFrom magrittr %>%
 validate_fold <- function(fold_id,
-                          data_folded,
+                          dat_folded,
                           lambda,
                           k,
                           admm_params,
                           loss_funcs,
                           y_scale,
                           extra_args) {
-  data_train <- data_folded[-fold_id] %>% bind_rows()
-  data_validate <- data_folded[[fold_id]]
+  dat_train <- bind_rows(dat_folded[-fold_id])
+  dat_validate <- dat_folded[[fold_id]]
 
   args <- c(
     list(
-      x = data_train$x,
-      y = data_train$y,
-      weights = data_train$weights,
+      x = dat_train$x,
+      y = dat_train$y,
+      weights = dat_train$weights,
       k = k,
       lambda = lambda,
       obj_tol = admm_params$obj_tol,
@@ -601,18 +617,18 @@ validate_fold <- function(fold_id,
   fit <- do.call(.trendfilter, args)
 
   tf_validate_preds <- suppressWarnings(
-    predict(fit, lambda = lambda, x_eval = data_validate$x)
+    predict(fit, lambda = lambda, x_eval = dat_validate$x)
   )
 
   out <- lapply(
     seq_along(loss_funcs),
     FUN = function(X) {
       apply(
-        tf_validate_preds * y_scale,
-        2,
-        loss_funcs[[X]],
-        y = data_validate$y * y_scale,
-        weights = data_validate$weights / y_scale^2
+        X = tf_validate_preds * y_scale,
+        MARGIN = 2,
+        FUN = loss_funcs[[X]],
+        y = dat_validate$y * y_scale,
+        weights = dat_validate$weights / y_scale^2
       ) %>%
         as.double()
     }
@@ -870,22 +886,24 @@ sure_trendfilter <- function(x,
 
   k %<>% as.integer()
 
-  data <- tibble(x = as.double(x),
-                 y = as.double(y),
-                 weights = as.double(weights)) %>%
+  dat <- tibble(
+    x = as.double(x),
+    y = as.double(y),
+    weights = as.double(weights)
+  ) %>%
     drop_na() %>%
     arrange(x) %>%
     filter(weights > 0)
 
   rm(x, y, weights)
-  n <- nrow(data)
+  n <- nrow(dat)
 
-  x_scale <- median(diff(data$x))
-  y_scale <- median(abs(data$y)) / 10
+  x_scale <- median(diff(dat$x))
+  y_scale <- median(abs(dat$y)) / 10
   scale <- c(x_scale, y_scale)
   names(scale) <- c("x","y")
 
-  data_scaled <- data %>%
+  dat_scaled <- dat %>%
     mutate(
       x = x / x_scale,
       y = y / y_scale,
@@ -895,28 +913,30 @@ sure_trendfilter <- function(x,
   admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
   admm_params$x_tol <- admm_params$x_tol / x_scale
 
-  if (min(diff(data_scaled$x)) <= admm_params$x_tol) {
+  if (min(diff(dat_scaled$x)) <= admm_params$x_tol) {
     thin_out <- .tf_thin(
-      data_scaled$x,
-      data_scaled$y,
-      data_scaled$weights,
-      k,
-      admm_params
+      x = dat_scaled$x,
+      y = dat_scaled$y,
+      weights = dat_scaled$weights,
+      k = k,
+      admm_params = admm_params
     )
 
-    data_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
+    dat_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
   }
 
-  lambda <- get_lambda_grid_edf_spacing(data = data_scaled,
-                                        admm_params = admm_params,
-                                        nlambda = nlambda,
-                                        k = k)
+  lambda <- get_lambda_grid_edf_spacing(
+    dat = dat_scaled,
+    admm_params = admm_params,
+    nlambda = nlambda,
+    k = k
+  )
 
   args <- c(
     list(
-      x = data_scaled$x,
-      y = data_scaled$y,
-      weights = data_scaled$weights,
+      x = dat_scaled$x,
+      y = dat_scaled$y,
+      weights = dat_scaled$weights,
       lambda = lambda,
       k = k,
       obj_tol = admm_params$obj_tol,
@@ -930,8 +950,8 @@ sure_trendfilter <- function(x,
 
   fit <- do.call(.trendfilter, args)
 
-  squared_residuals_mat <- (fit$fitted_values - data_scaled$y)^2
-  optimism_mat <- 2 / (data_scaled$weights * n) *
+  squared_residuals_mat <- (fit$fitted_values - dat_scaled$y)^2
+  optimism_mat <- 2 / (dat_scaled$weights * n) *
     matrix(rep(fit$edf, each = n), nrow = n)
 
   error_mat <- (squared_residuals_mat + optimism_mat) * y_scale^2
@@ -939,7 +959,7 @@ sure_trendfilter <- function(x,
   i_min <- as.integer(min(which.min(error)))
 
   se_error <- replicate(
-    5000,
+    n = 5000,
     error_mat[sample.int(n, replace = TRUE), ] %>%
       colMeans()
   ) %>%
@@ -969,9 +989,9 @@ sure_trendfilter <- function(x,
         admm_params = admm_params,
         obj_func = fit$obj_fun,
         n_iter = fit$n_iter,
-        x = data_scaled$x * x_scale,
-        y = data_scaled$y * y_scale,
-        weights = data_scaled$weights / y_scale^2,
+        x = dat_scaled$x * x_scale,
+        y = dat_scaled$y * y_scale,
+        weights = dat_scaled$weights / y_scale^2,
         k = k,
         status = fit$status,
         call = sure_call,

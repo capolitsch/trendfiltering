@@ -131,7 +131,13 @@
 #' y <- eclipsing_binary$flux
 #' weights <- 1 / eclipsing_binary$std_err^2
 #'
-#' cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
+#' cv_tf <- cv_trendfilter(
+#'   x = x,
+#'   y = y,
+#'   weights = weights,
+#'   max_iter = 1e4,
+#'   obj_tol = 1e-6
+#' )
 #'
 #' boot_tf <- bootstrap_trendfilter(
 #'   obj = cv_tf,
@@ -155,11 +161,11 @@
 #'   edf = sure_tf$edf_min
 #' )
 
-#' @importFrom dplyr case_when mutate
+#' @importFrom dplyr case_when mutate tibble
 #' @importFrom magrittr %>% %<>%
 #' @importFrom rlang %||%
 #' @importFrom parallel mclapply detectCores
-#' @importFrom stats residuals fitted.values approx
+#' @importFrom stats residuals fitted.values sd
 #' @export
 bootstrap_trendfilter <- function(obj,
                                   algorithm = c("nonparametric","parametric","wild"),
@@ -170,6 +176,7 @@ bootstrap_trendfilter <- function(obj,
                                   ...) {
   stopifnot(B >= 20)
   stopifnot(any(class(obj) == "trendfiltering"))
+  stopifnot(any(class(obj) == "trendfilter"))
   stopifnot(
     any(class(obj) == "cv_trendfilter") || any(class(obj) == "sure_trendfilter")
   )
@@ -243,8 +250,8 @@ bootstrap_trendfilter <- function(obj,
     ],
     edf_opt
   ) %>%
-    unique() %>%
-    sort(decreasing = TRUE)
+    unique.default() %>%
+    sort.default(decreasing = TRUE)
 
   if ("edf_tol" %in% names(extra_args)) {
     edf_tol <- extra_args$edf_tol
@@ -266,7 +273,7 @@ bootstrap_trendfilter <- function(obj,
     algorithm == "wild" ~ list(wild_sampler)
   )[[1]]
 
-  data_scaled <- tibble(
+  dat_scaled <- tibble(
     x = obj$x / obj$scale["x"],
     y = obj$y / obj$scale["y"],
     weights = obj$weights * obj$scale["y"]^2
@@ -275,13 +282,13 @@ bootstrap_trendfilter <- function(obj,
   lambda_opt <- obj$lambda[i_opt]
 
   if (algorithm == "parametric") {
-    data_scaled %<>% mutate(
+    dat_scaled %<>% mutate(
       fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale["y"]
     )
   }
 
   if (algorithm == "wild") {
-    data_scaled %<>% mutate(
+    dat_scaled %<>% mutate(
       fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale["y"],
       residuals = residuals(obj, lambda = lambda_opt) / obj$scale["y"]
     )
@@ -290,7 +297,7 @@ bootstrap_trendfilter <- function(obj,
   par_out <- mclapply(
     1:B,
     bootstrap_parallel,
-    data_scaled = data_scaled,
+    dat_scaled = dat_scaled,
     k = obj$k,
     admm_params = obj$admm_params,
     edf_opt = edf_opt,
@@ -302,8 +309,6 @@ bootstrap_trendfilter <- function(obj,
     scale = obj$scale,
     mc.cores = mc_cores
   )
-
-  save(par_out, file = "~/Desktop/debug.RData")
 
   ensemble <- sapply(
     1:B,
@@ -360,9 +365,8 @@ bootstrap_trendfilter <- function(obj,
 
 
 #' @noRd
-#' @importFrom glmgen .tf_fit .tf_boot
 bootstrap_parallel <- function(b,
-                               data_scaled,
+                               dat_scaled,
                                k,
                                admm_params,
                                edf_opt,
@@ -372,12 +376,12 @@ bootstrap_parallel <- function(b,
                                edf_tol,
                                zero_tol,
                                scale) {
-  data_scaled <- sampler(data_scaled)
+  dat_scaled <- sampler(dat_scaled)
 
   fit <- .trendfilter(
-    x = data_scaled$x,
-    y = data_scaled$y,
-    weights = data_scaled$weights,
+    x = dat_scaled$x,
+    y = dat_scaled$y,
+    weights = dat_scaled$weights,
     k = k,
     lambda = lambda_grid,
     obj_tol = admm_params$obj_tol,
@@ -392,7 +396,7 @@ bootstrap_parallel <- function(b,
     return(
       bootstrap_parallel(
         b = 1,
-        data_scaled,
+        dat_scaled,
         k,
         admm_params,
         edf_opt,
@@ -430,46 +434,53 @@ bootstrap_parallel <- function(b,
 
 #' Bootstrap sampling/resampling functions
 #'
-#' @param data A tibble or data frame with minimal column set: `x` and `y` (for
+#' @param dat A tibble or data frame with minimal column set: `x` and `y` (for
 #' all samplers), `weights` and `fitted.values` (for `parametric.sampler`), and
 #' `residuals` (for `wild.sampler`).
 #'
-#' @return Bootstrap sample returned in the same format as `data`.
+#' @return Bootstrap sample returned in the same format as `dat`.
 
 
 #' @importFrom dplyr mutate n
 #' @importFrom magrittr %>%
 #' @importFrom stats rnorm
 #' @noRd
-parametric_sampler <- function(data) {
-  data %>% mutate(y = fitted_values + rnorm(n = n(), sd = 1 / sqrt(weights)))
+parametric_sampler <- function(dat) {
+  dat %>%
+    mutate(
+      y = fitted_values + rnorm(n = n(), sd = 1 / sqrt(weights))
+    )
 }
 
 
-#' @importFrom dplyr slice_sample n
+#' @importFrom dplyr slice_sample
 #' @importFrom magrittr %>%
 #' @noRd
-nonparametric_resampler <- function(data) {
-  data %>% slice_sample(n = nrow(data), replace = TRUE)
+nonparametric_resampler <- function(dat) {
+  dat %>% slice_sample(n = nrow(dat), replace = TRUE)
 }
 
 
 #' @importFrom dplyr mutate n
 #' @importFrom magrittr %>%
 #' @noRd
-wild_sampler <- function(data) {
-  data %>% mutate(y = fitted_values + residuals *
-                    sample(
-                      x = c(
-                        (1 + sqrt(5)) / 2,
-                        (1 - sqrt(5)) / 2
-                      ),
-                      size = n(), replace = TRUE,
-                      prob = c(
-                        (1 + sqrt(5)) / (2 * sqrt(5)),
-                        (sqrt(5) - 1) / (2 * sqrt(5))
-                      )
-                    ))
+wild_sampler <- function(dat) {
+  dat %>%
+    mutate(y = fitted_values +
+             residuals *
+             sample(
+               x = c(
+                 (1 + sqrt(5)) / 2,
+                 (1 - sqrt(5)) / 2
+               ),
+               size = n(),
+               replace = TRUE,
+               prob = c(
+                 (1 + sqrt(5)) / (2 * sqrt(5)),
+                 (sqrt(5) - 1) / (2 * sqrt(5))
+               )
+             )
+    )
 }
 
 
@@ -492,13 +503,11 @@ wild_sampler <- function(data) {
 #'    for time-domain astronomy and astronomical spectroscopy. *MNRAS*, 492(3),
 #'    p. 4005-4018.
 #'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4005/5704413)]
-#'    [[arXiv](https://arxiv.org/abs/1908.07151)]
-#'    [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].
+#'    [[arXiv](https://arxiv.org/abs/1908.07151)].
 #' 2. Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
 #'    signals with varying degrees of smoothness. *MNRAS*, 492(3), p. 4019-4032.
 #'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4019/5704414)]
-#'    [[arXiv](https://arxiv.org/abs/2001.03552)]
-#'    [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].
+#'    [[arXiv](https://arxiv.org/abs/2001.03552)].
 #'
 #' @examples
 #' # Example 1: Phase-folded light curve of an eclipsing binary star system
@@ -516,7 +525,13 @@ wild_sampler <- function(data) {
 #' y <- eclipsing_binary$flux
 #' weights <- 1 / eclipsing_binary$std_err^2
 #'
-#' cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
+#' cv_tf <- cv_trendfilter(
+#'   x = x,
+#'   y = y,
+#'   weights = weights,
+#'   max_iter = 1e4,
+#'   obj_tol = 1e-6
+#' )
 #'
 #' boot_tf <- bootstrap_trendfilter(
 #'   obj = cv_tf,
