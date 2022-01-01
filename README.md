@@ -2,7 +2,7 @@
 
 ### [Package website](https://capolitsch.github.io/trendfiltering/)
 
-A suite of tools for denoising one-dimensional signals with trend filtering. 
+A suite of tools for denoising one-dimensional data sets with trend filtering. 
 Optimizing the hyparameter via Stein's unbiased risk estimate or $V$-fold cross 
 validation with a customizable validation loss functional, and 
 one-standard-error rules. Relaxed trend filtering, and various bootstrap 
