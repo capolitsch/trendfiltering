@@ -136,7 +136,7 @@ and residuals() may be called on the cv_trendfilter() output." />
     <div class="ref-description">
     <p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
  For every candidate hyperparameter value, estimate the trend
-filtering model's out-of-sample error by <em></em>\(V\)-fold cross validation.
+filtering model's out-of-sample error by \(V\)-fold cross validation.
 Many common regression loss functions are defined internally, and a cross
 validation curve is returned for each. Custom loss functions may also be
 passed via the <code>loss_funcs</code> argument. See the <strong>Loss functions</strong> section
@@ -173,8 +173,8 @@ and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code
       <th>weights</th>
       <td><p>Weights for the observed outputs, defined as the reciprocal variance of the
 additive noise that contaminates the output signal. When the noise is
-expected to have an equal variance <em></em>\(\sigma^2\) for all observations,
-a scalar may be passed to <code>weights</code>, i.e. <code>weights = </code><em></em>\(1/\sigma^2\).
+expected to have an equal variance \(\sigma^2\) for all observations,
+a scalar may be passed to <code>weights</code>, i.e. <code>weights = </code>\(1/\sigma^2\).
 Otherwise, <code>weights</code> must be a vector with the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
     <tr>
@@ -215,8 +215,8 @@ only contain integer values <code>1</code>, ..., <code>V</code> designating the 
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>'cv_trendfilter'</code> and subclass <code>'trendfilter'</code>.
-This is a list with the elements below,
+    <p>An object of class <code>'cv_trendfilter'</code> and subclass
+'<code><a href='trendfilter.html'>trendfilter</a></code>'. This is a list with the elements below,
 as well as all elements from the '<code><a href='trendfilter.html'>trendfilter</a></code>' call.</p><dl>
 <dt><code>lambda</code></dt><dd><p>Vector of candidate hyperparameter values (always returned
 in descending order).</p></dd>
@@ -345,7 +345,7 @@ $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
 \left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|\]</p></li>
 </ol>
 
-<p>where <em></em>\(w_i:=\) <code>weights[i]</code>.</p>
+<p>where \(w_i:=\) <code>weights[i]</code>.</p>
 <p>When defining custom loss functions, each function within the named list
 passed to <code>loss_funcs</code> should take three vector arguments --- <code>y</code>,
 <code>tf_estimate</code>, and <code>weights</code> --- and return a single scalar value for the
@@ -389,7 +389,13 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='va'>eclipsing_binary</span><span class='op'>$</span><span class='va'>flux</span>
 <span class='va'>weights</span> <span class='op'>&lt;-</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='va'>eclipsing_binary</span><span class='op'>$</span><span class='va'>std_err</span><span class='op'>^</span><span class='fl'>2</span>
 
-<span class='va'>cv_tf</span> <span class='op'>&lt;-</span> <span class='fu'>cv_trendfilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span>, max_iter <span class='op'>=</span> <span class='fl'>1e4</span>, obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span><span class='op'>)</span>
+<span class='va'>cv_tf</span> <span class='op'>&lt;-</span> <span class='fu'>cv_trendfilter</span><span class='op'>(</span>
+  x <span class='op'>=</span> <span class='va'>x</span>,
+  y <span class='op'>=</span> <span class='va'>y</span>,
+  weights <span class='op'>=</span> <span class='va'>weights</span>,
+  max_iter <span class='op'>=</span> <span class='fl'>1e4</span>,
+  obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span>
+<span class='op'>)</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

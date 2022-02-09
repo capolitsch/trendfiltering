@@ -314,7 +314,13 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='va'>eclipsing_binary</span><span class='op'>$</span><span class='va'>flux</span>
 <span class='va'>weights</span> <span class='op'>&lt;-</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='va'>eclipsing_binary</span><span class='op'>$</span><span class='va'>std_err</span><span class='op'>^</span><span class='fl'>2</span>
 
-<span class='va'>cv_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cv_trendfilter.html'>cv_trendfilter</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span>, max_iter <span class='op'>=</span> <span class='fl'>1e4</span>, obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span><span class='op'>)</span>
+<span class='va'>cv_tf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cv_trendfilter.html'>cv_trendfilter</a></span><span class='op'>(</span>
+  x <span class='op'>=</span> <span class='va'>x</span>,
+  y <span class='op'>=</span> <span class='va'>y</span>,
+  weights <span class='op'>=</span> <span class='va'>weights</span>,
+  max_iter <span class='op'>=</span> <span class='fl'>1e4</span>,
+  obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span>
+<span class='op'>)</span>
 
 <span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span>
   obj <span class='op'>=</span> <span class='va'>cv_tf</span>,

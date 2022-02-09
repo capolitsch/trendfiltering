@@ -31,14 +31,16 @@ template:
 development:
   mode: release
 
+pkgdown:
+  as_is: true
+
 reference:
   - title: "Fit a model"
+    desc: >
+      Fit a trend filtering model
     contents:
     - '`trendfilter`'
     - '`.trendfilter`'
-    desc: >
-        Fit a trend filtering model (back-end function with more options for
-        expert users)
   - title: "Optimize hyperparameter(s)"
     contents:
       - '`cv_trendfilter`'
@@ -88,6 +90,8 @@ redirects:
   - [bootstrap_trendfilter.html, reference/bootstrap_trendfilter.html]
   - [cv_trendfilter.html, reference/cv_trendfilter.html]
   - [sure_trendfilter.html, reference/sure_trendfilter.html]
+  - [.trendfilter.html, dot-trendfilter.html]
+  - [reference/.trendfilter.html, reference/dot-trendfilter.html]
 
 repo:
   branch: main
