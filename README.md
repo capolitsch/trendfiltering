@@ -2,11 +2,14 @@
 
 ### [Package website](https://capolitsch.github.io/trendfiltering/)
 
-A suite of tools for denoising and analyizing  one-dimensional data with trend 
-filtering. Optimizing the hyparameter via Stein's unbiased risk estimate or 
-$V$-fold cross validation with a customizable validation loss functional, and 
-one-standard-error rules. Relaxed trend filtering, and various bootstrap 
-algorithms for uncertainty quantification.
+A suite of tools for denoising and analyzing one-dimensional 
+signals with trend filtering. Trend filtering constructs a piecewise
+polynomial estimate (of any order) for the signal with knots chosen 
+adaptively from the observed data. Hyperpameter(s) can be optimized by 
+Stein's unbiased risk estimate or V-fold cross validation with a 
+customizable loss function. Methods are also included for trend filtering
+uncertainty quantification and a generalized "relaxed trend filtering"
+estimator.
 
 The `trendfiltering` package can be installed from GitHub using the command 
 below.

@@ -2,6 +2,9 @@
 .Rhistory
 .Rapp.history
 
+# pkgdown base plot files
+/docs/reference/Rplot*
+
 # Package-specific R profile
 .Rprofile
 

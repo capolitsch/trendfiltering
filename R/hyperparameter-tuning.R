@@ -247,6 +247,8 @@ cv_trendfilter <- function(x,
   extra_args <- list(...)
 
   if (any(names(extra_args) == "k")) {
+    k <- extra_args$k
+    extra_args$k <- NULL
     stopifnot(is.numeric(k) && k == round(k))
     stopifnot(length(k) == 1)
     if (!k %in% 0:2) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
@@ -533,8 +535,8 @@ cv_trendfilter <- function(x,
     extra_args
   )
 
-  duplicated_args <- which(duplicated(names(args)))
-  if (length(duplicated_args) > 0) args <- args[-duplicated_args]
+  dup_args <- duplicated(names(args))
+  if (any(dup_args)) args <- args[-which(dup_args)]
 
   fit <- do.call(.trendfilter, args)
 
@@ -844,6 +846,8 @@ sure_trendfilter <- function(x,
   extra_args <- list(...)
 
   if (any(names(extra_args) == "k")) {
+    k <- extra_args$k
+    extra_args$k <- NULL
     stopifnot(is.numeric(k) && k == round(k))
     stopifnot(length(k) == 1)
     if (!k %in% 0:2) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
@@ -945,8 +949,8 @@ sure_trendfilter <- function(x,
     extra_args
   )
 
-  duplicated_args <- duplicated(names(args))
-  if (any(duplicated_args)) args <- args[-duplicated_args]
+  dup_args <- duplicated(names(args))
+  if (any(dup_args)) args <- args[-which(dup_args)]
 
   fit <- do.call(.trendfilter, args)
 

@@ -2,7 +2,8 @@
 % Please edit documentation in R/trendfilter.R
 \name{trendfilter}
 \alias{trendfilter}
-\title{Fit a trend filtering model}
+\title{Fit a trend filtering model (back-end function with more options for expert
+users)}
 \usage{
 trendfilter(x, y, weights = NULL, lambda, edf = NULL, ...)
 }

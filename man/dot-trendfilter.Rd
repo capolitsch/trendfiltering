@@ -3,7 +3,7 @@
 \name{.trendfilter}
 \alias{.trendfilter}
 \alias{dot-trendfilter}
-\title{Fit a trend filtering model}
+\title{Fit a trend filtering model (front-end function focused on ease of use)}
 \usage{
 .trendfilter(
   x,
@@ -68,8 +68,7 @@ estimator, for every hyperparameter value in \code{lambda}.}
 If \code{length(lambda) == 1}, fitted values for the single fit are returned as a
 numeric vector. Otherwise, fitted values are returned in a matrix with
 \code{length(lambda)} columns, with \code{fitted_values[,i]} corresponding to the trend
-filtering estimate with hyperparameter \code{lambda[i]}.
-}
+filtering estimate with hyperparameter \code{lambda[i]}.}
 \item{\code{admm_params}}{A list of the parameter values used by the ADMM
 algorithm used to solve the trend filtering convex optimization.}
 \item{\code{obj_func}}{The relative change in the objective function over the

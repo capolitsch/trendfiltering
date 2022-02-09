@@ -1,4 +1,4 @@
-#' Fit a trend filtering model
+#' Fit a trend filtering model (front-end function focused on ease of use)
 #'
 #' Fit a trend filtering model. Generic functions such as [`predict()`],
 #' [`fitted.values()`], and [`residuals()`] may be called on the
@@ -54,8 +54,7 @@
 #' If `length(lambda) == 1`, fitted values for the single fit are returned as a
 #' numeric vector. Otherwise, fitted values are returned in a matrix with
 #' `length(lambda)` columns, with `fitted_values[,i]` corresponding to the trend
-#' filtering estimate with hyperparameter `lambda[i]`.
-#' }
+#' filtering estimate with hyperparameter `lambda[i]`.}
 #' \item{`admm_params`}{A list of the parameter values used by the ADMM
 #' algorithm used to solve the trend filtering convex optimization.}
 #' \item{`obj_func`}{The relative change in the objective function over the
@@ -256,7 +255,8 @@
 }
 
 
-#' Fit a trend filtering model
+#' Fit a trend filtering model (back-end function with more options for expert
+#' users)
 #'
 #' Fit a trend filtering model. Generic functions such as [`predict()`],
 #' [`fitted.values()`], and [`residuals()`] may be called on the
