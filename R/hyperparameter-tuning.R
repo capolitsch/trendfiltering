@@ -855,7 +855,7 @@ sure_trendfilter <- function(x,
     extra_args$k <- NULL
     stopifnot(is.numeric(k) && k == round(k))
     stopifnot(length(k) == 1)
-    if (!k %in% 0:2) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
+    if (!k %in% 0:3) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
   } else {
     k <- 2L
   }
