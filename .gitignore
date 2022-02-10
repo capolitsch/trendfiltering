@@ -5,6 +5,10 @@
 # pkgdown base plot files
 /docs/reference/Rplot*
 
+# Unfinished files
+/R/relax_trendfilter.R
+/R/methods-base.R
+
 # Package-specific R profile
 .Rprofile
 
@@ -43,6 +47,3 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
-
-/R/unfinished-scraps.R
-/R/methods-base.R

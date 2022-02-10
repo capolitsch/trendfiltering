@@ -1,4 +1,4 @@
-#' Get predictions from a trendfilter object
+#' Predict from a trend filtering model
 #'
 #' Get predictions from a '[`trendfilter`][`trendfilter()`]' object.
 #'
@@ -89,7 +89,7 @@ predict.trendfilter <- function(obj,
 }
 
 
-#' Get fitted values from a trendfilter object
+#' Fitted values of a trend filtering model
 #'
 #' Get fitted values from a '[`trendfilter`][`trendfilter()`]' object.
 #'
@@ -127,7 +127,7 @@ fitted.trendfilter <- function(obj, lambda = NULL, ...) {
 }
 
 
-#' Get residuals from a trendfilter object
+#' Residuals of a trend filtering model
 #'
 #' Get residuals from a '[`trendfilter`][`trendfilter()`]' object.
 #'

@@ -126,10 +126,10 @@
 #'
 #' @return An object of class '`cv_trendfilter`' and subclass
 #' '[`trendfilter`][`trendfilter()`]'. Generic functions such as [`predict()`],
-#' [`fitted.values()`], and [`residuals()`] may be called on the
+#' [`fitted()`], and [`residuals()`] may be called on the
 #' [`sure_trendfilter()`] output. A '`cv_trendfilter`' object is a list with
-#' the elements below, as well as all elements from the
-#' '[`trendfilter`][`trendfilter()`]' call.
+#' the elements below, as well as all elements from a
+#' '[`trendfilter`][`trendfilter()`]' call on the full data set.
 #' \describe{
 #' \item{`lambda`}{Vector of candidate hyperparameter values (always returned
 #' in descending order).}
@@ -194,7 +194,7 @@
 #' \item{`k`}{Degree of the trend filtering estimates.}
 #' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
-#' \item{`scale`}{For internal use.}
+#' \item{`xy_scale`}{For internal use.}
 #' }
 #'
 #' @references
@@ -256,7 +256,7 @@ cv_trendfilter <- function(x,
     extra_args$k <- NULL
     stopifnot(is.numeric(k) && k == round(k))
     stopifnot(length(k) == 1)
-    if (!k %in% 0:2) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
+    if (!k %in% 0:3) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
   } else {
     k <- 2L
   }

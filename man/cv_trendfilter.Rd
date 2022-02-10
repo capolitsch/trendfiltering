@@ -52,10 +52,10 @@ only contain integer values \code{1}, ..., \code{V} designating the fold assignm
 \value{
 An object of class '\code{cv_trendfilter}' and subclass
 '\code{\link[=trendfilter]{trendfilter}}'. Generic functions such as \code{\link[=predict]{predict()}},
-\code{\link[=fitted.values]{fitted.values()}}, and \code{\link[=residuals]{residuals()}} may be called on the
+\code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}} may be called on the
 \code{\link[=sure_trendfilter]{sure_trendfilter()}} output. A '\code{cv_trendfilter}' object is a list with
-the elements below, as well as all elements from the
-'\code{\link[=trendfilter]{trendfilter}}' call.
+the elements below, as well as all elements from a
+'\code{\link[=trendfilter]{trendfilter}}' call on the full data set.
 \describe{
 \item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
 in descending order).}
@@ -120,7 +120,7 @@ present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
 \item{\code{k}}{Degree of the trend filtering estimates.}
 \item{\code{status}}{For internal use. Output from the C solver.}
 \item{\code{call}}{The function call.}
-\item{\code{scale}}{For internal use.}
+\item{\code{xy_scale}}{For internal use.}
 }
 }
 \description{

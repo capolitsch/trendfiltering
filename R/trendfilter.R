@@ -1,4 +1,5 @@
-#' Fit a trend filtering model (front-end function focused on ease of use)
+#' Fit a trend filtering model (back-end function with more options for expert
+#' users)
 #'
 #' Fit a trend filtering model.
 #'
@@ -33,13 +34,15 @@
 #' @param max_iter
 #'   Maximum number of iterations that we will tolerate for the trend filtering
 #'   convex optimization algorithm. Defaults to `max_iter = length(y)`.
+#' @param scale
+#'   A logical
 #' @param ...
 #'   Additional named arguments. Currently unused.
 #'
 #' @return An object of class `'trendfilter'`. Generic functions such as
-#' [`predict()`], [`fitted.values()`], and [`residuals()`] may be called on
-#' objects of class `'trendfilter'`. A `'trendfilter'` object is a list with the
-#' following elements:
+#' [`predict()`], [`fitted()`], and [`residuals()`] may be called on any object
+#' of class (or subclass) `'trendfilter'`. A `'trendfilter'` object is a list
+#' with the following elements:
 #' \describe{
 #' \item{`x`}{Vector of observed values for the input variable.}
 #' \item{`y`}{Vector of observed values for the output variable (if originally
@@ -71,7 +74,7 @@
 #' `max_iter = length(y)`.}
 #' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
-#' \item{`scale`}{For internal use.}
+#' \item{`xy_scale`}{For internal use.}
 #' }
 #'
 #' @references
@@ -140,7 +143,7 @@
 
   stopifnot(is.numeric(k) && length(k) == 1 && k == round(k))
   k %<>% as.integer()
-  if (!any(k == 0:2)) stop("`k` must be equal to 0, 1, or 2.")
+  if (!any(k == 0:3)) stop("`k` must be equal to 0, 1, or 2.")
 
   n <- length(y)
   weights <- weights %||% rep_len(1, n)
@@ -185,14 +188,14 @@
   rm(x, y, weights)
   n <- nrow(dat)
 
-  if ("scaling" %in% names(extra_args)) {
-    scaling <- extra_args$scaling
-    extra_args$scaling <- NULL
+  if ("scale" %in% names(extra_args)) {
+    scale <- extra_args$scale
+    extra_args$scale <- NULL
   } else {
-    scaling <- TRUE
+    scale <- TRUE
   }
 
-  if (!scaling) {
+  if (!scale) {
     x_scale <- 1
     y_scale <- 1
   } else {
@@ -231,8 +234,8 @@
     lambda = lambda
   )
 
-  scale <- c(x_scale, y_scale)
-  names(scale) <- c("x","y")
+  xy_scale <- c(x_scale, y_scale)
+  names(xy_scale) <- c("x","y")
 
   invisible(
     structure(
@@ -249,7 +252,7 @@
         n_iter = as.integer(fit$iter),
         status = fit$status,
         call = tf_call,
-        scale = scale
+        xy_scale = xy_scale
       ),
       class = c("trendfilter", "trendfiltering")
     )
@@ -257,8 +260,7 @@
 }
 
 
-#' Fit a trend filtering model (back-end function with more options for expert
-#' users)
+#' Fit a trend filtering model (front-end function focused on ease of use)
 #'
 #' Fit a trend filtering model.
 #'
@@ -284,9 +286,9 @@
 #'   [`.trendfilter()`].
 #'
 #' @return An object of class `'trendfilter'`. Generic functions such as
-#' [`predict()`], [`fitted.values()`], and [`residuals()`] may be called on
-#' objects of class `'trendfilter'`. A `'trendfilter'` object is a list with the
-#' following elements:
+#' [`predict()`], [`fitted()`], and [`residuals()`] may be called on any object
+#' of class (or subclass) `'trendfilter'`. A `'trendfilter'` object is a list
+#' with the following elements:
 #' \describe{
 #' \item{`x`}{Vector of observed values for the input variable.}
 #' \item{`y`}{Vector of observed values for the output variable (if originally

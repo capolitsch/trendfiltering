@@ -9,7 +9,7 @@
 \alias{fitted.cv_trendfilter}
 \alias{fitted.sure_trendfilter}
 \alias{fitted.bootstrap_trendfilter}
-\title{Get fitted values from a trendfilter object}
+\title{Fitted values of a trend filtering model}
 \usage{
 \method{fitted}{trendfilter}(obj, lambda = NULL, ...)
 }

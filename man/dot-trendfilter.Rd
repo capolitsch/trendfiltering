@@ -3,7 +3,8 @@
 \name{.trendfilter}
 \alias{.trendfilter}
 \alias{dot-trendfilter}
-\title{Fit a trend filtering model (front-end function focused on ease of use)}
+\title{Fit a trend filtering model (back-end function with more options for expert
+users)}
 \usage{
 .trendfilter(
   x,
@@ -50,12 +51,14 @@ Defaults to \code{obj_tol = 1e-10}.}
 convex optimization algorithm. Defaults to \code{max_iter = length(y)}.}
 
 \item{...}{Additional named arguments. Currently unused.}
+
+\item{scale}{A logical}
 }
 \value{
 An object of class \code{'trendfilter'}. Generic functions such as
-\code{\link[=predict]{predict()}}, \code{\link[=fitted.values]{fitted.values()}}, and \code{\link[=residuals]{residuals()}} may be called on
-objects of class \code{'trendfilter'}. A \code{'trendfilter'} object is a list with the
-following elements:
+\code{\link[=predict]{predict()}}, \code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}} may be called on any object
+of class (or subclass) \code{'trendfilter'}. A \code{'trendfilter'} object is a list
+with the following elements:
 \describe{
 \item{\code{x}}{Vector of observed values for the input variable.}
 \item{\code{y}}{Vector of observed values for the output variable (if originally
@@ -87,7 +90,7 @@ This can be done by passing an extra argument \code{max_iter} to the
 \code{max_iter = length(y)}.}
 \item{\code{status}}{For internal use. Output from the C solver.}
 \item{\code{call}}{The function call.}
-\item{\code{scale}}{For internal use.}
+\item{\code{xy_scale}}{For internal use.}
 }
 }
 \description{

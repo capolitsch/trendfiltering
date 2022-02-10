@@ -2,7 +2,7 @@
 % Please edit documentation in R/methods-stats.R
 \name{predict.trendfilter}
 \alias{predict.trendfilter}
-\title{Get predictions from a trendfilter object}
+\title{Predict from a trend filtering model}
 \usage{
 \method{predict}{trendfilter}(obj, lambda = NULL, x_eval = NULL, zero_tol = 1e-10, ...)
 }

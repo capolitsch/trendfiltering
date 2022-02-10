@@ -1,4 +1,4 @@
-#' Utility functions for internal/expert use only
+#' Utility functions for internal use
 
 #' @noRd
 #' @importFrom rlang %||%

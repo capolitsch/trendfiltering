@@ -2,8 +2,7 @@
 % Please edit documentation in R/trendfilter.R
 \name{trendfilter}
 \alias{trendfilter}
-\title{Fit a trend filtering model (back-end function with more options for expert
-users)}
+\title{Fit a trend filtering model (front-end function focused on ease of use)}
 \usage{
 trendfilter(x, y, weights = NULL, lambda, edf = NULL, ...)
 }
@@ -30,9 +29,9 @@ freedom in each model.}
 }
 \value{
 An object of class \code{'trendfilter'}. Generic functions such as
-\code{\link[=predict]{predict()}}, \code{\link[=fitted.values]{fitted.values()}}, and \code{\link[=residuals]{residuals()}} may be called on
-objects of class \code{'trendfilter'}. A \code{'trendfilter'} object is a list with the
-following elements:
+\code{\link[=predict]{predict()}}, \code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}} may be called on any object
+of class (or subclass) \code{'trendfilter'}. A \code{'trendfilter'} object is a list
+with the following elements:
 \describe{
 \item{\code{x}}{Vector of observed values for the input variable.}
 \item{\code{y}}{Vector of observed values for the output variable (if originally
