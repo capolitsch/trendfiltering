@@ -1,7 +1,7 @@
 Type: Package
 Package: trendfiltering
 Title: The state-of-the-art method for denoising 1D signals
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: 
     person(given = "Collin A.", 
            family = "Politsch", 
@@ -9,14 +9,13 @@ Authors@R:
            role = c("aut", "cre"), 
            comment = c(ORCID = "0000-0003-3727-9167")
            )
-Description: A suite of tools for denoising and analyzing one-dimensional 
+Description: A suite of tools for denoising and analyzing one-dimensional
     signals with trend filtering. Trend filtering constructs a piecewise
-    polynomial estimate (of any order) for the signal with knots chosen 
-    adaptively from the observed data. Hyperpameter(s) can be optimized by 
-    Stein's unbiased risk estimate or V-fold cross validation with a 
-    customizable loss function. Methods are also included for trend filtering
-    uncertainty quantification and a generalized "relaxed trend filtering"
-    estimator.
+    polynomial estimate for the signal with knots chosen adaptively from the
+    observed data. Hyperpameter(s) can be optimized by cross validation (with
+    any loss function) or by minimizing Stein's unbiased risk estimate. Methods
+    are also included for trend filtering uncertainty quantification and a 
+    generalized "relaxed trend filtering" estimator.
 License: MIT
 URL: https://capolitsch.github.io/trendfiltering
 BugReports: https://github.com/capolitsch/trendfiltering/issues

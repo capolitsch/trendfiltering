@@ -70,7 +70,7 @@
 
 <span class="navbar-brand">
 <a class="navbar-link" href="index.html">trendfiltering</a>
-<span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+<span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
 </span>
 </div>
 
@@ -120,14 +120,17 @@
 </div>
 
 
+
 <div id="summary" class="section level2">
 <p>
 <font size="3">
-A suite of tools for denoising one-dimensional signals with trend filtering.
-Optimizing the hyparameter via Stein's unbiased risk estimate (SURE) or
-<i>V</i>-fold cross validation with a customizable loss function, and
-one-standard-error rules. Relaxed trend filtering, and various bootstrap
-algorithms for uncertainty quantification.
+A suite of tools for denoising and analyzing one-dimensional
+signals with trend filtering. Trend filtering constructs a piecewise
+polynomial estimate for the signal with knots chosen adaptively from the
+observed data. Hyperpameter(s) can be optimized by cross validation (with any
+loss function) or by minimizing Stein's unbiased risk estimate. Methods are
+also included for trend filtering uncertainty quantification
+and a generalized "relaxed trend filtering" estimator.
 </font>
 </p>
 </div>

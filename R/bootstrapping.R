@@ -1,19 +1,7 @@
-#' Construct pointwise variability bands via a bootstrap algorithm that's
-#' tailored to the observed data
+#' Construct pointwise variability bands via a bootstrap
 #'
 #' Generate a bootstrap ensemble of trend filtering estimates in order to
-#' quantify the uncertainty in the optimized trend filtering estimate. One of
-#' three possible bootstrap algorithms should be chosen according to the
-#' criteria summarized in the **Details** section below. Pointwise variability
-#' bands are then obtained by passing the '`bootstrap_trendfilter`' object to
-#' [`vbands()`], along with the desired level (e.g. `level = 0.95`).
-#' Bootstrapping trend filtering estimators tends to yield more accurate
-#' uncertainties when, for each bootstrap estimate, we fix the number of
-#' effective degrees of freedom, `edf` (a reparametrization of the
-#' hyperparameter `lambda`), instead of fixing `lambda` itself. Thus,
-#' `bootstrap_trendfilter()` has an `edf` argument instead of `lambda`. See
-#' the `edf` argument description and **Examples** section for guidance on how
-#' `edf` can be chosen.
+#' quantify the uncertainty in the optimized trend filtering estimate.
 #'
 #' @param obj
 #'   An object of class '[`cv_trendfilter`][cv_trendfilter()]' or
@@ -41,7 +29,18 @@
 #'   Additional named arguments. Currently only a few experimental arguments
 #'   may be passed by experts.
 #'
-#' @details Our recommendations for when to use each of the possible settings
+#' @details One of three possible bootstrap algorithms should be chosen
+#' according to the criteria below. Pointwise variability bands are then
+#' obtained by passing the '`bootstrap_trendfilter`' object to [`vbands()`],
+#' along with the desired level (e.g. `level = 0.95`). Bootstrapping trend
+#' filtering estimators tends to yield more accurate uncertainties when, for
+#' each bootstrap estimate, we fix the number of effective degrees of freedom,
+#' `edf` (a reparametrization of the hyperparameter `lambda`), instead of fixing
+#' `lambda` itself. Thus, `bootstrap_trendfilter()` has an `edf` argument
+#' instead of `lambda`. See the `edf` argument description and **Examples**
+#' section for guidance on how `edf` can be chosen.
+#'
+#' Our recommendations for when to use each of the possible settings
 #' for the `algorithm` argument are shown in the table below. See
 #' [Politsch et al. (2020a)](
 #' https://academic.oup.com/mnras/article/492/3/4005/5704413) for more details.

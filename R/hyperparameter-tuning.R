@@ -1,14 +1,9 @@
-#' Optimize the trend filtering hyperparameter by V-fold cross validation
+#' Optimize a trend filtering model by V-fold cross validation
 #'
 #' \loadmathjax For every candidate hyperparameter value, estimate the trend
 #' filtering model's out-of-sample error by \mjseqn{V}-fold cross validation.
-#' Many common regression loss functions are defined internally, and a cross
-#' validation curve is returned for each. Custom loss functions may also be
-#' passed via the `loss_funcs` argument. See the **Loss functions** section
-#' below for definitions of the internal loss functions, and for guidelines on
-#' when [`cv_trendfilter()`] should be used versus [`sure_trendfilter()`].
-#' Generic functions such as [`predict()`], [`fitted.values()`],
-#' and [`residuals()`] may be called on the [`cv_trendfilter()`] output.
+#' See the **Details** section for guidelines on when [`cv_trendfilter()`]
+#' should be used versus [`sure_trendfilter()`].
 #'
 #' @param x
 #'   Vector of observed values for the input variable.
@@ -42,7 +37,14 @@
 #'   `mc_cores = V`.
 #' @param ... Additional named arguments to pass to [`.trendfilter()`].
 #'
-#' @details Our recommendations for when to use [`cv_trendfilter()`] versus
+#' @details Many common regression loss functions are defined internally, and a
+#' cross validation curve is returned for each. Custom loss functions may also
+#' be passed via the `loss_funcs` argument. See the **Loss functions** section
+#' below for definitions of the internal loss functions.
+#' Generic functions such as [`predict()`], [`fitted.values()`],
+#' and [`residuals()`] may be called on the [`cv_trendfilter()`] output.
+#'
+#' Our recommendations for when to use [`cv_trendfilter()`] versus
 #' [`sure_trendfilter()`] are summarized in the table below. See Section 3.5 of
 #' [Politsch et al. (2020a)](https://arxiv.org/abs/1908.07151) for more details.
 #'
@@ -122,9 +124,12 @@
 #' my_loss_funcs <- list(MedAE = MedAE)
 #' ```
 #'
-#' @return An object of class `'cv_trendfilter'` and subclass
-#' '[`trendfilter`][`trendfilter()`]'. This is a list with the elements below,
-#' as well as all elements from the '[`trendfilter`][`trendfilter()`]' call.
+#' @return An object of class '`cv_trendfilter`' and subclass
+#' '[`trendfilter`][`trendfilter()`]'. Generic functions such as [`predict()`],
+#' [`fitted.values()`], and [`residuals()`] may be called on the
+#' [`sure_trendfilter()`] output. A '`cv_trendfilter`' object is a list with
+#' the elements below, as well as all elements from the
+#' '[`trendfilter`][`trendfilter()`]' call.
 #' \describe{
 #' \item{`lambda`}{Vector of candidate hyperparameter values (always returned
 #' in descending order).}
@@ -712,15 +717,12 @@ get_internal_loss_funcs <- function() {
 }
 
 
-#' Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
-#' risk estimate
+#' Optimize a trend filtering model by minimizing Stein's unbiased risk estimate
 #'
 #' For every candidate hyperparameter value, compute an unbiased estimate of the
 #' trend filtering model's predictive mean-squared error. See the **Details**
 #' section for guidelines on when [`sure_trendfilter()`] should be used versus
-#' [`cv_trendfilter()`]. Generic functions such as [`predict()`],
-#' [`fitted.values()`], and [`residuals()`] may be called on the
-#' [`sure_trendfilter()`] output.
+#' [`cv_trendfilter()`].
 #'
 #' @inheritParams cv_trendfilter
 #'
@@ -742,8 +744,11 @@ get_internal_loss_funcs <- function() {
 #' a case when the inputs are evenly sampled on the `log10(x)` scale.
 #'
 #' @return An object of class '`sure_trendfilter`' and subclass
-#' '[`trendfilter`][`trendfilter()`]'. This is a list with the elements below,
-#' as well as all elements from the '[`trendfilter`][`trendfilter()`]' call.
+#' '[`trendfilter`][`trendfilter()`]'. Generic functions such as [`predict()`],
+#' [`fitted.values()`], and [`residuals()`] may be called on the
+#' [`sure_trendfilter()`] output. A '`sure_trendfilter`' object is a list with
+#' the elements below, as well as all elements from the
+#' '[`trendfilter`][`trendfilter()`]' call.
 #' \describe{
 #' \item{`lambda`}{Vector of candidate hyperparameter values (always returned
 #' in descending order).}

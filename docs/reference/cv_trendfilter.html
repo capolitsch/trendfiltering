@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Optimize the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter • trendfiltering</title>
+<title>Optimize a trend filtering model by V-fold cross validation — cv_trendfilter • trendfiltering</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,17 +46,12 @@
 
 
 
-<meta property="og:title" content="Optimize the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter" />
+<meta property="og:title" content="Optimize a trend filtering model by V-fold cross validation — cv_trendfilter" />
 <meta property="og:description" content="
  For every candidate hyperparameter value, estimate the trend
 filtering model's out-of-sample error by \(V\)-fold cross validation.
-Many common regression loss functions are defined internally, and a cross
-validation curve is returned for each. Custom loss functions may also be
-passed via the loss_funcs argument. See the Loss functions section
-below for definitions of the internal loss functions, and for guidelines on
-when cv_trendfilter() should be used versus sure_trendfilter().
-Generic functions such as predict(), fitted.values(),
-and residuals() may be called on the cv_trendfilter() output." />
+See the Details section for guidelines on when cv_trendfilter()
+should be used versus sure_trendfilter()." />
 <meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
 
@@ -89,7 +84,7 @@ and residuals() may be called on the cv_trendfilter() output." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trendfiltering</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -128,7 +123,7 @@ and residuals() may be called on the cv_trendfilter() output." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Optimize the trend filtering hyperparameter by V-fold cross validation</h1>
+    <h1>Optimize a trend filtering model by V-fold cross validation</h1>
     <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/hyperparameter-tuning.R'><code>R/hyperparameter-tuning.R</code></a></small>
     <div class="hidden name"><code>cv_trendfilter.Rd</code></div>
     </div>
@@ -137,13 +132,8 @@ and residuals() may be called on the cv_trendfilter() output." />
     <p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
  For every candidate hyperparameter value, estimate the trend
 filtering model's out-of-sample error by \(V\)-fold cross validation.
-Many common regression loss functions are defined internally, and a cross
-validation curve is returned for each. Custom loss functions may also be
-passed via the <code>loss_funcs</code> argument. See the <strong>Loss functions</strong> section
-below for definitions of the internal loss functions, and for guidelines on
-when <code>cv_trendfilter()</code> should be used versus <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>.
-Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>,
-and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on the <code>cv_trendfilter()</code> output.</p>
+See the <strong>Details</strong> section for guidelines on when <code>cv_trendfilter()</code>
+should be used versus <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>cv_trendfilter</span><span class='op'>(</span>
@@ -215,9 +205,12 @@ only contain integer values <code>1</code>, ..., <code>V</code> designating the 
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>'cv_trendfilter'</code> and subclass
-'<code><a href='trendfilter.html'>trendfilter</a></code>'. This is a list with the elements below,
-as well as all elements from the '<code><a href='trendfilter.html'>trendfilter</a></code>' call.</p><dl>
+    <p>An object of class '<code>cv_trendfilter</code>' and subclass
+'<code><a href='trendfilter.html'>trendfilter</a></code>'. Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>,
+<code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on the
+<code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> output. A '<code>cv_trendfilter</code>' object is a list with
+the elements below, as well as all elements from the
+'<code><a href='trendfilter.html'>trendfilter</a></code>' call.</p><dl>
 <dt><code>lambda</code></dt><dd><p>Vector of candidate hyperparameter values (always returned
 in descending order).</p></dd>
 <dt><code>edf</code></dt><dd><p>Number of effective degrees of freedom in the trend filtering
@@ -286,7 +279,13 @@ present, observations with <code><a href='https://rdrr.io/r/base/NA.html'>is.na(
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Our recommendations for when to use <code>cv_trendfilter()</code> versus
+    <p>Many common regression loss functions are defined internally, and a
+cross validation curve is returned for each. Custom loss functions may also
+be passed via the <code>loss_funcs</code> argument. See the <strong>Loss functions</strong> section
+below for definitions of the internal loss functions.
+Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>,
+and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on the <code>cv_trendfilter()</code> output.</p>
+<p>Our recommendations for when to use <code>cv_trendfilter()</code> versus
 <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> are summarized in the table below. See Section 3.5 of
 <a href='https://arxiv.org/abs/1908.07151'>Politsch et al. (2020a)</a> for more details.</p><table class='table'>
 <tr><td>Scenario</td><td>Hyperparameter optimization</td></tr>

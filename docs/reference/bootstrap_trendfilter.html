@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Construct pointwise variability bands via a bootstrap algorithm that's
-tailored to the observed data — bootstrap_trendfilter • trendfiltering</title>
+<title>Construct pointwise variability bands via a bootstrap — bootstrap_trendfilter • trendfiltering</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -47,21 +46,9 @@ tailored to the observed data — bootstrap_trendfilter • trendfiltering</titl
 
 
 
-<meta property="og:title" content="Construct pointwise variability bands via a bootstrap algorithm that's
-tailored to the observed data — bootstrap_trendfilter" />
+<meta property="og:title" content="Construct pointwise variability bands via a bootstrap — bootstrap_trendfilter" />
 <meta property="og:description" content="Generate a bootstrap ensemble of trend filtering estimates in order to
-quantify the uncertainty in the optimized trend filtering estimate. One of
-three possible bootstrap algorithms should be chosen according to the
-criteria summarized in the Details section below. Pointwise variability
-bands are then obtained by passing the 'bootstrap_trendfilter' object to
-vbands(), along with the desired level (e.g. level = 0.95).
-Bootstrapping trend filtering estimators tends to yield more accurate
-uncertainties when, for each bootstrap estimate, we fix the number of
-effective degrees of freedom, edf (a reparametrization of the
-hyperparameter lambda), instead of fixing lambda itself. Thus,
-bootstrap_trendfilter() has an edf argument instead of lambda. See
-the edf argument description and Examples section for guidance on how
-edf can be chosen." />
+quantify the uncertainty in the optimized trend filtering estimate." />
 <meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
 
@@ -94,7 +81,7 @@ edf can be chosen." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trendfiltering</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -133,26 +120,14 @@ edf can be chosen." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Construct pointwise variability bands via a bootstrap algorithm that's
-tailored to the observed data</h1>
+    <h1>Construct pointwise variability bands via a bootstrap</h1>
     <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/bootstrapping.R'><code>R/bootstrapping.R</code></a></small>
     <div class="hidden name"><code>bootstrap_trendfilter.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Generate a bootstrap ensemble of trend filtering estimates in order to
-quantify the uncertainty in the optimized trend filtering estimate. One of
-three possible bootstrap algorithms should be chosen according to the
-criteria summarized in the <strong>Details</strong> section below. Pointwise variability
-bands are then obtained by passing the '<code>bootstrap_trendfilter</code>' object to
-<code><a href='vbands.html'>vbands()</a></code>, along with the desired level (e.g. <code>level = 0.95</code>).
-Bootstrapping trend filtering estimators tends to yield more accurate
-uncertainties when, for each bootstrap estimate, we fix the number of
-effective degrees of freedom, <code>edf</code> (a reparametrization of the
-hyperparameter <code>lambda</code>), instead of fixing <code>lambda</code> itself. Thus,
-<code>bootstrap_trendfilter()</code> has an <code>edf</code> argument instead of <code>lambda</code>. See
-the <code>edf</code> argument description and <strong>Examples</strong> section for guidance on how
-<code>edf</code> can be chosen.</p>
+quantify the uncertainty in the optimized trend filtering estimate.</p>
     </div>
 
     <pre class="usage"><span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span>
@@ -254,7 +229,17 @@ estimates), inherited from <code>obj</code>.</p></dd>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Our recommendations for when to use each of the possible settings
+    <p>One of three possible bootstrap algorithms should be chosen
+according to the criteria below. Pointwise variability bands are then
+obtained by passing the '<code>bootstrap_trendfilter</code>' object to <code><a href='vbands.html'>vbands()</a></code>,
+along with the desired level (e.g. <code>level = 0.95</code>). Bootstrapping trend
+filtering estimators tends to yield more accurate uncertainties when, for
+each bootstrap estimate, we fix the number of effective degrees of freedom,
+<code>edf</code> (a reparametrization of the hyperparameter <code>lambda</code>), instead of fixing
+<code>lambda</code> itself. Thus, <code>bootstrap_trendfilter()</code> has an <code>edf</code> argument
+instead of <code>lambda</code>. See the <code>edf</code> argument description and <strong>Examples</strong>
+section for guidance on how <code>edf</code> can be chosen.</p>
+<p>Our recommendations for when to use each of the possible settings
 for the <code>algorithm</code> argument are shown in the table below. See
 <a href='https://academic.oup.com/mnras/article/492/3/4005/5704413'>Politsch et al. (2020a)</a> for more details.</p><table class='table'>
 <tr><td>Scenario</td><td>Uncertainty quantification</td></tr>

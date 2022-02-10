@@ -2,8 +2,7 @@
 % Please edit documentation in R/bootstrapping.R
 \name{bootstrap_trendfilter}
 \alias{bootstrap_trendfilter}
-\title{Construct pointwise variability bands via a bootstrap algorithm that's
-tailored to the observed data}
+\title{Construct pointwise variability bands via a bootstrap}
 \usage{
 bootstrap_trendfilter(
   obj,
@@ -87,20 +86,20 @@ estimates), inherited from \code{obj}.}
 }
 \description{
 Generate a bootstrap ensemble of trend filtering estimates in order to
-quantify the uncertainty in the optimized trend filtering estimate. One of
-three possible bootstrap algorithms should be chosen according to the
-criteria summarized in the \strong{Details} section below. Pointwise variability
-bands are then obtained by passing the '\code{bootstrap_trendfilter}' object to
-\code{\link[=vbands]{vbands()}}, along with the desired level (e.g. \code{level = 0.95}).
-Bootstrapping trend filtering estimators tends to yield more accurate
-uncertainties when, for each bootstrap estimate, we fix the number of
-effective degrees of freedom, \code{edf} (a reparametrization of the
-hyperparameter \code{lambda}), instead of fixing \code{lambda} itself. Thus,
-\code{bootstrap_trendfilter()} has an \code{edf} argument instead of \code{lambda}. See
-the \code{edf} argument description and \strong{Examples} section for guidance on how
-\code{edf} can be chosen.
+quantify the uncertainty in the optimized trend filtering estimate.
 }
 \details{
+One of three possible bootstrap algorithms should be chosen
+according to the criteria below. Pointwise variability bands are then
+obtained by passing the '\code{bootstrap_trendfilter}' object to \code{\link[=vbands]{vbands()}},
+along with the desired level (e.g. \code{level = 0.95}). Bootstrapping trend
+filtering estimators tends to yield more accurate uncertainties when, for
+each bootstrap estimate, we fix the number of effective degrees of freedom,
+\code{edf} (a reparametrization of the hyperparameter \code{lambda}), instead of fixing
+\code{lambda} itself. Thus, \code{bootstrap_trendfilter()} has an \code{edf} argument
+instead of \code{lambda}. See the \code{edf} argument description and \strong{Examples}
+section for guidance on how \code{edf} can be chosen.
+
 Our recommendations for when to use each of the possible settings
 for the \code{algorithm} argument are shown in the table below. See
 \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for more details.\tabular{ll}{

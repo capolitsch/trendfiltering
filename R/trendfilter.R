@@ -1,8 +1,6 @@
 #' Fit a trend filtering model (front-end function focused on ease of use)
 #'
-#' Fit a trend filtering model. Generic functions such as [`predict()`],
-#' [`fitted.values()`], and [`residuals()`] may be called on the
-#' [`.trendfilter()`] output.
+#' Fit a trend filtering model.
 #'
 #' @param x
 #'   Vector of observed values for the input variable.
@@ -38,7 +36,9 @@
 #' @param ...
 #'   Additional named arguments. Currently unused.
 #'
-#' @return An object of class `'trendfilter'`. This is a list with the
+#' @return An object of class `'trendfilter'`. Generic functions such as
+#' [`predict()`], [`fitted.values()`], and [`residuals()`] may be called on
+#' objects of class `'trendfilter'`. A `'trendfilter'` object is a list with the
 #' following elements:
 #' \describe{
 #' \item{`x`}{Vector of observed values for the input variable.}
@@ -64,9 +64,11 @@
 #' every hyperparameter value in `lambda`. If an element of `n_iter` is exactly
 #' equal to `admm_params$max_iter`, then the ADMM algorithm stopped before
 #' reaching the objective tolerance `admm_params$obj_tol`. In these situations,
-#' you may need to increase the maximum number of tolerable iterations by
-#' passing a `max_iter` argument to `cv_trendfilter()` in order to ensure that
-#' the ADMM solution has converged to satisfactory precision.}
+#' you may need to increase the maximum number of tolerable iterations in order
+#' to ensure that the ADMM solution has converged to satisfactory precision.
+#' This can be done by passing an extra argument `max_iter` to the
+#' `.trendfilter` function call and increasing it from its default value
+#' `max_iter = length(y)`.}
 #' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
 #' \item{`scale`}{For internal use.}
@@ -258,9 +260,7 @@
 #' Fit a trend filtering model (back-end function with more options for expert
 #' users)
 #'
-#' Fit a trend filtering model. Generic functions such as [`predict()`],
-#' [`fitted.values()`], and [`residuals()`] may be called on the
-#' [`trendfilter()`] output.
+#' Fit a trend filtering model.
 #'
 #' @param x
 #'   Vector of observed values for the input variable.
@@ -283,7 +283,43 @@
 #'   Additional named arguments to pass to the internal/expert function
 #'   [`.trendfilter()`].
 #'
-#' @return An object of class `'trendfilter'`.
+#' @return An object of class `'trendfilter'`. Generic functions such as
+#' [`predict()`], [`fitted.values()`], and [`residuals()`] may be called on
+#' objects of class `'trendfilter'`. A `'trendfilter'` object is a list with the
+#' following elements:
+#' \describe{
+#' \item{`x`}{Vector of observed values for the input variable.}
+#' \item{`y`}{Vector of observed values for the output variable (if originally
+#' present, observations with `is.na(y)` or `weights == 0` are dropped).}
+#' \item{`weights`}{Vector of weights for the observed outputs.}
+#' \item{`k`}{Degree of the trend filtering estimate.}
+#' \item{`lambda`}{Vector of candidate hyperparameter values (always returned
+#' in descending order).}
+#' \item{`edf`}{Number of effective degrees of freedom in the trend filtering
+#' estimator, for every hyperparameter value in `lambda`.}
+#' \item{`fitted_values`}{The fitted values of the trend filtering estimate(s).
+#' If `length(lambda) == 1`, fitted values for the single fit are returned as a
+#' numeric vector. Otherwise, fitted values are returned in a matrix with
+#' `length(lambda)` columns, with `fitted_values[,i]` corresponding to the trend
+#' filtering estimate with hyperparameter `lambda[i]`.}
+#' \item{`admm_params`}{A list of the parameter values used by the ADMM
+#' algorithm used to solve the trend filtering convex optimization.}
+#' \item{`obj_func`}{The relative change in the objective function over the
+#' ADMM algorithm's final iteration, for every hyperparameter value in
+#' `lambda`.}
+#' \item{`n_iter`}{Total number of iterations taken by the ADMM algorithm, for
+#' every hyperparameter value in `lambda`. If an element of `n_iter` is exactly
+#' equal to `admm_params$max_iter`, then the ADMM algorithm stopped before
+#' reaching the objective tolerance `admm_params$obj_tol`. In these situations,
+#' you may need to increase the maximum number of tolerable iterations in order
+#' to ensure that the ADMM solution has converged to satisfactory precision.
+#' This can be done by passing an extra argument `max_iter` to the
+#' `trendfilter` function call and increasing it from its default value
+#' `max_iter = length(y)`.}
+#' \item{`status`}{For internal use. Output from the C solver.}
+#' \item{`call`}{The function call.}
+#' \item{`scale`}{For internal use.}
+#' }
 #'
 #' @references
 #' 1. Politsch et al. (2020a). Trend filtering – I. A modern statistical tool

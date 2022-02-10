@@ -2,7 +2,7 @@
 % Please edit documentation in R/hyperparameter-tuning.R
 \name{cv_trendfilter}
 \alias{cv_trendfilter}
-\title{Optimize the trend filtering hyperparameter by V-fold cross validation}
+\title{Optimize a trend filtering model by V-fold cross validation}
 \usage{
 cv_trendfilter(
   x,
@@ -50,9 +50,12 @@ only contain integer values \code{1}, ..., \code{V} designating the fold assignm
 \item{...}{Additional named arguments to pass to \code{\link[=.trendfilter]{.trendfilter()}}.}
 }
 \value{
-An object of class \code{'cv_trendfilter'} and subclass
-'\code{\link[=trendfilter]{trendfilter}}'. This is a list with the elements below,
-as well as all elements from the '\code{\link[=trendfilter]{trendfilter}}' call.
+An object of class '\code{cv_trendfilter}' and subclass
+'\code{\link[=trendfilter]{trendfilter}}'. Generic functions such as \code{\link[=predict]{predict()}},
+\code{\link[=fitted.values]{fitted.values()}}, and \code{\link[=residuals]{residuals()}} may be called on the
+\code{\link[=sure_trendfilter]{sure_trendfilter()}} output. A '\code{cv_trendfilter}' object is a list with
+the elements below, as well as all elements from the
+'\code{\link[=trendfilter]{trendfilter}}' call.
 \describe{
 \item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
 in descending order).}
@@ -123,15 +126,17 @@ present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
 \description{
 \loadmathjax For every candidate hyperparameter value, estimate the trend
 filtering model's out-of-sample error by \mjseqn{V}-fold cross validation.
-Many common regression loss functions are defined internally, and a cross
-validation curve is returned for each. Custom loss functions may also be
-passed via the \code{loss_funcs} argument. See the \strong{Loss functions} section
-below for definitions of the internal loss functions, and for guidelines on
-when \code{\link[=cv_trendfilter]{cv_trendfilter()}} should be used versus \code{\link[=sure_trendfilter]{sure_trendfilter()}}.
-Generic functions such as \code{\link[=predict]{predict()}}, \code{\link[=fitted.values]{fitted.values()}},
-and \code{\link[=residuals]{residuals()}} may be called on the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
+See the \strong{Details} section for guidelines on when \code{\link[=cv_trendfilter]{cv_trendfilter()}}
+should be used versus \code{\link[=sure_trendfilter]{sure_trendfilter()}}.
 }
 \details{
+Many common regression loss functions are defined internally, and a
+cross validation curve is returned for each. Custom loss functions may also
+be passed via the \code{loss_funcs} argument. See the \strong{Loss functions} section
+below for definitions of the internal loss functions.
+Generic functions such as \code{\link[=predict]{predict()}}, \code{\link[=fitted.values]{fitted.values()}},
+and \code{\link[=residuals]{residuals()}} may be called on the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
+
 Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} versus
 \code{\link[=sure_trendfilter]{sure_trendfilter()}} are summarized in the table below. See Section 3.5 of
 \href{https://arxiv.org/abs/1908.07151}{Politsch et al. (2020a)} for more details.\tabular{lc}{

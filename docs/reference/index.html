@@ -70,7 +70,7 @@
 </button>
 <span class="navbar-brand">
 <a class="navbar-link" href="../index.html">trendfiltering</a>
-<span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+<span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
 </span>
 </div>
 
@@ -156,8 +156,8 @@ users)</p>
 <td>
 <p><span style="color:red">(Not yet available)</span> Fit a "relaxed" trend filtering model by computing a
 weighted average of the
-standard trend filtering estimate and an (unpenalized) spline that shares the
-same knot set. The weighted average gives rise to a second model
+standard trend filtering estimate and a sparse least-squares estimate that shares
+the same active knot set. The weighted average gives rise to a second model
 hyperparameter that requires tuning.</p><br>
 </td>
 </tr>
@@ -335,8 +335,6 @@ by the Kepler space telescope</p></td>
 
 
 </tbody>
-
-
 
 
 

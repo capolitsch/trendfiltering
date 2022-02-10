@@ -2,8 +2,7 @@
 % Please edit documentation in R/hyperparameter-tuning.R
 \name{sure_trendfilter}
 \alias{sure_trendfilter}
-\title{Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
-risk estimate}
+\title{Optimize a trend filtering model by minimizing Stein's unbiased risk estimate}
 \usage{
 sure_trendfilter(x, y, weights, nlambda = 250L, ...)
 }
@@ -28,8 +27,11 @@ controlling the granularity of the hyperparameter grid.}
 }
 \value{
 An object of class '\code{sure_trendfilter}' and subclass
-'\code{\link[=trendfilter]{trendfilter}}'. This is a list with the elements below,
-as well as all elements from the '\code{\link[=trendfilter]{trendfilter}}' call.
+'\code{\link[=trendfilter]{trendfilter}}'. Generic functions such as \code{\link[=predict]{predict()}},
+\code{\link[=fitted.values]{fitted.values()}}, and \code{\link[=residuals]{residuals()}} may be called on the
+\code{\link[=sure_trendfilter]{sure_trendfilter()}} output. A '\code{sure_trendfilter}' object is a list with
+the elements below, as well as all elements from the
+'\code{\link[=trendfilter]{trendfilter}}' call.
 \describe{
 \item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
 in descending order).}
@@ -90,9 +92,7 @@ present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
 For every candidate hyperparameter value, compute an unbiased estimate of the
 trend filtering model's predictive mean-squared error. See the \strong{Details}
 section for guidelines on when \code{\link[=sure_trendfilter]{sure_trendfilter()}} should be used versus
-\code{\link[=cv_trendfilter]{cv_trendfilter()}}. Generic functions such as \code{\link[=predict]{predict()}},
-\code{\link[=fitted.values]{fitted.values()}}, and \code{\link[=residuals]{residuals()}} may be called on the
-\code{\link[=sure_trendfilter]{sure_trendfilter()}} output.
+\code{\link[=cv_trendfilter]{cv_trendfilter()}}.
 }
 \details{
 Our recommendations for when to use \code{\link[=sure_trendfilter]{sure_trendfilter()}} versus

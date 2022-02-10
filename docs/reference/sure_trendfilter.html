@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
-risk estimate — sure_trendfilter • trendfiltering</title>
+<title>Optimize a trend filtering model by minimizing Stein's unbiased risk estimate — sure_trendfilter • trendfiltering</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -47,14 +46,11 @@ risk estimate — sure_trendfilter • trendfiltering</title>
 
 
 
-<meta property="og:title" content="Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
-risk estimate — sure_trendfilter" />
+<meta property="og:title" content="Optimize a trend filtering model by minimizing Stein's unbiased risk estimate — sure_trendfilter" />
 <meta property="og:description" content="For every candidate hyperparameter value, compute an unbiased estimate of the
 trend filtering model's predictive mean-squared error. See the Details
 section for guidelines on when sure_trendfilter() should be used versus
-cv_trendfilter(). Generic functions such as predict(),
-fitted.values(), and residuals() may be called on the
-sure_trendfilter() output." />
+cv_trendfilter()." />
 <meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
 
@@ -87,7 +83,7 @@ sure_trendfilter() output." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trendfiltering</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -126,8 +122,7 @@ sure_trendfilter() output." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
-risk estimate</h1>
+    <h1>Optimize a trend filtering model by minimizing Stein's unbiased risk estimate</h1>
     <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/hyperparameter-tuning.R'><code>R/hyperparameter-tuning.R</code></a></small>
     <div class="hidden name"><code>sure_trendfilter.Rd</code></div>
     </div>
@@ -136,9 +131,7 @@ risk estimate</h1>
     <p>For every candidate hyperparameter value, compute an unbiased estimate of the
 trend filtering model's predictive mean-squared error. See the <strong>Details</strong>
 section for guidelines on when <code>sure_trendfilter()</code> should be used versus
-<code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>. Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>,
-<code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on the
-<code>sure_trendfilter()</code> output.</p>
+<code><a href='cv_trendfilter.html'>cv_trendfilter()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>sure_trendfilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span>, nlambda <span class='op'>=</span> <span class='fl'>250L</span>, <span class='va'>...</span><span class='op'>)</span></pre>
@@ -179,8 +172,11 @@ controlling the granularity of the hyperparameter grid.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class '<code>sure_trendfilter</code>' and subclass
-'<code><a href='trendfilter.html'>trendfilter</a></code>'. This is a list with the elements below,
-as well as all elements from the '<code><a href='trendfilter.html'>trendfilter</a></code>' call.</p><dl>
+'<code><a href='trendfilter.html'>trendfilter</a></code>'. Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>,
+<code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on the
+<code>sure_trendfilter()</code> output. A '<code>sure_trendfilter</code>' object is a list with
+the elements below, as well as all elements from the
+'<code><a href='trendfilter.html'>trendfilter</a></code>' call.</p><dl>
 <dt><code>lambda</code></dt><dd><p>Vector of candidate hyperparameter values (always returned
 in descending order).</p></dd>
 <dt><code>edf</code></dt><dd><p>Number of effective degrees of freedom in the trend filtering
