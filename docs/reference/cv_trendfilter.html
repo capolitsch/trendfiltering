@@ -194,8 +194,8 @@ below for an example.</p></td>
     <tr>
       <th>fold_ids</th>
       <td><p>An integer vector defining a custom partition of the data for cross
-validation. <code>fold_ids</code> must have the same length as <code>x</code> and <code>y</code>, and
-only contain integer values <code>1</code>, ..., <code>V</code> designating the fold assignments.</p></td>
+validation. <code>fold_ids</code> must have the same length as <code>x</code> and <code>y</code>, and only
+contain integer values <code>1</code>, ..., <code>V</code> designating the fold assignments.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -272,7 +272,7 @@ present, observations with <code><a href='https://rdrr.io/r/base/NA.html'>is.na(
 <dt><code>k</code></dt><dd><p>Degree of the trend filtering estimates.</p></dd>
 <dt><code>status</code></dt><dd><p>For internal use. Output from the C solver.</p></dd>
 <dt><code>call</code></dt><dd><p>The function call.</p></dd>
-<dt><code>xy_scale</code></dt><dd><p>For internal use.</p></dd>
+<dt><code>scale_xy</code></dt><dd><p>For internal use.</p></dd>
 
 </dl>
 
@@ -394,7 +394,7 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
   max_iter <span class='op'>=</span> <span class='fl'>1e4</span>,
   obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

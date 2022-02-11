@@ -163,12 +163,11 @@ computational cost is acceptable).</p></td>
     <tr>
       <th>edf</th>
       <td><p>The desired number of effective degrees of freedom in each bootstrap
-estimate. When <code>obj</code> is of class
-'<code><a href='sure_trendfilter.html'>sure_trendfilter</a></code>', <code>edf = obj$edf_min</code> and
-<code>edf = obj$edf_1se</code> are advisible options. When <code>obj</code> is of class
-'<code><a href='cv_trendfilter.html'>cv_trendfilter</a></code>', any element of the (now vectors)
-<code>obj$edf_min</code> and <code>obj$edf_1se</code> may be a reasonable choice. Defaults to
-<code>edf = obj$edf_min["MAE"]</code>.</p></td>
+estimate. When <code>obj</code> is of class <code><a href='sure_trendfilter.html'>sure_trendfilter</a></code>',
+<code>edf = obj$edf_min</code> and <code>edf = obj$edf_1se</code> are advisible options. When
+<code>obj</code> is of class <code><a href='cv_trendfilter.html'>cv_trendfilter</a></code>', any element of the
+(now vectors) <code>obj$edf_min</code> and <code>obj$edf_1se</code> may be a reasonable choice.
+Defaults to <code>edf = obj$edf_min["MAE"]</code>.</p></td>
     </tr>
     <tr>
       <th>mc_cores</th>
@@ -223,7 +222,7 @@ estimates with hyperparameter values in <code>lambda</code>, inherited from <cod
 <dt><code>k</code></dt><dd><p>Degree of the trend filtering point estimate (and bootstrap
 estimates), inherited from <code>obj</code>.</p></dd>
 <dt><code>call</code></dt><dd><p>The function call.</p></dd>
-<dt><code>xy_scale</code></dt><dd><p>For internal use.</p></dd>
+<dt><code>scale_xy</code></dt><dd><p>For internal use.</p></dd>
 
 </dl>
 
@@ -306,13 +305,13 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
   max_iter <span class='op'>=</span> <span class='fl'>1e4</span>,
   obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='input'>
+
 <span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span>
   obj <span class='op'>=</span> <span class='va'>cv_tf</span>,
   algorithm <span class='op'>=</span> <span class='st'>"nonparametric"</span>,
   edf <span class='op'>=</span> <span class='va'>cv_tf</span><span class='op'>$</span><span class='va'>edf_min</span><span class='op'>[</span><span class='st'>"MAE"</span><span class='op'>]</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in if (edf_opt &lt; obj$k + 1 || edf_opt &gt; length(obj$x)) {    stop("`edf` must be greater than `k + 1` and less than n. See ",         "`obj$edf_min` and `obj$edf_1se` for reasonable choices.")}: missing value where TRUE/FALSE needed</span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: scheduled cores 5, 2 encountered errors in user code, all values of the jobs will be affected</span></div><div class='output co'>#&gt; <span class='error'>Error in par_out[[X]][["tf_estimate_boot"]]: subscript out of bounds</span></div><div class='input'>
 <span class='co'># Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar</span>
 
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"quasar_spectrum"</span><span class='op'>)</span>

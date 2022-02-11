@@ -2,7 +2,7 @@ pandoc: 2.14.0.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles: {}
-last_built: 2022-02-11T02:38Z
+last_built: 2022-02-11T04:38Z
 urls:
   reference: https://capolitsch.github.io/trendfiltering/reference
   article: https://capolitsch.github.io/trendfiltering/articles
