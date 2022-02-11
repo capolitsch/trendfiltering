@@ -169,11 +169,11 @@ Otherwise, <code>weights</code> must be a vector with the same length as <code>x
     </tr>
     <tr>
       <th>nlambda</th>
-      <td><p>Number of hyperparameter values to test during cross validation. Defaults
-to <code>nlambda = 250</code>. The hyperparameter grid is internally constructed to
-span the full trend filtering model space (which is bookended by a global
-polynomial solution and an interpolating solution), with <code>nlambda</code>
-controlling the granularity of the hyperparameter grid.</p></td>
+      <td><p>Number of hyperparameter values to evaluate during cross validation.
+Defaults to <code>nlambda = 250</code>. The hyperparameter grid is internally
+constructed to span the full trend filtering model space (which is
+bookended by a global polynomial solution and an interpolating solution),
+with <code>nlambda</code> controlling the granularity of the hyperparameter grid.</p></td>
     </tr>
     <tr>
       <th>V</th>
@@ -205,12 +205,12 @@ only contain integer values <code>1</code>, ..., <code>V</code> designating the 
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class '<code>cv_trendfilter</code>' and subclass
-'<code><a href='trendfilter.html'>trendfilter</a></code>'. Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>,
-<code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on the
-<code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> output. A '<code>cv_trendfilter</code>' object is a list with
-the elements below, as well as all elements from the
-'<code><a href='trendfilter.html'>trendfilter</a></code>' call.</p><dl>
+    <p>An object of class '<code>cv_trendfilter</code>'. The object has subclass
+'<code><a href='trendfilter.html'>trendfilter</a></code>' and may therefore be passed to generic
+stats functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code>.
+And more precisely, a <code>cv_trendfilter</code>' object is a list with the elements
+below, as well as all elements from a <code><a href='trendfilter.html'>trendfilter</a></code>' call
+on the full data set.</p><dl>
 <dt><code>lambda</code></dt><dd><p>Vector of candidate hyperparameter values (always returned
 in descending order).</p></dd>
 <dt><code>edf</code></dt><dd><p>Number of effective degrees of freedom in the trend filtering
@@ -255,13 +255,12 @@ algorithm used to solve the trend filtering convex optimization.</p></dd>
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 <code>lambda</code>.</p></dd>
 <dt><code>n_iter</code></dt><dd><p>Total number of iterations taken by the ADMM algorithm, for
-every candidate hyperparameter in <code>lambda</code>. If an element of <code>n_iter</code>
-is exactly equal to <code>admm_params$max_iter</code>, then the
-ADMM algorithm stopped before reaching the objective tolerance
-<code>admm_params$obj_tol</code>. In these situations, you may need to
-increase the maximum number of tolerable iterations by passing a
-<code>max_iter</code> argument to <code>cv_trendfilter()</code> in order to ensure that the ADMM
-solution has converged to satisfactory precision.</p></dd>
+every candidate hyperparameter in <code>lambda</code>. If an element of <code>n_iter</code> is
+exactly equal to <code>admm_params$max_iter</code>, then the ADMM algorithm stopped
+before reaching the objective tolerance <code>admm_params$obj_tol</code>. In these
+situations, you may need to increase the maximum number of tolerable
+iterations by passing a <code>max_iter</code> argument to <code>cv_trendfilter()</code> in order
+to ensure that the ADMM solution has converged to satisfactory precision.</p></dd>
 <dt><code>loss_funcs</code></dt><dd><p>A named list of functions that defines all loss functions
 --- both internal and user-passed --- evaluated during cross validation.</p></dd>
 <dt><code>V</code></dt><dd><p>The number of folds the data were split into for cross
@@ -273,7 +272,7 @@ present, observations with <code><a href='https://rdrr.io/r/base/NA.html'>is.na(
 <dt><code>k</code></dt><dd><p>Degree of the trend filtering estimates.</p></dd>
 <dt><code>status</code></dt><dd><p>For internal use. Output from the C solver.</p></dd>
 <dt><code>call</code></dt><dd><p>The function call.</p></dd>
-<dt><code>scale</code></dt><dd><p>For internal use.</p></dd>
+<dt><code>xy_scale</code></dt><dd><p>For internal use.</p></dd>
 
 </dl>
 
@@ -283,8 +282,8 @@ present, observations with <code><a href='https://rdrr.io/r/base/NA.html'>is.na(
 cross validation curve is returned for each. Custom loss functions may also
 be passed via the <code>loss_funcs</code> argument. See the <strong>Loss functions</strong> section
 below for definitions of the internal loss functions.
-Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>,
-and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on the <code>cv_trendfilter()</code> output.</p>
+Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may
+be called on the <code>cv_trendfilter()</code> output.</p>
 <p>Our recommendations for when to use <code>cv_trendfilter()</code> versus
 <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> are summarized in the table below. See Section 3.5 of
 <a href='https://arxiv.org/abs/1908.07151'>Politsch et al. (2020a)</a> for more details.</p><table class='table'>
@@ -395,7 +394,7 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
   max_iter <span class='op'>=</span> <span class='fl'>1e4</span>,
   obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span>
 <span class='op'>)</span>
-</div></pre>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

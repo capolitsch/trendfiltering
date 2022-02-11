@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fit a trend filtering model (front-end function focused on ease of use) — .trendfilter • trendfiltering</title>
+<title>Fit a trend filtering model (back-end function with more options for experts) — .trendfilter • trendfiltering</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,7 @@
 
 
 
-<meta property="og:title" content="Fit a trend filtering model (front-end function focused on ease of use) — .trendfilter" />
+<meta property="og:title" content="Fit a trend filtering model (back-end function with more options for experts) — .trendfilter" />
 <meta property="og:description" content="Fit a trend filtering model." />
 <meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
@@ -119,7 +119,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fit a trend filtering model (front-end function focused on ease of use)</h1>
+    <h1>Fit a trend filtering model (back-end function with more options for experts)</h1>
     <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/trendfilter.R'><code>R/trendfilter.R</code></a></small>
     <div class="hidden name"><code>dot-trendfilter.Rd</code></div>
     </div>
@@ -194,14 +194,18 @@ convex optimization algorithm. Defaults to <code>max_iter = length(y)</code>.</p
       <th>...</th>
       <td><p>Additional named arguments. Currently unused.</p></td>
     </tr>
+    <tr>
+      <th>scale</th>
+      <td><p>A logical</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class <code>'trendfilter'</code>. Generic functions such as
-<code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on
-objects of class <code>'trendfilter'</code>. A <code>'trendfilter'</code> object is a list with the
-following elements:</p><dl>
+<code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on any object
+of class (or subclass) <code>'trendfilter'</code>. A <code>'trendfilter'</code> object is a list
+with the following elements:</p><dl>
 <dt><code>x</code></dt><dd><p>Vector of observed values for the input variable.</p></dd>
 <dt><code>y</code></dt><dd><p>Vector of observed values for the output variable (if originally
 present, observations with <code><a href='https://rdrr.io/r/base/NA.html'>is.na(y)</a></code> or <code>weights == 0</code> are dropped).</p></dd>
@@ -232,7 +236,7 @@ This can be done by passing an extra argument <code>max_iter</code> to the
 <code>max_iter = length(y)</code>.</p></dd>
 <dt><code>status</code></dt><dd><p>For internal use. Output from the C solver.</p></dd>
 <dt><code>call</code></dt><dd><p>The function call.</p></dd>
-<dt><code>scale</code></dt><dd><p>For internal use.</p></dd>
+<dt><code>xy_scale</code></dt><dd><p>For internal use.</p></dd>
 
 </dl>
 

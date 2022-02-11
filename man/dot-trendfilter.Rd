@@ -3,8 +3,7 @@
 \name{.trendfilter}
 \alias{.trendfilter}
 \alias{dot-trendfilter}
-\title{Fit a trend filtering model (back-end function with more options for expert
-users)}
+\title{Fit a trend filtering model (back-end function with more options for experts)}
 \usage{
 .trendfilter(
   x,

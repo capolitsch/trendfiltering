@@ -144,8 +144,7 @@
 <p><code><a href="dot-trendfilter.html">.trendfilter()</a></code></p>
 </td>
 <td>
-<p>Fit a trend filtering model (back-end function with more options for expert
-users)</p>
+<p>Fit a trend filtering model (back-end function with more options for experts)</p>
 </td>
 </tr>
 
@@ -154,11 +153,9 @@ users)</p>
 <p><code>relax_trendfilter()</code></p>
 </td>
 <td>
-<p><span style="color:red">(Not yet available)</span> Fit a "relaxed" trend filtering model by computing a
-weighted average of the
-standard trend filtering estimate and a sparse least-squares estimate that shares
-the same active knot set. The weighted average gives rise to a second model
-hyperparameter that requires tuning.</p><br>
+<p><span style="color:red">(Not yet available)</span> Fit a "relaxed" trend filtering
+model by computing a weighted average of the standard trend filtering estimate and an
+(unpenalized) spline that shares the same knot set.</p><br>
 </td>
 </tr>
 
@@ -204,8 +201,7 @@ risk estimate</p><br>
 
 <tr>
 <td>
-<p><code><a href="bootstrap_trendfilter.html">bootstrap_trendfilter(<i>&lt;cv_trendfilter&gt;</i>)</a></code>
-<code><a href="bootstrap_trendfilter.html">bootstrap_trendfilter(<i>&lt;sure_trendfilter&gt;</i>)</a></code></p>
+<p><code><a href="bootstrap_trendfilter.html">bootstrap_trendfilter(<i>&lt;trendfilter&gt;</i>)</a></code></p>
 </td>
 <td>
 <p>Generate an ensemble of trend filtering estimates via a bootstrap</p>
@@ -229,15 +225,8 @@ risk estimate</p><br>
 <tbody>
 <tr>
 <th colspan="2">
-<h2 id="section-stats" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Call generic <tt>stats</tt> functions on trend filtering objects</h2>
+<h2 id="section-stats" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Call generic <tt>stats</tt> functions</h2>
 <p class="section-desc"></p>
-<p>Objects of class <code>'<a href="cv_trendfilter.html">cv_trendfilter</a>'</code>,
-<code>'<a href="sure_trendfilter.html">sure_trendfilter</a>'</code>,
-<code>'relax_trendfilter'</code>, and
-<code>'<a href="bootstrap_trendfilter.html">bootstrap_trendfilter</a>'</code>
-all share the base class <code>'<a href="trendfilter.html">trendfilter</a>'</code>,
-and therefore may be passed to these <tt><a href='https://rdrr.io/r/stats/stats-package.html'>stats</a></tt>
-package generic functions.</p><br>
 </th>
 </tr>
 
@@ -264,12 +253,23 @@ package generic functions.</p><br>
 
 </tbody>
 
+
+
+
+
 <tbody>
 <tr>
 <th colspan="2">
-<h2 id="section-summary" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Summarize trend filtering objects</h2>
+<h2 id="section-plot" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Plot and summarize models</h2>
 <p class="section-desc"></p>
 </th>
+</tr>
+
+<tr>
+<td>
+<p><code>plot(<i>&lt;trendfilter&gt;</i>)</code></p>
+</td>
+<td><p><span style="color:red">(Not yet available)</span></p></td>
 </tr>
 
 <tr>
@@ -287,25 +287,6 @@ package generic functions.</p><br>
 <p><span style="color:red">(Not yet available)</span></p></td>
 </tr>
 
-</tbody>
-
-
-
-<tbody>
-<tr>
-<th colspan="2">
-<h2 id="section-plot" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Plotting</h2>
-<p class="section-desc"></p>
-</th>
-</tr>
-
-<tr>
-<td>
-<p><code>plot(<i>&lt;trendfilter&gt;</i>)</code></p>
-</td>
-<td><p><span style="color:red">(Not yet available)</span></p></td>
-</tr>
-
 
 </tbody>
 
@@ -313,7 +294,7 @@ package generic functions.</p><br>
 <tbody>
 <tr>
 <th colspan="2">
-<h2 id="section-data" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Data sets</h2>
+<h2 id="section-data" class="hasAnchor"><a href="#section-functions" class="anchor"></a>Data</h2>
 <p class="section-desc"></p>
 </th>
 </tr>
@@ -322,8 +303,7 @@ package generic functions.</p><br>
 <td>
 <p><code><a href="eclipsing_binary.html">data(eclipsing_binary)</a></code></p>
 </td>
-<td><p>Phase-folded light curve of an eclipsing binary star system, observed
-by the Kepler space telescope</p></td>
+<td><p>Phase-folded light curve of an eclipsing binary star system</p></td>
 </tr>
 
 <tr>
@@ -335,6 +315,8 @@ by the Kepler space telescope</p></td>
 
 
 </tbody>
+
+
 
 
 

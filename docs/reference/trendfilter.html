@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fit a trend filtering model (back-end function with more options for expert
-users) — trendfilter • trendfiltering</title>
+<title>Fit a trend filtering model (front-end function focused on ease of use) — trendfilter • trendfiltering</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -47,8 +46,7 @@ users) — trendfilter • trendfiltering</title>
 
 
 
-<meta property="og:title" content="Fit a trend filtering model (back-end function with more options for expert
-users) — trendfilter" />
+<meta property="og:title" content="Fit a trend filtering model (front-end function focused on ease of use) — trendfilter" />
 <meta property="og:description" content="Fit a trend filtering model." />
 <meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
@@ -91,7 +89,7 @@ users) — trendfilter" />
         <li>
   <a href="../index.html">
     <span class="fas fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
@@ -105,24 +103,23 @@ users) — trendfilter" />
         <li>
   <a href="https://github.com/capolitsch/trendfiltering">
     <span class="fab fa-github fa-lg"></span>
-
+     
   </a>
 </li>
       </ul>
-
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-
+      
 
       </header>
 
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fit a trend filtering model (back-end function with more options for expert
-users)</h1>
+    <h1>Fit a trend filtering model (front-end function focused on ease of use)</h1>
     <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/trendfilter.R'><code>R/trendfilter.R</code></a></small>
     <div class="hidden name"><code>trendfilter.Rd</code></div>
     </div>
@@ -146,13 +143,12 @@ users)</h1>
     </tr>
     <tr>
       <th>weights</th>
-      <td><p>Weights for the output measurements. Output weights are defined as
-      the inverse variance of the additive noise that contaminates the output
-      signal. When the noise is expected to have a constant variance \(\sigma^2\)
-      over all outputs, a scalar may be passed to <code>weights</code>, i.e.
-      <code>weights = </code>\(1/\sigma^2\). Otherwise, <code>weights</code>
-      must be a vector with the same length as <code>x</code> and
-      <code>y</code>.</p></td>
+      <td><p>Weights for the output measurements. Output weights are defined as the
+inverse variance of the additive noise that contaminates the output signal.
+When the noise is expected to have a constant variance \(\sigma^2\)
+over all outputs, a scalar may be passed to <code>weights</code>, i.e.
+<code>weights = </code>\(1/\sigma^2\). Otherwise, <code>weights</code> must be a vector with
+the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
     <tr>
       <th>lambda</th>
@@ -167,16 +163,16 @@ freedom in each model.</p></td>
     <tr>
       <th>...</th>
       <td><p>Additional named arguments to pass to the internal/expert function
-<code><a href='dot-trendfilter.html'>.trendfilter()</a></code>.</p></td>
+<code><a href='.trendfilter.html'>.trendfilter()</a></code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class <code>'trendfilter'</code>. Generic functions such as
-<code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on
-objects of class <code>'trendfilter'</code>. A <code>'trendfilter'</code> object is a list with the
-following elements:</p><dl>
+<code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on any object
+of class (or subclass) <code>'trendfilter'</code>. A <code>'trendfilter'</code> object is a list
+with the following elements:</p><dl>
 <dt><code>x</code></dt><dd><p>Vector of observed values for the input variable.</p></dd>
 <dt><code>y</code></dt><dd><p>Vector of observed values for the output variable (if originally
 present, observations with <code><a href='https://rdrr.io/r/base/NA.html'>is.na(y)</a></code> or <code>weights == 0</code> are dropped).</p></dd>
@@ -207,13 +203,13 @@ This can be done by passing an extra argument <code>max_iter</code> to the
 <code>max_iter = length(y)</code>.</p></dd>
 <dt><code>status</code></dt><dd><p>For internal use. Output from the C solver.</p></dd>
 <dt><code>call</code></dt><dd><p>The function call.</p></dd>
-<dt><code>scale</code></dt><dd><p>For internal use.</p></dd>
+<dt><code>xy_scale</code></dt><dd><p>For internal use.</p></dd>
 
 </dl>
 
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-
+    
 <ol>
 <li><p>Politsch et al. (2020a). Trend filtering – I. A modern statistical tool
 for time-domain astronomy and astronomical spectroscopy. <em>MNRAS</em>, 492(3),
@@ -266,7 +262,7 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
       </footer>
    </div>
 
-
+  
 
 
   </body>

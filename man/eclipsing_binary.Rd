@@ -14,10 +14,11 @@ A tibble with column set \code{c("phase", "flux", "std_err")}.
 eclipsing_binary
 }
 \description{
-A binary star system's apparent brightness time series, collected by NASA's
-\href{https://www.nasa.gov/mission_pages/kepler/overview/index.html}{\emph{Kepler} mission}. The
-gravitationally-bound pair of stars in the system orbit each other with a
-period of ~1.56 Earth days. The system's \emph{Kepler} identification is KIC
+A time series of a binary star system's apparent brightness, collected by
+NASA's \href{https://www.nasa.gov/mission_pages/kepler/overview/index.html}{\emph{Kepler} mission}. These
+"eclipsing binary" stars orbit one other with a period of ~1.56
+Earth days and eclipse one another from the perspective of Earthly observers.
+The \emph{Kepler} identification number for this eclipsing binary system is KIC
 6048106.
 }
 \keyword{datasets}

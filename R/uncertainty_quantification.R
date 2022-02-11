@@ -60,10 +60,10 @@
 #'
 #' @return An object of class '`bootstrap_trendfilter`' and subclass
 #' '[`trendfilter`][trendfilter()]'. Generic functions such as [`predict()`],
-#' [`fitted.values()`], and [`residuals()`] may also be called on
-#' `bootstrap_trendfilter()` objects, with the same effect as if they were
-#' called on the `obj` argument originally passed to `bootstrap_trendfilter()`.
-#' A `bootstrap_trendfilter` object is a list containing the follow elements:
+#' [`fitted`], and [`residuals()`] may also be called on `bootstrap_trendfilter`
+#' objects, with the same effect as if they were called on the `obj` argument
+#' originally passed to `bootstrap_trendfilter()`. A `bootstrap_trendfilter`
+#' object is a list containing the follow elements:
 #' \describe{
 #' \item{`x_eval`}{Input grid that each bootstrap trend filtering estimate was
 #' evaluated on.}
@@ -98,7 +98,7 @@
 #' \item{`k`}{Degree of the trend filtering point estimate (and bootstrap
 #' estimates), inherited from `obj`.}
 #' \item{`call`}{The function call.}
-#' \item{`scale`}{For internal use.}
+#' \item{`xy_scale`}{For internal use.}
 #' }
 #'
 #' @references
@@ -164,7 +164,7 @@
 #' @importFrom magrittr %>% %<>%
 #' @importFrom rlang %||%
 #' @importFrom parallel mclapply detectCores
-#' @importFrom stats residuals fitted.values sd
+#' @importFrom stats residuals fitted sd
 #' @export
 bootstrap_trendfilter <- function(obj,
                                   algorithm = c("nonparametric","parametric","wild"),
@@ -273,23 +273,23 @@ bootstrap_trendfilter <- function(obj,
   )[[1]]
 
   dat_scaled <- tibble(
-    x = obj$x / obj$scale["x"],
-    y = obj$y / obj$scale["y"],
-    weights = obj$weights * obj$scale["y"]^2
+    x = obj$x / obj$xy_scale["x"],
+    y = obj$y / obj$xy_scale["y"],
+    weights = obj$weights * obj$xy_scale["y"]^2
   )
 
   lambda_opt <- obj$lambda[i_opt]
 
   if (algorithm == "parametric") {
     dat_scaled %<>% mutate(
-      fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale["y"]
+      fitted_values = fitted(obj, lambda = lambda_opt) / obj$xy_scale["y"]
     )
   }
 
   if (algorithm == "wild") {
     dat_scaled %<>% mutate(
-      fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale["y"],
-      residuals = residuals(obj, lambda = lambda_opt) / obj$scale["y"]
+      fitted_values = fitted(obj, lambda = lambda_opt) / obj$xy_scale["y"],
+      residuals = residuals(obj, lambda = lambda_opt) / obj$xy_scale["y"]
     )
   }
 
@@ -302,10 +302,10 @@ bootstrap_trendfilter <- function(obj,
     edf_opt = edf_opt,
     lambda_grid = lambda_grid,
     sampler = sampler,
-    x_eval = x_eval / obj$scale["x"],
+    x_eval = x_eval / obj$xy_scale["x"],
     edf_tol = edf_tol,
     zero_tol = zero_tol,
-    scale = obj$scale,
+    xy_scale = obj$xy_scale,
     mc.cores = mc_cores
   )
 
@@ -355,7 +355,7 @@ bootstrap_trendfilter <- function(obj,
         weights = obj$weights,
         k = obj$k,
         call = boot.call,
-        scale = obj$scale
+        xy_scale = obj$xy_scale
       ),
       class = c("bootstrap_trendfilter", "trendfilter", "trendfiltering")
     )
@@ -374,7 +374,7 @@ bootstrap_parallel <- function(b,
                                x_eval,
                                edf_tol,
                                zero_tol,
-                               scale) {
+                               xy_scale) {
   dat_scaled <- sampler(dat_scaled)
 
   fit <- .trendfilter(
@@ -404,7 +404,7 @@ bootstrap_parallel <- function(b,
         x_eval,
         edf_tol,
         zero_tol,
-        scale
+        xy_scale
       )
     )
   }
@@ -417,7 +417,7 @@ bootstrap_parallel <- function(b,
     lambda = lambda_boot,
     x_eval = x_eval,
     zero_tol = zero_tol
-  ) * scale["y"]
+  ) * xy_scale["y"]
 
   tf_estimate_boot %<>% as.numeric()
   names(tf_estimate_boot) <- NULL
@@ -434,7 +434,7 @@ bootstrap_parallel <- function(b,
 #' Bootstrap sampling/resampling functions
 #'
 #' @param dat A tibble or data frame with minimal column set: `x` and `y` (for
-#' all samplers), `weights` and `fitted.values` (for `parametric.sampler`), and
+#' all samplers), `weights` and `fitted` (for `parametric.sampler`), and
 #' `residuals` (for `wild.sampler`).
 #'
 #' @return Bootstrap sample returned in the same format as `dat`.

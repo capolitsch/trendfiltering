@@ -121,7 +121,7 @@ quantify the uncertainty in the optimized trend filtering estimate." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Construct pointwise variability bands via a bootstrap</h1>
-    <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/bootstrapping.R'><code>R/bootstrapping.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/uncertainty_quantification.R'><code>R/uncertainty_quantification.R</code></a></small>
     <div class="hidden name"><code>bootstrap_trendfilter.Rd</code></div>
     </div>
 
@@ -186,10 +186,10 @@ may be passed by experts.</p></td>
 
     <p>An object of class '<code>bootstrap_trendfilter</code>' and subclass
 '<code><a href='trendfilter.html'>trendfilter</a></code>'. Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>,
-<code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may also be called on
-<code>bootstrap_trendfilter()</code> objects, with the same effect as if they were
-called on the <code>obj</code> argument originally passed to <code>bootstrap_trendfilter()</code>.
-A <code>bootstrap_trendfilter</code> object is a list containing the follow elements:</p><dl>
+<code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may also be called on <code>bootstrap_trendfilter</code>
+objects, with the same effect as if they were called on the <code>obj</code> argument
+originally passed to <code>bootstrap_trendfilter()</code>. A <code>bootstrap_trendfilter</code>
+object is a list containing the follow elements:</p><dl>
 <dt><code>x_eval</code></dt><dd><p>Input grid that each bootstrap trend filtering estimate was
 evaluated on.</p></dd>
 <dt><code>ensemble</code></dt><dd><p>The full trend filtering bootstrap ensemble as a matrix
@@ -223,7 +223,7 @@ estimates with hyperparameter values in <code>lambda</code>, inherited from <cod
 <dt><code>k</code></dt><dd><p>Degree of the trend filtering point estimate (and bootstrap
 estimates), inherited from <code>obj</code>.</p></dd>
 <dt><code>call</code></dt><dd><p>The function call.</p></dd>
-<dt><code>scale</code></dt><dd><p>For internal use.</p></dd>
+<dt><code>xy_scale</code></dt><dd><p>For internal use.</p></dd>
 
 </dl>
 
@@ -306,13 +306,13 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
   max_iter <span class='op'>=</span> <span class='fl'>1e4</span>,
   obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span>
 <span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='output co'>#&gt; <span class='warning'>Warning: no non-missing arguments to min; returning Inf</span></div><div class='input'>
 <span class='va'>boot_tf</span> <span class='op'>&lt;-</span> <span class='fu'>bootstrap_trendfilter</span><span class='op'>(</span>
   obj <span class='op'>=</span> <span class='va'>cv_tf</span>,
   algorithm <span class='op'>=</span> <span class='st'>"nonparametric"</span>,
   edf <span class='op'>=</span> <span class='va'>cv_tf</span><span class='op'>$</span><span class='va'>edf_min</span><span class='op'>[</span><span class='st'>"MAE"</span><span class='op'>]</span>
 <span class='op'>)</span>
-
+</div><div class='output co'>#&gt; <span class='error'>Error in if (edf_opt &lt; obj$k + 1 || edf_opt &gt; length(obj$x)) {    stop("`edf` must be greater than `k + 1` and less than n. See ",         "`obj$edf_min` and `obj$edf_1se` for reasonable choices.")}: missing value where TRUE/FALSE needed</span></div><div class='input'>
 <span class='co'># Example 2: The "Lyman-alpha forest" in the spectrum of a distant quasar</span>
 
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"quasar_spectrum"</span><span class='op'>)</span>

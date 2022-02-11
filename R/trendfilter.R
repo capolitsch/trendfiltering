@@ -1,5 +1,4 @@
-#' Fit a trend filtering model (back-end function with more options for expert
-#' users)
+#' Fit a trend filtering model (back-end function with more options for experts)
 #'
 #' Fit a trend filtering model.
 #'
@@ -143,7 +142,7 @@
 
   stopifnot(is.numeric(k) && length(k) == 1 && k == round(k))
   k %<>% as.integer()
-  if (!any(k == 0:3)) stop("`k` must be equal to 0, 1, or 2.")
+  if (!any(k == 0:2)) stop("`k` must be equal to 0, 1, or 2.")
 
   n <- length(y)
   weights <- weights %||% rep_len(1, n)
@@ -185,7 +184,7 @@
     arrange(x) %>%
     filter(weights > 0)
 
-  rm(x, y, weights)
+  rm(x,y,weights)
   n <- nrow(dat)
 
   if ("scale" %in% names(extra_args)) {
@@ -320,7 +319,7 @@
 #' `max_iter = length(y)`.}
 #' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
-#' \item{`scale`}{For internal use.}
+#' \item{`xy_scale`}{For internal use.}
 #' }
 #'
 #' @references

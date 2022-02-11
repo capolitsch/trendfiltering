@@ -43,10 +43,10 @@ may be passed by experts.}
 \value{
 An object of class '\code{bootstrap_trendfilter}' and subclass
 '\code{\link[=trendfilter]{trendfilter}}'. Generic functions such as \code{\link[=predict]{predict()}},
-\code{\link[=fitted.values]{fitted.values()}}, and \code{\link[=residuals]{residuals()}} may also be called on
-\code{bootstrap_trendfilter()} objects, with the same effect as if they were
-called on the \code{obj} argument originally passed to \code{bootstrap_trendfilter()}.
-A \code{bootstrap_trendfilter} object is a list containing the follow elements:
+\code{\link{fitted}}, and \code{\link[=residuals]{residuals()}} may also be called on \code{bootstrap_trendfilter}
+objects, with the same effect as if they were called on the \code{obj} argument
+originally passed to \code{bootstrap_trendfilter()}. A \code{bootstrap_trendfilter}
+object is a list containing the follow elements:
 \describe{
 \item{\code{x_eval}}{Input grid that each bootstrap trend filtering estimate was
 evaluated on.}
@@ -81,7 +81,7 @@ estimates with hyperparameter values in \code{lambda}, inherited from \code{obj}
 \item{\code{k}}{Degree of the trend filtering point estimate (and bootstrap
 estimates), inherited from \code{obj}.}
 \item{\code{call}}{The function call.}
-\item{\code{scale}}{For internal use.}
+\item{\code{xy_scale}}{For internal use.}
 }
 }
 \description{

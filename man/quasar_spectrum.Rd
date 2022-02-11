@@ -3,7 +3,7 @@
 \docType{data}
 \name{quasar_spectrum}
 \alias{quasar_spectrum}
-\title{Lyman-alpha forest in the absorption spectrum of a distant quasar}
+\title{Spectroscopic measurements of a distant quasar}
 \format{
 A tibble with column set \code{c("log10_wavelength", "flux", "weights")}.
 }
@@ -14,6 +14,13 @@ A tibble with column set \code{c("log10_wavelength", "flux", "weights")}.
 quasar_spectrum
 }
 \description{
-Lyman-alpha forest in the absorption spectrum of a distant quasar
+Part of the electromagnetic spectrum of an extremely luminous galaxy. This
+special type of galaxy -- a quasar -- is the most luminous object class in
+the Universe. The specific interval of its spectrum that is studied here
+traces the structure of diffuse gas in intergalactic space, along the quasar
+light's one-dimensional path to Earth. The intergalactic gas that the light
+passes through is primarily composed of neutrally-charged hydrogen, which
+creates a "forest" of absorptions in this specific interval of the quasar's
+spectrum.
 }
 \keyword{datasets}

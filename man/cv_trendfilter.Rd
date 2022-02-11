@@ -27,11 +27,11 @@ expected to have an equal variance \mjseqn{\sigma^2} for all observations,
 a scalar may be passed to \code{weights}, i.e. \verb{weights = }\mjseqn{1/\sigma^2}.
 Otherwise, \code{weights} must be a vector with the same length as \code{x} and \code{y}.}
 
-\item{nlambda}{Number of hyperparameter values to test during cross validation. Defaults
-to \code{nlambda = 250}. The hyperparameter grid is internally constructed to
-span the full trend filtering model space (which is bookended by a global
-polynomial solution and an interpolating solution), with \code{nlambda}
-controlling the granularity of the hyperparameter grid.}
+\item{nlambda}{Number of hyperparameter values to evaluate during cross validation.
+Defaults to \code{nlambda = 250}. The hyperparameter grid is internally
+constructed to span the full trend filtering model space (which is
+bookended by a global polynomial solution and an interpolating solution),
+with \code{nlambda} controlling the granularity of the hyperparameter grid.}
 
 \item{V}{Number of folds that the data are partitioned into for V-fold cross
 validation. Must be at least 2 and no more than 10. Defaults to \code{V = 10}.}
@@ -50,12 +50,12 @@ only contain integer values \code{1}, ..., \code{V} designating the fold assignm
 \item{...}{Additional named arguments to pass to \code{\link[=.trendfilter]{.trendfilter()}}.}
 }
 \value{
-An object of class '\code{cv_trendfilter}' and subclass
-'\code{\link[=trendfilter]{trendfilter}}'. Generic functions such as \code{\link[=predict]{predict()}},
-\code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}} may be called on the
-\code{\link[=sure_trendfilter]{sure_trendfilter()}} output. A '\code{cv_trendfilter}' object is a list with
-the elements below, as well as all elements from a
-'\code{\link[=trendfilter]{trendfilter}}' call on the full data set.
+An object of class '\code{cv_trendfilter}'. The object has subclass
+'\code{\link[=trendfilter]{trendfilter}}' and may therefore be passed to generic
+stats functions such as \code{\link[=predict]{predict()}}, \code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}}.
+And more precisely, a \code{cv_trendfilter}' object is a list with the elements
+below, as well as all elements from a \code{\link[=trendfilter]{trendfilter}}' call
+on the full data set.
 \describe{
 \item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
 in descending order).}
@@ -102,13 +102,12 @@ algorithm used to solve the trend filtering convex optimization.}
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 \code{lambda}.}
 \item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
-every candidate hyperparameter in \code{lambda}. If an element of \code{n_iter}
-is exactly equal to \code{admm_params$max_iter}, then the
-ADMM algorithm stopped before reaching the objective tolerance
-\code{admm_params$obj_tol}. In these situations, you may need to
-increase the maximum number of tolerable iterations by passing a
-\code{max_iter} argument to \code{cv_trendfilter()} in order to ensure that the ADMM
-solution has converged to satisfactory precision.}
+every candidate hyperparameter in \code{lambda}. If an element of \code{n_iter} is
+exactly equal to \code{admm_params$max_iter}, then the ADMM algorithm stopped
+before reaching the objective tolerance \code{admm_params$obj_tol}. In these
+situations, you may need to increase the maximum number of tolerable
+iterations by passing a \code{max_iter} argument to \code{cv_trendfilter()} in order
+to ensure that the ADMM solution has converged to satisfactory precision.}
 \item{\code{loss_funcs}}{A named list of functions that defines all loss functions
 --- both internal and user-passed --- evaluated during cross validation.}
 \item{\code{V}}{The number of folds the data were split into for cross
@@ -134,8 +133,8 @@ Many common regression loss functions are defined internally, and a
 cross validation curve is returned for each. Custom loss functions may also
 be passed via the \code{loss_funcs} argument. See the \strong{Loss functions} section
 below for definitions of the internal loss functions.
-Generic functions such as \code{\link[=predict]{predict()}}, \code{\link[=fitted.values]{fitted.values()}},
-and \code{\link[=residuals]{residuals()}} may be called on the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
+Generic functions such as \code{\link[=predict]{predict()}}, \code{\link{fitted}}, and \code{\link[=residuals]{residuals()}} may
+be called on the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
 
 Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} versus
 \code{\link[=sure_trendfilter]{sure_trendfilter()}} are summarized in the table below. See Section 3.5 of
