@@ -44,8 +44,8 @@ to be evaluated during cross validation. See the \strong{Loss functions} section
 below for an example.}
 
 \item{fold_ids}{An integer vector defining a custom partition of the data for cross
-validation. \code{fold_ids} must have the same length as \code{x} and \code{y}, and
-only contain integer values \code{1}, ..., \code{V} designating the fold assignments.}
+validation. \code{fold_ids} must have the same length as \code{x} and \code{y}, and only
+contain integer values \code{1}, ..., \code{V} designating the fold assignments.}
 
 \item{...}{Additional named arguments to pass to \code{\link[=.trendfilter]{.trendfilter()}}.}
 }

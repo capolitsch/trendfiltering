@@ -30,8 +30,8 @@
 #'   below for an example.
 #' @param fold_ids
 #'   An integer vector defining a custom partition of the data for cross
-#'   validation. `fold_ids` must have the same length as `x` and `y`, and
-#'   only contain integer values `1`, ..., `V` designating the fold assignments.
+#'   validation. `fold_ids` must have the same length as `x` and `y`, and only
+#'   contain integer values `1`, ..., `V` designating the fold assignments.
 #' @param mc_cores
 #'   Number of cores to utilize for parallel computing. Defaults to
 #'   `mc_cores = V`.
@@ -255,7 +255,7 @@ cv_trendfilter <- function(x,
     extra_args$k <- NULL
     stopifnot(is.numeric(k) && k == round(k))
     stopifnot(length(k) == 1)
-    if (!k %in% 0:3) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
+    if (!k %in% 0:2) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
   } else {
     k <- 2L
   }
@@ -854,7 +854,7 @@ sure_trendfilter <- function(x,
     extra_args$k <- NULL
     stopifnot(is.numeric(k) && k == round(k))
     stopifnot(length(k) == 1)
-    if (!k %in% 0:3) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
+    if (!k %in% 0:2) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
   } else {
     k <- 2L
   }

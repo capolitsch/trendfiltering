@@ -16,12 +16,11 @@
 #'   computational cost is acceptable).
 #' @param edf
 #'   The desired number of effective degrees of freedom in each bootstrap
-#'   estimate. When `obj` is of class
-#'   '[`sure_trendfilter`][sure_trendfilter()]', `edf = obj$edf_min` and
-#'   `edf = obj$edf_1se` are advisible options. When `obj` is of class
-#'   '[`cv_trendfilter`][cv_trendfilter()]', any element of the (now vectors)
-#'   `obj$edf_min` and `obj$edf_1se` may be a reasonable choice. Defaults to
-#'   `edf = obj$edf_min["MAE"]`.
+#'   estimate. When `obj` is of class [`sure_trendfilter`][sure_trendfilter()]',
+#'   `edf = obj$edf_min` and `edf = obj$edf_1se` are advisible options. When
+#'   `obj` is of class [`cv_trendfilter`][cv_trendfilter()]', any element of the
+#'   (now vectors) `obj$edf_min` and `obj$edf_1se` may be a reasonable choice.
+#'   Defaults to `edf = obj$edf_min["MAE"]`.
 #' @param mc_cores
 #'   Number of cores to utilize for parallel computing. Defaults to the number
 #'   of cores detected, minus 4.

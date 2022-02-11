@@ -27,12 +27,11 @@ ensemble. Defaults to \code{B = 100L} (larger values encouraged if the
 computational cost is acceptable).}
 
 \item{edf}{The desired number of effective degrees of freedom in each bootstrap
-estimate. When \code{obj} is of class
-'\code{\link[=sure_trendfilter]{sure_trendfilter}}', \code{edf = obj$edf_min} and
-\code{edf = obj$edf_1se} are advisible options. When \code{obj} is of class
-'\code{\link[=cv_trendfilter]{cv_trendfilter}}', any element of the (now vectors)
-\code{obj$edf_min} and \code{obj$edf_1se} may be a reasonable choice. Defaults to
-\code{edf = obj$edf_min["MAE"]}.}
+estimate. When \code{obj} is of class \code{\link[=sure_trendfilter]{sure_trendfilter}}',
+\code{edf = obj$edf_min} and \code{edf = obj$edf_1se} are advisible options. When
+\code{obj} is of class \code{\link[=cv_trendfilter]{cv_trendfilter}}', any element of the
+(now vectors) \code{obj$edf_min} and \code{obj$edf_1se} may be a reasonable choice.
+Defaults to \code{edf = obj$edf_min["MAE"]}.}
 
 \item{mc_cores}{Number of cores to utilize for parallel computing. Defaults to the number
 of cores detected, minus 4.}
