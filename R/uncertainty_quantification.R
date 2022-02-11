@@ -384,7 +384,7 @@ bootstrap_parallel <- function(b,
     lambda = lambda_grid,
     obj_tol = admm_params$obj_tol,
     max_iter = admm_params$max_iter,
-    scaling = FALSE
+    scale = FALSE
   )
 
   i_min <- which.min(abs(fit$edf - edf_opt))[1]
