@@ -3,7 +3,7 @@
 \name{.trendfilter}
 \alias{.trendfilter}
 \alias{dot-trendfilter}
-\title{Fit a trend filtering model}
+\title{Fit a trend filtering model (back-end function with more options for experts)}
 \usage{
 .trendfilter(
   x,
@@ -50,10 +50,14 @@ Defaults to \code{obj_tol = 1e-10}.}
 convex optimization algorithm. Defaults to \code{max_iter = length(y)}.}
 
 \item{...}{Additional named arguments. Currently unused.}
+
+\item{scale}{A logical indicating whether to scale the inputs and outputs.}
 }
 \value{
-An object of class \code{'trendfilter'}. This is a list with the
-following elements:
+An object of class \code{'trendfilter'}. Generic functions such as
+\code{\link[=predict]{predict()}}, \code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}} may be called on any object
+of class (or subclass) \code{'trendfilter'}. A \code{'trendfilter'} object is a list
+with the following elements:
 \describe{
 \item{\code{x}}{Vector of observed values for the input variable.}
 \item{\code{y}}{Vector of observed values for the output variable (if originally
@@ -68,30 +72,28 @@ estimator, for every hyperparameter value in \code{lambda}.}
 If \code{length(lambda) == 1}, fitted values for the single fit are returned as a
 numeric vector. Otherwise, fitted values are returned in a matrix with
 \code{length(lambda)} columns, with \code{fitted_values[,i]} corresponding to the trend
-filtering estimate with hyperparameter \code{lambda[i]}.
-}
+filtering estimate with hyperparameter \code{lambda[i]}.}
 \item{\code{admm_params}}{A list of the parameter values used by the ADMM
 algorithm used to solve the trend filtering convex optimization.}
 \item{\code{obj_func}}{The relative change in the objective function over the
 ADMM algorithm's final iteration, for every hyperparameter value in
 \code{lambda}.}
 \item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
-every hyperparameter value in \code{lambda}. If an element of \code{n_iter}
-is exactly equal to \code{admm_params$max_iter}, then the
-ADMM algorithm stopped before reaching the objective tolerance
-\code{admm_params$obj_tol}. In these situations, you may need to
-increase the maximum number of tolerable iterations by passing a
-\code{max_iter} argument to \code{cv_trendfilter()} in order to ensure that the ADMM
-solution has converged to satisfactory precision.}
+every hyperparameter value in \code{lambda}. If an element of \code{n_iter} is exactly
+equal to \code{admm_params$max_iter}, then the ADMM algorithm stopped before
+reaching the objective tolerance \code{admm_params$obj_tol}. In these situations,
+you may need to increase the maximum number of tolerable iterations in order
+to ensure that the ADMM solution has converged to satisfactory precision.
+This can be done by passing an extra argument \code{max_iter} to the
+\code{.trendfilter} function call and increasing it from its default value
+\code{max_iter = length(y)}.}
 \item{\code{status}}{For internal use. Output from the C solver.}
 \item{\code{call}}{The function call.}
-\item{\code{scale}}{For internal use.}
+\item{\code{scale_xy}}{For internal use.}
 }
 }
 \description{
-Fit a trend filtering model. Generic functions such as \code{\link[=predict]{predict()}},
-\code{\link[=fitted.values]{fitted.values()}}, and \code{\link[=residuals]{residuals()}} may be called on the
-\code{\link[=.trendfilter]{.trendfilter()}} output.
+Fit a trend filtering model.
 }
 \examples{
 data("eclipsing_binary")
@@ -101,12 +103,13 @@ x <- eclipsing_binary$phase
 y <- eclipsing_binary$flux
 weights <- 1 / eclipsing_binary$std_err^2
 
-fit <- .trendfilter(x,
-                    y,
-                    weights,
-                    lambda = exp(10),
-                    obj_tol = 1e-6,
-                    max_iter = 1e4
+fit <- .trendfilter(
+  x,
+  y,
+  weights,
+  lambda = exp(10),
+  obj_tol = 1e-6,
+  max_iter = 1e4
 )
 }
 \references{

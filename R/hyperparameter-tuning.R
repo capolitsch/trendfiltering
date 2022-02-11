@@ -1,14 +1,9 @@
-#' Optimize the trend filtering hyperparameter by V-fold cross validation
+#' Optimize a trend filtering model by V-fold cross validation
 #'
 #' \loadmathjax For every candidate hyperparameter value, estimate the trend
 #' filtering model's out-of-sample error by \mjseqn{V}-fold cross validation.
-#' Many common regression loss functions are defined internally, and a cross
-#' validation curve is returned for each. Custom loss functions may also be
-#' passed via the `loss_funcs` argument. See the **Loss functions** section
-#' below for definitions of the internal loss functions, and for guidelines on
-#' when [`cv_trendfilter()`] should be used versus [`sure_trendfilter()`].
-#' Generic functions such as [`predict()`], [`fitted.values()`],
-#' and [`residuals()`] may be called on the [`cv_trendfilter()`] output.
+#' See the **Details** section for guidelines on when [`cv_trendfilter()`]
+#' should be used versus [`sure_trendfilter()`].
 #'
 #' @param x
 #'   Vector of observed values for the input variable.
@@ -21,11 +16,11 @@
 #'   a scalar may be passed to `weights`, i.e. `weights = `\mjseqn{1/\sigma^2}.
 #'   Otherwise, `weights` must be a vector with the same length as `x` and `y`.
 #' @param nlambda
-#'   Number of hyperparameter values to test during cross validation. Defaults
-#'   to `nlambda = 250`. The hyperparameter grid is internally constructed to
-#'   span the full trend filtering model space (which is bookended by a global
-#'   polynomial solution and an interpolating solution), with `nlambda`
-#'   controlling the granularity of the hyperparameter grid.
+#'   Number of hyperparameter values to evaluate during cross validation.
+#'   Defaults to `nlambda = 250`. The hyperparameter grid is internally
+#'   constructed to span the full trend filtering model space (which is
+#'   bookended by a global polynomial solution and an interpolating solution),
+#'   with `nlambda` controlling the granularity of the hyperparameter grid.
 #' @param V
 #'   Number of folds that the data are partitioned into for V-fold cross
 #'   validation. Must be at least 2 and no more than 10. Defaults to `V = 10`.
@@ -35,14 +30,21 @@
 #'   below for an example.
 #' @param fold_ids
 #'   An integer vector defining a custom partition of the data for cross
-#'   validation. `fold_ids` must have the same length as `x` and `y`, and
-#'   only contain integer values `1`, ..., `V` designating the fold assignments.
+#'   validation. `fold_ids` must have the same length as `x` and `y`, and only
+#'   contain integer values `1`, ..., `V` designating the fold assignments.
 #' @param mc_cores
 #'   Number of cores to utilize for parallel computing. Defaults to
 #'   `mc_cores = V`.
 #' @param ... Additional named arguments to pass to [`.trendfilter()`].
 #'
-#' @details Our recommendations for when to use [`cv_trendfilter()`] versus
+#' @details Many common regression loss functions are defined internally, and a
+#' cross validation curve is returned for each. Custom loss functions may also
+#' be passed via the `loss_funcs` argument. See the **Loss functions** section
+#' below for definitions of the internal loss functions.
+#' Generic functions such as [`predict()`], [`fitted`], and [`residuals()`] may
+#' be called on the [`cv_trendfilter()`] output.
+#'
+#' Our recommendations for when to use [`cv_trendfilter()`] versus
 #' [`sure_trendfilter()`] are summarized in the table below. See Section 3.5 of
 #' [Politsch et al. (2020a)](https://arxiv.org/abs/1908.07151) for more details.
 #'
@@ -122,9 +124,12 @@
 #' my_loss_funcs <- list(MedAE = MedAE)
 #' ```
 #'
-#' @return An object of class `'cv_trendfilter'` and subclass `'trendfilter'`.
-#' This is a list with the elements below,
-#' as well as all elements from the '[`trendfilter`][`trendfilter()`]' call.
+#' @return An object of class '`cv_trendfilter`'. The object has subclass
+#' '[`trendfilter`][`trendfilter()`]' and may therefore be passed to generic
+#' stats functions such as [`predict()`], [`fitted()`], and [`residuals()`].
+#' And more precisely, a `cv_trendfilter`' object is a list with the elements
+#' below, as well as all elements from a [`trendfilter`][`trendfilter()`]' call
+#' on the full data set.
 #' \describe{
 #' \item{`lambda`}{Vector of candidate hyperparameter values (always returned
 #' in descending order).}
@@ -171,13 +176,12 @@
 #' ADMM algorithm's final iteration, for every candidate hyperparameter in
 #' `lambda`.}
 #' \item{`n_iter`}{Total number of iterations taken by the ADMM algorithm, for
-#' every candidate hyperparameter in `lambda`. If an element of `n_iter`
-#' is exactly equal to `admm_params$max_iter`, then the
-#' ADMM algorithm stopped before reaching the objective tolerance
-#' `admm_params$obj_tol`. In these situations, you may need to
-#' increase the maximum number of tolerable iterations by passing a
-#' `max_iter` argument to `cv_trendfilter()` in order to ensure that the ADMM
-#' solution has converged to satisfactory precision.}
+#' every candidate hyperparameter in `lambda`. If an element of `n_iter` is
+#' exactly equal to `admm_params$max_iter`, then the ADMM algorithm stopped
+#' before reaching the objective tolerance `admm_params$obj_tol`. In these
+#' situations, you may need to increase the maximum number of tolerable
+#' iterations by passing a `max_iter` argument to `cv_trendfilter()` in order
+#' to ensure that the ADMM solution has converged to satisfactory precision.}
 #' \item{`loss_funcs`}{A named list of functions that defines all loss functions
 #' --- both internal and user-passed --- evaluated during cross validation.}
 #' \item{`V`}{The number of folds the data were split into for cross
@@ -189,7 +193,7 @@
 #' \item{`k`}{Degree of the trend filtering estimates.}
 #' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
-#' \item{`scale`}{For internal use.}
+#' \item{`scale_xy`}{For internal use.}
 #' }
 #'
 #' @references
@@ -211,7 +215,13 @@
 #' y <- eclipsing_binary$flux
 #' weights <- 1 / eclipsing_binary$std_err^2
 #'
-#' cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
+#' cv_tf <- cv_trendfilter(
+#'   x = x,
+#'   y = y,
+#'   weights = weights,
+#'   max_iter = 1e4,
+#'   obj_tol = 1e-6
+#' )
 #' @importFrom dplyr tibble filter mutate select arrange case_when group_split
 #' @importFrom dplyr bind_rows
 #' @importFrom tidyr drop_na expand_grid
@@ -241,6 +251,8 @@ cv_trendfilter <- function(x,
   extra_args <- list(...)
 
   if (any(names(extra_args) == "k")) {
+    k <- extra_args$k
+    extra_args$k <- NULL
     stopifnot(is.numeric(k) && k == round(k))
     stopifnot(length(k) == 1)
     if (!k %in% 0:2) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
@@ -284,7 +296,11 @@ cv_trendfilter <- function(x,
     nlambda %<>% as.integer()
   }
 
-  mc_cores <- min(c(detectCores(), V, max(c(1, floor(mc_cores)))))
+  mc_cores <- min(
+    V,
+    detectCores(),
+    max(1, floor(mc_cores))
+  )
 
   if (mc_cores < V & mc_cores < detectCores() / 2) {
     warning(
@@ -316,8 +332,8 @@ cv_trendfilter <- function(x,
         inds <- which(classes != "function")
         stop(
           paste(
-            "Element(s)", paste(inds, collapse = ", "),
-            " of `loss_funcs` are not of class 'function'."
+            "Element(s)", paste(inds, collapse = ", "), " of `loss_funcs` are ",
+            "not of class 'function'."
           ),
           call. = FALSE
         )
@@ -387,23 +403,23 @@ cv_trendfilter <- function(x,
     }
   }
 
-  data <- tibble(x = as.double(x),
-                 y = as.double(y),
-                 weights = as.double(weights),
-                 fold_id = as.integer(fold_ids)) %>%
+  dat <- tibble(
+    x = as.double(x),
+    y = as.double(y),
+    weights = as.double(weights),
+    fold_id = as.integer(fold_ids)
+  ) %>%
     drop_na() %>%
     arrange(x) %>%
     filter(weights > 0)
 
   rm(x, y, weights)
-  n <- nrow(data)
+  n <- nrow(dat)
 
-  x_scale <- median(diff(data$x))
-  y_scale <- median(abs(data$y)) / 10
-  scale <- c(x_scale, y_scale)
-  names(scale) <- c("x", "y")
+  x_scale <- median(diff(dat$x))
+  y_scale <- median(abs(dat$y)) / 10
 
-  data_scaled <- data %>%
+  dat_scaled <- dat %>%
     mutate(
       x = x / x_scale,
       y = y / y_scale,
@@ -413,35 +429,39 @@ cv_trendfilter <- function(x,
   admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
   admm_params$x_tol <- admm_params$x_tol / x_scale
 
-  if (min(diff(data_scaled$x)) <= admm_params$x_tol) {
+  if (min(diff(dat_scaled$x)) <= admm_params$x_tol) {
     thin_out <- .tf_thin(
-      data_scaled$x,
-      data_scaled$y,
-      data_scaled$weights,
-      k,
-      admm_params
+      x = dat_scaled$x,
+      y = dat_scaled$y,
+      weights = dat_scaled$weights,
+      k = k,
+      admm_params = admm_params
     )
 
-    inds <- match(thin_out$x, data_scaled$x)
-    data_scaled <- tibble(x = thin_out$x,
-                          y = thin_out$y,
-                          weights = thin_out$w,
-                          fold_id = data_scaled$fold_id[inds])
+    inds <- match(thin_out$x, dat_scaled$x)
+    dat_scaled <- tibble(
+      x = thin_out$x,
+      y = thin_out$y,
+      weights = thin_out$w,
+      fold_id = dat_scaled$fold_id[inds]
+    )
   }
 
-  data_folded <- data_scaled %>%
+  dat_folded <- dat_scaled %>%
     mutate(ids = fold_id) %>%
     group_split(ids, .keep = FALSE)
 
-  lambda <- get_lambda_grid_edf_spacing(data = data_scaled,
-                                        admm_params = admm_params,
-                                        nlambda = nlambda,
-                                        k = k)
+  lambda <- get_lambda_grid_edf_spacing(
+    dat = dat_scaled,
+    admm_params = admm_params,
+    nlambda = nlambda,
+    k = k
+  )
 
   cv_out <- mclapply(
     1:V,
     FUN = validate_fold,
-    data_folded = data_folded,
+    dat_folded = dat_folded,
     lambda = lambda,
     k = k,
     admm_params = admm_params,
@@ -506,9 +526,9 @@ cv_trendfilter <- function(x,
 
   args <- c(
     list(
-      x = data_scaled$x,
-      y = data_scaled$y,
-      weights = data_scaled$weights,
+      x = dat_scaled$x,
+      y = dat_scaled$y,
+      weights = dat_scaled$weights,
       lambda = lambda,
       k = k,
       obj_tol = admm_params$obj_tol,
@@ -517,8 +537,8 @@ cv_trendfilter <- function(x,
     extra_args
   )
 
-  duplicated_args <- which(duplicated(names(args)))
-  if (length(duplicated_args) > 0) args <- args[-duplicated_args]
+  dup_args <- duplicated(names(args))
+  if (any(dup_args)) args <- args[-which(dup_args)]
 
   fit <- do.call(.trendfilter, args)
 
@@ -526,6 +546,8 @@ cv_trendfilter <- function(x,
   edf_1se <- fit$edf[i_1se]
 
   loss_func_names <- names(loss_funcs)
+  scale_xy <- c(x_scale, y_scale)
+  names(scale_xy) <- c("x", "y")
 
   names(lambda_min) <- loss_func_names
   names(lambda_1se) <- loss_func_names
@@ -555,13 +577,13 @@ cv_trendfilter <- function(x,
         n_iter = fit$n_iter,
         loss_funcs = loss_funcs,
         V = V,
-        x = data_scaled$x * x_scale,
-        y = data_scaled$y * y_scale,
-        weights = data_scaled$weights / y_scale^2,
+        x = dat_scaled$x * x_scale,
+        y = dat_scaled$y * y_scale,
+        weights = dat_scaled$weights / y_scale^2,
         k = k,
         status = fit$status,
         call = cv_call,
-        scale = scale
+        scale_xy = scale_xy
       ),
       class = c("cv_trendfilter", "trendfilter", "trendfiltering")
     )
@@ -572,21 +594,21 @@ cv_trendfilter <- function(x,
 #' @importFrom dplyr bind_rows
 #' @importFrom magrittr %>%
 validate_fold <- function(fold_id,
-                          data_folded,
+                          dat_folded,
                           lambda,
                           k,
                           admm_params,
                           loss_funcs,
                           y_scale,
                           extra_args) {
-  data_train <- data_folded[-fold_id] %>% bind_rows()
-  data_validate <- data_folded[[fold_id]]
+  dat_train <- bind_rows(dat_folded[-fold_id])
+  dat_validate <- dat_folded[[fold_id]]
 
   args <- c(
     list(
-      x = data_train$x,
-      y = data_train$y,
-      weights = data_train$weights,
+      x = dat_train$x,
+      y = dat_train$y,
+      weights = dat_train$weights,
       k = k,
       lambda = lambda,
       obj_tol = admm_params$obj_tol,
@@ -601,18 +623,18 @@ validate_fold <- function(fold_id,
   fit <- do.call(.trendfilter, args)
 
   tf_validate_preds <- suppressWarnings(
-    predict(fit, lambda = lambda, x_eval = data_validate$x)
+    predict(fit, lambda = lambda, x_eval = dat_validate$x)
   )
 
   out <- lapply(
     seq_along(loss_funcs),
     FUN = function(X) {
       apply(
-        tf_validate_preds * y_scale,
-        2,
-        loss_funcs[[X]],
-        y = data_validate$y * y_scale,
-        weights = data_validate$weights / y_scale^2
+        X = tf_validate_preds * y_scale,
+        MARGIN = 2,
+        FUN = loss_funcs[[X]],
+        y = dat_validate$y * y_scale,
+        weights = dat_validate$weights / y_scale^2
       ) %>%
         as.double()
     }
@@ -694,15 +716,12 @@ get_internal_loss_funcs <- function() {
 }
 
 
-#' Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
-#' risk estimate
+#' Optimize a trend filtering model by minimizing Stein's unbiased risk estimate
 #'
 #' For every candidate hyperparameter value, compute an unbiased estimate of the
 #' trend filtering model's predictive mean-squared error. See the **Details**
 #' section for guidelines on when [`sure_trendfilter()`] should be used versus
-#' [`cv_trendfilter()`]. Generic functions such as [`predict()`],
-#' [`fitted.values()`], and [`residuals()`] may be called on the
-#' [`sure_trendfilter()`] output.
+#' [`cv_trendfilter()`].
 #'
 #' @inheritParams cv_trendfilter
 #'
@@ -723,9 +742,12 @@ get_internal_loss_funcs <- function() {
 #' filtering analysis on that scale. See the [`sure_trendfilter()`] examples for
 #' a case when the inputs are evenly sampled on the `log10(x)` scale.
 #'
-#' @return An object of class '`sure_trendfilter`' and subclass
-#' '[`trendfilter`][`trendfilter()`]'. This is a list with the elements below,
-#' as well as all elements from the '[`trendfilter`][`trendfilter()`]' call.
+#' @return An object of class '`sure_trendfilter`'. The object has subclass
+#' '[`trendfilter`][`trendfilter()`]' and may therefore be passed to generic
+#' stats functions such as [`predict()`], [`fitted()`], and [`residuals()`].
+#' More precisely, a `sure_trendfilter`' object is a list with the elements
+#' below, as well as all elements from the [`trendfilter`][`trendfilter()`]'
+#' call.
 #' \describe{
 #' \item{`lambda`}{Vector of candidate hyperparameter values (always returned
 #' in descending order).}
@@ -828,6 +850,8 @@ sure_trendfilter <- function(x,
   extra_args <- list(...)
 
   if (any(names(extra_args) == "k")) {
+    k <- extra_args$k
+    extra_args$k <- NULL
     stopifnot(is.numeric(k) && k == round(k))
     stopifnot(length(k) == 1)
     if (!k %in% 0:2) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
@@ -870,22 +894,22 @@ sure_trendfilter <- function(x,
 
   k %<>% as.integer()
 
-  data <- tibble(x = as.double(x),
-                 y = as.double(y),
-                 weights = as.double(weights)) %>%
+  dat <- tibble(
+    x = as.double(x),
+    y = as.double(y),
+    weights = as.double(weights)
+  ) %>%
     drop_na() %>%
     arrange(x) %>%
     filter(weights > 0)
 
   rm(x, y, weights)
-  n <- nrow(data)
+  n <- nrow(dat)
 
-  x_scale <- median(diff(data$x))
-  y_scale <- median(abs(data$y)) / 10
-  scale <- c(x_scale, y_scale)
-  names(scale) <- c("x","y")
+  x_scale <- median(diff(dat$x))
+  y_scale <- median(abs(dat$y)) / 10
 
-  data_scaled <- data %>%
+  dat_scaled <- dat %>%
     mutate(
       x = x / x_scale,
       y = y / y_scale,
@@ -895,28 +919,30 @@ sure_trendfilter <- function(x,
   admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
   admm_params$x_tol <- admm_params$x_tol / x_scale
 
-  if (min(diff(data_scaled$x)) <= admm_params$x_tol) {
+  if (min(diff(dat_scaled$x)) <= admm_params$x_tol) {
     thin_out <- .tf_thin(
-      data_scaled$x,
-      data_scaled$y,
-      data_scaled$weights,
-      k,
-      admm_params
+      x = dat_scaled$x,
+      y = dat_scaled$y,
+      weights = dat_scaled$weights,
+      k = k,
+      admm_params = admm_params
     )
 
-    data_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
+    dat_scaled <- tibble(x = thin_out$x, y = thin_out$y, weights = thin_out$w)
   }
 
-  lambda <- get_lambda_grid_edf_spacing(data = data_scaled,
-                                        admm_params = admm_params,
-                                        nlambda = nlambda,
-                                        k = k)
+  lambda <- get_lambda_grid_edf_spacing(
+    dat = dat_scaled,
+    admm_params = admm_params,
+    nlambda = nlambda,
+    k = k
+  )
 
   args <- c(
     list(
-      x = data_scaled$x,
-      y = data_scaled$y,
-      weights = data_scaled$weights,
+      x = dat_scaled$x,
+      y = dat_scaled$y,
+      weights = dat_scaled$weights,
       lambda = lambda,
       k = k,
       obj_tol = admm_params$obj_tol,
@@ -925,13 +951,13 @@ sure_trendfilter <- function(x,
     extra_args
   )
 
-  duplicated_args <- duplicated(names(args))
-  if (any(duplicated_args)) args <- args[-duplicated_args]
+  dup_args <- duplicated(names(args))
+  if (any(dup_args)) args <- args[-which(dup_args)]
 
   fit <- do.call(.trendfilter, args)
 
-  squared_residuals_mat <- (fit$fitted_values - data_scaled$y)^2
-  optimism_mat <- 2 / (data_scaled$weights * n) *
+  squared_residuals_mat <- (fit$fitted_values - dat_scaled$y)^2
+  optimism_mat <- 2 / (dat_scaled$weights * n) *
     matrix(rep(fit$edf, each = n), nrow = n)
 
   error_mat <- (squared_residuals_mat + optimism_mat) * y_scale^2
@@ -939,7 +965,7 @@ sure_trendfilter <- function(x,
   i_min <- as.integer(min(which.min(error)))
 
   se_error <- replicate(
-    5000,
+    n = 5000,
     error_mat[sample.int(n, replace = TRUE), ] %>%
       colMeans()
   ) %>%
@@ -949,6 +975,9 @@ sure_trendfilter <- function(x,
     error <= error[i_min] + se_error[i_min]
   ) %>%
     min()
+
+  scale_xy <- c(x_scale, y_scale)
+  names(scale_xy) <- c("x","y")
 
   invisible(
     structure(
@@ -969,13 +998,13 @@ sure_trendfilter <- function(x,
         admm_params = admm_params,
         obj_func = fit$obj_fun,
         n_iter = fit$n_iter,
-        x = data_scaled$x * x_scale,
-        y = data_scaled$y * y_scale,
-        weights = data_scaled$weights / y_scale^2,
+        x = dat_scaled$x * x_scale,
+        y = dat_scaled$y * y_scale,
+        weights = dat_scaled$weights / y_scale^2,
         k = k,
         status = fit$status,
         call = sure_call,
-        scale = scale
+        scale_xy = scale_xy
       ),
       class = c("sure_trendfilter", "trendfilter", "trendfiltering")
     )

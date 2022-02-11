@@ -2,7 +2,7 @@
 % Please edit documentation in R/hyperparameter-tuning.R
 \name{cv_trendfilter}
 \alias{cv_trendfilter}
-\title{Optimize the trend filtering hyperparameter by V-fold cross validation}
+\title{Optimize a trend filtering model by V-fold cross validation}
 \usage{
 cv_trendfilter(
   x,
@@ -27,11 +27,11 @@ expected to have an equal variance \mjseqn{\sigma^2} for all observations,
 a scalar may be passed to \code{weights}, i.e. \verb{weights = }\mjseqn{1/\sigma^2}.
 Otherwise, \code{weights} must be a vector with the same length as \code{x} and \code{y}.}
 
-\item{nlambda}{Number of hyperparameter values to test during cross validation. Defaults
-to \code{nlambda = 250}. The hyperparameter grid is internally constructed to
-span the full trend filtering model space (which is bookended by a global
-polynomial solution and an interpolating solution), with \code{nlambda}
-controlling the granularity of the hyperparameter grid.}
+\item{nlambda}{Number of hyperparameter values to evaluate during cross validation.
+Defaults to \code{nlambda = 250}. The hyperparameter grid is internally
+constructed to span the full trend filtering model space (which is
+bookended by a global polynomial solution and an interpolating solution),
+with \code{nlambda} controlling the granularity of the hyperparameter grid.}
 
 \item{V}{Number of folds that the data are partitioned into for V-fold cross
 validation. Must be at least 2 and no more than 10. Defaults to \code{V = 10}.}
@@ -44,15 +44,18 @@ to be evaluated during cross validation. See the \strong{Loss functions} section
 below for an example.}
 
 \item{fold_ids}{An integer vector defining a custom partition of the data for cross
-validation. \code{fold_ids} must have the same length as \code{x} and \code{y}, and
-only contain integer values \code{1}, ..., \code{V} designating the fold assignments.}
+validation. \code{fold_ids} must have the same length as \code{x} and \code{y}, and only
+contain integer values \code{1}, ..., \code{V} designating the fold assignments.}
 
 \item{...}{Additional named arguments to pass to \code{\link[=.trendfilter]{.trendfilter()}}.}
 }
 \value{
-An object of class \code{'cv_trendfilter'} and subclass \code{'trendfilter'}.
-This is a list with the elements below,
-as well as all elements from the '\code{\link[=trendfilter]{trendfilter}}' call.
+An object of class '\code{cv_trendfilter}'. The object has subclass
+'\code{\link[=trendfilter]{trendfilter}}' and may therefore be passed to generic
+stats functions such as \code{\link[=predict]{predict()}}, \code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}}.
+And more precisely, a \code{cv_trendfilter}' object is a list with the elements
+below, as well as all elements from a \code{\link[=trendfilter]{trendfilter}}' call
+on the full data set.
 \describe{
 \item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
 in descending order).}
@@ -99,13 +102,12 @@ algorithm used to solve the trend filtering convex optimization.}
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 \code{lambda}.}
 \item{\code{n_iter}}{Total number of iterations taken by the ADMM algorithm, for
-every candidate hyperparameter in \code{lambda}. If an element of \code{n_iter}
-is exactly equal to \code{admm_params$max_iter}, then the
-ADMM algorithm stopped before reaching the objective tolerance
-\code{admm_params$obj_tol}. In these situations, you may need to
-increase the maximum number of tolerable iterations by passing a
-\code{max_iter} argument to \code{cv_trendfilter()} in order to ensure that the ADMM
-solution has converged to satisfactory precision.}
+every candidate hyperparameter in \code{lambda}. If an element of \code{n_iter} is
+exactly equal to \code{admm_params$max_iter}, then the ADMM algorithm stopped
+before reaching the objective tolerance \code{admm_params$obj_tol}. In these
+situations, you may need to increase the maximum number of tolerable
+iterations by passing a \code{max_iter} argument to \code{cv_trendfilter()} in order
+to ensure that the ADMM solution has converged to satisfactory precision.}
 \item{\code{loss_funcs}}{A named list of functions that defines all loss functions
 --- both internal and user-passed --- evaluated during cross validation.}
 \item{\code{V}}{The number of folds the data were split into for cross
@@ -117,21 +119,23 @@ present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
 \item{\code{k}}{Degree of the trend filtering estimates.}
 \item{\code{status}}{For internal use. Output from the C solver.}
 \item{\code{call}}{The function call.}
-\item{\code{scale}}{For internal use.}
+\item{\code{scale_xy}}{For internal use.}
 }
 }
 \description{
 \loadmathjax For every candidate hyperparameter value, estimate the trend
 filtering model's out-of-sample error by \mjseqn{V}-fold cross validation.
-Many common regression loss functions are defined internally, and a cross
-validation curve is returned for each. Custom loss functions may also be
-passed via the \code{loss_funcs} argument. See the \strong{Loss functions} section
-below for definitions of the internal loss functions, and for guidelines on
-when \code{\link[=cv_trendfilter]{cv_trendfilter()}} should be used versus \code{\link[=sure_trendfilter]{sure_trendfilter()}}.
-Generic functions such as \code{\link[=predict]{predict()}}, \code{\link[=fitted.values]{fitted.values()}},
-and \code{\link[=residuals]{residuals()}} may be called on the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
+See the \strong{Details} section for guidelines on when \code{\link[=cv_trendfilter]{cv_trendfilter()}}
+should be used versus \code{\link[=sure_trendfilter]{sure_trendfilter()}}.
 }
 \details{
+Many common regression loss functions are defined internally, and a
+cross validation curve is returned for each. Custom loss functions may also
+be passed via the \code{loss_funcs} argument. See the \strong{Loss functions} section
+below for definitions of the internal loss functions.
+Generic functions such as \code{\link[=predict]{predict()}}, \code{\link{fitted}}, and \code{\link[=residuals]{residuals()}} may
+be called on the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
+
 Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} versus
 \code{\link[=sure_trendfilter]{sure_trendfilter()}} are summarized in the table below. See Section 3.5 of
 \href{https://arxiv.org/abs/1908.07151}{Politsch et al. (2020a)} for more details.\tabular{lc}{
@@ -213,7 +217,13 @@ x <- eclipsing_binary$phase
 y <- eclipsing_binary$flux
 weights <- 1 / eclipsing_binary$std_err^2
 
-cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
+cv_tf <- cv_trendfilter(
+  x = x,
+  y = y,
+  weights = weights,
+  max_iter = 1e4,
+  obj_tol = 1e-6
+)
 }
 \references{
 \enumerate{

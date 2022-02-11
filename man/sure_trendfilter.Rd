@@ -2,8 +2,7 @@
 % Please edit documentation in R/hyperparameter-tuning.R
 \name{sure_trendfilter}
 \alias{sure_trendfilter}
-\title{Optimize the trend filtering hyperparameter by minimizing Stein's unbiased
-risk estimate}
+\title{Optimize a trend filtering model by minimizing Stein's unbiased risk estimate}
 \usage{
 sure_trendfilter(x, y, weights, nlambda = 250L, ...)
 }
@@ -18,18 +17,21 @@ expected to have an equal variance \mjseqn{\sigma^2} for all observations,
 a scalar may be passed to \code{weights}, i.e. \verb{weights = }\mjseqn{1/\sigma^2}.
 Otherwise, \code{weights} must be a vector with the same length as \code{x} and \code{y}.}
 
-\item{nlambda}{Number of hyperparameter values to test during cross validation. Defaults
-to \code{nlambda = 250}. The hyperparameter grid is internally constructed to
-span the full trend filtering model space (which is bookended by a global
-polynomial solution and an interpolating solution), with \code{nlambda}
-controlling the granularity of the hyperparameter grid.}
+\item{nlambda}{Number of hyperparameter values to evaluate during cross validation.
+Defaults to \code{nlambda = 250}. The hyperparameter grid is internally
+constructed to span the full trend filtering model space (which is
+bookended by a global polynomial solution and an interpolating solution),
+with \code{nlambda} controlling the granularity of the hyperparameter grid.}
 
 \item{...}{Additional named arguments to pass to \code{\link[=.trendfilter]{.trendfilter()}}.}
 }
 \value{
-An object of class '\code{sure_trendfilter}' and subclass
-'\code{\link[=trendfilter]{trendfilter}}'. This is a list with the elements below,
-as well as all elements from the '\code{\link[=trendfilter]{trendfilter}}' call.
+An object of class '\code{sure_trendfilter}'. The object has subclass
+'\code{\link[=trendfilter]{trendfilter}}' and may therefore be passed to generic
+stats functions such as \code{\link[=predict]{predict()}}, \code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}}.
+More precisely, a \code{sure_trendfilter}' object is a list with the elements
+below, as well as all elements from the \code{\link[=trendfilter]{trendfilter}}'
+call.
 \describe{
 \item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
 in descending order).}
@@ -90,9 +92,7 @@ present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
 For every candidate hyperparameter value, compute an unbiased estimate of the
 trend filtering model's predictive mean-squared error. See the \strong{Details}
 section for guidelines on when \code{\link[=sure_trendfilter]{sure_trendfilter()}} should be used versus
-\code{\link[=cv_trendfilter]{cv_trendfilter()}}. Generic functions such as \code{\link[=predict]{predict()}},
-\code{\link[=fitted.values]{fitted.values()}}, and \code{\link[=residuals]{residuals()}} may be called on the
-\code{\link[=sure_trendfilter]{sure_trendfilter()}} output.
+\code{\link[=cv_trendfilter]{cv_trendfilter()}}.
 }
 \details{
 Our recommendations for when to use \code{\link[=sure_trendfilter]{sure_trendfilter()}} versus

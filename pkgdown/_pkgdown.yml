@@ -31,26 +31,36 @@ template:
 development:
   mode: release
 
+pkgdown:
+  as_is: true
+
 reference:
   - title: "Fit a model"
-  - contents:
+    desc: >
+      Fit a trend filtering model
+    contents:
     - '`trendfilter`'
     - '`.trendfilter`'
   - title: "Optimize hyperparameter(s)"
-  - contents:
+    contents:
       - '`cv_trendfilter`'
       - '`sure_trendfilter`'
   - title: "Compute bootstrap ensembles/uncertainties"
-  - contents:
+    contents:
       - '`bootstrap_trendfilter`'
       - '`vbands`'
   - title: "Call stats generics on trend filtering objects"
-  - contents:
+    desc: >
+        Objects of class 'cv_trendfilter', 'sure_trendfilter',
+        'relax_trendfilter', and 'bootstrap_trendfilter' all share the base
+        class 'trendfilter', and therefore may be passed to these stats package
+        generic functions.
+    contents:
       - '`predict.trendfilter`'
       - '`fitted.trendfilter`'
       - '`residuals.trendfilter`'
   - title: "Data sets"
-  - contents:
+    contents:
       - '`eclipsing_binary`'
       - '`quasar_spectrum`'
 
@@ -80,6 +90,8 @@ redirects:
   - [bootstrap_trendfilter.html, reference/bootstrap_trendfilter.html]
   - [cv_trendfilter.html, reference/cv_trendfilter.html]
   - [sure_trendfilter.html, reference/sure_trendfilter.html]
+  - [.trendfilter.html, dot-trendfilter.html]
+  - [reference/.trendfilter.html, reference/dot-trendfilter.html]
 
 repo:
   branch: main

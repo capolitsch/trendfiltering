@@ -9,7 +9,7 @@
 \alias{resids.cv_trendfilter}
 \alias{resids.sure_trendfilter}
 \alias{resids.bootstrap_trendfilter}
-\title{Get residuals from a trendfilter object}
+\title{Residuals of a trend filtering model}
 \usage{
 \method{residuals}{trendfilter}(obj, lambda = NULL, x_eval = NULL, zero_tol = NULL, ...)
 }
@@ -29,5 +29,5 @@ value is set to zero. Defaults to \code{zero_tol = 1e-10}.}
 \item{...}{Additional named arguments. Currently unused.}
 }
 \description{
-Get residuals from a trendfilter object
+Get residuals from a '\code{\link[=trendfilter]{trendfilter}}' object.
 }

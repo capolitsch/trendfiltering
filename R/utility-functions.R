@@ -1,4 +1,4 @@
-#' Utility functions for internal/expert use only
+#' Utility functions for internal use
 
 #' @noRd
 #' @importFrom rlang %||%
@@ -25,21 +25,21 @@ get_admm_params <- function(obj_tol = NULL, max_iter = NULL) {
 #' @importFrom magrittr %>%
 #' @importFrom stats approx
 #' @noRd
-get_lambda_grid_edf_spacing <- function(data,
+get_lambda_grid_edf_spacing <- function(dat,
                                         admm_params,
                                         nlambda,
                                         k = 2L,
                                         lambda_min_ratio = 1e-16,
                                         ...) {
   nlambda_start <- nlambda
-  n <- nrow(data)
+  n <- nrow(dat)
 
   tf_out <- .tf_fit(
-    data$x,
-    data$y,
-    data$weights,
+    x = dat$x,
+    y = dat$y,
+    weights = dat$weights,
     k = k,
-    admm_params,
+    admm_params = admm_params,
     nlambda = nlambda_start,
     lambda_min_ratio = lambda_min_ratio
   )
@@ -69,11 +69,13 @@ get_lambda_grid_edf_spacing <- function(data,
     lambda_start <- lambda_start[-inds]
   }
 
-  exp(approx(
-    x = edf_start,
-    y = log(lambda_start),
-    xout = seq(min(edf_start), max(edf_start), length = nlambda)
-  )[["y"]]) %>%
+  exp(
+    approx(
+      x = edf_start,
+      y = log(lambda_start),
+      xout = seq(min(edf_start), max(edf_start), length = nlambda)
+    )[["y"]]
+  ) %>%
     unique.default() %>%
     sort.default(decreasing = TRUE)
 }

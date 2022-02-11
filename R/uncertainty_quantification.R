@@ -1,19 +1,7 @@
-#' Construct pointwise variability bands via a bootstrap algorithm that's
-#' tailored to the observed data
+#' Construct pointwise variability bands via a bootstrap
 #'
 #' Generate a bootstrap ensemble of trend filtering estimates in order to
-#' quantify the uncertainty in the optimized trend filtering estimate. One of
-#' three possible bootstrap algorithms should be chosen according to the
-#' criteria summarized in the **Details** section below. Pointwise variability
-#' bands are then obtained by passing the '`bootstrap_trendfilter`' object to
-#' [`vbands()`], along with the desired level (e.g. `level = 0.95`).
-#' Bootstrapping trend filtering estimators tends to yield more accurate
-#' uncertainties when, for each bootstrap estimate, we fix the number of
-#' effective degrees of freedom, `edf` (a reparametrization of the
-#' hyperparameter `lambda`), instead of fixing `lambda` itself. Thus,
-#' `bootstrap_trendfilter()` has an `edf` argument instead of `lambda`. See
-#' the `edf` argument description and **Examples** section for guidance on how
-#' `edf` can be chosen.
+#' quantify the uncertainty in the optimized trend filtering estimate.
 #'
 #' @param obj
 #'   An object of class '[`cv_trendfilter`][cv_trendfilter()]' or
@@ -28,12 +16,11 @@
 #'   computational cost is acceptable).
 #' @param edf
 #'   The desired number of effective degrees of freedom in each bootstrap
-#'   estimate. When `obj` is of class
-#'   '[`sure_trendfilter`][sure_trendfilter()]', `edf = obj$edf_min` and
-#'   `edf = obj$edf_1se` are advisible options. When `obj` is of class
-#'   '[`cv_trendfilter`][cv_trendfilter()]', any element of the (now vectors)
-#'   `obj$edf_min` and `obj$edf_1se` may be a reasonable choice. Defaults to
-#'   `edf = obj$edf_min["MAE"]`.
+#'   estimate. When `obj` is of class [`sure_trendfilter`][sure_trendfilter()]',
+#'   `edf = obj$edf_min` and `edf = obj$edf_1se` are advisible options. When
+#'   `obj` is of class [`cv_trendfilter`][cv_trendfilter()]', any element of the
+#'   (now vectors) `obj$edf_min` and `obj$edf_1se` may be a reasonable choice.
+#'   Defaults to `edf = obj$edf_min["MAE"]`.
 #' @param mc_cores
 #'   Number of cores to utilize for parallel computing. Defaults to the number
 #'   of cores detected, minus 4.
@@ -41,7 +28,18 @@
 #'   Additional named arguments. Currently only a few experimental arguments
 #'   may be passed by experts.
 #'
-#' @details Our recommendations for when to use each of the possible settings
+#' @details One of three possible bootstrap algorithms should be chosen
+#' according to the criteria below. Pointwise variability bands are then
+#' obtained by passing the '`bootstrap_trendfilter`' object to [`vbands()`],
+#' along with the desired level (e.g. `level = 0.95`). Bootstrapping trend
+#' filtering estimators tends to yield more accurate uncertainties when, for
+#' each bootstrap estimate, we fix the number of effective degrees of freedom,
+#' `edf` (a reparametrization of the hyperparameter `lambda`), instead of fixing
+#' `lambda` itself. Thus, `bootstrap_trendfilter()` has an `edf` argument
+#' instead of `lambda`. See the `edf` argument description and **Examples**
+#' section for guidance on how `edf` can be chosen.
+#'
+#' Our recommendations for when to use each of the possible settings
 #' for the `algorithm` argument are shown in the table below. See
 #' [Politsch et al. (2020a)](
 #' https://academic.oup.com/mnras/article/492/3/4005/5704413) for more details.
@@ -61,10 +59,10 @@
 #'
 #' @return An object of class '`bootstrap_trendfilter`' and subclass
 #' '[`trendfilter`][trendfilter()]'. Generic functions such as [`predict()`],
-#' [`fitted.values()`], and [`residuals()`] may also be called on
-#' `bootstrap_trendfilter()` objects, with the same effect as if they were
-#' called on the `obj` argument originally passed to `bootstrap_trendfilter()`.
-#' A `bootstrap_trendfilter` object is a list containing the follow elements:
+#' [`fitted`], and [`residuals()`] may also be called on `bootstrap_trendfilter`
+#' objects, with the same effect as if they were called on the `obj` argument
+#' originally passed to `bootstrap_trendfilter()`. A `bootstrap_trendfilter`
+#' object is a list containing the follow elements:
 #' \describe{
 #' \item{`x_eval`}{Input grid that each bootstrap trend filtering estimate was
 #' evaluated on.}
@@ -99,7 +97,7 @@
 #' \item{`k`}{Degree of the trend filtering point estimate (and bootstrap
 #' estimates), inherited from `obj`.}
 #' \item{`call`}{The function call.}
-#' \item{`scale`}{For internal use.}
+#' \item{`scale_xy`}{For internal use.}
 #' }
 #'
 #' @references
@@ -131,7 +129,13 @@
 #' y <- eclipsing_binary$flux
 #' weights <- 1 / eclipsing_binary$std_err^2
 #'
-#' cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
+#' cv_tf <- cv_trendfilter(
+#'   x = x,
+#'   y = y,
+#'   weights = weights,
+#'   max_iter = 1e4,
+#'   obj_tol = 1e-6
+#' )
 #'
 #' boot_tf <- bootstrap_trendfilter(
 #'   obj = cv_tf,
@@ -155,11 +159,11 @@
 #'   edf = sure_tf$edf_min
 #' )
 
-#' @importFrom dplyr case_when mutate
+#' @importFrom dplyr case_when mutate tibble
 #' @importFrom magrittr %>% %<>%
 #' @importFrom rlang %||%
 #' @importFrom parallel mclapply detectCores
-#' @importFrom stats residuals fitted.values approx
+#' @importFrom stats residuals fitted sd
 #' @export
 bootstrap_trendfilter <- function(obj,
                                   algorithm = c("nonparametric","parametric","wild"),
@@ -170,6 +174,7 @@ bootstrap_trendfilter <- function(obj,
                                   ...) {
   stopifnot(B >= 20)
   stopifnot(any(class(obj) == "trendfiltering"))
+  stopifnot(any(class(obj) == "trendfilter"))
   stopifnot(
     any(class(obj) == "cv_trendfilter") || any(class(obj) == "sure_trendfilter")
   )
@@ -243,8 +248,8 @@ bootstrap_trendfilter <- function(obj,
     ],
     edf_opt
   ) %>%
-    unique() %>%
-    sort(decreasing = TRUE)
+    unique.default() %>%
+    sort.default(decreasing = TRUE)
 
   if ("edf_tol" %in% names(extra_args)) {
     edf_tol <- extra_args$edf_tol
@@ -266,40 +271,40 @@ bootstrap_trendfilter <- function(obj,
     algorithm == "wild" ~ list(wild_sampler)
   )[[1]]
 
-  data_scaled <- tibble(
-    x = obj$x / obj$scale["x"],
-    y = obj$y / obj$scale["y"],
-    weights = obj$weights * obj$scale["y"]^2
+  dat_scaled <- tibble(
+    x = obj$x / obj$scale_xy["x"],
+    y = obj$y / obj$scale_xy["y"],
+    weights = obj$weights * obj$scale_xy["y"]^2
   )
 
   lambda_opt <- obj$lambda[i_opt]
 
   if (algorithm == "parametric") {
-    data_scaled %<>% mutate(
-      fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale["y"]
+    dat_scaled %<>% mutate(
+      fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale_xy["y"]
     )
   }
 
   if (algorithm == "wild") {
-    data_scaled %<>% mutate(
-      fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale["y"],
-      residuals = residuals(obj, lambda = lambda_opt) / obj$scale["y"]
+    dat_scaled %<>% mutate(
+      fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale_xy["y"],
+      residuals = residuals(obj, lambda = lambda_opt) / obj$scale_xy["y"]
     )
   }
 
   par_out <- mclapply(
     1:B,
     bootstrap_parallel,
-    data_scaled = data_scaled,
+    dat_scaled = dat_scaled,
     k = obj$k,
     admm_params = obj$admm_params,
     edf_opt = edf_opt,
     lambda_grid = lambda_grid,
     sampler = sampler,
-    x_eval = x_eval / obj$scale["x"],
+    x_eval = x_eval / obj$scale_xy["x"],
     edf_tol = edf_tol,
     zero_tol = zero_tol,
-    scale = obj$scale,
+    scale_xy = obj$scale_xy,
     mc.cores = mc_cores
   )
 
@@ -349,7 +354,7 @@ bootstrap_trendfilter <- function(obj,
         weights = obj$weights,
         k = obj$k,
         call = boot.call,
-        scale = obj$scale
+        scale_xy = obj$scale_xy
       ),
       class = c("bootstrap_trendfilter", "trendfilter", "trendfiltering")
     )
@@ -358,9 +363,8 @@ bootstrap_trendfilter <- function(obj,
 
 
 #' @noRd
-#' @importFrom glmgen .tf_fit .tf_boot
 bootstrap_parallel <- function(b,
-                               data_scaled,
+                               dat_scaled,
                                k,
                                admm_params,
                                edf_opt,
@@ -369,18 +373,18 @@ bootstrap_parallel <- function(b,
                                x_eval,
                                edf_tol,
                                zero_tol,
-                               scale) {
-  data_scaled <- sampler(data_scaled)
+                               scale_xy) {
+  dat_scaled <- sampler(dat_scaled)
 
   fit <- .trendfilter(
-    x = data_scaled$x,
-    y = data_scaled$y,
-    weights = data_scaled$weights,
+    x = dat_scaled$x,
+    y = dat_scaled$y,
+    weights = dat_scaled$weights,
     k = k,
     lambda = lambda_grid,
     obj_tol = admm_params$obj_tol,
     max_iter = admm_params$max_iter,
-    scaling = FALSE
+    scale = FALSE
   )
 
   i_min <- which.min(abs(fit$edf - edf_opt))[1]
@@ -390,7 +394,7 @@ bootstrap_parallel <- function(b,
     return(
       bootstrap_parallel(
         b = 1,
-        data_scaled,
+        dat_scaled,
         k,
         admm_params,
         edf_opt,
@@ -399,7 +403,7 @@ bootstrap_parallel <- function(b,
         x_eval,
         edf_tol,
         zero_tol,
-        scale
+        scale_xy
       )
     )
   }
@@ -412,7 +416,7 @@ bootstrap_parallel <- function(b,
     lambda = lambda_boot,
     x_eval = x_eval,
     zero_tol = zero_tol
-  ) * scale["y"]
+  ) * scale_xy["y"]
 
   tf_estimate_boot %<>% as.numeric()
   names(tf_estimate_boot) <- NULL
@@ -428,46 +432,53 @@ bootstrap_parallel <- function(b,
 
 #' Bootstrap sampling/resampling functions
 #'
-#' @param data A tibble or data frame with minimal column set: `x` and `y` (for
-#' all samplers), `weights` and `fitted.values` (for `parametric.sampler`), and
+#' @param dat A tibble or data frame with minimal column set: `x` and `y` (for
+#' all samplers), `weights` and `fitted` (for `parametric.sampler`), and
 #' `residuals` (for `wild.sampler`).
 #'
-#' @return Bootstrap sample returned in the same format as `data`.
+#' @return Bootstrap sample returned in the same format as `dat`.
 
 
 #' @importFrom dplyr mutate n
 #' @importFrom magrittr %>%
 #' @importFrom stats rnorm
 #' @noRd
-parametric_sampler <- function(data) {
-  data %>% mutate(y = fitted_values + rnorm(n = n(), sd = 1 / sqrt(weights)))
+parametric_sampler <- function(dat) {
+  dat %>%
+    mutate(
+      y = fitted_values + rnorm(n = n(), sd = 1 / sqrt(weights))
+    )
 }
 
 
-#' @importFrom dplyr slice_sample n
+#' @importFrom dplyr slice_sample
 #' @importFrom magrittr %>%
 #' @noRd
-nonparametric_resampler <- function(data) {
-  data %>% slice_sample(n = nrow(data), replace = TRUE)
+nonparametric_resampler <- function(dat) {
+  dat %>% slice_sample(n = nrow(dat), replace = TRUE)
 }
 
 
 #' @importFrom dplyr mutate n
 #' @importFrom magrittr %>%
 #' @noRd
-wild_sampler <- function(data) {
-  data %>% mutate(y = fitted_values + residuals *
-                    sample(
-                      x = c(
-                        (1 + sqrt(5)) / 2,
-                        (1 - sqrt(5)) / 2
-                      ),
-                      size = n(), replace = TRUE,
-                      prob = c(
-                        (1 + sqrt(5)) / (2 * sqrt(5)),
-                        (sqrt(5) - 1) / (2 * sqrt(5))
-                      )
-                    ))
+wild_sampler <- function(dat) {
+  dat %>%
+    mutate(y = fitted_values +
+             residuals *
+             sample(
+               x = c(
+                 (1 + sqrt(5)) / 2,
+                 (1 - sqrt(5)) / 2
+               ),
+               size = n(),
+               replace = TRUE,
+               prob = c(
+                 (1 + sqrt(5)) / (2 * sqrt(5)),
+                 (sqrt(5) - 1) / (2 * sqrt(5))
+               )
+             )
+    )
 }
 
 
@@ -490,13 +501,11 @@ wild_sampler <- function(data) {
 #'    for time-domain astronomy and astronomical spectroscopy. *MNRAS*, 492(3),
 #'    p. 4005-4018.
 #'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4005/5704413)]
-#'    [[arXiv](https://arxiv.org/abs/1908.07151)]
-#'    [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].
+#'    [[arXiv](https://arxiv.org/abs/1908.07151)].
 #' 2. Politsch et al. (2020b). Trend Filtering – II. Denoising astronomical
 #'    signals with varying degrees of smoothness. *MNRAS*, 492(3), p. 4019-4032.
 #'    [[Publisher](https://academic.oup.com/mnras/article/492/3/4019/5704414)]
-#'    [[arXiv](https://arxiv.org/abs/2001.03552)]
-#'    [[BibTeX](https://capolitsch.github.io/trendfiltering/authors.html)].
+#'    [[arXiv](https://arxiv.org/abs/2001.03552)].
 #'
 #' @examples
 #' # Example 1: Phase-folded light curve of an eclipsing binary star system
@@ -514,7 +523,13 @@ wild_sampler <- function(data) {
 #' y <- eclipsing_binary$flux
 #' weights <- 1 / eclipsing_binary$std_err^2
 #'
-#' cv_tf <- cv_trendfilter(x, y, weights, max_iter = 1e4, obj_tol = 1e-6)
+#' cv_tf <- cv_trendfilter(
+#'   x = x,
+#'   y = y,
+#'   weights = weights,
+#'   max_iter = 1e4,
+#'   obj_tol = 1e-6
+#' )
 #'
 #' boot_tf <- bootstrap_trendfilter(
 #'   obj = cv_tf,

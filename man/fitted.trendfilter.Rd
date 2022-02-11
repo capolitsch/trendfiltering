@@ -9,7 +9,7 @@
 \alias{fitted.cv_trendfilter}
 \alias{fitted.sure_trendfilter}
 \alias{fitted.bootstrap_trendfilter}
-\title{Get fitted values from a trendfilter object}
+\title{Fitted values of a trend filtering model}
 \usage{
 \method{fitted}{trendfilter}(obj, lambda = NULL, ...)
 }
@@ -26,5 +26,5 @@ hyperparameter values in \code{obj$lambda}.}
 value is set to zero. Defaults to \code{zero_tol = 1e-10}.}
 }
 \description{
-Get fitted values from a trendfilter object
+Get fitted values from a '\code{\link[=trendfilter]{trendfilter}}' object.
 }

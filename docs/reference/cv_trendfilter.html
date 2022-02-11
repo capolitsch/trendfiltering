@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Optimize the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter • trendfiltering</title>
+<title>Optimize a trend filtering model by V-fold cross validation — cv_trendfilter • trendfiltering</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,17 +46,12 @@
 
 
 
-<meta property="og:title" content="Optimize the trend filtering hyperparameter by V-fold cross validation — cv_trendfilter" />
+<meta property="og:title" content="Optimize a trend filtering model by V-fold cross validation — cv_trendfilter" />
 <meta property="og:description" content="
  For every candidate hyperparameter value, estimate the trend
 filtering model's out-of-sample error by \(V\)-fold cross validation.
-Many common regression loss functions are defined internally, and a cross
-validation curve is returned for each. Custom loss functions may also be
-passed via the loss_funcs argument. See the Loss functions section
-below for definitions of the internal loss functions, and for guidelines on
-when cv_trendfilter() should be used versus sure_trendfilter().
-Generic functions such as predict(), fitted.values(),
-and residuals() may be called on the cv_trendfilter() output." />
+See the Details section for guidelines on when cv_trendfilter()
+should be used versus sure_trendfilter()." />
 <meta property="og:image" content="https://capolitsch.github.io/trendfiltering/logo.svg" />
 
 
@@ -89,7 +84,7 @@ and residuals() may be called on the cv_trendfilter() output." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">trendfiltering</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -128,7 +123,7 @@ and residuals() may be called on the cv_trendfilter() output." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Optimize the trend filtering hyperparameter by V-fold cross validation</h1>
+    <h1>Optimize a trend filtering model by V-fold cross validation</h1>
     <small class="dont-index">Source: <a href='https://github.com/capolitsch/trendfiltering/blob/main/R/hyperparameter-tuning.R'><code>R/hyperparameter-tuning.R</code></a></small>
     <div class="hidden name"><code>cv_trendfilter.Rd</code></div>
     </div>
@@ -136,14 +131,9 @@ and residuals() may be called on the cv_trendfilter() output." />
     <div class="ref-description">
     <p><script id="MathJax-script" async src="../../mathjaxr/doc/mathjax/es5/tex-chtml-full.js"></script>
  For every candidate hyperparameter value, estimate the trend
-filtering model's out-of-sample error by <em></em>\(V\)-fold cross validation.
-Many common regression loss functions are defined internally, and a cross
-validation curve is returned for each. Custom loss functions may also be
-passed via the <code>loss_funcs</code> argument. See the <strong>Loss functions</strong> section
-below for definitions of the internal loss functions, and for guidelines on
-when <code>cv_trendfilter()</code> should be used versus <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>.
-Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted.values()</a></code>,
-and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may be called on the <code>cv_trendfilter()</code> output.</p>
+filtering model's out-of-sample error by \(V\)-fold cross validation.
+See the <strong>Details</strong> section for guidelines on when <code>cv_trendfilter()</code>
+should be used versus <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>cv_trendfilter</span><span class='op'>(</span>
@@ -173,17 +163,17 @@ and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code
       <th>weights</th>
       <td><p>Weights for the observed outputs, defined as the reciprocal variance of the
 additive noise that contaminates the output signal. When the noise is
-expected to have an equal variance <em></em>\(\sigma^2\) for all observations,
-a scalar may be passed to <code>weights</code>, i.e. <code>weights = </code><em></em>\(1/\sigma^2\).
+expected to have an equal variance \(\sigma^2\) for all observations,
+a scalar may be passed to <code>weights</code>, i.e. <code>weights = </code>\(1/\sigma^2\).
 Otherwise, <code>weights</code> must be a vector with the same length as <code>x</code> and <code>y</code>.</p></td>
     </tr>
     <tr>
       <th>nlambda</th>
-      <td><p>Number of hyperparameter values to test during cross validation. Defaults
-to <code>nlambda = 250</code>. The hyperparameter grid is internally constructed to
-span the full trend filtering model space (which is bookended by a global
-polynomial solution and an interpolating solution), with <code>nlambda</code>
-controlling the granularity of the hyperparameter grid.</p></td>
+      <td><p>Number of hyperparameter values to evaluate during cross validation.
+Defaults to <code>nlambda = 250</code>. The hyperparameter grid is internally
+constructed to span the full trend filtering model space (which is
+bookended by a global polynomial solution and an interpolating solution),
+with <code>nlambda</code> controlling the granularity of the hyperparameter grid.</p></td>
     </tr>
     <tr>
       <th>V</th>
@@ -204,8 +194,8 @@ below for an example.</p></td>
     <tr>
       <th>fold_ids</th>
       <td><p>An integer vector defining a custom partition of the data for cross
-validation. <code>fold_ids</code> must have the same length as <code>x</code> and <code>y</code>, and
-only contain integer values <code>1</code>, ..., <code>V</code> designating the fold assignments.</p></td>
+validation. <code>fold_ids</code> must have the same length as <code>x</code> and <code>y</code>, and only
+contain integer values <code>1</code>, ..., <code>V</code> designating the fold assignments.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -215,9 +205,12 @@ only contain integer values <code>1</code>, ..., <code>V</code> designating the 
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>'cv_trendfilter'</code> and subclass <code>'trendfilter'</code>.
-This is a list with the elements below,
-as well as all elements from the '<code><a href='trendfilter.html'>trendfilter</a></code>' call.</p><dl>
+    <p>An object of class '<code>cv_trendfilter</code>'. The object has subclass
+'<code><a href='trendfilter.html'>trendfilter</a></code>' and may therefore be passed to generic
+stats functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted()</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code>.
+And more precisely, a <code>cv_trendfilter</code>' object is a list with the elements
+below, as well as all elements from a <code><a href='trendfilter.html'>trendfilter</a></code>' call
+on the full data set.</p><dl>
 <dt><code>lambda</code></dt><dd><p>Vector of candidate hyperparameter values (always returned
 in descending order).</p></dd>
 <dt><code>edf</code></dt><dd><p>Number of effective degrees of freedom in the trend filtering
@@ -262,13 +255,12 @@ algorithm used to solve the trend filtering convex optimization.</p></dd>
 ADMM algorithm's final iteration, for every candidate hyperparameter in
 <code>lambda</code>.</p></dd>
 <dt><code>n_iter</code></dt><dd><p>Total number of iterations taken by the ADMM algorithm, for
-every candidate hyperparameter in <code>lambda</code>. If an element of <code>n_iter</code>
-is exactly equal to <code>admm_params$max_iter</code>, then the
-ADMM algorithm stopped before reaching the objective tolerance
-<code>admm_params$obj_tol</code>. In these situations, you may need to
-increase the maximum number of tolerable iterations by passing a
-<code>max_iter</code> argument to <code>cv_trendfilter()</code> in order to ensure that the ADMM
-solution has converged to satisfactory precision.</p></dd>
+every candidate hyperparameter in <code>lambda</code>. If an element of <code>n_iter</code> is
+exactly equal to <code>admm_params$max_iter</code>, then the ADMM algorithm stopped
+before reaching the objective tolerance <code>admm_params$obj_tol</code>. In these
+situations, you may need to increase the maximum number of tolerable
+iterations by passing a <code>max_iter</code> argument to <code>cv_trendfilter()</code> in order
+to ensure that the ADMM solution has converged to satisfactory precision.</p></dd>
 <dt><code>loss_funcs</code></dt><dd><p>A named list of functions that defines all loss functions
 --- both internal and user-passed --- evaluated during cross validation.</p></dd>
 <dt><code>V</code></dt><dd><p>The number of folds the data were split into for cross
@@ -280,13 +272,19 @@ present, observations with <code><a href='https://rdrr.io/r/base/NA.html'>is.na(
 <dt><code>k</code></dt><dd><p>Degree of the trend filtering estimates.</p></dd>
 <dt><code>status</code></dt><dd><p>For internal use. Output from the C solver.</p></dd>
 <dt><code>call</code></dt><dd><p>The function call.</p></dd>
-<dt><code>scale</code></dt><dd><p>For internal use.</p></dd>
+<dt><code>scale_xy</code></dt><dd><p>For internal use.</p></dd>
 
 </dl>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Our recommendations for when to use <code>cv_trendfilter()</code> versus
+    <p>Many common regression loss functions are defined internally, and a
+cross validation curve is returned for each. Custom loss functions may also
+be passed via the <code>loss_funcs</code> argument. See the <strong>Loss functions</strong> section
+below for definitions of the internal loss functions.
+Generic functions such as <code><a href='https://rdrr.io/r/stats/predict.html'>predict()</a></code>, <code><a href='https://rdrr.io/r/stats/fitted.values.html'>fitted</a></code>, and <code><a href='https://rdrr.io/r/stats/residuals.html'>residuals()</a></code> may
+be called on the <code>cv_trendfilter()</code> output.</p>
+<p>Our recommendations for when to use <code>cv_trendfilter()</code> versus
 <code><a href='sure_trendfilter.html'>sure_trendfilter()</a></code> are summarized in the table below. See Section 3.5 of
 <a href='https://arxiv.org/abs/1908.07151'>Politsch et al. (2020a)</a> for more details.</p><table class='table'>
 <tr><td>Scenario</td><td>Hyperparameter optimization</td></tr>
@@ -345,7 +343,7 @@ $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
 \left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|\]</p></li>
 </ol>
 
-<p>where <em></em>\(w_i:=\) <code>weights[i]</code>.</p>
+<p>where \(w_i:=\) <code>weights[i]</code>.</p>
 <p>When defining custom loss functions, each function within the named list
 passed to <code>loss_funcs</code> should take three vector arguments --- <code>y</code>,
 <code>tf_estimate</code>, and <code>weights</code> --- and return a single scalar value for the
@@ -389,7 +387,13 @@ signals with varying degrees of smoothness. <em>MNRAS</em>, 492(3), p. 4019-4032
 <span class='va'>y</span> <span class='op'>&lt;-</span> <span class='va'>eclipsing_binary</span><span class='op'>$</span><span class='va'>flux</span>
 <span class='va'>weights</span> <span class='op'>&lt;-</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='va'>eclipsing_binary</span><span class='op'>$</span><span class='va'>std_err</span><span class='op'>^</span><span class='fl'>2</span>
 
-<span class='va'>cv_tf</span> <span class='op'>&lt;-</span> <span class='fu'>cv_trendfilter</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>weights</span>, max_iter <span class='op'>=</span> <span class='fl'>1e4</span>, obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span><span class='op'>)</span>
+<span class='va'>cv_tf</span> <span class='op'>&lt;-</span> <span class='fu'>cv_trendfilter</span><span class='op'>(</span>
+  x <span class='op'>=</span> <span class='va'>x</span>,
+  y <span class='op'>=</span> <span class='va'>y</span>,
+  weights <span class='op'>=</span> <span class='va'>weights</span>,
+  max_iter <span class='op'>=</span> <span class='fl'>1e4</span>,
+  obj_tol <span class='op'>=</span> <span class='fl'>1e-6</span>
+<span class='op'>)</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

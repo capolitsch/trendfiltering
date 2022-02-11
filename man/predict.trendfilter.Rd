@@ -2,7 +2,7 @@
 % Please edit documentation in R/methods-stats.R
 \name{predict.trendfilter}
 \alias{predict.trendfilter}
-\title{Get predictions from a trendfilter object}
+\title{Predict from a trend filtering model}
 \usage{
 \method{predict}{trendfilter}(obj, lambda = NULL, x_eval = NULL, zero_tol = 1e-10, ...)
 }
@@ -22,5 +22,5 @@ value is set to zero. Defaults to \code{zero_tol = 1e-6}.}
 \item{...}{Additional named arguments. Currently unused.}
 }
 \description{
-Get predictions from a '\code{\link[=trendfilter]{trendfilter}}' object
+Get predictions from a '\code{\link[=trendfilter]{trendfilter}}' object.
 }
