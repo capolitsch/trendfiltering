@@ -34,7 +34,7 @@
 #'   Maximum number of iterations that we will tolerate for the trend filtering
 #'   convex optimization algorithm. Defaults to `max_iter = length(y)`.
 #' @param scale
-#'   A logical
+#'   A logical indicating whether to scale the inputs and outputs.
 #' @param ...
 #'   Additional named arguments. Currently unused.
 #'
@@ -73,7 +73,7 @@
 #' `max_iter = length(y)`.}
 #' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
-#' \item{`xy_scale`}{For internal use.}
+#' \item{`scale_xy`}{For internal use.}
 #' }
 #'
 #' @references
@@ -233,8 +233,8 @@
     lambda = lambda
   )
 
-  xy_scale <- c(x_scale, y_scale)
-  names(xy_scale) <- c("x","y")
+  scale_xy <- c(x_scale, y_scale)
+  names(scale_xy) <- c("x","y")
 
   invisible(
     structure(
@@ -251,7 +251,7 @@
         n_iter = as.integer(fit$iter),
         status = fit$status,
         call = tf_call,
-        xy_scale = xy_scale
+        scale_xy = scale_xy
       ),
       class = c("trendfilter", "trendfiltering")
     )
@@ -319,7 +319,7 @@
 #' `max_iter = length(y)`.}
 #' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
-#' \item{`xy_scale`}{For internal use.}
+#' \item{`scale_xy`}{For internal use.}
 #' }
 #'
 #' @references

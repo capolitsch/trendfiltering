@@ -193,7 +193,7 @@
 #' \item{`k`}{Degree of the trend filtering estimates.}
 #' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
-#' \item{`xy_scale`}{For internal use.}
+#' \item{`scale_xy`}{For internal use.}
 #' }
 #'
 #' @references
@@ -546,8 +546,8 @@ cv_trendfilter <- function(x,
   edf_1se <- fit$edf[i_1se]
 
   loss_func_names <- names(loss_funcs)
-  xy_scale <- c(x_scale, y_scale)
-  names(xy_scale) <- c("x", "y")
+  scale_xy <- c(x_scale, y_scale)
+  names(scale_xy) <- c("x", "y")
 
   names(lambda_min) <- loss_func_names
   names(lambda_1se) <- loss_func_names
@@ -583,7 +583,7 @@ cv_trendfilter <- function(x,
         k = k,
         status = fit$status,
         call = cv_call,
-        xy_scale = xy_scale
+        scale_xy = scale_xy
       ),
       class = c("cv_trendfilter", "trendfilter", "trendfiltering")
     )
@@ -976,8 +976,8 @@ sure_trendfilter <- function(x,
   ) %>%
     min()
 
-  xy_scale <- c(x_scale, y_scale)
-  names(xy_scale) <- c("x","y")
+  scale_xy <- c(x_scale, y_scale)
+  names(scale_xy) <- c("x","y")
 
   invisible(
     structure(
@@ -1004,7 +1004,7 @@ sure_trendfilter <- function(x,
         k = k,
         status = fit$status,
         call = sure_call,
-        xy_scale = xy_scale
+        scale_xy = scale_xy
       ),
       class = c("sure_trendfilter", "trendfilter", "trendfiltering")
     )

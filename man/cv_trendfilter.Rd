@@ -119,7 +119,7 @@ present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
 \item{\code{k}}{Degree of the trend filtering estimates.}
 \item{\code{status}}{For internal use. Output from the C solver.}
 \item{\code{call}}{The function call.}
-\item{\code{xy_scale}}{For internal use.}
+\item{\code{scale_xy}}{For internal use.}
 }
 }
 \description{

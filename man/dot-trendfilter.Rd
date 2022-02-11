@@ -51,7 +51,7 @@ convex optimization algorithm. Defaults to \code{max_iter = length(y)}.}
 
 \item{...}{Additional named arguments. Currently unused.}
 
-\item{scale}{A logical}
+\item{scale}{A logical indicating whether to scale the inputs and outputs.}
 }
 \value{
 An object of class \code{'trendfilter'}. Generic functions such as
@@ -89,7 +89,7 @@ This can be done by passing an extra argument \code{max_iter} to the
 \code{max_iter = length(y)}.}
 \item{\code{status}}{For internal use. Output from the C solver.}
 \item{\code{call}}{The function call.}
-\item{\code{xy_scale}}{For internal use.}
+\item{\code{scale_xy}}{For internal use.}
 }
 }
 \description{

@@ -63,7 +63,7 @@ This can be done by passing an extra argument \code{max_iter} to the
 \code{max_iter = length(y)}.}
 \item{\code{status}}{For internal use. Output from the C solver.}
 \item{\code{call}}{The function call.}
-\item{\code{xy_scale}}{For internal use.}
+\item{\code{scale_xy}}{For internal use.}
 }
 }
 \description{
