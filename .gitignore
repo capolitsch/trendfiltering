@@ -9,6 +9,8 @@
 /R/relax_trendfilter.R
 /R/methods-base.R
 
+/H_operations
+
 # Package-specific R profile
 .Rprofile
 
