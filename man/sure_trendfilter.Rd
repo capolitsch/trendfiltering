@@ -98,7 +98,7 @@ section for guidelines on when \code{\link[=sure_trendfilter]{sure_trendfilter()
 Our recommendations for when to use \code{\link[=sure_trendfilter]{sure_trendfilter()}} versus
 \code{\link[=cv_trendfilter]{cv_trendfilter()}} are summarized in the table below. See Section 3.5 of
 \href{https://arxiv.org/abs/1908.07151}{Politsch et al. (2020a)} for more details.\tabular{lc}{
-   Scenario \tab Hyperparameter optimization \cr
+   \emph{Scenario} \tab \emph{Hyperparameter optimization} \cr
    \code{x} is unevenly sampled \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
    \code{x} is evenly sampled and measurement variances for \code{y} are not available \tab \code{\link[=cv_trendfilter]{cv_trendfilter()}} \cr
    \code{x} is evenly sampled and measurement variances for \code{y} are available \tab \code{\link[=sure_trendfilter]{sure_trendfilter()}} \cr

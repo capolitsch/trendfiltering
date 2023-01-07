@@ -104,7 +104,7 @@ section for guidance on how \code{edf} can be chosen.
 Our recommendations for when to use each of the possible settings
 for the \code{algorithm} argument are shown in the table below. See
 \href{https://academic.oup.com/mnras/article/492/3/4005/5704413}{Politsch et al. (2020a)} for more details.\tabular{ll}{
-   Scenario \tab Uncertainty quantification \cr
+   \emph{Scenario} \tab \emph{Uncertainty quantification} \cr
    \code{x} is unevenly sampled \tab \code{algorithm = "nonparametric"} \cr
    \code{x} is evenly sampled and measurement variances for \code{y} are available \tab \code{algorithm = "parametric"} \cr
    \code{x} is evenly sampled and measurement variances for \code{y} are not available \tab \code{algorithm = "wild"} \cr

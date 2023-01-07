@@ -48,11 +48,11 @@
 #' [`sure_trendfilter()`] are summarized in the table below. See Section 3.5 of
 #' [Politsch et al. (2020a)](https://arxiv.org/abs/1908.07151) for more details.
 #'
-#' | Scenario                                                                  |  Hyperparameter optimization  |
-#' | :---                                                                      |                         :---: |
-#' | `x` is unevenly sampled                                                   |      [`cv_trendfilter()`]     |
-#' | `x` is evenly sampled and measurement variances for `y` are not available |      [`cv_trendfilter()`]     |
-#' | `x` is evenly sampled and measurement variances for `y` are available     |      [`sure_trendfilter()`]   |
+#' | *Scenario*                                                                  |  *Hyperparameter optimization*  |
+#' | :---                                                                        |                           :---: |
+#' | `x` is unevenly sampled                                                     |      [`cv_trendfilter()`]       |
+#' | `x` is evenly sampled and measurement variances for `y` are not available   |      [`cv_trendfilter()`]       |
+#' | `x` is evenly sampled and measurement variances for `y` are available       |      [`sure_trendfilter()`]     |
 #'
 #' For our purposes, an evenly sampled data set with some discarded pixels
 #' (either sporadically or in wide consecutive chunks) is still considered to
@@ -737,11 +737,11 @@ get_internal_loss_funcs <- function() {
 #' [`cv_trendfilter()`] are summarized in the table below. See Section 3.5 of
 #' [Politsch et al. (2020a)](https://arxiv.org/abs/1908.07151) for more details.
 #'
-#' | Scenario                                                                  |  Hyperparameter optimization  |
-#' | :---                                                                      |                         :---: |
-#' | `x` is unevenly sampled                                                   |      [`cv_trendfilter()`]     |
-#' | `x` is evenly sampled and measurement variances for `y` are not available |      [`cv_trendfilter()`]     |
-#' | `x` is evenly sampled and measurement variances for `y` are available     |      [`sure_trendfilter()`]   |
+#' | *Scenario*                                                                |  *Hyperparameter optimization*  |
+#' | :---                                                                      |                           :---: |
+#' | `x` is unevenly sampled                                                   |        [`cv_trendfilter()`]     |
+#' | `x` is evenly sampled and measurement variances for `y` are not available |        [`cv_trendfilter()`]     |
+#' | `x` is evenly sampled and measurement variances for `y` are available     |        [`sure_trendfilter()`]   |
 #'
 #' For our purposes, an evenly sampled data set with some discarded pixels
 #' (either sporadically or in wide consecutive chunks) is still considered to

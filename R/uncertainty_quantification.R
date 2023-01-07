@@ -46,11 +46,11 @@
 #' [Politsch et al. (2020a)](
 #' https://academic.oup.com/mnras/article/492/3/4005/5704413) for more details.
 #'
-#' | Scenario                                                                  |  Uncertainty quantification  |
-#' | :---                                                                      |                   :---       |
-#' | `x` is unevenly sampled                                                   | `algorithm = "nonparametric"`|
-#' | `x` is evenly sampled and measurement variances for `y` are available     | `algorithm = "parametric"`   |
-#' | `x` is evenly sampled and measurement variances for `y` are not available | `algorithm = "wild"`         |
+#' | *Scenario*                                                                  |  *Uncertainty quantification*  |
+#' | :---                                                                        |                     :---       |
+#' | `x` is unevenly sampled                                                     |   `algorithm = "nonparametric"`|
+#' | `x` is evenly sampled and measurement variances for `y` are available       |   `algorithm = "parametric"`   |
+#' | `x` is evenly sampled and measurement variances for `y` are not available   |   `algorithm = "wild"`         |
 #'
 #' For our purposes, an evenly sampled data set with some discarded pixels
 #' (either sporadically or in large consecutive chunks) is still considered to
