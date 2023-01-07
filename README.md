@@ -6,7 +6,7 @@ A suite of tools for denoising and analyzing one-dimensional
 signals with trend filtering. Trend filtering constructs a piecewise
 polynomial estimate (of any order) for the signal with knots chosen 
 adaptively from the observed data. Hyperpameter(s) can be optimized by 
-Stein's unbiased risk estimate or V-fold cross validation with a 
+Stein's unbiased risk estimate or *V*-fold cross validation with a 
 customizable loss function. Methods are also included for trend filtering
 uncertainty quantification and a generalized "relaxed trend filtering"
 estimator.

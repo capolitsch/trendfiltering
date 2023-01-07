@@ -1,4 +1,4 @@
-#' Optimize a trend filtering model by V-fold cross validation
+#' Optimize a trend filtering model by *V*-fold cross validation
 #'
 #' \loadmathjax For every candidate hyperparameter value, estimate the trend
 #' filtering model's out-of-sample error by \mjseqn{V}-fold cross validation.
@@ -41,8 +41,8 @@
 #' cross validation curve is returned for each. Custom loss functions may also
 #' be passed via the `loss_funcs` argument. See the **Loss functions** section
 #' below for definitions of the internal loss functions.
-#' Generic functions such as [`predict()`], [`fitted`], and [`residuals()`] may
-#' be called on the [`cv_trendfilter()`] output.
+#' Generic functions such as [`predict()`], [`fitted()`], and [`residuals()`]
+#' may be called on the [`cv_trendfilter()`] output.
 #'
 #' Our recommendations for when to use [`cv_trendfilter()`] versus
 #' [`sure_trendfilter()`] are summarized in the table below. See Section 3.5 of
@@ -90,7 +90,7 @@
 #'
 #' 7. Huber loss: \mjsdeqn{Huber(\lambda) =
 #' \frac{1}{n}\sum_{i=1}^{n}L_{\lambda}(Y_i; \delta)}
-#' \mjsdeqn{\text{where}\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
+#' where\mjsdeqn{\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
 #' |Y_i - \hat{f}(x_i; \lambda)|^2, &
 #' $|Y_i - \hat{f}(x_i; \lambda)| \leq \delta$ \cr
 #' 2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, &
@@ -98,7 +98,7 @@
 #'
 #' 8. Weighted Huber loss: \mjsdeqn{wHuber(\lambda) =
 #' \sum_{i=1}^{n}L_{\lambda}(Y_i; \delta)}
-#' \mjsdeqn{\text{where}\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
+#' where\mjsdeqn{\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
 #' |Y_i - \hat{f}(x_i; \lambda)|^2w_i, &
 #' $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
 #' 2\delta|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} -
@@ -127,8 +127,8 @@
 #' @return An object of class '`cv_trendfilter`'. The object has subclass
 #' '[`trendfilter`][`trendfilter()`]' and may therefore be passed to generic
 #' stats functions such as [`predict()`], [`fitted()`], and [`residuals()`].
-#' And more precisely, a `cv_trendfilter`' object is a list with the elements
-#' below, as well as all elements from a [`trendfilter`][`trendfilter()`]' call
+#' And more precisely, a '`cv_trendfilter`' object is a list with the elements
+#' below, as well as all elements from a [`trendfilter()`][`trendfilter()`] call
 #' on the full data set.
 #' \describe{
 #' \item{`lambda`}{Vector of candidate hyperparameter values (always returned
@@ -253,9 +253,11 @@ cv_trendfilter <- function(x,
   if (any(names(extra_args) == "k")) {
     k <- extra_args$k
     extra_args$k <- NULL
-    stopifnot(is.numeric(k) && k == round(k))
-    stopifnot(length(k) == 1)
+    stopifnot(is.numeric(k))
+    stopifnot(length(k) == 1L)
+    stopifnot(k == round(k))
     if (!k %in% 0:2) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
+    k %<>% as.integer()
   } else {
     k <- 2L
   }
@@ -263,7 +265,9 @@ cv_trendfilter <- function(x,
   if (any(names(extra_args) == "obj_tol")) {
     obj_tol <- extra_args$obj_tol
     extra_args$obj_tol <- NULL
-    stopifnot(is.numeric(obj_tol) && obj_tol > 0L && length(obj_tol) == 1L)
+    stopifnot(is.numeric(obj_tol))
+    stopifnot(length(obj_tol) == 1L)
+    stopifnot(obj_tol > 0L)
   } else{
     obj_tol <- NULL
   }
@@ -271,15 +275,19 @@ cv_trendfilter <- function(x,
   if (any(names(extra_args) == "max_iter")) {
     max_iter <- extra_args$max_iter
     extra_args$max_iter <- NULL
-    stopifnot(is.numeric(max_iter) && max_iter == round(max_iter))
+    stopifnot(is.numeric(max_iter))
     stopifnot(length(max_iter) == 1L)
+    stopifnot(max_iter == round(max_iter))
     max_iter %<>% as.integer()
   } else{
     max_iter <- 0
   }
 
-  stopifnot(is.numeric(V) && V == round(V))
-  if (V < 2L || V > 10L) {
+  stopifnot(is.numeric(V))
+  stopifnot(length(V) == 1L)
+  stopifnot(V == round(V))
+  V %<>% as.integer()
+  if (V < 2L | V > 10L) {
     stop("Must have `V >= 2` and `V <= 10`.", call. = FALSE)
   }
 
@@ -290,7 +298,10 @@ cv_trendfilter <- function(x,
   stopifnot(all(weights >= 0L))
   if (length(weights) == 1) weights <- rep_len(weights, n)
 
-  if (nlambda < 100 || nlambda != round(nlambda)) {
+  stopifnot(is.numeric(nlambda))
+  stopifnot(length(nlambda) == 1L)
+  stopifnot(nlambda == round(nlambda))
+  if (nlambda < 100) {
     stop("`nlambda` must be an integer >= 100`.", call. = FALSE)
   } else {
     nlambda %<>% as.integer()
@@ -339,7 +350,7 @@ cv_trendfilter <- function(x,
         )
       }
 
-      if (is.null(names(loss_funcs)) || any(names(loss_funcs) == "")) {
+      if (is.null(names(loss_funcs)) | any(names(loss_funcs) == "")) {
         stop(
           "`loss_funcs` must be a named list of functions.",
           call. = FALSE
@@ -363,9 +374,6 @@ cv_trendfilter <- function(x,
       loss_funcs <- c(internal_loss_funcs, loss_funcs)
     }
   }
-
-  k %<>% as.integer()
-  V %<>% as.integer()
 
   if (is.null(fold_ids)) {
     fold_ids <- sample(rep_len(1:V, n))
@@ -407,7 +415,7 @@ cv_trendfilter <- function(x,
     x = as.double(x),
     y = as.double(y),
     weights = as.double(weights),
-    fold_id = as.integer(fold_ids)
+    fold_ids = as.integer(fold_ids)
   ) %>%
     drop_na() %>%
     arrange(x) %>%
@@ -443,13 +451,12 @@ cv_trendfilter <- function(x,
       x = thin_out$x,
       y = thin_out$y,
       weights = thin_out$w,
-      fold_id = dat_scaled$fold_id[inds]
+      fold_ids = dat_scaled$fold_ids[inds]
     )
   }
 
   dat_folded <- dat_scaled %>%
-    mutate(ids = fold_id) %>%
-    group_split(ids, .keep = FALSE)
+    group_split(fold_ids, .keep = TRUE)
 
   lambda <- get_lambda_grid_edf_spacing(
     dat = dat_scaled,
@@ -579,7 +586,7 @@ cv_trendfilter <- function(x,
         V = V,
         x = dat_scaled$x * x_scale,
         y = dat_scaled$y * y_scale,
-        weights = dat_scaled$weights / y_scale^2,
+        weights = dat_scaled$weights / y_scale ^ 2,
         k = k,
         status = fit$status,
         call = cv_call,
@@ -645,6 +652,7 @@ validate_fold <- function(fold_id,
 }
 
 
+#' @importFrom stats sd
 get_internal_loss_funcs <- function() {
   MAE <- function(tf_estimate, y, weights) {
     mean(abs(tf_estimate - y))
@@ -745,8 +753,8 @@ get_internal_loss_funcs <- function() {
 #' @return An object of class '`sure_trendfilter`'. The object has subclass
 #' '[`trendfilter`][`trendfilter()`]' and may therefore be passed to generic
 #' stats functions such as [`predict()`], [`fitted()`], and [`residuals()`].
-#' More precisely, a `sure_trendfilter`' object is a list with the elements
-#' below, as well as all elements from the [`trendfilter`][`trendfilter()`]'
+#' More precisely, a '`sure_trendfilter`' object is a list with the elements
+#' below, as well as all elements from the [`trendfilter()`][`trendfilter()`]
 #' call.
 #' \describe{
 #' \item{`lambda`}{Vector of candidate hyperparameter values (always returned
@@ -825,7 +833,7 @@ get_internal_loss_funcs <- function() {
 #'
 #' sure_tf <- sure_trendfilter(x, y, weights)
 #' @importFrom glmgen .tf_thin .tf_fit .tf_predict
-#' @importFrom dplyr tibble filter mutate select arrange case_when group_split
+#' @importFrom dplyr tibble filter mutate select arrange case_when
 #' @importFrom dplyr bind_rows
 #' @importFrom tidyr drop_na
 #' @importFrom purrr map
@@ -852,9 +860,11 @@ sure_trendfilter <- function(x,
   if (any(names(extra_args) == "k")) {
     k <- extra_args$k
     extra_args$k <- NULL
-    stopifnot(is.numeric(k) && k == round(k))
-    stopifnot(length(k) == 1)
+    stopifnot(is.numeric(k))
+    stopifnot(length(k) == 1L)
+    stopifnot(k == round(k))
     if (!k %in% 0:2) stop("`k` must be equal to 0, 1, or 2.", call. = FALSE)
+    k %<>% as.integer()
   } else {
     k <- 2L
   }
@@ -862,7 +872,9 @@ sure_trendfilter <- function(x,
   if (any(names(extra_args) == "obj_tol")) {
     obj_tol <- extra_args$obj_tol
     extra_args$obj_tol <- NULL
-    stopifnot(is.numeric(obj_tol) && obj_tol > 0L && length(obj_tol) == 1L)
+    stopifnot(is.numeric(obj_tol))
+    stopifnot(length(obj_tol) == 1L)
+    stopifnot(obj_tol > 0L)
   } else{
     obj_tol <- NULL
   }
@@ -870,8 +882,9 @@ sure_trendfilter <- function(x,
   if (any(names(extra_args) == "max_iter")) {
     max_iter <- extra_args$max_iter
     extra_args$max_iter <- NULL
-    stopifnot(is.numeric(max_iter) && max_iter == round(max_iter))
+    stopifnot(is.numeric(max_iter))
     stopifnot(length(max_iter) == 1L)
+    stopifnot(max_iter == round(max_iter))
     max_iter %<>% as.integer()
   } else{
     max_iter <- 0
@@ -886,13 +899,14 @@ sure_trendfilter <- function(x,
   stopifnot(all(weights >= 0L))
   if (length(weights) == 1) weights <- rep_len(weights, n)
 
-  if (nlambda < 100 || nlambda != round(nlambda)) {
+  stopifnot(is.numeric(nlambda))
+  stopifnot(length(nlambda) == 1L)
+  stopifnot(nlambda == round(nlambda))
+  if (nlambda < 100) {
     stop("`nlambda` must be an integer >= 100`.", call. = FALSE)
   } else {
     nlambda %<>% as.integer()
   }
-
-  k %<>% as.integer()
 
   dat <- tibble(
     x = as.double(x),
@@ -986,8 +1000,8 @@ sure_trendfilter <- function(x,
         edf = fit$edf,
         error = error,
         se_error = se_error,
-        training_error = colMeans(squared_residuals_mat) * y_scale^2,
-        optimism = colMeans(optimism_mat) * y_scale^2,
+        training_error = colMeans(squared_residuals_mat) * y_scale ^ 2,
+        optimism = colMeans(optimism_mat) * y_scale ^ 2,
         lambda_min = lambda[i_min],
         lambda_1se = lambda[i_1se],
         edf_min = fit$edf[i_min],

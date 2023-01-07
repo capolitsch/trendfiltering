@@ -17,7 +17,7 @@ authors:
 
 template:
   code_folding: show
-  bootstrap: 4
+  bootstrap: 5
   params:
     bootswatch: "cosmo"
   bslib:

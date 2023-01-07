@@ -1,6 +1,8 @@
 #' Fit a trend filtering model (back-end function with more options for experts)
 #'
-#' Fit a trend filtering model.
+#' Back-end function for fitting a trend filtering model, with more options for
+#' experts. For non-experts, use the front-end function
+#' [`'trendfilter'`][`trendfilter()`]'.
 #'
 #' @param x
 #'   Vector of observed values for the input variable.
@@ -33,8 +35,8 @@
 #' @param max_iter
 #'   Maximum number of iterations that we will tolerate for the trend filtering
 #'   convex optimization algorithm. Defaults to `max_iter = length(y)`.
-#' @param scale
-#'   A logical indicating whether to scale the inputs and outputs.
+# @param scale
+#   A logical indicating whether to scale the inputs and outputs.
 #' @param ...
 #'   Additional named arguments. Currently unused.
 #'
@@ -104,6 +106,7 @@
 #'   max_iter = 1e4
 #' )
 
+#' @import mathjaxr
 #' @importFrom glmgen .tf_thin .tf_fit .tf_predict
 #' @importFrom dplyr tibble filter mutate select arrange case_when group_split
 #' @importFrom dplyr bind_rows
@@ -140,7 +143,7 @@
   stopifnot(is.numeric(y))
   stopifnot(length(x) == length(y))
 
-  stopifnot(is.numeric(k) && length(k) == 1 && k == round(k))
+  stopifnot(is.numeric(k) & length(k) == 1 & k == round(k))
   k %<>% as.integer()
   if (!any(k == 0:2)) stop("`k` must be equal to 0, 1, or 2.")
 
@@ -241,7 +244,7 @@
       list(
         x = dat_scaled$x * x_scale,
         y = dat_scaled$y * y_scale,
-        weights = dat_scaled$weights / y_scale^2,
+        weights = dat_scaled$weights / y_scale ^ 2,
         k = as.integer(k),
         lambda = lambda,
         edf = as.integer(fit$df),

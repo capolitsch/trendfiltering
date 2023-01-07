@@ -2,7 +2,7 @@
 % Please edit documentation in R/hyperparameter-tuning.R
 \name{cv_trendfilter}
 \alias{cv_trendfilter}
-\title{Optimize a trend filtering model by V-fold cross validation}
+\title{Optimize a trend filtering model by \emph{V}-fold cross validation}
 \usage{
 cv_trendfilter(
   x,
@@ -53,8 +53,8 @@ contain integer values \code{1}, ..., \code{V} designating the fold assignments.
 An object of class '\code{cv_trendfilter}'. The object has subclass
 '\code{\link[=trendfilter]{trendfilter}}' and may therefore be passed to generic
 stats functions such as \code{\link[=predict]{predict()}}, \code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}}.
-And more precisely, a \code{cv_trendfilter}' object is a list with the elements
-below, as well as all elements from a \code{\link[=trendfilter]{trendfilter}}' call
+And more precisely, a '\code{cv_trendfilter}' object is a list with the elements
+below, as well as all elements from a \code{\link[=trendfilter]{trendfilter()}} call
 on the full data set.
 \describe{
 \item{\code{lambda}}{Vector of candidate hyperparameter values (always returned
@@ -133,8 +133,8 @@ Many common regression loss functions are defined internally, and a
 cross validation curve is returned for each. Custom loss functions may also
 be passed via the \code{loss_funcs} argument. See the \strong{Loss functions} section
 below for definitions of the internal loss functions.
-Generic functions such as \code{\link[=predict]{predict()}}, \code{\link{fitted}}, and \code{\link[=residuals]{residuals()}} may
-be called on the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
+Generic functions such as \code{\link[=predict]{predict()}}, \code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}}
+may be called on the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
 
 Our recommendations for when to use \code{\link[=cv_trendfilter]{cv_trendfilter()}} versus
 \code{\link[=sure_trendfilter]{sure_trendfilter()}} are summarized in the table below. See Section 3.5 of
@@ -177,14 +177,14 @@ within the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
 \log\left(\cosh\left((Y_i - \hat{f}(x_i; \lambda))\sqrt{w_i}\right)\right)}
 \item Huber loss: \mjsdeqn{Huber(\lambda) =
 \frac{1}{n}\sum_{i=1}^{n}L_{\lambda}(Y_i; \delta)}
-\mjsdeqn{\text{where}\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
+where\mjsdeqn{\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
 |Y_i - \hat{f}(x_i; \lambda)|^2, &
 $|Y_i - \hat{f}(x_i; \lambda)| \leq \delta$ \cr
 2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, &
 $|Y_i - \hat{f}(x_i; \lambda)| > \delta$}}
 \item Weighted Huber loss: \mjsdeqn{wHuber(\lambda) =
 \sum_{i=1}^{n}L_{\lambda}(Y_i; \delta)}
-\mjsdeqn{\text{where}\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
+where\mjsdeqn{\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
 |Y_i - \hat{f}(x_i; \lambda)|^2w_i, &
 $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
 2\delta|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} -
@@ -201,7 +201,9 @@ passed to \code{loss_funcs} should take three vector arguments --- \code{y},
 \code{tf_estimate}, and \code{weights} --- and return a single scalar value for the
 validation loss. For example, if we wanted to optimize the hyperparameter by
 minimizing an uncertainty-weighted median of the model's MAD errors, we would
-pass the list below to \code{loss_funcs}:\if{html}{\out{<div class="sourceCode r">}}\preformatted{MedAE <- function(tf_estimate, y, weights) \{
+pass the list below to \code{loss_funcs}:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{MedAE <- function(tf_estimate, y, weights) \{
   matrixStats::weightedMedian(abs(tf_estimate - y), sqrt(weights))
 \}
 
