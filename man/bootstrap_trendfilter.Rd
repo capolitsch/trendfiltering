@@ -26,6 +26,8 @@ for guidelines on when each choice should be used.}
 ensemble. Defaults to \code{B = 100L} (larger values encouraged if the
 computational cost is acceptable).}
 
+\item{x_eval}{Input grid to evaluate each bootstrap trend filtering estimate on.}
+
 \item{edf}{The desired number of effective degrees of freedom in each bootstrap
 estimate. When \code{obj} is of class \code{\link[=sure_trendfilter]{sure_trendfilter}}',
 \code{edf = obj$edf_min} and \code{edf = obj$edf_1se} are advisible options. When

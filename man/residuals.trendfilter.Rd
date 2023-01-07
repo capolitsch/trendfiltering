@@ -11,23 +11,26 @@
 \alias{resids.bootstrap_trendfilter}
 \title{Residuals of a trend filtering model}
 \usage{
-\method{residuals}{trendfilter}(obj, lambda = NULL, x_eval = NULL, zero_tol = NULL, ...)
+\method{residuals}{trendfilter}(object, ...)
 }
 \arguments{
-\item{obj}{Object of class \code{trendfilter}.}
+\item{object}{Object of class '\code{\link[=trendfilter]{trendfilter}}'.}
 
-\item{lambda}{One or more lambda values to compute residuals for. Defaults to
-\code{lambda = NULL}, in which case, residuals are computed for all
-hyperparameter values in \code{obj$lambda}.}
-
-\item{x_eval}{Vector of inputs where the trend filtering model(s) will be evaluated.
-Defaults to \code{x_eval = NULL}, in which case \code{x_eval = obj$x}.}
-
-\item{zero_tol}{Threshold parameter that controls the point at which a small coefficient
-value is set to zero. Defaults to \code{zero_tol = 1e-10}.}
-
-\item{...}{Additional named arguments. Currently unused.}
+\item{...}{Additional named arguments.}
 }
 \description{
 Get residuals from a '\code{\link[=trendfilter]{trendfilter}}' object.
+}
+\details{
+As of now, the additional parameters that can be passed are:
+\describe{
+\item{\code{lambda}}{One or more lambda values to compute model residuals for.
+By default, residuals are computed for every model in
+\code{object$lambda}.}
+\item{\code{x_eval}}{Vector of inputs where the trend filtering model(s) will be
+evaluated. By default, \code{x_eval = object$x}.}
+\item{\code{zero_tol}}{(For experts) Threshold parameter that controls the point
+at which a small coefficient value is set to zero. Defaults to
+\code{zero_tol = 1e-10}.}
+}
 }

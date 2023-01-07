@@ -11,20 +11,26 @@
 \alias{fitted.bootstrap_trendfilter}
 \title{Fitted values of a trend filtering model}
 \usage{
-\method{fitted}{trendfilter}(obj, lambda = NULL, ...)
+\method{fitted}{trendfilter}(object, ...)
 }
 \arguments{
-\item{obj}{Object of class \code{trendfilter}.}
+\item{object}{Object of class '\code{\link[=trendfilter]{trendfilter}}'.}
 
-\item{lambda}{One or more lambda values to compute fitted values for. Defaults to
-\code{lambda = NULL}, in which case, fitted values are computed for all
-hyperparameter values in \code{obj$lambda}.}
-
-\item{...}{Additional named arguments. Currently unused.}
-
-\item{zero_tol}{Threshold parameter that controls the point at which a small coefficient
-value is set to zero. Defaults to \code{zero_tol = 1e-10}.}
+\item{...}{Additional named arguments.}
 }
 \description{
 Get fitted values from a '\code{\link[=trendfilter]{trendfilter}}' object.
+}
+\details{
+As of now, the additional parameters that can be passed are:
+\describe{
+\item{\code{lambda}}{One or more lambda values to compute fitted values for.
+By default, fitted values are computed for every model in
+\code{object$lambda}.}
+\item{\code{x_eval}}{Vector of inputs where the trend filtering model(s) will be
+evaluated. By default, \code{x_eval = object$x}.}
+\item{\code{zero_tol}}{(For experts) Threshold parameter that controls the point
+at which a small coefficient value is set to zero. Defaults to
+\code{zero_tol = 1e-10}.}
+}
 }

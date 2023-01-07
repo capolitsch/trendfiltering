@@ -50,8 +50,6 @@ Defaults to \code{obj_tol = 1e-10}.}
 convex optimization algorithm. Defaults to \code{max_iter = length(y)}.}
 
 \item{...}{Additional named arguments. Currently unused.}
-
-\item{scale}{A logical indicating whether to scale the inputs and outputs.}
 }
 \value{
 An object of class \code{'trendfilter'}. Generic functions such as
@@ -93,7 +91,9 @@ This can be done by passing an extra argument \code{max_iter} to the
 }
 }
 \description{
-Fit a trend filtering model.
+Back-end function for fitting a trend filtering model, with more options for
+experts. For non-experts, use the front-end function
+\code{\link[=trendfilter]{'trendfilter'}}'.
 }
 \examples{
 data("eclipsing_binary")

@@ -14,6 +14,8 @@
 #'   The number of bootstrap samples to be drawn to generate the trend filtering
 #'   ensemble. Defaults to `B = 100L` (larger values encouraged if the
 #'   computational cost is acceptable).
+#' @param x_eval
+#'   Input grid to evaluate each bootstrap trend filtering estimate on.
 #' @param edf
 #'   The desired number of effective degrees of freedom in each bootstrap
 #'   estimate. When `obj` is of class [`sure_trendfilter`][sure_trendfilter()]',
@@ -176,7 +178,7 @@ bootstrap_trendfilter <- function(obj,
   stopifnot(any(class(obj) == "trendfiltering"))
   stopifnot(any(class(obj) == "trendfilter"))
   stopifnot(
-    any(class(obj) == "cv_trendfilter") || any(class(obj) == "sure_trendfilter")
+    any(class(obj) == "cv_trendfilter") | any(class(obj) == "sure_trendfilter")
   )
 
   boot.call <- match.call
@@ -199,7 +201,7 @@ bootstrap_trendfilter <- function(obj,
     if (length(edf_opt) > 1) {
       stop("`edf` must be of length 1.")
     }
-    if (edf_opt < obj$k + 1 || edf_opt > length(obj$x)) {
+    if (edf_opt < obj$k + 1 | edf_opt > length(obj$x)) {
       stop(
         "`edf` must be greater than `k + 1` and less than n. See ",
         "`obj$edf_min` and `obj$edf_1se` for reasonable choices."
@@ -211,12 +213,12 @@ bootstrap_trendfilter <- function(obj,
   x_eval <- x_eval %||% obj$x
 
   stopifnot(is.numeric(x_eval))
-  if (any(x_eval < min(obj$x) || x_eval > max(obj$x))) {
+  if (any(x_eval < min(obj$x) | x_eval > max(obj$x))) {
     stop("One of more values in `x_eval` is outside the observed `x` range.")
   }
 
   stopifnot(
-    is.numeric(mc_cores) && length(mc_cores) == 1 && round(mc_cores) == mc_cores
+    is.numeric(mc_cores) & length(mc_cores) == 1 & round(mc_cores) == mc_cores
   )
 
   mc_cores <- min(
@@ -226,7 +228,7 @@ bootstrap_trendfilter <- function(obj,
   ) %>%
     as.integer()
 
-  if (mc_cores < detectCores() / 2 && mc_cores < B) {
+  if (mc_cores < detectCores() / 2 & mc_cores < B) {
     warning(
       "Your machine has ", detectCores(), " cores.\n Consider increasing ",
       "`mc_cores` to speed up computation."
@@ -416,7 +418,10 @@ bootstrap_parallel <- function(b,
     lambda = lambda_boot,
     x_eval = x_eval,
     zero_tol = zero_tol
-  ) * scale_xy["y"]
+  ) %>%
+    suppressWarnings()
+
+  tf_estimate_boot <- tf_estimate_boot * scale_xy["y"]
 
   tf_estimate_boot %<>% as.numeric()
   names(tf_estimate_boot) <- NULL
@@ -444,9 +449,10 @@ bootstrap_parallel <- function(b,
 #' @importFrom stats rnorm
 #' @noRd
 parametric_sampler <- function(dat) {
-  dat %>%
+  stopifnot(all(c("fitted_values","weights") %in% names(dat)))
+  dat %<>%
     mutate(
-      y = fitted_values + rnorm(n = n(), sd = 1 / sqrt(weights))
+      y = dat$fitted_values + rnorm(n = n(), sd = 1 / sqrt(dat$weights))
     )
 }
 
@@ -463,9 +469,10 @@ nonparametric_resampler <- function(dat) {
 #' @importFrom magrittr %>%
 #' @noRd
 wild_sampler <- function(dat) {
+  stopifnot(all(c("fitted_values","residuals") %in% names(dat)))
   dat %>%
-    mutate(y = fitted_values +
-             residuals *
+    mutate(y = dat$fitted_values +
+             dat$residuals *
              sample(
                x = c(
                  (1 + sqrt(5)) / 2,
@@ -557,6 +564,7 @@ wild_sampler <- function(dat) {
 #' bands <- vbands(boot_tf)
 
 #' @importFrom dplyr tibble
+#' @importFrom stats quantile
 #' @export
 vbands <- function(obj, level = 0.95) {
   stopifnot(level > 0 & level < 1)
