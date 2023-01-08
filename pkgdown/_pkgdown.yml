@@ -4,7 +4,6 @@ destination: docs/
 url: "https://capolitsch.github.io/trendfiltering"
 
 home:
-  align-items: baseline;
   title: >
     trendfiltering R package • The state-of-the-art method for denoising 1D
     signals
