@@ -14,15 +14,15 @@
 \method{fitted}{trendfilter}(object, ...)
 }
 \arguments{
-\item{object}{Object of class '\code{\link[=trendfilter]{trendfilter}}'.}
+\item{object}{Object of class "\code{\link[=trendfilter]{trendfilter}}".}
 
 \item{...}{Additional named arguments.}
 }
 \description{
-Get fitted values from a '\code{\link[=trendfilter]{trendfilter}}' object.
+Get fitted values from a "\code{\link[=trendfilter]{trendfilter}}" object.
 }
 \details{
-As of now, the additional parameters that can be passed are:
+As of now, the additional named arguments that can be passed are:
 \describe{
 \item{\code{lambda}}{One or more lambda values to compute fitted values for.
 By default, fitted values are computed for every model in

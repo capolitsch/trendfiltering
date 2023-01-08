@@ -21,7 +21,6 @@ get_admm_params <- function(obj_tol = NULL, max_iter = NULL) {
 
 
 #' @importFrom glmgen .tf_fit
-#' @importFrom dplyr last
 #' @importFrom magrittr %>%
 #' @importFrom stats approx
 #' @noRd

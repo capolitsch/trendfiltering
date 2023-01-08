@@ -1,6 +1,7 @@
 # History files
 .Rhistory
 .Rapp.history
+.Rbuildignore
 
 # pkgdown base plot files
 /docs/reference/Rplot*
@@ -49,3 +50,4 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+docs

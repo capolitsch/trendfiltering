@@ -15,8 +15,8 @@ bootstrap_trendfilter(
 )
 }
 \arguments{
-\item{obj}{An object of class '\code{\link[=cv_trendfilter]{cv_trendfilter}}' or
-'\code{\link[=sure_trendfilter]{sure_trendfilter}}'.}
+\item{obj}{An object of class "\code{\link[=cv_trendfilter]{cv_trendfilter}}" or
+"\code{\link[=sure_trendfilter]{sure_trendfilter}}".}
 
 \item{algorithm}{A string specifying which variation of the bootstrap to use. One of
 \code{c("nonparametric", "parametric", "wild")}. See \strong{Details} section below
@@ -29,11 +29,11 @@ computational cost is acceptable).}
 \item{x_eval}{Input grid to evaluate each bootstrap trend filtering estimate on.}
 
 \item{edf}{The desired number of effective degrees of freedom in each bootstrap
-estimate. When \code{obj} is of class \code{\link[=sure_trendfilter]{sure_trendfilter}}',
+estimate. When \code{obj} is of class "\code{\link[=sure_trendfilter]{sure_trendfilter}}",
 \code{edf = obj$edf_min} and \code{edf = obj$edf_1se} are advisible options. When
-\code{obj} is of class \code{\link[=cv_trendfilter]{cv_trendfilter}}', any element of the
-(now vectors) \code{obj$edf_min} and \code{obj$edf_1se} may be a reasonable choice.
-Defaults to \code{edf = obj$edf_min["MAE"]}.}
+\code{obj} is of class "\code{\link[=cv_trendfilter]{cv_trendfilter}}", any element of
+the (now vectors) \code{obj$edf_min} and \code{obj$edf_1se} may be a reasonable
+choice. Defaults to \code{edf = obj$edf_min["MAE"]}.}
 
 \item{mc_cores}{Number of cores to utilize for parallel computing. Defaults to the number
 of cores detected, minus 4.}
@@ -42,12 +42,12 @@ of cores detected, minus 4.}
 may be passed by experts.}
 }
 \value{
-An object of class '\code{bootstrap_trendfilter}' and subclass
-'\code{\link[=trendfilter]{trendfilter}}'. Generic functions such as \code{\link[=predict]{predict()}},
-\code{\link{fitted}}, and \code{\link[=residuals]{residuals()}} may also be called on \code{bootstrap_trendfilter}
-objects, with the same effect as if they were called on the \code{obj} argument
-originally passed to \code{bootstrap_trendfilter()}. A \code{bootstrap_trendfilter}
-object is a list containing the follow elements:
+An object of class "\code{bootstrap_trendfilter}" and subclass
+"\code{\link[=trendfilter]{trendfilter}}". Generic functions such as \code{\link[=predict]{predict()}},
+\code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}} may also be called on
+"\code{bootstrap_trendfilter}" objects, with the same effect as if they were called
+on the \code{obj} argument originally passed to \code{bootstrap_trendfilter()}. A
+"\code{bootstrap_trendfilter}" object is a list containing the follow elements:
 \describe{
 \item{\code{x_eval}}{Input grid that each bootstrap trend filtering estimate was
 evaluated on.}
@@ -92,7 +92,7 @@ quantify the uncertainty in the optimized trend filtering estimate.
 \details{
 One of three possible bootstrap algorithms should be chosen
 according to the criteria below. Pointwise variability bands are then
-obtained by passing the '\code{bootstrap_trendfilter}' object to \code{\link[=vbands]{vbands()}},
+obtained by passing the "\code{bootstrap_trendfilter}" object to \code{\link[=vbands]{vbands()}},
 along with the desired level (e.g. \code{level = 0.95}). Bootstrapping trend
 filtering estimators tends to yield more accurate uncertainties when, for
 each bootstrap estimate, we fix the number of effective degrees of freedom,

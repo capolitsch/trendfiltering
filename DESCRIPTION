@@ -1,7 +1,7 @@
 Type: Package
 Package: trendfiltering
 Title: The state-of-the-art method for denoising 1D signals
-Version: 0.3.2
+Version: 0.3.3
 Authors@R: 
     person(given = "Collin A.", 
            family = "Politsch", 
@@ -15,7 +15,7 @@ Description: A suite of tools for denoising and analyzing one-dimensional
     observed data. Hyperpameter(s) can be optimized by cross validation (with
     any loss function) or by minimizing Stein's unbiased risk estimate. Methods
     are also included for trend filtering uncertainty quantification and a 
-    generalized "relaxed trend filtering" estimator.
+    generalized 'relaxed trend filtering' estimator.
 License: MIT + file LICENSE
 URL: https://capolitsch.github.io/trendfiltering
 BugReports: https://github.com/capolitsch/trendfiltering/issues
@@ -24,14 +24,13 @@ Depends:
 Remotes:
     capolitsch/glmgen/R_pkg/glmgen
 Imports: 
+    stats (>= 4.2.1),
+    matrixStats (>= 0.63.0),
     glmgen (>= 0.0.3),
     dplyr (>= 1.0.10),
     tidyr (>= 1.2.1),
     magrittr (>= 2.0.3),
     rlang (>= 1.0.6),
-    purrr (>= 1.0.0),
-    matrixStats (>= 0.63.0),
-    stats (>= 4.2.1),
     mathjaxr (>= 1.6-0)
 RdMacros: 
     mathjaxr

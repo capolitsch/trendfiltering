@@ -26,10 +26,10 @@ with \code{nlambda} controlling the granularity of the hyperparameter grid.}
 \item{...}{Additional named arguments to pass to \code{\link[=.trendfilter]{.trendfilter()}}.}
 }
 \value{
-An object of class '\code{sure_trendfilter}'. The object has subclass
-'\code{\link[=trendfilter]{trendfilter}}' and may therefore be passed to generic
+An object of class "\code{sure_trendfilter}". The object has subclass
+"\code{\link[=trendfilter]{trendfilter}}" and may therefore be passed to generic
 stats functions such as \code{\link[=predict]{predict()}}, \code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}}.
-More precisely, a '\code{sure_trendfilter}' object is a list with the elements
+More precisely, a "\code{sure_trendfilter}" object is a list with the elements
 below, as well as all elements from the \code{\link[=trendfilter]{trendfilter()}}
 call.
 \describe{

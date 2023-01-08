@@ -28,9 +28,9 @@ freedom in each model.}
 \code{\link[=.trendfilter]{.trendfilter()}}.}
 }
 \value{
-An object of class \code{'trendfilter'}. Generic functions such as
+An object of class "\code{trendfilter}". Generic functions such as
 \code{\link[=predict]{predict()}}, \code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}} may be called on any object
-of class (or subclass) \code{'trendfilter'}. A \code{'trendfilter'} object is a list
+of class (or subclass) "\code{trendfilter}". A "\code{trendfilter}" object is a list
 with the following elements:
 \describe{
 \item{\code{x}}{Vector of observed values for the input variable.}
@@ -63,7 +63,7 @@ This can be done by passing an extra argument \code{max_iter} to the
 \code{max_iter = length(y)}.}
 \item{\code{status}}{For internal use. Output from the C solver.}
 \item{\code{call}}{The function call.}
-\item{\code{scale_xy}}{For internal use.}
+\item{\code{scale_xy}}{Internal scaling parameters.}
 }
 }
 \description{
@@ -78,6 +78,9 @@ y <- eclipsing_binary$flux
 weights <- 1 / eclipsing_binary$std_err^2
 
 fit <- trendfilter(x, y, weights, lambda = exp(10))
+
+x_grid <- seq(min(x), max(x), length = 500)
+y_pred <- predict(fit, x_eval = x_grid)
 }
 \references{
 \enumerate{

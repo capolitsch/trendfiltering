@@ -90,19 +90,23 @@
 #'
 #' 7. Huber loss: \mjsdeqn{Huber(\lambda) =
 #' \frac{1}{n}\sum_{i=1}^{n}L_{\lambda}(Y_i; \delta)}
-#' where\mjsdeqn{\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
-#' |Y_i - \hat{f}(x_i; \lambda)|^2, &
-#' $|Y_i - \hat{f}(x_i; \lambda)| \leq \delta$ \cr
-#' 2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, &
-#' $|Y_i - \hat{f}(x_i; \lambda)| > \delta$}}
+#' where\mjdeqn{\;\;\;\;L_{\lambda}(Y_i; \delta) =
+#' \begin{cases}
+#' |Y_i - \hat{f}(x_i; \lambda)|^2, & |Y_i - \hat{f}(x_i; \lambda)| \leq \delta \cr
+#' 2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, & |Y_i - \hat{f}(x_i; \lambda)| > \delta
+#' \end{cases}}{\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
+#' |Y_i - \hat{f}(x_i; \lambda)|^2, & |Y_i - \hat{f}(x_i; \lambda)| \leq \delta \cr
+#' 2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, & |Y_i - \hat{f}(x_i; \lambda)| > \delta}}
 #'
 #' 8. Weighted Huber loss: \mjsdeqn{wHuber(\lambda) =
 #' \sum_{i=1}^{n}L_{\lambda}(Y_i; \delta)}
-#' where\mjsdeqn{\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
-#' |Y_i - \hat{f}(x_i; \lambda)|^2w_i, &
-#' $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
-#' 2\delta|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} -
-#' \delta^2, & $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta$}}
+#' where\mjdeqn{\;\;\;\;L_{\lambda}(Y_i; \delta) =
+#' \begin{cases}
+#' |Y_i - \hat{f}(x_i; \lambda)|^2w_i, & |Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta \cr
+#' 2\delta|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} - \delta^2, & |Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta
+#' \end{cases}}{\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
+#' |Y_i - \hat{f}(x_i; \lambda)|^2w_i, & |Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta \cr
+#' 2\delta|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} - \delta^2, & |Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta}}
 #'
 #' 9. Mean-squared logarithmic error: \mjsdeqn{MSLE(\lambda) =
 #' \frac{1}{n}\sum_{i=1}^{n}
@@ -124,10 +128,10 @@
 #' my_loss_funcs <- list(MedAE = MedAE)
 #' ```
 #'
-#' @return An object of class '`cv_trendfilter`'. The object has subclass
-#' '[`trendfilter`][`trendfilter()`]' and may therefore be passed to generic
+#' @return An object of class "`cv_trendfilter`". The object has subclass
+#' "[`trendfilter`][`trendfilter()`]" and may therefore be passed to generic
 #' stats functions such as [`predict()`], [`fitted()`], and [`residuals()`].
-#' And more precisely, a '`cv_trendfilter`' object is a list with the elements
+#' And more precisely, a "`cv_trendfilter`" object is a list with the elements
 #' below, as well as all elements from a [`trendfilter()`][`trendfilter()`] call
 #' on the full data set.
 #' \describe{
@@ -222,11 +226,9 @@
 #'   max_iter = 1e4,
 #'   obj_tol = 1e-6
 #' )
-#' @importFrom dplyr tibble filter mutate select arrange case_when group_split
-#' @importFrom dplyr bind_rows
+#' @importFrom dplyr tibble filter mutate arrange group_split
 #' @importFrom tidyr drop_na expand_grid
-#' @importFrom purrr map
-#' @importFrom magrittr %>% %$% %<>%
+#' @importFrom magrittr %>% %<>%
 #' @importFrom rlang %||%
 #' @importFrom parallel mclapply detectCores
 #' @importFrom matrixStats rowSds
@@ -750,10 +752,10 @@ get_internal_loss_funcs <- function() {
 #' filtering analysis on that scale. See the [`sure_trendfilter()`] examples for
 #' a case when the inputs are evenly sampled on the `log10(x)` scale.
 #'
-#' @return An object of class '`sure_trendfilter`'. The object has subclass
-#' '[`trendfilter`][`trendfilter()`]' and may therefore be passed to generic
+#' @return An object of class "`sure_trendfilter`". The object has subclass
+#' "[`trendfilter`][`trendfilter()`]" and may therefore be passed to generic
 #' stats functions such as [`predict()`], [`fitted()`], and [`residuals()`].
-#' More precisely, a '`sure_trendfilter`' object is a list with the elements
+#' More precisely, a "`sure_trendfilter`" object is a list with the elements
 #' below, as well as all elements from the [`trendfilter()`][`trendfilter()`]
 #' call.
 #' \describe{
@@ -833,11 +835,9 @@ get_internal_loss_funcs <- function() {
 #'
 #' sure_tf <- sure_trendfilter(x, y, weights)
 #' @importFrom glmgen .tf_thin .tf_fit .tf_predict
-#' @importFrom dplyr tibble filter mutate select arrange case_when
-#' @importFrom dplyr bind_rows
+#' @importFrom dplyr tibble filter mutate arrange
 #' @importFrom tidyr drop_na
-#' @importFrom purrr map
-#' @importFrom magrittr %>% %$% %<>%
+#' @importFrom magrittr %>% %<>%
 #' @importFrom rlang %||%
 #' @importFrom parallel mclapply detectCores
 #' @importFrom matrixStats rowSds

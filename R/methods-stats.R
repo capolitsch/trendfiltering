@@ -1,14 +1,14 @@
 #' Predict from a trend filtering model
 #'
-#' Get predictions from a '[`trendfilter`][`trendfilter()`]' object.
+#' Get predictions from a "[`trendfilter`][`trendfilter()`]" object.
 #'
 #' @param object
-#'   An object of class/subclass '[`trendfilter`][`trendfilter()`]'.
+#'   An object of class/subclass "[`trendfilter`][`trendfilter()`]".
 #' @param ...
 #'   Additional named arguments.
 #'
 #' @details
-#' As of now, the additional parameters that can be passed are:
+#' As of now, the additional parameters that may be passed are:
 #' \describe{
 #' \item{`lambda`}{One or more lambda values to evaluate predictions for.
 #' By default, predictions are computed for every model in `object$lambda`.}
@@ -20,8 +20,6 @@
 #' }
 #'
 #' @importFrom glmgen .tf_predict
-#' @importFrom dplyr case_when tibble
-#' @importFrom magrittr %<>% %>%
 #' @importFrom rlang %||%
 #' @rdname predict.trendfilter
 #' @export
@@ -50,8 +48,7 @@ predict.trendfilter <- function(object, ...) {
   if (any(names(extra_args) == "x_eval")) {
     x_eval <- extra_args$x_eval
     extra_args$x_eval <- NULL
-    stopifnot(is.numeric(lambda))
-    stopifnot(min(lambda) >= 0L)
+    stopifnot(is.numeric(x_eval))
     if (any(x_eval < min(object$x)) | any(x_eval > max(object$x))) {
       warning("One or more elements of `x_eval` are outside `range(x)`.",
               call. = FALSE)
@@ -111,15 +108,15 @@ predict.trendfilter <- function(object, ...) {
 
 #' Fitted values of a trend filtering model
 #'
-#' Get fitted values from a '[`trendfilter`][`trendfilter()`]' object.
+#' Get fitted values from a "[`trendfilter`][`trendfilter()`]" object.
 #'
 #' @param object
-#'   Object of class '[`trendfilter`][`trendfilter()`]'.
+#'   Object of class "[`trendfilter`][`trendfilter()`]".
 #' @param ...
 #'   Additional named arguments.
 #'
 #' @details
-#' As of now, the additional parameters that can be passed are:
+#' As of now, the additional named arguments that can be passed are:
 #' \describe{
 #' \item{`lambda`}{One or more lambda values to compute fitted values for.
 #' By default, fitted values are computed for every model in
@@ -168,15 +165,15 @@ fitted.trendfilter <- function(object, ...) {
 
 #' Residuals of a trend filtering model
 #'
-#' Get residuals from a '[`trendfilter`][`trendfilter()`]' object.
+#' Get residuals from a "[`trendfilter`][`trendfilter()`]" object.
 #'
 #' @param object
-#'   Object of class '[`trendfilter`][`trendfilter()`]'.
+#'   Object of class "[`trendfilter`][`trendfilter()`]".
 #' @param ...
 #'   Additional named arguments.
 #'
 #' @details
-#' As of now, the additional parameters that can be passed are:
+#' As of now, the additional named arguments that may be passed are:
 #' \describe{
 #' \item{`lambda`}{One or more lambda values to compute model residuals for.
 #' By default, residuals are computed for every model in
@@ -222,7 +219,13 @@ residuals.trendfilter <- function(object, ...) {
     zero_tol <- NULL
   }
 
-  object$y - predict(object, lambda = lambda, x_eval = x_eval, zero_tol = zero_tol, ...)
+  object$y - predict(
+    object,
+    lambda = lambda,
+    x_eval = x_eval,
+    zero_tol = zero_tol,
+    ...
+  )
 }
 
 

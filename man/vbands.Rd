@@ -7,7 +7,7 @@
 vbands(obj, level = 0.95)
 }
 \arguments{
-\item{obj}{A '\code{\link[=bootstrap_trendfilter]{bootstrap_trendfilter}}' object.}
+\item{obj}{A "\code{\link[=bootstrap_trendfilter]{bootstrap_trendfilter}}" object.}
 
 \item{level}{The level of the pointwise variability bands. Defaults to \code{level = 0.95}.}
 }

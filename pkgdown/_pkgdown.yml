@@ -16,8 +16,8 @@ authors:
     href: "https://collinpolitsch.com/"
 
 template:
-  code_folding: show
   bootstrap: 5
+  code_folding: show
   params:
     bootswatch: "cosmo"
   bslib:

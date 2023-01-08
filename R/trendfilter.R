@@ -1,8 +1,7 @@
 #' Fit a trend filtering model (back-end function with more options for experts)
 #'
 #' Back-end function for fitting a trend filtering model, with more options for
-#' experts. For non-experts, use the front-end function
-#' [`'trendfilter'`][`trendfilter()`]'.
+#' experts. For non-experts, use the front-end function [`trendfilter()`].
 #'
 #' @param x
 #'   Vector of observed values for the input variable.
@@ -40,9 +39,9 @@
 #' @param ...
 #'   Additional named arguments. Currently unused.
 #'
-#' @return An object of class `'trendfilter'`. Generic functions such as
+#' @return An object of class "`trendfilter`". Generic functions such as
 #' [`predict()`], [`fitted()`], and [`residuals()`] may be called on any object
-#' of class (or subclass) `'trendfilter'`. A `'trendfilter'` object is a list
+#' of class (or subclass) "`trendfilter`". A "`trendfilter`" object is a list
 #' with the following elements:
 #' \describe{
 #' \item{`x`}{Vector of observed values for the input variable.}
@@ -71,11 +70,11 @@
 #' you may need to increase the maximum number of tolerable iterations in order
 #' to ensure that the ADMM solution has converged to satisfactory precision.
 #' This can be done by passing an extra argument `max_iter` to the
-#' `.trendfilter` function call and increasing it from its default value
+#' `.trendfilter()` function call and increasing it from its default value
 #' `max_iter = length(y)`.}
 #' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
-#' \item{`scale_xy`}{For internal use.}
+#' \item{`scale_xy`}{Internal scaling parameters.}
 #' }
 #'
 #' @references
@@ -107,14 +106,11 @@
 #' )
 
 #' @import mathjaxr
-#' @importFrom glmgen .tf_thin .tf_fit .tf_predict
-#' @importFrom dplyr tibble filter mutate select arrange case_when group_split
-#' @importFrom dplyr bind_rows
+#' @importFrom glmgen .tf_thin .tf_fit
+#' @importFrom dplyr tibble filter mutate arrange
 #' @importFrom tidyr drop_na
-#' @importFrom purrr map
-#' @importFrom magrittr %>% %$% %<>%
+#' @importFrom magrittr %>% %<>%
 #' @importFrom rlang %||%
-#' @importFrom matrixStats rowSds
 #' @importFrom stats median
 #' @aliases dot-trendfilter
 #' @export
@@ -287,9 +283,9 @@
 #'   Additional named arguments to pass to the internal/expert function
 #'   [`.trendfilter()`].
 #'
-#' @return An object of class `'trendfilter'`. Generic functions such as
+#' @return An object of class "`trendfilter`". Generic functions such as
 #' [`predict()`], [`fitted()`], and [`residuals()`] may be called on any object
-#' of class (or subclass) `'trendfilter'`. A `'trendfilter'` object is a list
+#' of class (or subclass) "`trendfilter`". A "`trendfilter`" object is a list
 #' with the following elements:
 #' \describe{
 #' \item{`x`}{Vector of observed values for the input variable.}
@@ -322,7 +318,7 @@
 #' `max_iter = length(y)`.}
 #' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
-#' \item{`scale_xy`}{For internal use.}
+#' \item{`scale_xy`}{Internal scaling parameters.}
 #' }
 #'
 #' @references
@@ -345,6 +341,9 @@
 #' weights <- 1 / eclipsing_binary$std_err^2
 #'
 #' fit <- trendfilter(x, y, weights, lambda = exp(10))
+#'
+#' x_grid <- seq(min(x), max(x), length = 500)
+#' y_pred <- predict(fit, x_eval = x_grid)
 
 #' @export
 trendfilter <- function(x,

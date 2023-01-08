@@ -7,15 +7,15 @@
 \method{predict}{trendfilter}(object, ...)
 }
 \arguments{
-\item{object}{An object of class/subclass '\code{\link[=trendfilter]{trendfilter}}'.}
+\item{object}{An object of class/subclass "\code{\link[=trendfilter]{trendfilter}}".}
 
 \item{...}{Additional named arguments.}
 }
 \description{
-Get predictions from a '\code{\link[=trendfilter]{trendfilter}}' object.
+Get predictions from a "\code{\link[=trendfilter]{trendfilter}}" object.
 }
 \details{
-As of now, the additional parameters that can be passed are:
+As of now, the additional parameters that may be passed are:
 \describe{
 \item{\code{lambda}}{One or more lambda values to evaluate predictions for.
 By default, predictions are computed for every model in \code{object$lambda}.}

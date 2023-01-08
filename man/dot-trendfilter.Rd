@@ -52,9 +52,9 @@ convex optimization algorithm. Defaults to \code{max_iter = length(y)}.}
 \item{...}{Additional named arguments. Currently unused.}
 }
 \value{
-An object of class \code{'trendfilter'}. Generic functions such as
+An object of class "\code{trendfilter}". Generic functions such as
 \code{\link[=predict]{predict()}}, \code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}} may be called on any object
-of class (or subclass) \code{'trendfilter'}. A \code{'trendfilter'} object is a list
+of class (or subclass) "\code{trendfilter}". A "\code{trendfilter}" object is a list
 with the following elements:
 \describe{
 \item{\code{x}}{Vector of observed values for the input variable.}
@@ -83,17 +83,16 @@ reaching the objective tolerance \code{admm_params$obj_tol}. In these situations
 you may need to increase the maximum number of tolerable iterations in order
 to ensure that the ADMM solution has converged to satisfactory precision.
 This can be done by passing an extra argument \code{max_iter} to the
-\code{.trendfilter} function call and increasing it from its default value
+\code{.trendfilter()} function call and increasing it from its default value
 \code{max_iter = length(y)}.}
 \item{\code{status}}{For internal use. Output from the C solver.}
 \item{\code{call}}{The function call.}
-\item{\code{scale_xy}}{For internal use.}
+\item{\code{scale_xy}}{Internal scaling parameters.}
 }
 }
 \description{
 Back-end function for fitting a trend filtering model, with more options for
-experts. For non-experts, use the front-end function
-\code{\link[=trendfilter]{'trendfilter'}}'.
+experts. For non-experts, use the front-end function \code{\link[=trendfilter]{trendfilter()}}.
 }
 \examples{
 data("eclipsing_binary")

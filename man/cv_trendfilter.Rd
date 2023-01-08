@@ -50,10 +50,10 @@ contain integer values \code{1}, ..., \code{V} designating the fold assignments.
 \item{...}{Additional named arguments to pass to \code{\link[=.trendfilter]{.trendfilter()}}.}
 }
 \value{
-An object of class '\code{cv_trendfilter}'. The object has subclass
-'\code{\link[=trendfilter]{trendfilter}}' and may therefore be passed to generic
+An object of class "\code{cv_trendfilter}". The object has subclass
+"\code{\link[=trendfilter]{trendfilter}}" and may therefore be passed to generic
 stats functions such as \code{\link[=predict]{predict()}}, \code{\link[=fitted]{fitted()}}, and \code{\link[=residuals]{residuals()}}.
-And more precisely, a '\code{cv_trendfilter}' object is a list with the elements
+And more precisely, a "\code{cv_trendfilter}" object is a list with the elements
 below, as well as all elements from a \code{\link[=trendfilter]{trendfilter()}} call
 on the full data set.
 \describe{
@@ -177,18 +177,22 @@ within the \code{\link[=cv_trendfilter]{cv_trendfilter()}} output.
 \log\left(\cosh\left((Y_i - \hat{f}(x_i; \lambda))\sqrt{w_i}\right)\right)}
 \item Huber loss: \mjsdeqn{Huber(\lambda) =
 \frac{1}{n}\sum_{i=1}^{n}L_{\lambda}(Y_i; \delta)}
-where\mjsdeqn{\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
-|Y_i - \hat{f}(x_i; \lambda)|^2, &
-$|Y_i - \hat{f}(x_i; \lambda)| \leq \delta$ \cr
-2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, &
-$|Y_i - \hat{f}(x_i; \lambda)| > \delta$}}
+where\mjdeqn{\;\;\;\;L_{\lambda}(Y_i; \delta) =
+\begin{cases}
+|Y_i - \hat{f}(x_i; \lambda)|^2, & |Y_i - \hat{f}(x_i; \lambda)| \leq \delta \cr
+2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, & |Y_i - \hat{f}(x_i; \lambda)| > \delta
+\end{cases}}{\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
+|Y_i - \hat{f}(x_i; \lambda)|^2, & |Y_i - \hat{f}(x_i; \lambda)| \leq \delta \cr
+2\delta|Y_i - \hat{f}(x_i; \lambda)| - \delta^2, & |Y_i - \hat{f}(x_i; \lambda)| > \delta}}
 \item Weighted Huber loss: \mjsdeqn{wHuber(\lambda) =
 \sum_{i=1}^{n}L_{\lambda}(Y_i; \delta)}
-where\mjsdeqn{\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
-|Y_i - \hat{f}(x_i; \lambda)|^2w_i, &
-$|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
-2\delta|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} -
-\delta^2, & $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta$}}
+where\mjdeqn{\;\;\;\;L_{\lambda}(Y_i; \delta) =
+\begin{cases}
+|Y_i - \hat{f}(x_i; \lambda)|^2w_i, & |Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta \cr
+2\delta|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} - \delta^2, & |Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta
+\end{cases}}{\;\;\;\;L_{\lambda}(Y_i; \delta) = \cases{
+|Y_i - \hat{f}(x_i; \lambda)|^2w_i, & |Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta \cr
+2\delta|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} - \delta^2, & |Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta}}
 \item Mean-squared logarithmic error: \mjsdeqn{MSLE(\lambda) =
 \frac{1}{n}\sum_{i=1}^{n}
 \left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|}

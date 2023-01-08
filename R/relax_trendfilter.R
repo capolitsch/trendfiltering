@@ -4,4 +4,4 @@
 #' average gives rise to a second model hyperparameter that requires tuning.
 #'
 #' Fit a relaxed trend filtering model. Generic functions such as [`predict()`],
-#' [`fitted.values()`], and [`residuals()`] may be called on the output.
+#' [`fitted()`], and [`residuals()`] may be called on the output.

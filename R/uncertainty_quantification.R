@@ -4,8 +4,8 @@
 #' quantify the uncertainty in the optimized trend filtering estimate.
 #'
 #' @param obj
-#'   An object of class '[`cv_trendfilter`][cv_trendfilter()]' or
-#'   '[`sure_trendfilter`][sure_trendfilter()]'.
+#'   An object of class "[`cv_trendfilter`][cv_trendfilter()]" or
+#'   "[`sure_trendfilter`][sure_trendfilter()]".
 #' @param algorithm
 #'   A string specifying which variation of the bootstrap to use. One of
 #'   `c("nonparametric", "parametric", "wild")`. See **Details** section below
@@ -18,11 +18,11 @@
 #'   Input grid to evaluate each bootstrap trend filtering estimate on.
 #' @param edf
 #'   The desired number of effective degrees of freedom in each bootstrap
-#'   estimate. When `obj` is of class [`sure_trendfilter`][sure_trendfilter()]',
+#'   estimate. When `obj` is of class "[`sure_trendfilter`][sure_trendfilter()]",
 #'   `edf = obj$edf_min` and `edf = obj$edf_1se` are advisible options. When
-#'   `obj` is of class [`cv_trendfilter`][cv_trendfilter()]', any element of the
-#'   (now vectors) `obj$edf_min` and `obj$edf_1se` may be a reasonable choice.
-#'   Defaults to `edf = obj$edf_min["MAE"]`.
+#'   `obj` is of class "[`cv_trendfilter`][cv_trendfilter()]", any element of
+#'   the (now vectors) `obj$edf_min` and `obj$edf_1se` may be a reasonable
+#'   choice. Defaults to `edf = obj$edf_min["MAE"]`.
 #' @param mc_cores
 #'   Number of cores to utilize for parallel computing. Defaults to the number
 #'   of cores detected, minus 4.
@@ -32,7 +32,7 @@
 #'
 #' @details One of three possible bootstrap algorithms should be chosen
 #' according to the criteria below. Pointwise variability bands are then
-#' obtained by passing the '`bootstrap_trendfilter`' object to [`vbands()`],
+#' obtained by passing the "`bootstrap_trendfilter`" object to [`vbands()`],
 #' along with the desired level (e.g. `level = 0.95`). Bootstrapping trend
 #' filtering estimators tends to yield more accurate uncertainties when, for
 #' each bootstrap estimate, we fix the number of effective degrees of freedom,
@@ -59,12 +59,12 @@
 #' filtering analysis on that scale. See Example 2 below for a case when the
 #' inputs are evenly sampled on the `log10(x)` scale.
 #'
-#' @return An object of class '`bootstrap_trendfilter`' and subclass
-#' '[`trendfilter`][trendfilter()]'. Generic functions such as [`predict()`],
-#' [`fitted`], and [`residuals()`] may also be called on `bootstrap_trendfilter`
-#' objects, with the same effect as if they were called on the `obj` argument
-#' originally passed to `bootstrap_trendfilter()`. A `bootstrap_trendfilter`
-#' object is a list containing the follow elements:
+#' @return An object of class "`bootstrap_trendfilter`" and subclass
+#' "[`trendfilter`][trendfilter()]". Generic functions such as [`predict()`],
+#' [`fitted()`], and [`residuals()`] may also be called on
+#' "`bootstrap_trendfilter`" objects, with the same effect as if they were called
+#' on the `obj` argument originally passed to `bootstrap_trendfilter()`. A
+#' "`bootstrap_trendfilter`" object is a list containing the follow elements:
 #' \describe{
 #' \item{`x_eval`}{Input grid that each bootstrap trend filtering estimate was
 #' evaluated on.}
@@ -496,7 +496,7 @@ wild_sampler <- function(dat) {
 #' [`bootstrap_trendfilter()`].
 #'
 #' @param obj
-#'   A '[`bootstrap_trendfilter`][bootstrap_trendfilter()]' object.
+#'   A "[`bootstrap_trendfilter`][bootstrap_trendfilter()]" object.
 #' @param level
 #'   The level of the pointwise variability bands. Defaults to `level = 0.95`.
 #' @return A tibble with column set `c("x","lower_band","upper_band")`.

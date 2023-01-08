@@ -14,15 +14,15 @@
 \method{residuals}{trendfilter}(object, ...)
 }
 \arguments{
-\item{object}{Object of class '\code{\link[=trendfilter]{trendfilter}}'.}
+\item{object}{Object of class "\code{\link[=trendfilter]{trendfilter}}".}
 
 \item{...}{Additional named arguments.}
 }
 \description{
-Get residuals from a '\code{\link[=trendfilter]{trendfilter}}' object.
+Get residuals from a "\code{\link[=trendfilter]{trendfilter}}" object.
 }
 \details{
-As of now, the additional parameters that can be passed are:
+As of now, the additional named arguments that may be passed are:
 \describe{
 \item{\code{lambda}}{One or more lambda values to compute model residuals for.
 By default, residuals are computed for every model in
