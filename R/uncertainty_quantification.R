@@ -98,8 +98,8 @@
 #' `obj`.}
 #' \item{`k`}{Degree of the trend filtering point estimate (and bootstrap
 #' estimates), inherited from `obj`.}
+#' \item{`scale`}{Internal scaling parameters for the optimization.}
 #' \item{`call`}{The function call.}
-#' \item{`scale_xy`}{For internal use.}
 #' }
 #'
 #' @references
@@ -274,23 +274,23 @@ bootstrap_trendfilter <- function(obj,
   )[[1]]
 
   dat_scaled <- tibble(
-    x = obj$x / obj$scale_xy["x"],
-    y = obj$y / obj$scale_xy["y"],
-    weights = obj$weights * obj$scale_xy["y"]^2
+    x = obj$x / obj$scale["x"],
+    y = obj$y / obj$scale["y"],
+    weights = obj$weights * obj$scale["y"]^2
   )
 
   lambda_opt <- obj$lambda[i_opt]
 
   if (algorithm == "parametric") {
     dat_scaled %<>% mutate(
-      fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale_xy["y"]
+      fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale["y"]
     )
   }
 
   if (algorithm == "wild") {
     dat_scaled %<>% mutate(
-      fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale_xy["y"],
-      residuals = residuals(obj, lambda = lambda_opt) / obj$scale_xy["y"]
+      fitted_values = fitted(obj, lambda = lambda_opt) / obj$scale["y"],
+      residuals = residuals(obj, lambda = lambda_opt) / obj$scale["y"]
     )
   }
 
@@ -303,10 +303,10 @@ bootstrap_trendfilter <- function(obj,
     edf_opt = edf_opt,
     lambda_grid = lambda_grid,
     sampler = sampler,
-    x_eval = x_eval / obj$scale_xy["x"],
+    x_eval = x_eval / obj$scale["x"],
     edf_tol = edf_tol,
     zero_tol = zero_tol,
-    scale_xy = obj$scale_xy,
+    scale = obj$scale,
     mc.cores = mc_cores
   )
 
@@ -355,8 +355,8 @@ bootstrap_trendfilter <- function(obj,
         y = obj$y,
         weights = obj$weights,
         k = obj$k,
-        call = boot.call,
-        scale_xy = obj$scale_xy
+        scale = obj$scale,
+        call = boot.call
       ),
       class = c("bootstrap_trendfilter", "trendfilter", "trendfiltering")
     )
@@ -375,7 +375,7 @@ bootstrap_parallel <- function(b,
                                x_eval,
                                edf_tol,
                                zero_tol,
-                               scale_xy) {
+                               scale) {
   dat_scaled <- sampler(dat_scaled)
 
   fit <- .trendfilter(
@@ -386,7 +386,7 @@ bootstrap_parallel <- function(b,
     lambda = lambda_grid,
     obj_tol = admm_params$obj_tol,
     max_iter = admm_params$max_iter,
-    scale = FALSE
+    scale_data = FALSE
   )
 
   i_min <- which.min(abs(fit$edf - edf_opt))[1]
@@ -405,7 +405,7 @@ bootstrap_parallel <- function(b,
         x_eval,
         edf_tol,
         zero_tol,
-        scale_xy
+        scale
       )
     )
   }
@@ -421,7 +421,7 @@ bootstrap_parallel <- function(b,
   ) %>%
     suppressWarnings()
 
-  tf_estimate_boot <- tf_estimate_boot * scale_xy["y"]
+  tf_estimate_boot <- tf_estimate_boot * scale["y"]
 
   tf_estimate_boot %<>% as.numeric()
   names(tf_estimate_boot) <- NULL
@@ -471,8 +471,7 @@ nonparametric_resampler <- function(dat) {
 wild_sampler <- function(dat) {
   stopifnot(all(c("fitted_values","residuals") %in% names(dat)))
   dat %>%
-    mutate(y = dat$fitted_values +
-             dat$residuals *
+    mutate(y = dat$fitted_values + dat$residuals *
              sample(
                x = c(
                  (1 + sqrt(5)) / 2,

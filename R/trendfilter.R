@@ -34,7 +34,7 @@
 #' @param max_iter
 #'   Maximum number of iterations that we will tolerate for the trend filtering
 #'   convex optimization algorithm. Defaults to `max_iter = length(y)`.
-# @param scale
+# @param scale_data
 #   A logical indicating whether to scale the inputs and outputs.
 #' @param ...
 #'   Additional named arguments. Currently unused.
@@ -58,6 +58,7 @@
 #' numeric vector. Otherwise, fitted values are returned in a matrix with
 #' `length(lambda)` columns, with `fitted_values[,i]` corresponding to the trend
 #' filtering estimate with hyperparameter `lambda[i]`.}
+#' \item{`scale`}{Internal scaling parameters for the optimization.}
 #' \item{`admm_params`}{A list of the parameter values used by the ADMM
 #' algorithm used to solve the trend filtering convex optimization.}
 #' \item{`obj_func`}{The relative change in the objective function over the
@@ -72,9 +73,8 @@
 #' This can be done by passing an extra argument `max_iter` to the
 #' `.trendfilter()` function call and increasing it from its default value
 #' `max_iter = length(y)`.}
-#' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
-#' \item{`scale_xy`}{Internal scaling parameters.}
+#' \item{`status`}{For internal use. Output from the C solver.}
 #' }
 #'
 #' @references
@@ -140,14 +140,17 @@
   stopifnot(length(x) == length(y))
 
   stopifnot(is.numeric(k) & length(k) == 1 & k == round(k))
+
   k %<>% as.integer()
   if (!any(k == 0:2)) stop("`k` must be equal to 0, 1, or 2.")
 
   n <- length(y)
   weights <- weights %||% rep_len(1, n)
+
   stopifnot(is.numeric(weights))
   stopifnot(length(weights) %in% c(1L, n))
   stopifnot(all(weights >= 0L))
+
   if (length(weights) == 1) weights <- rep_len(weights, n)
 
   if (missing(lambda)) {
@@ -168,6 +171,7 @@
       lambda %<>%
         sort.default(decreasing = TRUE)
     }
+
   }
 
   stopifnot(is.numeric(obj_tol) & obj_tol > 0L & length(obj_tol) == 1L)
@@ -186,14 +190,14 @@
   rm(x,y,weights)
   n <- nrow(dat)
 
-  if ("scale" %in% names(extra_args)) {
-    scale <- extra_args$scale
-    extra_args$scale <- NULL
+  if ("scale_data" %in% names(extra_args)) {
+    scale_data <- extra_args$scale_data
+    extra_args$scale_data <- NULL
   } else {
-    scale <- TRUE
+    scale_data <- TRUE
   }
 
-  if (!scale) {
+  if ( !scale_data ) {
     x_scale <- 1
     y_scale <- 1
   } else {
@@ -205,13 +209,13 @@
     mutate(
       x = x / x_scale,
       y = y / y_scale,
-      weights = weights * y_scale^2
+      weights = weights * y_scale ^ 2
     )
 
   admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
   admm_params$x_tol <- admm_params$x_tol / x_scale
 
-  if (min(diff(dat_scaled$x)) <= admm_params$x_tol) {
+  if ( min(diff(dat_scaled$x)) <= admm_params$x_tol ) {
     thin_out <- .tf_thin(
       x = dat_scaled$x,
       y = dat_scaled$y,
@@ -232,8 +236,8 @@
     lambda = lambda
   )
 
-  scale_xy <- c(x_scale, y_scale)
-  names(scale_xy) <- c("x","y")
+  scale <- c(x_scale, y_scale)
+  names(scale) <- c("x","y")
 
   invisible(
     structure(
@@ -245,12 +249,12 @@
         lambda = lambda,
         edf = as.integer(fit$df),
         fitted_values = drop(fit$beta) * y_scale,
+        scale = scale,
         admm_params = admm_params,
         obj_func = drop(fit$obj),
         n_iter = as.integer(fit$iter),
-        status = fit$status,
         call = tf_call,
-        scale_xy = scale_xy
+        status = fit$status
       ),
       class = c("trendfilter", "trendfiltering")
     )
@@ -302,6 +306,7 @@
 #' numeric vector. Otherwise, fitted values are returned in a matrix with
 #' `length(lambda)` columns, with `fitted_values[,i]` corresponding to the trend
 #' filtering estimate with hyperparameter `lambda[i]`.}
+#' \item{`scale`}{Internal scaling parameters for the optimization.}
 #' \item{`admm_params`}{A list of the parameter values used by the ADMM
 #' algorithm used to solve the trend filtering convex optimization.}
 #' \item{`obj_func`}{The relative change in the objective function over the
@@ -316,9 +321,8 @@
 #' This can be done by passing an extra argument `max_iter` to the
 #' `trendfilter` function call and increasing it from its default value
 #' `max_iter = length(y)`.}
-#' \item{`status`}{For internal use. Output from the C solver.}
 #' \item{`call`}{The function call.}
-#' \item{`scale_xy`}{Internal scaling parameters.}
+#' \item{`status`}{For internal use. Output from the C solver.}
 #' }
 #'
 #' @references

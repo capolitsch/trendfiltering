@@ -195,9 +195,9 @@
 #' present, observations with `is.na(y)` or `weights == 0` are dropped).}
 #' \item{`weights`}{Vector of weights for the observed outputs.}
 #' \item{`k`}{Degree of the trend filtering estimates.}
-#' \item{`status`}{For internal use. Output from the C solver.}
+#' \item{`scale`}{Internal scaling parameters for the optimization.}
 #' \item{`call`}{The function call.}
-#' \item{`scale_xy`}{For internal use.}
+#' \item{`status`}{For internal use. Output from the C solver.}
 #' }
 #'
 #' @references
@@ -555,8 +555,8 @@ cv_trendfilter <- function(x,
   edf_1se <- fit$edf[i_1se]
 
   loss_func_names <- names(loss_funcs)
-  scale_xy <- c(x_scale, y_scale)
-  names(scale_xy) <- c("x", "y")
+  scale <- c(x_scale, y_scale)
+  names(scale) <- c("x", "y")
 
   names(lambda_min) <- loss_func_names
   names(lambda_1se) <- loss_func_names
@@ -590,9 +590,9 @@ cv_trendfilter <- function(x,
         y = dat_scaled$y * y_scale,
         weights = dat_scaled$weights / y_scale ^ 2,
         k = k,
-        status = fit$status,
+        scale = scale,
         call = cv_call,
-        scale_xy = scale_xy
+        status = fit$status
       ),
       class = c("cv_trendfilter", "trendfilter", "trendfiltering")
     )
@@ -990,8 +990,8 @@ sure_trendfilter <- function(x,
   ) %>%
     min()
 
-  scale_xy <- c(x_scale, y_scale)
-  names(scale_xy) <- c("x","y")
+  scale <- c(x_scale, y_scale)
+  names(scale) <- c("x","y")
 
   invisible(
     structure(
@@ -1016,9 +1016,9 @@ sure_trendfilter <- function(x,
         y = dat_scaled$y * y_scale,
         weights = dat_scaled$weights / y_scale^2,
         k = k,
-        status = fit$status,
+        scale = scale,
         call = sure_call,
-        scale_xy = scale_xy
+        status = fit$status
       ),
       class = c("sure_trendfilter", "trendfilter", "trendfiltering")
     )

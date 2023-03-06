@@ -17,6 +17,8 @@ authors:
 
 template:
   bootstrap: 5
+  includes:
+    before_title: "<br/><br/><br/>"
   code_folding: show
   params:
     bootswatch: "cosmo"
