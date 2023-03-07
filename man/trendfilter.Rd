@@ -47,6 +47,7 @@ If \code{length(lambda) == 1}, fitted values for the single fit are returned as 
 numeric vector. Otherwise, fitted values are returned in a matrix with
 \code{length(lambda)} columns, with \code{fitted_values[,i]} corresponding to the trend
 filtering estimate with hyperparameter \code{lambda[i]}.}
+\item{\code{scale}}{Internal scaling parameters for the optimization.}
 \item{\code{admm_params}}{A list of the parameter values used by the ADMM
 algorithm used to solve the trend filtering convex optimization.}
 \item{\code{obj_func}}{The relative change in the objective function over the
@@ -61,9 +62,8 @@ to ensure that the ADMM solution has converged to satisfactory precision.
 This can be done by passing an extra argument \code{max_iter} to the
 \code{trendfilter} function call and increasing it from its default value
 \code{max_iter = length(y)}.}
-\item{\code{status}}{For internal use. Output from the C solver.}
 \item{\code{call}}{The function call.}
-\item{\code{scale_xy}}{Internal scaling parameters.}
+\item{\code{status}}{For internal use. Output from the C solver.}
 }
 }
 \description{

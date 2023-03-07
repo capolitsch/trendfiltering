@@ -117,9 +117,9 @@ validation.}
 present, observations with \code{is.na(y)} or \code{weights == 0} are dropped).}
 \item{\code{weights}}{Vector of weights for the observed outputs.}
 \item{\code{k}}{Degree of the trend filtering estimates.}
-\item{\code{status}}{For internal use. Output from the C solver.}
+\item{\code{scale}}{Internal scaling parameters for the optimization.}
 \item{\code{call}}{The function call.}
-\item{\code{scale_xy}}{For internal use.}
+\item{\code{status}}{For internal use. Output from the C solver.}
 }
 }
 \description{

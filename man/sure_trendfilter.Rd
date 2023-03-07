@@ -63,8 +63,7 @@ filtering estimator with hyperparameter \code{lambda_1se}.}
 \item{\code{fitted_values}}{The fitted values of all trend filtering estimates,
 return as a matrix with \code{length(lambda)} columns, with \code{fitted_values[,i]}
 corresponding to the trend filtering estimate with hyperparameter
-\code{lambda[i]}.
-}
+\code{lambda[i]}.}
 \item{\code{admm_params}}{A list of the parameter values used by the ADMM
 algorithm used to solve the trend filtering convex optimization.}
 \item{\code{obj_func}}{The relative change in the objective function over the

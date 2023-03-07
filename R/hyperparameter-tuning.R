@@ -270,7 +270,7 @@ cv_trendfilter <- function(x,
     stopifnot(is.numeric(obj_tol))
     stopifnot(length(obj_tol) == 1L)
     stopifnot(obj_tol > 0L)
-  } else{
+  } else {
     obj_tol <- NULL
   }
 
@@ -281,7 +281,7 @@ cv_trendfilter <- function(x,
     stopifnot(length(max_iter) == 1L)
     stopifnot(max_iter == round(max_iter))
     max_iter %<>% as.integer()
-  } else{
+  } else {
     max_iter <- 0
   }
 
@@ -588,7 +588,7 @@ cv_trendfilter <- function(x,
         V = V,
         x = dat_scaled$x * x_scale,
         y = dat_scaled$y * y_scale,
-        weights = dat_scaled$weights / y_scale ^ 2,
+        weights = dat_scaled$weights / y_scale^2,
         k = k,
         scale = scale,
         call = cv_call,
@@ -789,8 +789,7 @@ get_internal_loss_funcs <- function() {
 #' \item{`fitted_values`}{The fitted values of all trend filtering estimates,
 #' return as a matrix with `length(lambda)` columns, with `fitted_values[,i]`
 #' corresponding to the trend filtering estimate with hyperparameter
-#' `lambda[i]`.
-#' }
+#' `lambda[i]`.}
 #' \item{`admm_params`}{A list of the parameter values used by the ADMM
 #' algorithm used to solve the trend filtering convex optimization.}
 #' \item{`obj_func`}{The relative change in the objective function over the
@@ -875,7 +874,7 @@ sure_trendfilter <- function(x,
     stopifnot(is.numeric(obj_tol))
     stopifnot(length(obj_tol) == 1L)
     stopifnot(obj_tol > 0L)
-  } else{
+  } else {
     obj_tol <- NULL
   }
 
@@ -886,7 +885,7 @@ sure_trendfilter <- function(x,
     stopifnot(length(max_iter) == 1L)
     stopifnot(max_iter == round(max_iter))
     max_iter %<>% as.integer()
-  } else{
+  } else {
     max_iter <- 0
   }
 
@@ -991,7 +990,7 @@ sure_trendfilter <- function(x,
     min()
 
   scale <- c(x_scale, y_scale)
-  names(scale) <- c("x","y")
+  names(scale) <- c("x", "y")
 
   invisible(
     structure(
@@ -1000,8 +999,8 @@ sure_trendfilter <- function(x,
         edf = fit$edf,
         error = error,
         se_error = se_error,
-        training_error = colMeans(squared_residuals_mat) * y_scale ^ 2,
-        optimism = colMeans(optimism_mat) * y_scale ^ 2,
+        training_error = colMeans(squared_residuals_mat) * y_scale^2,
+        optimism = colMeans(optimism_mat) * y_scale^2,
         lambda_min = lambda[i_min],
         lambda_1se = lambda[i_1se],
         edf_min = fit$edf[i_min],

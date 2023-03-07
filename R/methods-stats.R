@@ -51,7 +51,8 @@ predict.trendfilter <- function(object, ...) {
     stopifnot(is.numeric(x_eval))
     if (any(x_eval < min(object$x)) | any(x_eval > max(object$x))) {
       warning("One or more elements of `x_eval` are outside `range(x)`.",
-              call. = FALSE)
+        call. = FALSE
+      )
     }
   } else {
     x_eval <- NULL
@@ -99,7 +100,7 @@ predict.trendfilter <- function(object, ...) {
 
     if (length(object$lambda) == 1) {
       return(p)
-    } else{
+    } else {
       return(matrix(p, ncol = length(lambda)))
     }
   }

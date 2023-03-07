@@ -171,7 +171,6 @@
       lambda %<>%
         sort.default(decreasing = TRUE)
     }
-
   }
 
   stopifnot(is.numeric(obj_tol) & obj_tol > 0L & length(obj_tol) == 1L)
@@ -187,7 +186,7 @@
     arrange(x) %>%
     filter(weights > 0)
 
-  rm(x,y,weights)
+  rm(x, y, weights)
   n <- nrow(dat)
 
   if ("scale_data" %in% names(extra_args)) {
@@ -197,7 +196,7 @@
     scale_data <- TRUE
   }
 
-  if ( !scale_data ) {
+  if (!scale_data) {
     x_scale <- 1
     y_scale <- 1
   } else {
@@ -209,13 +208,13 @@
     mutate(
       x = x / x_scale,
       y = y / y_scale,
-      weights = weights * y_scale ^ 2
+      weights = weights * y_scale^2
     )
 
   admm_params <- get_admm_params(obj_tol, max(max_iter, n, 200L))
   admm_params$x_tol <- admm_params$x_tol / x_scale
 
-  if ( min(diff(dat_scaled$x)) <= admm_params$x_tol ) {
+  if (min(diff(dat_scaled$x)) <= admm_params$x_tol) {
     thin_out <- .tf_thin(
       x = dat_scaled$x,
       y = dat_scaled$y,
@@ -237,14 +236,14 @@
   )
 
   scale <- c(x_scale, y_scale)
-  names(scale) <- c("x","y")
+  names(scale) <- c("x", "y")
 
   invisible(
     structure(
       list(
         x = dat_scaled$x * x_scale,
         y = dat_scaled$y * y_scale,
-        weights = dat_scaled$weights / y_scale ^ 2,
+        weights = dat_scaled$weights / y_scale^2,
         k = as.integer(k),
         lambda = lambda,
         edf = as.integer(fit$df),

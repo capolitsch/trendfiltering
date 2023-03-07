@@ -168,7 +168,7 @@
 #' @importFrom stats residuals fitted sd
 #' @export
 bootstrap_trendfilter <- function(obj,
-                                  algorithm = c("nonparametric","parametric","wild"),
+                                  algorithm = c("nonparametric", "parametric", "wild"),
                                   B = 100L,
                                   x_eval = NULL,
                                   edf = NULL,
@@ -188,12 +188,12 @@ bootstrap_trendfilter <- function(obj,
   if (is.null(edf)) {
     if (any(class(obj) == "cv_trendfilter")) {
       if (sd(obj$weights) > 0L) {
-        edf_opt <- median(obj$edf_min[c(2,4,6,8,9)])
+        edf_opt <- median(obj$edf_min[c(2, 4, 6, 8, 9)])
       } else {
-        edf_opt <- median(obj$edf_min[c(1,3,5,7,9)])
+        edf_opt <- median(obj$edf_min[c(1, 3, 5, 7, 9)])
       }
     } else {
-        edf_opt <- obj$edf_min
+      edf_opt <- obj$edf_min
     }
   } else {
     edf_opt <- edf
@@ -449,7 +449,7 @@ bootstrap_parallel <- function(b,
 #' @importFrom stats rnorm
 #' @noRd
 parametric_sampler <- function(dat) {
-  stopifnot(all(c("fitted_values","weights") %in% names(dat)))
+  stopifnot(all(c("fitted_values", "weights") %in% names(dat)))
   dat %<>%
     mutate(
       y = dat$fitted_values + rnorm(n = n(), sd = 1 / sqrt(dat$weights))
@@ -469,22 +469,21 @@ nonparametric_resampler <- function(dat) {
 #' @importFrom magrittr %>%
 #' @noRd
 wild_sampler <- function(dat) {
-  stopifnot(all(c("fitted_values","residuals") %in% names(dat)))
+  stopifnot(all(c("fitted_values", "residuals") %in% names(dat)))
   dat %>%
     mutate(y = dat$fitted_values + dat$residuals *
-             sample(
-               x = c(
-                 (1 + sqrt(5)) / 2,
-                 (1 - sqrt(5)) / 2
-               ),
-               size = n(),
-               replace = TRUE,
-               prob = c(
-                 (1 + sqrt(5)) / (2 * sqrt(5)),
-                 (sqrt(5) - 1) / (2 * sqrt(5))
-               )
-             )
-    )
+      sample(
+        x = c(
+          (1 + sqrt(5)) / 2,
+          (1 - sqrt(5)) / 2
+        ),
+        size = n(),
+        replace = TRUE,
+        prob = c(
+          (1 + sqrt(5)) / (2 * sqrt(5)),
+          (sqrt(5) - 1) / (2 * sqrt(5))
+        )
+      ))
 }
 
 

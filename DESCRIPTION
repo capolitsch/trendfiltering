@@ -26,7 +26,6 @@ Remotes:
 Imports: 
     stats (>= 4.2.1),
     matrixStats (>= 0.63.0),
-    Rcpp (>= 1.0.9),
     glmgen (>= 0.0.3),
     dplyr (>= 1.0.10),
     tidyr (>= 1.2.1),

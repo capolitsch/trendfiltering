@@ -81,8 +81,8 @@ estimates with hyperparameter values in \code{lambda}, inherited from \code{obj}
 \code{obj}.}
 \item{\code{k}}{Degree of the trend filtering point estimate (and bootstrap
 estimates), inherited from \code{obj}.}
+\item{\code{scale}}{Internal scaling parameters for the optimization.}
 \item{\code{call}}{The function call.}
-\item{\code{scale_xy}}{For internal use.}
 }
 }
 \description{

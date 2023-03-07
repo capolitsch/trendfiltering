@@ -22,18 +22,22 @@
 #' of class `relax_trendfilter`". A "`relax_trendfilter`" object is a
 #' list with the following elements:
 #'
+#' @importFrom dspline d_mat_mult
 relax_trendfilter <- function(obj, alpha, ...) {
-
   d <- d_mat(k = 2, x)
   p <- predict(fit, x_eval = x)
   knots <- x[order(abs(D %*% p), decreasing = T)[1:(fit$edf - k - 1)] + 1]
   basis <- bs(d$phase, knots = knots, degree = k, intercept = F)
   basis.eval <- bs(x.grid, knots = knots, degree = k, intercept = F)
   y.hat <- basis.eval %*% solve(t(basis) %*% basis) %*% t(basis) %*% d$tmp2
-  relaxed.TF <- TF.pred * alpha + y.hat * (1-alpha)
+  relaxed.TF <- TF.pred * alpha + y.hat * (1 - alpha)
 
-  pred.out <- data.frame(tf.pred = TF.pred, reg.spline = y.hat, relaxed.tf = relaxed.TF)
-  names(pred.out) <- c("tf.pred","reg.spline","relaxed.tf")
+  pred.out <- data.frame(
+    tf.pred = TF.pred,
+    reg.spline = y.hat,
+    relaxed.tf = relaxed.TF
+  )
+  names(pred.out) <- c("tf.pred", "reg.spline", "relaxed.tf")
   out.list <- list(preds = pred.out, knots = knots)
 
   if ("edf_radius" %in% names(extra_args)) {
@@ -79,3 +83,4 @@ relax_trendfilter <- function(obj, alpha, ...) {
       )
     )
   }
+}
