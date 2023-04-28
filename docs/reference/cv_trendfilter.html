@@ -342,7 +342,7 @@ $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} \leq \delta$ \cr
 \delta^2, & $|Y_i - \hat{f}(x_i; \lambda)|\sqrt{w_i} > \delta$}\]</p></li>
 <li><p>Mean-squared logarithmic error: \[MSLE(\lambda) =
 \frac{1}{n}\sum_{i=1}^{n}
-\left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|\]</p></li>
+\left|\log(Y_i + 1) - \log(\hat{f}(x_i; \lambda) + 1)\right|^2\]</p></li>
 </ol>
 
 <p>where \(w_i:=\) <code>weights[i]</code>.</p>
